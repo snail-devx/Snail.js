@@ -1,0 +1,15 @@
+{
+  "name": "snail.vue",
+  "description": "依赖【snail】，基于vue封装常用UI组件",
+  "author": "snail_dev@163.com",
+  "license": "MIT",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {},
+  "dependencies": {},
+  "peerDependencies": {
+    "typescript": ">=5.8.2"
+  }
+}

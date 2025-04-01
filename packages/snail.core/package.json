@@ -1,0 +1,15 @@
+{
+  "name": "snail.core",
+  "description": "Snail前端项目核心库，封装基础能力，无界面，无业务逻辑",
+  "author": "snail_dev@163.com",
+  "license": "MIT",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "module": "dist/snail.core.js",
+  "types": "dist/snail.core.d.ts",
+  "scripts": {},
+  "peerDependencies": {
+    "typescript": ">=5.8.2"
+  }
+}

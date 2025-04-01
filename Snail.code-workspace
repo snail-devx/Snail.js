@@ -1,0 +1,50 @@
+{
+	"folders": [
+		{
+			"path": "./",
+		}
+		//{
+		//	"path": "Snail.Core"
+		//},
+		//{
+		//	"path": "Snail.Vue"
+		//},
+		//{
+		//	"path": "Snail.Rollup"
+		//},
+		//{
+		//	"path": "Snail.Rollup.Plugins"
+		//},
+		//{
+		//	"path": ".packages"
+		//}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			//
+			"packages/snail.rollup**": true,
+			//	纯粹生成的npm包目录，忽略package.json文件，避免干扰VSCode的怕【NPN脚本】栏目
+			"packages/**/node_modules": true,
+			"release/**/package.json": true,
+			"LICENSE": true,
+			"pnpm-workspace.yaml": true,
+			"pnpm-lock.yaml": true,
+			"package-lock.json": true,
+			"*.code-workspace": true,
+		},
+		"svn.ignoreMissingSvnWarning": true
+	},
+	"extensions": {
+		"recommendations": [
+			"ecmel.vscode-html-css",
+			"esbenp.prettier-vscode",
+			"vitest.explorer",
+			"Vue.volar"
+		]
+	}
+}

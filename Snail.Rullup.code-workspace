@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"path": "./",
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			//
+			"packages/snail.core": true,
+			"packages/snail.vue": true,
+			//	固定文件隐藏，减少干扰
+			"packages/**/node_modules": true,
+			"release/**/package.json": true,
+			"LICENSE": true,
+			"pnpm-workspace.yaml": true,
+			"pnpm-lock.yaml": true,
+			"package-lock.json": true,
+			"*.code-workspace": true,
+		}
+	}
+}

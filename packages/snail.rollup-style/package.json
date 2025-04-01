@@ -1,0 +1,11 @@
+{
+  "name": "@snail/rollup-style",
+  "description": "配合【@snail/rollup-builder】使用的插件，支持less、css、scss、sass等样式文件打包编译",
+  "author": "snail_dev@163.com",
+  "license": "MIT",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {}
+}

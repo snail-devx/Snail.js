@@ -1,0 +1,11 @@
+{
+  "name": "@snail/rollup-vue",
+  "description": "配合【@snail/rollup-builder】使用的插件，支持Vue文件编译打包",
+  "author": "snail_dev@163.com",
+  "license": "MIT",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {}
+}

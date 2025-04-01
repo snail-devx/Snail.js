@@ -1,0 +1,40 @@
+// https://www.tslang.cn/docs/handbook/compiler-options.html
+{
+    "compilerOptions": {
+        //  基础配置
+        "moduleResolution": "node",
+        //      目标语言的版本；生成代码的模板标准
+        "target": "ESNext",
+        "module": "ESNext",
+        //      打包器，强制干掉注释，精简一下
+        "removeComments": true,
+        "stripInternal": false,
+        //      开启所有严格的类型检查、并在代码中注入'use strict'、允许null、undefined赋值给其他变量
+        "strict": true,
+        "alwaysStrict": true,
+        "strictNullChecks": false,
+        //      不允许隐式的any类型
+        "noImplicitAny": false,
+        //      TS需要引用的库，即声明文件，es5 默认引用dom、es5、scripthost,如需要使用es的高级版本特性，通常都需要配置，如es8的数组新特性需要引入"ES2019.Array"
+        "lib": [
+            "ES2019",
+            "DOM",
+        ],
+        //      不允许编译器编译JS，JSX文件；避免出现：(!) Plugin typescript: @rollup/plugin-typescript TS5055: Cannot write file '/Common/Core/LM.js' because it would overwrite input file.
+        "allowJs": false,
+        "checkJs": false,
+        //  .d.ts文件；相关配置；默认不生成，使用专有dts文件生成命令
+        "declaration": false,
+        //  解决import fs from "fs" 报错的问题
+        "allowSyntheticDefaultImports": true
+    },
+    "vueCompilerOptions": {
+        "target": 2.7
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "include": [
+        "packages/*/src",
+    ]
+}

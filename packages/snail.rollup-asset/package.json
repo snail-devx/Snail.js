@@ -1,0 +1,11 @@
+{
+  "name": "@snail/rollup-asset",
+  "description": "配合【@snail/rollup-builder】使用的插件，支持静态资源文件拷贝到输出目录",
+  "author": "snail_dev@163.com",
+  "license": "MIT",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {}
+}

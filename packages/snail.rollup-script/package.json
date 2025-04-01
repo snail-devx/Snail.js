@@ -1,0 +1,11 @@
+{
+  "name": "@snail/rollup-script",
+  "description": "配合【@snail/rollup-builder】使用的插件，支持ts、js、cjs、mjs等js脚本文件打包编译",
+  "author": "snail_dev@163.com",
+  "license": "MIT",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {}
+}

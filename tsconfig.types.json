@@ -1,0 +1,14 @@
+//  生成 .d.ts 文件是的tsc配置文件：继承【tsconfig.json】配置，然后重写部分配置
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        //  不移除注释
+        "removeComments": false,
+        //  仅输出.d.ts文件，不输出js文件内容
+        "emitDeclarationOnly": true,
+        "declaration": true,
+        //  输出路径；这个通过命令行外部自己传入： --rootDir "...\snail.core\src" --declarationDir "...\snail.core\dist\types"
+        // "declarationDir": "./dist/types",
+        // "outFile": "./dist/index.d.ts",
+    },
+}

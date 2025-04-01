@@ -1,0 +1,22 @@
+/**
+ * babel相关配置
+ */
+{
+    //  代码注释是否包含到输出文件中
+    "comments": false,
+    //  预设兼容环境
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                // 设置为false,否则babel会在rollup有机会执行其操作之前导致我们的模块转化为commonjs
+                "modules": false,
+                //  2019年发布的浏览器主要版本和iOS版本；Android先和chrome保持一致
+                "targets": {
+                    "chrome": "73",
+                    "ios": "13.0"
+                }
+            }
+        ]
+    ]
+}

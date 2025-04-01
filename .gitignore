@@ -2,6 +2,14 @@
 # https://modelica.org/
 # Ignore temporary files, build results, simulation files
 
+
+
+# 自定义
+node_modules
+release/
+packages/**/dist
+
+
 ## Modelica-specific files
 *~
 *.bak
