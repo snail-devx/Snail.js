@@ -74,7 +74,8 @@ export namespace url {
     export function getOrigin(server: string): string | undefined {
         try {
             const url = new URL(server);
-            return `${url.protocol}//${url.host}`;
+            // return `${url.protocol}//${url.host}`;
+            return url.origin;
         }
         catch (ex: any) {
             console.error(`getOrigin[${server}] throw an exception:${ex.message}`);

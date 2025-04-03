@@ -263,13 +263,14 @@ export function newId(): string {
  * @param paths 钻取数据的key路径集合
  * @returns T|undefined
  */
-export function drilling<T>(data: any, ...paths: string[]): T {
-    for (let index = 0; index < paths.length; index++) {
-        const key = paths[index];
-        data = (data || {})[key];
-        //  钻取失败，中断循环
-        if (data == undefined) {
-            break;
+export function drilling<T>(data: any, paths?: string[]): T {
+    if (isArrayNotEmpty(paths) == true) {
+        for (let key of paths) {
+            data = (data || {})[key];
+            //  钻取失败，中断循环
+            if (data == undefined) {
+                break;
+            }
         }
     }
     return data as T;

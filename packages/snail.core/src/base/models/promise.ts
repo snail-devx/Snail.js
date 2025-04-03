@@ -20,7 +20,6 @@ export type FlatPromise<T> = {
     reject: <T>(reason: T) => any;
 };
 
-
 /**
  * 异步操作结果；如http请求，dialog弹窗、、
  */

@@ -16,6 +16,7 @@ export * from "./base/promise"
 
 // ******************************      web      ******************************
 export * from "./web/http";
+export * from "./web/script";
 export * from "./web/server";
 export * from "./web/style";
 export * from "./web/url";

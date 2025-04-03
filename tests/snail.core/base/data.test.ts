@@ -152,10 +152,10 @@ describe("newId", () => {
 test("drilling", () => {
     expect(drilling.call(undefined)).toBeUndefined();
     expect(drilling(1)).toBe(1);
-    expect(drilling({}, "1", "2")).toBeUndefined();
-    expect(drilling(undefined, "1", "2")).toBeUndefined();
-    expect(drilling({ "toBen": "11" }, "toBen")).toBe("11");
-    expect(drilling({ "toBen": undefined }, "toBen")).toBeUndefined();
-    expect(drilling({ "toBen": { drilling: 33 } }, "toBen", "drilling")).toBe(33);
-    expect(drilling({ "toBen": {} }, "toBen", "drilling")).toBe(undefined);
+    expect(drilling({}, ["1", "2"])).toBeUndefined();
+    expect(drilling(undefined, ["1", "2"])).toBeUndefined();
+    expect(drilling({ "toBen": "11" }, ["toBen"])).toBe("11");
+    expect(drilling({ "toBen": undefined }, ["toBen"])).toBeUndefined();
+    expect(drilling({ "toBen": { drilling: 33 } }, ["toBen", "drilling"])).toBe(33);
+    expect(drilling({ "toBen": {} }, ["toBen", "drilling"])).toBe(undefined);
 });

@@ -73,7 +73,7 @@ export type HttpInterceptor = {
      * - promise时，中断http请求，此promise将作为回调结果；如从缓存直取数据
      * - 其他值，继续执行；不做任何处理
      */
-    request?<T>(request: HttpRequest): boolean | Promise<T>;
+    request?(request: HttpRequest): boolean | Promise<any>;
 
     /**
      * HTTP请求成功后调用
@@ -84,7 +84,7 @@ export type HttpInterceptor = {
      * - any时，作为http请求响应结果数据
      * - Promise时，等待执行完成，内部修改是返回给调用方成功还是失败，并给出具体值
      */
-    resolve?<T>(data: T, response: HttpResponse<T>, request: HttpRequest): T | Promise<T>;
+    resolve?(data: any, response: HttpResponse<any>, request: HttpRequest): any | Promise<any>;
 
     /**
      * HTTP请求失败后调用
@@ -95,7 +95,7 @@ export type HttpInterceptor = {
      * - any时，作为http请求失败原因
      * - Promise时，等待执行完成，内部修改是返回给调用方成功还是失败，并给出具体值
      */
-    reject?(reason: HttpError, response: HttpResponse<any>, request: HttpRequest): any | Promise<any>;
+    reject?(reason: any, response: HttpResponse<any>, request: HttpRequest): any | Promise<any>;
 }
 
 /**

@@ -6,7 +6,8 @@ import { ensureString, getType, hasOwnProperty, isFunction, isNullOrUndefined, i
 import { throwIfTrue, throwIfUndefined } from "../base/error";
 import { defer } from "../base/promise";
 import { HttpOptions, HttpInterceptor, IHttpClient, HttpRequest, HttpResponse, HttpError } from "./models/http";
-import { url } from "./url";
+import { IServerManager, ServerOptions } from "./models/server";
+import { server } from "./server";
 
 /**
  * HTTP模块：实现HTTP请求的封装
@@ -59,10 +60,11 @@ export namespace http {
          * @returns 请求结果，基于响应content-type做转换
          */
         function send<T>(request: HttpRequest): Promise<T> {
+            //  正则匹配，若外部加了g，则可能存在全局缓存；得清理lastIndex
             const interceptors: HttpInterceptor[] = [...INTERCEPTORS, ...hcInterceptors]
                 .filter(item => typeof (item.match) == "string"
                     ? request.url.toLowerCase() == item.match
-                    : item.match.test(request.url)
+                    : (item.match.lastIndex = 0, item.match.test(request.url))
                 );
             //  1、执行HTTP请求：运行请求拦截器，若拦截成功则不用执行实际的http请求了
             let requestPromise: Promise<HttpResponse<T>> = undefined;
@@ -87,7 +89,7 @@ export namespace http {
                 reason => Promise.reject(reason)
             )
             interceptors.forEach(interceptor => {
-                responsePromise = requestPromise.then(
+                responsePromise = responsePromise.then(
                     data => helper.runResponseInterceptor(data, response, request, interceptor, true),
                     reason => helper.runResponseInterceptor(reason, response, request, interceptor, false)
                 );
@@ -120,6 +122,17 @@ export namespace http {
         //  返回构建对象
         const hc: IHttpClient = { config, intercept, send, get, post };
         return hc;
+    }
+    /**
+     * 基于服务器配置创建HTTP请求客户端
+     * @param code 服务器编码
+     * @param type 服务器类型值，不传入则走默认的"DEFAULT_ServerType"；不存在报错
+     * @param sm 服务器管理器，不传则默认全局server
+     * @returns HTTP客户端实例
+     */
+    export function createByServer(code: string, type: keyof (ServerOptions) = "api", sm: IServerManager = server): IHttpClient {
+        const orign: string = sm.getUrl(code, type);
+        return create(orign);
     }
 
     /** 备份的配置；在config时若传入undefined等值，做还原 */
@@ -257,47 +270,39 @@ namespace helper {
             return deferred.promise;
         }
         //  3、发送fetch；解析响应结果
-        fetch(requetUrl, fOptions)
-            .then(
-                response => {
-                    //  状态码非ok，判定为失败
-                    if (response.ok === false) {
-                        const message = `response status is not OK:${response.status} ${response.statusText}`;
-                        return deferred.reject<HttpError>({ type: "response", status: response.status, message, request });
-                    }
-                    //  解析返回结果：基于响应结果类型分析；后期做成字典映射，if太多
-                    const contentType = response.headers.get("content-type");
-                    const tmpFunc = (tp: Promise<any>, type: string) => {
-                        tp.then(
-                            data => deferred.resolve({ data, status: response.status, body: response.body, headers: response.headers }),
-                            reason => {
-                                const message: string = `${type} failed:${reason}`;
-                                deferred.reject<HttpError>({ type: "response", status: response.status, message, request })
-                            }
-                        )
-                    };
-                    //      json格式
-                    if (REGEX_JSON_CONTENTTYPE.test(contentType) == true) {
-                        tmpFunc(response.json(), "get json");
-                    }
-                    //      text格式
-                    else if (REGEX_TEXT_CONTENTTYPE.test(contentType) == true) {
-                        tmpFunc(response.text(), "get text");
-                    }
-                    //      默认
-                    else {
-                        tmpFunc(Promise.resolve(response.body), "get body");
-                    }
-                },
-                reason => {
-                    //  AbortError 超时时 controller.abort 方法抛出的错误，特殊处理
-                    const message = reason && reason.name == "AbortError"
-                        ? "request is timeout"
-                        : `fetch error:${reason}`;
-                    deferred.reject<HttpError>({ type: "response", status: -200, message, request });
+        fetch(requetUrl, fOptions).then(
+            hr => {
+                //  状态码非ok，判定为失败
+                if (hr.ok === false) {
+                    const message = `response status is not ok:${hr.status} ${hr.statusText}`;
+                    return deferred.reject<HttpError>({ type: "response", status: hr.status, message, request });
                 }
-            )
-            .finally(() => timeoutId !== undefined && clearTimeout(timeoutId));
+                //  解析返回结果：基于响应结果类型分析；后期做成字典映射，if太多
+                /*  json格式->text->body：json、text的promise常规来回不会报错
+                    除非response的content-type和body值不匹配；但目前来说没有
+                 */
+                const contentType = hr.headers.get("content-type");
+                const resolve = (data: any) => {
+                    deferred.resolve({ data, status: hr.status, body: hr.body, headers: hr.headers });
+                }
+                if (REGEX_JSON_CONTENTTYPE.test(contentType) == true) {
+                    hr.json().then(resolve);
+                }
+                else if (REGEX_TEXT_CONTENTTYPE.test(contentType) == true) {
+                    hr.text().then(resolve);
+                }
+                else {
+                    resolve(hr.body);
+                }
+            },
+            reason => {
+                //  AbortError 超时时 controller.abort 方法抛出的错误，特殊处理
+                const message = reason && reason.name == "AbortError"
+                    ? "request is timeout"
+                    : `fetch error.${reason}`;
+                deferred.reject<HttpError>({ type: "response", status: -200, message, request });
+            }
+        ).finally(() => timeoutId !== undefined && clearTimeout(timeoutId));
 
         return deferred.promise;
     }
@@ -411,22 +416,22 @@ namespace helper {
         var promise: Promise<HttpResponse<T>> = undefined;
         if (interceptor.request) {
             try {
-                const ret = interceptor.request<T>(request);
+                const ret = interceptor.request(request);
                 //  返回值为promise，则等待promise结果作为响应结果数据
                 if (isPromise(ret) == true) {
                     promise = (ret as Promise<T>).then(
                         data => Promise.resolve<HttpResponse<T>>({ data, status: 200 }),
-                        reason => buildInterceptReject(request, interceptor, `interceptor.request reject:${reason}`)
+                        reason => buildInterceptReject(request, interceptor, `request intercepted with reject.${reason}`)
                     );
                 }
                 //  返回值为false，则强制中断执行
                 else if (ret === false) {
-                    promise = buildInterceptReject(request, interceptor, "abort:interceptor.request return false");
+                    promise = buildInterceptReject(request, interceptor, "request intercepted with false");
                 }
             }
             catch (ex: any) {
                 //@ts-ignore
-                promise = buildInterceptReject(request, interceptor, `run request interceptor error:${ex.message}`, ex);
+                promise = buildInterceptReject(request, interceptor, `request intercepted with error.${ex.message}`, ex);
             }
         }
         return promise;
@@ -449,7 +454,7 @@ namespace helper {
         }
         catch (ex: any) {
             //  @ts-ignore
-            return buildInterceptReject(request, interceptor, `run response interceptor error:${ex.message}`, ex);
+            return buildInterceptReject(request, interceptor, `response intercepted with error.${ex.message}`, ex);
         }
     }
     /**

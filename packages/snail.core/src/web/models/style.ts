@@ -54,7 +54,7 @@ export type StyleOptions = {
 
     /**
      * 样式文件的所在的服务器
-     * - 不指定则使用location.origin
+     * - 优先级： scope -> global-> location
      * @see https://developer.mozilla.org/zh-CN/docs/Web/API/URL/URL#base
      */
     origin: string;
