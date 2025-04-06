@@ -1,29 +1,42 @@
 import { assert, describe, expect, test } from 'vitest'
 import { script } from "../../../packages/snail.core/src/web/script"
+import { http } from '../../../packages/snail.core/src/web/http';
+import { HttpRequest } from '../../../packages/snail.core/src/web/models/http';
 
-
-
-'use strict';
-function newScope3(value) {
-    var testStr = value;
-    const mgr = {
-        value,
-        test: function () {
-            console.log(this === g);
-            debugger;
-            console.log(testStr)
+//  HTTP全局拦截：支持的几种加载模式，返回代码
+{
+    http.intercept({
+        match: /scripts\/amd\.js/i,
+        request(request: HttpRequest) {
+            return Promise.resolve(`
+        `);
         },
-        has: function () {
-            g ? g.test() : mgr.test()
-        }
-    };
-    return mgr;
+    });
+    http.intercept({
+        match: /scripts\/cmd\.js/i,
+        request(request: HttpRequest) {
+            return Promise.resolve(`
+        `);
+        },
+    });
+    http.intercept({
+        match: /scripts\/iife\.js/i,
+        request(request: HttpRequest) {
+            return Promise.resolve(`
+        `);
+        },
+    });
+    http.intercept({
+        match: /scripts\/umd\.js/i,
+        request(request: HttpRequest) {
+            return Promise.resolve(`
+        `);
+        },
+    });
 }
 
-var g = newScope3("g3");
-test("1111", () => {
-    var i = newScope3("i3");
-    i.test.call(g);
-    i.test.call({ fzj: 11111 });
-    i.test();
-})
+//  测试全局
+test("global", async () => {
+    var data = await script.load("scripts/amd.js")
+
+});
