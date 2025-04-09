@@ -54,6 +54,10 @@ export function throwIfNull(data: any, msg: string): void {
 export function throwIfNullOrUndefined(data: any, msg: string): void {
     isNullOrUndefined(data) && throwError(msg);
 }
+//#endregion
+
+//#region *************************************        异常优化        *************************************
+/**
  * 获取异常消息
  * @param error 错误对象；如果是Error及其子类，则error.message；否则error自身
  * @param preMessage 前置消息
