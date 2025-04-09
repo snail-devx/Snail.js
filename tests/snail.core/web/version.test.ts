@@ -37,11 +37,11 @@ function tmpFunc(vm: IVersionManager): void {
 }
 //  全局、私有作用域
 test("global", () => tmpFunc(version));
-test("newScope", () => tmpFunc(version.newScope(null!)));
-test("newScope1", () => tmpFunc(version.newScope({})));
+test("newScope", () => tmpFunc(version.newScope()));
+test("newScope1", () => tmpFunc(version.newScope()));
 //  测试隔离性
 test("private", () => {
-    let vm1 = version, vm2 = version.newScope(), vm3 = version.newScope(Object.create(null));
+    let vm1 = version, vm2 = version.newScope(), vm3 = version.newScope();
     [vm1, vm2, vm3].forEach((vm, index) => {
         vm.config({ version: index + "" });
         vm.addFile("/test?x", "/test?x=" + index)

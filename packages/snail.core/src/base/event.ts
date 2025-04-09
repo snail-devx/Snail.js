@@ -10,18 +10,14 @@ import { EventHandle, EventSender, IEventManager } from "./models/event";
 export namespace event {
     /**
      * 新的事件作用域；执行后返回一个全新的事件管理器对象
-     * - 若传入了context，则将事件方法挂载的context上，否则内部自己构建
      * - 事件作用域为当前上下文特有；不和全局等共享
-     * @param context 上下文对象；
      * @returns 事件管理器对象
      */
-    export function newScope(context?: object): IEventManager {
+    export function newScope(): IEventManager {
         /** 为什么不采用class：
          *      采用class类，即使属性约束为private的属性，编译为js后，也会挂载到this上，不安全（外部可直接操作定义的事件数组）
          *      采用这种方式；确保定义的事件监听100%不会对外暴露，确保安全性
          */
-        /** 管理器对象 */
-        const manager: IEventManager = isObject(context) ? context : Object.create(null);
         /** 事件监听信息：key为事件名，value为监听的事件集合 */
         const events: { [key in string]: EventHandle<any>[] } = Object.create(null);
 
@@ -121,10 +117,9 @@ export namespace event {
         }
 
         //  构建对象属性返回：先定义变量，这样进行型接口约束
-        {
-            const mgr: IEventManager = { on, once, off, trigger };
-            return Object.assign(manager, mgr);
-        }
+        /** 管理器对象 */
+        const manager: IEventManager = Object.freeze({ on, once, off, trigger });
+        return manager;
     }
 
     /** 全局事件管理器对象 */

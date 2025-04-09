@@ -14,12 +14,9 @@ export namespace style {
 
     /**
      * 新的样式作用域：执行后返回一个全新的管理器对象
-     * @param context 上下文对象；
      * @returns 新的管理器对象
      */
-    export function newScope(context?: object): IStyleManager {
-        /** 管理器对象 */
-        const manager: IStyleManager = isObject(context) ? context : Object.create(null);
+    export function newScope(): IStyleManager {
         /**  配置选项：作用域级别*/
         const scopeConfig: StyleOptions = Object.create(null);
         /** 当前样式主题 */
@@ -150,16 +147,16 @@ export namespace style {
         }
         //#endregion
 
-        //  构建对象属性返回；先定义变量，这样进行型接口约束
-        {
-            event.on(EVENT_ChangeTheme, theme);
-            const mgr: IStyleManager = { config, register, theme, destroy };
-            return Object.assign(manager, mgr);
-        }
+        //  事件监听：主题改变事件
+        event.on(EVENT_ChangeTheme, theme);
+
+        /** 管理器对象 */
+        const manager: IStyleManager = Object.freeze({ config, register, theme, destroy });
+        return manager;
     }
 
     /** 全局样式管理 */
-    const global: IStyleManager = newScope(Object.create(null));
+    const global: IStyleManager = newScope();
     /** 备份的配置；在config时若传入undefined等值，做还原 */
     const BAKCONFIG: StyleOptions = Object.freeze(Object.assign({}, CONFIG));
     /**

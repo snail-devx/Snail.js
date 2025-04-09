@@ -19,7 +19,7 @@ export interface IScriptManager extends IScriptHandle {
      * @param files 脚本文件数组
      * @returns 脚本句柄，支持对注册的脚本做销毁等操作
      */
-    register(files: (string | ScriptFile)[]): IScriptHandle;
+    register(...files: (string | ScriptFile)[]): IScriptHandle;
     /**
      * 指定脚本是否已注册
      * @param id 脚本id；传入模块名（如：vue），或者脚本url地址（如：/xx/xhs/test.js）
@@ -37,7 +37,7 @@ export interface IScriptManager extends IScriptHandle {
      * @param loadOptions 脚本加载的配置选项
      * @returns 解析后的脚本对象
      */
-    load<T>(id: string, loadOptions?: ScriptLoadOptions): Promise<T>;
+    load<T>(id: string, loadOptions?: Partial<ScriptLoadOptions>): Promise<T>;
     /**
      * 批量加载脚本：获取脚本内容并执行，返回export对象信息
      * @param ids 脚本id集合：传入模块名（如：vue），或者脚本url地址（如：/xx/xhs/test.js）
@@ -47,7 +47,7 @@ export interface IScriptManager extends IScriptHandle {
      * @param loadOptions 脚本加载的配置选项
      * @returns 解析后的脚本对象，按照ids顺序返回
      */
-    loads(ids: string[], loadOptions?: ScriptLoadOptions): Promise<any[]>;
+    loads(ids: string[], loadOptions?: Partial<ScriptLoadOptions>): Promise<any[]>;
 }
 
 /**
@@ -82,7 +82,7 @@ export type ScriptFile = {
      * - 脚本推荐umd模式
      * - 最终和orign配合得到最终的下载地址
      */
-    url: string;
+    url?: string;
     /**
      * 脚本导出模块
      * - 可在register时传入，即可避免load时重复加载

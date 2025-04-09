@@ -42,6 +42,7 @@ export interface IHttpClient {
  * - 如配置默认的header
  */
 export type HttpOptions = {
+    
     /**
      * HTTP请求默认的content-type值
      * - 不传入默认  application/json;charset=utf-8

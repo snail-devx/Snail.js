@@ -39,14 +39,22 @@ export namespace url {
      * - “\”换成“/” 
      * - 连续“/”换成"/""
      * - 去掉末尾的“/”
-     * @param url 要格式化的url，别传入siteUrl（http://www.baidu.com/x.html），否则会格式化错误
+     * @param url 要格式化的url
      * @returns 格式化好的url地址；无效url（空、非string）返回undefined
      */
     export function format(url: string): string | undefined {
-        // 暂时不去除多个 "//"：
-        return isStringNotEmpty(url)
-            ? url.replace(/\\/g, '/').replace(/\/{2,}/g, '/').replace(/\/+$/, '')
-            : undefined;
+        if (isStringNotEmpty(url) == false) {
+            return undefined;
+        }
+        //  兼容一下siteUrl模式
+        let origin: string = undefined;
+        if (isSite(url) == true) {
+            const tmpUrl = new URL(url);
+            origin = tmpUrl.origin;
+            url = `${tmpUrl.pathname}${tmpUrl.search}${tmpUrl.hash}`;
+        }
+        url = url.replace(/\\/g, '/').replace(/\/{2,}/g, '/').replace(/\/+$/, '');
+        return origin ? `${origin}${url}` : url;
     }
     /**
      * 转换url

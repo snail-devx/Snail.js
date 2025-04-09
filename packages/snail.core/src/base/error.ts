@@ -54,4 +54,15 @@ export function throwIfNull(data: any, msg: string): void {
 export function throwIfNullOrUndefined(data: any, msg: string): void {
     isNullOrUndefined(data) && throwError(msg);
 }
+ * 获取异常消息
+ * @param error 错误对象；如果是Error及其子类，则error.message；否则error自身
+ * @param preMessage 前置消息
+ * @returns 组装好的异常消息；基于${preMessage}${message}
+ */
+export function getMessage(error: Error | any, preMessage: string = ''): string {
+    const message: string = error instanceof Error
+        ? error.message
+        : typeof error == "string" ? error : JSON.stringify(error);
+    return `${preMessage}${message}`;
+}
 //#endregion

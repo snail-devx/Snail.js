@@ -25,6 +25,6 @@ export function defer<T>(): FlatPromise<T> {
  */
 export function delay(timeout?: number): Promise<boolean> {
     return new Promise(resolve => {
-        setTimeout(() => resolve(true), timeout);
+        setTimeout(resolve, timeout, true);
     });
 }

@@ -1,6 +1,6 @@
 import { isArray, isArrayNotEmpty, isNullOrUndefined, isObject, isStringNotEmpty, hasOwnProperty } from "../base/data";
 import { drilling, ensureFunction, ensureString, tidyString, } from "../base/data";
-import { throwError, throwIfNullOrUndefined, throwIfTrue } from "../base/error";
+import { getMessage, throwIfNullOrUndefined, throwIfTrue } from "../base/error";
 import { defer } from "../base/promise";
 import { url } from "./url";
 import { http } from "./http";
@@ -10,7 +10,8 @@ import { IHttpClient } from "./models/http";
 
 /**
  * 脚本模块：支持动态加载指定js模块，支持锚点
- * - 支持cmd、amd、umd和iife方式加载js模块
+ * - 支持amd、umd和iife方式加载js模块
+ * - 不支持cmd中使用require方法，核心为异步方式加载js，require为同步方式，强制报错
  */
 export namespace script {
     /** 全局脚本配置 */
@@ -38,7 +39,7 @@ export namespace script {
          * @param files 脚本文件数组
          * @returns 脚本句柄，支持对注册的脚本做销毁等操作
          */
-        function register(files: (string | ScriptFile)[]): IScriptHandle {
+        function register(...files: (string | ScriptFile)[]): IScriptHandle {
             const sfs: Record<string, ScriptFile> = Object.create(null);
             const defaultOrign: string = options.origin || CONFIG.origin;
             isArrayNotEmpty(files) && files.forEach(file => {
@@ -73,7 +74,7 @@ export namespace script {
          * @returns 存在返回true；否则false
          */
         function has(id: string, referUrl?: string): boolean {
-            return getScriptFile(id, referUrl).script !== undefined;
+            return !!getScriptFile(id, referUrl).script;
         }
         /**
          * 加载指定脚本：获取脚本内容并执行，返回export对象信息
@@ -84,7 +85,7 @@ export namespace script {
          * @remarks 若脚本依赖其他脚本，依赖脚本在当前scope未注册，则会从global中查找
          * @returns 解析后的脚本对象
          */
-        function load<T>(id: string, loadOptions?: ScriptLoadOptions): Promise<T> {
+        async function load<T>(id: string, loadOptions?: Partial<ScriptLoadOptions>): Promise<T> {
             /** 查找脚本：file
              *      1、是否已注册：当前manager是否已注册；未注册则从global全局查找是否注册，达到复用目的
              *      2、未注册：基于id在当manager中就地注册，方便下次复用
@@ -101,66 +102,39 @@ export namespace script {
              */
             isObject(loadOptions) || (loadOptions = { ids: [], refer: undefined });
             isArray(loadOptions.ids) || (loadOptions.ids = []);
-            let trunToGlobal: boolean = false;
-            let hash: string = undefined, file: ScriptFile = undefined;
-            //  1、查找脚本
-            ({ id, script: file, hash } = getScriptFile(id, loadOptions.refer));
+            //  1、查找脚本：若不存在，则尝试global中加载，否则就地全新注册
+            let { script: file, hash } = getScriptFile(id, loadOptions.refer);
             if (file === undefined) {
-                trunToGlobal = manager !== global && global.has(id, loadOptions.refer);
-                if (trunToGlobal == false) {
-                    file = formScriptUrl(id, loadOptions.refer, options.origin || CONFIG.origin);
-                    SCRIPTS[file.id] = file;
+                if (manager !== global && global.has(id, loadOptions.refer) == true) {
+                    return global.load(id, loadOptions);
                 }
+                file = formScriptUrl(id, loadOptions.refer, options.origin || CONFIG.origin);
+                SCRIPTS[file.id] = file;
             }
-            //  2、加载脚本：全局、缓存都不存在时，使用http下载脚本做动态加载
-            let loadTask: Promise<any> = trunToGlobal
-                ? global.load(id, loadOptions)
-                : file.exports !== undefined ? Promise.resolve(file.exports) : undefined;
-            //      需要进行HTTP加载，加载前验证脚本是否死循环，是否有缓存
-            if (loadTask == undefined) {
-                loadTask = LOADTASKMAP[file.id];
-                if (loadOptions.ids.indexOf(file.id) != -1) {
-                    const message = `circular load script.path:${loadOptions.ids.concat(file.id)}`;
-                    return Promise.reject(message);
+            //  2、构建脚本加载任务：若存在exports值，则直接复用返回；否则构建http加载loadTask
+            if (file.exports !== undefined) {
+                return drillScriptByHash(file.exports, hash);
+            }
+            //      判断死循环
+            if (loadOptions.ids.indexOf(file.id) != -1) {
+                const message = getMessage(loadOptions.ids.concat(file.id), `dead loop load script[${file.id}].`);
+                return Promise.reject(message);
+            }
+            //      构建脚本加载任务：复用已有加载任务
+            try {
+                let loadTask: Promise<T> = LOADTASKMAP[file.id];
+                if (loadTask === undefined) {
+                    const fileUrl: string = (options.version || CONFIG.version || version).formart(file.url);
+                    loadTask = buildScriptByUrl(manager, fileUrl, { ids: [...loadOptions.ids, file.id], refer: file.url });
+                    LOADTASKMAP[file.id] = loadTask;
                 }
+                const exports = await loadTask;
+                return drillScriptByHash(exports, hash);
             }
-            //      发送http请求加载脚本
-            if (loadTask == undefined) {
-                const requestUrl: string = (options.version || CONFIG.version || version).formart(file.url);
-                loadTask = HC.get<string>(requestUrl)
-                    .then(
-                        text => {
-                            loadOptions = { ids: [...loadOptions.ids, file.id], refer: file.url };
-                            return buildScriptByText(manager, text, loadOptions);
-                        },
-                        Promise.reject
-                    )
-                    .then(
-                        obj => {
-                            console.log(`load script[${file.id}] success`, obj);
-                            return Promise.resolve(obj);
-                        },
-                        reaon => {
-                            console.error(`load script[${file.id}] failed`, reaon);
-                            return Promise.reject(`load script[${file.id}] failed.${reaon.message}`);
-                        }
-                    );
-                LOADTASKMAP[file.id] = loadTask;
+            catch (ex) {
+                console.error(`load script[${file.id}] failed:`, ex);
+                return Promise.reject(getMessage(ex, `load script[${file.id}] failed.`));
             }
-            //  3、解析hash值
-            let hashes: string[] = (hash || "").split('#').map(item => item.trim()).filter(item => item !== "");
-            return hashes.length == 0
-                ? loadTask
-                : loadTask.then(
-                    data => {
-                        const ret = Object.create(null);
-                        hashes.forEach(item => ret[item] = drilling(data, item.split(".")));
-                        return hashes.length == 1
-                            ? ret[Object.keys(ret)[0]]
-                            : ret;
-                    },
-                    Promise.reject
-                );
         }
         /**
          * 批量加载脚本：获取脚本内容并执行，返回export对象信息
@@ -171,7 +145,7 @@ export namespace script {
          * @remarks 若脚本依赖其他脚本，依赖脚本在当前scope未注册，则会从global中查找
          * @returns 解析后的脚本对象，按照ids顺序返回
          */
-        function loads(ids: string[], loadOptions?: ScriptLoadOptions): Promise<any[]> {
+        function loads(ids: string[], loadOptions?: Partial<ScriptLoadOptions>): Promise<any[]> {
             /* promise.all能确保顺序*/
             return isArrayNotEmpty(ids)
                 ? Promise.all(ids.map(id => load<any>(id, loadOptions)))
@@ -225,7 +199,7 @@ export namespace script {
         }
         //#endregion
 
-        //  管理器对象构建
+        /** 管理器对象 */
         const manager: IScriptManager = Object.freeze({ register, has, load, loads, destroy });
         return manager;
     }
@@ -256,8 +230,8 @@ export namespace script {
      * @param files 脚本文件数组
      * @returns 脚本句柄，支持对注册的脚本做销毁等操作
      */
-    export function register(files: (string | ScriptFile)[]): IScriptHandle {
-        return global.register(files);
+    export function register(...files: (string | ScriptFile)[]): IScriptHandle {
+        return global.register(...files);
     }
     /**
      * 指定脚本是否已注册
@@ -289,8 +263,7 @@ export namespace script {
     export function loads(ids: string[]): Promise<any[]> {
         return global.loads(ids);
     }
-    //#region 
-
+    //#endregion 
 
     //#region *************************************script全局私有助手方法*************************************
     /**
@@ -325,11 +298,11 @@ export namespace script {
                         : undefined;
             scriptUrl = baseUrl ? new URL(file, baseUrl) : new URL(file);
         }
-        //  若url和location.origin同源，则仅使用path；否则加上origin值
+        //  若url和origin同源，则仅使用path；否则加上origin值
         const path: string = url.format(scriptUrl.pathname);
         throwIfTrue(path == "", `file[${path}]is invalid, it is empty after format`);
         return {
-            id: scriptUrl.origin == location.origin
+            id: scriptUrl.origin == defaultOrign
                 ? scriptUrl.pathname.toLowerCase()
                 : `${scriptUrl.origin}${scriptUrl.pathname}`.toLowerCase(),
             url: scriptUrl.href,
@@ -337,59 +310,46 @@ export namespace script {
         }
     }
     /**
-    * 基于文本构建js脚本模块
-    * @param manager 
-    * @param text 
-    * @param loadOptions 
-    * @returns 下载后构建好的js脚本模块
-    */
-    function buildScriptByText(manager: IScriptManager, text: string, loadOptions: ScriptLoadOptions): Promise<any> {
-        /** 支持amd/cmd、umd、iife模式的js脚本解析加载
-         *      1、使用new Function构建方法做执行
-         *      2、拦截define，进行defind方法调用，内部分析ids数据，然后做依赖分析
-         *      3、cmd的require屏蔽掉，不支持；纯异步逻辑，require要求同步加载，这里不支持
-         *      4、对this做拦截，避免指向全局；使用apply改变this指向
-         *      5、全局使用严格模式，避免a=1；这类直接往window上写变量值
-         *          目前效果：a=1；若window上未定义会报错，若定义了，则会直接改了window上的a值
-         *          后续考虑遍历window下的所有变量，在Function之前定义一下，这样Function中就无法直接针对全局赋值了，或者改变变量值了
-         *          但是需要把document等特定key对外开放，可以配置，放到ScriptOptions中配置
-         *  umd模式示例代码：
-                function (global, factory) {
-                    typeof exports === 'object' && typeof module !== 'undefined' 
-                        ? factory(exports, require('../../Core.js'), require('../../Common/UI.Core.js')) 
-                        :typeof define === 'function' && define.amd 
-                            ? define(['exports', '../../Common/Core.js', '../../Common/UI.Core.js'], factory)
-                            :(global = typeof globalThis !== 'undefined' ? globalThis : global || self, 
-                                factory(global.do = global.do || {}, global.core, global.ui));
-                })(this, (function (exports, core, ui) {
-         *   amd模式示例代码：
-                define(['exports', '../../Common/UI.Core.js', '../../Common/Core.js'], (function (exports, ui, core) { 'use strict';
-         */
+     * 基于脚本url地址构建脚本：下载然后动态构建
+     * @param manager 
+     * @param fileUrl 
+     * @param loadOptions 
+     * @returns 
+     */
+    async function buildScriptByUrl(manager: IScriptManager, fileUrl: string, loadOptions: ScriptLoadOptions): Promise<any> {
         const deferred = defer<any>();
         //  1、准备参数，做拦截处理
         /**     amd脚本加载任务：为null表示非amd模式，需要考虑iife等 */
         let amdTask: Promise<any> = undefined;
         /**     全局上下文对象，避免直接指向window */
         const globalThis = Object.create(null);
+        /**     模块挂载的exports变量 */
+        const exports = Object.create(null);
         /**     执行脚本时的全局参数：拦截各种模式的加载逻辑 */
         const globalArgs = Object.create(null);
         {
             globalArgs.globalThis = globalThis;
+            globalArgs.global = globalThis;
+            globalArgs.self = globalThis;
             globalArgs.window = globalThis;
             /*  拦截cmd模式js加载，它利用require，是同步加载方式
              *      typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('./Core.ts'))
              */
-            globalArgs.exports = undefined;
+            globalArgs.exports = exports;
             globalArgs.module = undefined;
             globalArgs.require = function () {
-                deferred.reject(`cmd require function is not support,try to amd.args:${JSON.stringify(arguments)}`);
+                const message = getMessage(arguments, "require function is not supported,try to amd define.args:");
+                deferred.reject(message);
             }
             /** 拦截es模式js加载 import 方法；这个得是同步的
              * import ('/x.js');
+             * @remarks 暂时不支持es模式，后续看情况支持
+             * 代码备份
+             globalArgs.import = function () {
+                const message = getMessage(arguments, "es import function is not supported,try to amd.args:");
+                deferred.reject(message);
+             }
              */
-            globalArgs.import = function () {
-                deferred.reject(`es import function is not support,try to amd.args:${JSON.stringify(arguments)}`)
-            }
             /** 拦截amd的define，完成内部依js脚本处理
              *  1、此方法各种用法都有
              *      define(id?,dependency?, factory)
@@ -402,13 +362,12 @@ export namespace script {
                 const deps: string[] | string = arguments[arguments.length - 2] || undefined;
                 const factory: Function = arguments[arguments.length - 1] || undefined;
                 id && console.warn(`define does not support id[${id}] argument,will ignore it`, { id, deps, factory });
-                ensureFunction(factory, "factory must be a function");
+                ensureFunction(factory, "define arguments 'factory'");
                 //  加载依赖脚本；exports依赖，直接返回amdExports对象，用于导出模块
-                const amdExports = Object.create(null);
                 let hasExportsDep = false;
                 const depTasks: Promise<any>[] = (typeof (deps) == "string" ? [deps] : (deps || []))
                     .map(dep => dep === "exports"
-                        ? (hasExportsDep = true, Promise.resolve(amdExports))
+                        ? (hasExportsDep = true, Promise.resolve(exports))
                         : manager.load<any>(dep, loadOptions)
                     );
                 //  执行factory
@@ -422,7 +381,7 @@ export namespace script {
                     amdTask = Promise.all(depTasks).then(
                         (data: any[]) => {
                             let frt = factory.apply(globalThis, data);
-                            return hasExportsDep == true ? amdExports : frt;
+                            return hasExportsDep ? exports : frt;
                         },
                         reason => Promise.reject(reason)
                     );
@@ -437,18 +396,38 @@ export namespace script {
              *      iife，从globalThis取第一个key作为返回值，无则直接ret。不是很好，需要再优化一下
              *      amd模式：等到结果
              */
+            const text = await HC.get<string>(fileUrl);
             const funcRet = new Function(...Object.keys(globalArgs), `'use strict';${text || ""}`)
                 .apply(globalThis, Object.values(globalArgs));
             amdTask == undefined
-                ? deferred.resolve(isNullOrUndefined(funcRet) ? globalThis[Object.keys[0]] : funcRet)
+                ? deferred.resolve(isNullOrUndefined(funcRet)
+                    ? globalThis[Object.keys(globalThis)[0]]
+                    : funcRet
+                )
                 : amdTask.then(deferred.resolve, deferred.reject);
         }
         catch (ex: any) {
-            console.error("buildScriptByText build script error", ex);
-            deferred.reject(`buildScriptByText build script error:${ex.message}`);
+            console.error("buildScriptByUrl build script error", ex);
+            deferred.reject(getMessage(ex, "buildScriptByUrl build script error:"));
         }
-
         return deferred.promise;
+    }
+    /**
+     * 基于hash钻取脚本
+     * @param exports 脚本导出对象
+     * @param hash hash锚点值
+     * @returns 
+     */
+    export function drillScriptByHash<T>(exports: any, hash: string): T | undefined {
+        const hashes: string[] = (hash || "").split('#').map(item => item.trim()).filter(item => item !== "");
+        if (hashes.length > 0) {
+            const ret = Object.create(null);
+            hashes.forEach(item => ret[item] = drilling(exports, item.split(".")));
+            return hashes.length == 1
+                ? ret[Object.keys(ret)[0]]
+                : ret;
+        }
+        return exports;
     }
     //#endregion
 }

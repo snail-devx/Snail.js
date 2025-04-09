@@ -110,8 +110,8 @@ describe("style-base", () => {
         expect(ele4.parentElement).toBeNull();
     }
     test("global", () => tmpFunc(style, 1));
-    test("scope-null", () => tmpFunc(style.newScope(undefined!), 2));
-    test("scope-Object", () => tmpFunc(style.newScope({}), 3));
+    test("scope-null", () => tmpFunc(style.newScope(), 2));
+    test("scope-Object", () => tmpFunc(style.newScope(), 3));
 });
 
 //  基于配置的相关测试：

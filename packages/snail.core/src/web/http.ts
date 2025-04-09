@@ -1,7 +1,3 @@
-/**
- * HTTP请求模块：实现HTTP请求的封装；支持拦截器、请求配置、响应配置等功能
- */
-
 import { ensureString, getType, hasOwnProperty, isFunction, isNullOrUndefined, isObject, isPromise, isRegexp, isStringNotEmpty, tidyString } from "../base/data";
 import { throwIfTrue, throwIfUndefined } from "../base/error";
 import { defer } from "../base/promise";

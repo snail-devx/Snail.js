@@ -3,6 +3,7 @@
  */
 
 import { ensureFunction, isFunction, isPromise } from "./data";
+import { getMessage } from "./error";
 import { RunResult } from "./models/function";
 import { defer } from "./promise";
 
@@ -23,39 +24,58 @@ export function run<T>(func: (...args: any[]) => T, ...args: any[]): RunResult<T
     catch (ex: any) {
         ret.success = false;
         ret.ex = ex;
-        ret.reason = ex.message;
+        ret.reason = getMessage(ex);
     }
     return ret;
 }
+
 /**
  * 运行异步方法
  * @param func 要运行的异步方法
  * @param args 运行func时所需参数
  * @returns 运行结果
  */
-export function runAsync<T>(func: (...args: any[]) => Promise<T> | T, ...args: any[]): Promise<RunResult<T>> {
-    const ret: RunResult<T | Promise<T>> = run(func, ...args);
-    const deferred = defer<RunResult<T>>();
-    if (isPromise(ret.data) == true) {
-        (ret.data as Promise<T>).then(
-            function (data) {
-                ret.success = true;
-                ret.data = data;
-                deferred.resolve(ret as RunResult<T>);
-            },
-            function (reason) {
-                delete ret.data;
-                ret.success = false;
-                ret.reason = reason;
-                deferred.resolve(ret as RunResult<T>);
-            }
-        );
+export async function runAsync<T>(func: (...args: any[]) => Promise<T> | T, ...args: any[]): Promise<RunResult<T>> {
+    const ret: RunResult<T> = Object.create(null);
+    try {
+        ensureFunction(func, "func");
+        // @ts-ignore
+        ret.data = await func.apply(this, args);
+        ret.success = true;
     }
-    else {
-        deferred.resolve(ret as RunResult<T>);
+    catch (ex: any) {
+        ret.success = false;
+        ret.ex = ex;
+        ret.reason = getMessage(ex);
     }
-    return deferred.promise;
-};
+    return ret;
+
+    /** 改版前的旧代码
+    function runAsync1<T>(func: (...args: any[]) => Promise<T> | T, ...args: any[]): Promise<RunResult<T>> {
+        const ret: RunResult<T | Promise<T>> = run(func, ...args);
+        const deferred = defer<RunResult<T>>();
+        if (isPromise(ret.data) == true) {
+            (ret.data as Promise<T>).then(
+                function (data) {
+                    ret.success = true;
+                    ret.data = data;
+                    deferred.resolve(ret as RunResult<T>);
+                },
+                function (reason) {
+                    delete ret.data;
+                    ret.success = false;
+                    ret.reason = reason;
+                    deferred.resolve(ret as RunResult<T>);
+                }
+            );
+        }
+        else {
+            deferred.resolve(ret as RunResult<T>);
+        }
+        return deferred.promise;
+    };    
+     */
+}
 
 /**
  * 防抖函数：指定延迟时间仅执行最新一次触发

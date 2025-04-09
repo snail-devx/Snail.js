@@ -38,6 +38,8 @@ test("format", () => {
     expect(url.format("\\\\xxx\\\\")).toStrictEqual("/xxx");
     expect(url.format("//xxx\\\\")).toStrictEqual("/xxx");
     expect(url.format("//xxx\\\\")).toStrictEqual("/xxx");
+    expect(url.format("//xxx\\\\")).toStrictEqual("/xxx");
+    expect(url.format("https://fanyi.baidu.com/")).toStrictEqual("https://fanyi.baidu.com");
 })
 test("parse", () => {
     expect(url.parse(undefined!)).toStrictEqual(undefined);

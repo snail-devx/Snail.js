@@ -18,12 +18,9 @@ export namespace version {
     const CONFIG: VersionOptions = { query: "_snv", version: String(new Date().getTime()) };
     /**
      * 新的版本作用域：执行后返回一个全新的管理器对象
-     * @param context 上下文对象；
      * @returns 新的管理器对象
      */
-    export function newScope(context?: object): IVersionManager {
-        /** 管理器对象 */
-        const manager: IVersionManager = isObject(context) ? context : Object.create(null);
+    export function newScope(): IVersionManager {
         /** 配置选项：作用域级别 */
         var scopeConfig: VersionOptions = Object.create(null);
         /** 版本文件：用于指定特定文件的版本信息；key为文件路径（不带查询参数和锚点），value为带有版本的url地址 */
@@ -92,15 +89,13 @@ export namespace version {
                 : `${upr.file}?${upr.queryMap}`;
         }
 
-        //  构建对象属性返回：先定义变量，这样进行型接口约束
-        {
-            const mgr: IVersionManager = { config, getVersion, addFile, formart };
-            return Object.assign(manager, mgr);
-        }
+        /** 管理器对象 */
+        const manager: IVersionManager = Object.freeze({ config, getVersion, addFile, formart });
+        return manager;
     }
 
     /** 全局版本管理 */
-    const global: IVersionManager = newScope(Object.create(null));
+    const global: IVersionManager = newScope();
     /** 备份的配置；在config时若传入undefined等值，做还原 */
     const BAKCONFIG: VersionOptions = Object.freeze(Object.assign({}, CONFIG));
     /**

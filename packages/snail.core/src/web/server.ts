@@ -13,14 +13,10 @@ export namespace server {
 
     /**
      * 创建服务器管理器作用域；执行后返回一个全新的管理器对象
-     * - 若传入了context，将可直接context.addServer、、、、
      * - 事件作用域为当前上下文特有；不和全局等共享
-     * @param context 上下文对象；
      * @returns 服务器管理器对象
      */
-    export function newScope(context?: object): IServerManager {
-        /** 管理器对象 */
-        const manager: IServerManager = isObject(context) ? context : Object.create(null);
+    export function newScope(): IServerManager {
         /** 注册的服务器：key为服务器编码code；value为对应的服务器配置选项 */
         const servers: { [key in string]: ServerOptions } = Object.create(null);
 
@@ -76,11 +72,9 @@ export namespace server {
             return manager;
         }
 
-        //  构建对象属性返回：先定义变量，这样进行型接口约束
-        {
-            const mgr: IServerManager = { register, has, get, getUrl, remove };
-            return Object.assign(manager, mgr);
-        }
+        /** 管理器对象 */
+        const manager: IServerManager = Object.freeze({ register, has, get, getUrl, remove });
+        return manager;
     }
 
     /** 全局服务器配置管理器 */

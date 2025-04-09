@@ -2,6 +2,7 @@ import { assert, describe, expect, test } from 'vitest'
 import { http } from "../../../packages/snail.core/src/web/http"
 import { IHttpClient } from '../../../packages/snail.core/src/web/models/http';
 import { delay } from '../../../packages/snail.core/src/base/promise';
+import { server } from '../../../packages/snail.core/src/web/server';
 
 const hc: IHttpClient = http.create("https://fanyi.baidu.com/");
 //  默认配置：百度接口，没做其他配置，虽然后返回值，状态码200，
@@ -27,6 +28,14 @@ test("default", async () => {
     data = await hc.send({ url: "/mtpe-individual/multimodal", timeout: 0, method: "GET", keepalive: true });
     expect(data).toMatch(/<title>百度翻译-您的超级翻译伙伴（文本、文档翻译）<\/title>/);
 });
+//  createByServer
+test("createByServer", async () => {
+    server.register("test", { "api": "https://fanyi.baidu.com/" });
+    const hc = http.createByServer("test", "api");
+    var data = await hc.send({ url: "/mtpe-individual/multimodal", method: "GET" });
+    expect(data).toMatch(/<title>百度翻译-您的超级翻译伙伴（文本、文档翻译）<\/title>/);
+});
+
 //  content-type测试：只要不报错即可，报错说明有问题：为了测试覆盖率，确保代码执行不报错
 test("content-type", async () => {
     //  测试提交数据content-type
@@ -87,6 +96,7 @@ test("throwError", async () => {
     await expect(() => hc.get("http://127.0.0.1:10234"))
         .rejects.toThrow(/^fetch error\./);
 });
+
 
 //  配置后的http请求
 test("config", async () => {
