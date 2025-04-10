@@ -15,8 +15,8 @@
 			"packages/snail.core": true,
 			"packages/snail.vue": true,
 			//	固定文件隐藏，减少干扰
-			"packages/**/node_modules": true,
 			"release/**/package.json": true,
+			"temp": true,
 			"LICENSE": true,
 			"pnpm-workspace.yaml": true,
 			"pnpm-lock.yaml": true,

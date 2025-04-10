@@ -17,11 +17,12 @@ export const argMap = minimist(process.argv.slice(2));
 /**
  * 构建指定项目包
  * @param {import("../types/package").Package} pkg 
+ * @param {boolean} [clearDistBefore=true] 是否在构建前清除dist目录
  */
-export function buildPackage(pkg) {
+export function buildPackage(pkg, clearDistBefore = true) {
     step(`👉 构建项目：${pkg.dir}\t\t包名：${pkg.name}`);
     log(`  rollupfile : ${pkg.rollupFile}`);
-    reMakeDir(pkg.distRoot);
+    clearDistBefore === true && reMakeDir(pkg.distRoot);
     //  执行rollup构建
     execaSync(
         "rollup",

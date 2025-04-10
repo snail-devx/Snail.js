@@ -83,7 +83,7 @@ function mergeRollupOutput(item) {
         out.format = out.format || "es";
         //  对输出路径进行决定路径处理；都没指定是，基于input路径进行拼接
         out.dir && (out.dir = resolve(pkg.root, out.dir));
-        out.file && (out.file = resolve(pkg.root, out.file));
+        out.file && (out.file = resolve(pkg.distRoot, out.file));
         !out.dir && !out.file && (out.file = resolve(pkg.distRoot, relative(pkg.srcRoot, item.input)));
         //  如果是ts文件，则强制.js
         out.file && (out.file = out.file.replace(/\.ts$/i, ".js"));

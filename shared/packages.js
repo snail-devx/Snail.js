@@ -13,6 +13,10 @@ import { isArrayNotEmpty } from "./base.js"
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 /** 动态加载文件方法 */
 const require = createRequire(import.meta.url)
+/** 临时目录根路径 */
+export const DIR_TEMPROOT = resolve(__dirname, "../temp");
+/** 发布目录根路径 */
+export const DIR_RELEASEROOT = resolve(__dirname, "../release");
 
 /**
  * 所有可用的Packages项目包；从根目录的【packages】目录下自动分析
@@ -45,9 +49,9 @@ export const allPackages = readdirSync(resolve(__dirname, "../packages"))
 
             root,
             srcRoot: resolve(root, "src"),
-            distRoot: resolve(root, "dist"),
-            typesRoot: resolve(root, "dist", "types"),
-            releaseRoot: resolve(__dirname, "../release", dir),
+            distRoot: resolve(DIR_TEMPROOT, dir),
+            typesRoot: resolve(DIR_TEMPROOT, dir, "src"),
+            releaseRoot: resolve(DIR_RELEASEROOT, dir),
 
             packageFile,
             rollupFile
