@@ -1,5 +1,5 @@
 {
-  "name": "@snail/rollup",
+  "name": "snail.rollup",
   "description": "基于Rollup封装的打包工具，基于项目化方式，管理文件依赖边界；脚本输出为独立组件，适合大型Library项目",
   "author": "snail_dev@163.com",
   "license": "MIT",
@@ -8,6 +8,7 @@
   "main": "index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "private": "false",
   "scripts": {},
   "dependencies": {
     "snail.core": "^1.0.0"

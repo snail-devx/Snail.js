@@ -214,7 +214,7 @@ export namespace http {
         }
         //      超时处理
         const controller: AbortController = request.timeout > 0 ? new AbortController() : undefined;
-        const timeoutId: number = controller
+        const timeoutId: NodeJS.Timeout = controller
             ? setTimeout(() => controller.abort(), request.timeout)
             : undefined;
         //  2、构建fetch请求相关信息 RequestInit信息，

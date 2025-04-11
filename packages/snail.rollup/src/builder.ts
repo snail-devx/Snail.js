@@ -5,20 +5,21 @@
 import { BuilderOptions, IRollupBuilder } from "./models/builder";
 import { PluginBuilder } from "./models/component";
 import { ensureString } from "snail.core"
-
 import { resolve } from "path";
 
 /**
  * 获取默认的构建器配置对象
  * @param root 项目根目录；用于构建siteRoot等参数
- * @returns 构建器配置对象
+ * @returns 构建器配置对象；构建规则
+ * - srcRoot为root+src
+ * - siteRoot和distRoot为root+dist
  */
 export function getDefaultOptions(root: string): BuilderOptions {
     ensureString(root, "root");
     return {
         srcRoot: resolve(root, "src"),
         siteRoot: resolve(root, "dist"),
-        distRoot: resolve(root, "dist")
+        distRoot: resolve(root, "dist"),
     }
 }
 

@@ -31,6 +31,12 @@ function releasePackage(pkg) {
     //  2、生成npm包文件
     step(`👉 生成NPM包：${pkg.releaseRoot}`);
     reMakeDir(pkg.releaseRoot);
+    //      递增版本号：后续看情况精确处理
+    execaSync(
+        "npm",
+        ["version", "patch"],
+        { cwd: pkg.root, stdio: "inherit" }
+    );
     //      1、  默认文件：package.json，license，README、、、
     DEFAULT_FILES.forEach(file => {
         const src = resolve(pkg.root, file);
@@ -95,6 +101,11 @@ function releasePackage(pkg) {
         existsSync(src) && (existsSync(dest) || cpSync(src, dest));
     });
     //  3、发布npm包：后续看情况实现
+    execaSync(
+        "npm",
+        ["publish"],
+        { cwd: pkg.releaseRoot, stdio: "inherit" }
+    );
 }
 
 

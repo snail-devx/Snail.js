@@ -3,12 +3,14 @@
   "description": "依赖【snail】，基于vue封装常用UI组件",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "type": "module",
   "main": "index.js",
   "types": "dist/index.d.ts",
   "scripts": {},
-  "dependencies": {},
+  "dependencies": {
+    "snail.core": "^1.0.0"
+  },
   "peerDependencies": {
     "typescript": ">=5.8.2"
   }
