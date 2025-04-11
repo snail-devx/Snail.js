@@ -29,9 +29,6 @@
         //  解决import fs from "fs" 报错的问题
         "allowSyntheticDefaultImports": true
     },
-    "vueCompilerOptions": {
-        "target": 2.7
-    },
     "exclude": [
         "node_modules"
     ],
