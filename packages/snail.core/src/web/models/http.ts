@@ -5,12 +5,6 @@ import { IServerManager } from "./server";
  */
 export interface IHttpClient {
     /**
-     * 配置HTTP客户端
-     * @param options 配置选项
-     * @returns HTTP请求客户端
-     */
-    config(options: Partial<HttpOptions>): IHttpClient;
-    /**
      * 配置客户端HTTP拦截器
      * @param interceptor 
      * @returns Http请求客户端
@@ -42,7 +36,13 @@ export interface IHttpClient {
  * - 如配置默认的header
  */
 export type HttpOptions = {
-    
+    /**
+     * 默认的服务器地址
+     * - 优先级： scope -> global；
+     * - 当 HttpRequest.origin未配置时，则使用此值
+     * - HttpRequest和options都未指定origin时，则需要HttpRequest.url显式指定服务器地址
+     */
+    origin: string;
     /**
      * HTTP请求默认的content-type值
      * - 不传入默认  application/json;charset=utf-8
@@ -105,6 +105,7 @@ export type HttpInterceptor = {
 export type HttpRequest = {
     /**
      * 请求url地址
+     * - HttpRequest和options都未指定origin时，则需要url显式指定服务器地址
      */
     url: string;
     /**
@@ -119,7 +120,8 @@ export type HttpRequest = {
 
     /**
      * 当前url请求服务器地址
-     * - 不传入则使用hc实例的origin值
+     * - 不指定时，使用HttpOptions.origin值
+     * - HttpRequest和options都未指定origin时，则需要HttpRequest.url显式指定服务器地址
      */
     origin?: string;
 

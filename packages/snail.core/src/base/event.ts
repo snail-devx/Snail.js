@@ -8,9 +8,12 @@ import { EventHandle, EventSender, IEventManager } from "./models/event";
  * - 支持新作用域事件 newScope ，和全局事件隔离
  */
 export namespace event {
+    /** 全局事件管理器对象 */
+    const global: IEventManager = newScope();
+
+    //#region ************************************* 公共方法、变量*************************************
     /**
      * 新的事件作用域；执行后返回一个全新的事件管理器对象
-     * - 事件作用域为当前上下文特有；不和全局等共享
      * @returns 事件管理器对象
      */
     export function newScope(): IEventManager {
@@ -121,9 +124,6 @@ export namespace event {
         const manager: IEventManager = Object.freeze({ on, once, off, trigger });
         return manager;
     }
-
-    /** 全局事件管理器对象 */
-    const global: IEventManager = newScope();
     /**
      * 监听全局事件
      * @param name 事件名称
@@ -161,4 +161,5 @@ export namespace event {
     export function trigger<T>(name: string, data?: T, sync?: boolean): IEventManager {
         return global.trigger(name, data, sync);
     }
+    //#endregion
 }

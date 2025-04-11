@@ -16,11 +16,6 @@ export interface IStyleHandle {
  */
 export interface IStyleManager extends IStyleHandle {
     /**
-     * 配置样式管理器
-     * @param options 配置选项
-     */
-    config(options: Partial<StyleOptions>): IStyleManager;
-    /**
      * 注册样式文件
      * - 基于配置origin组装样式文件全路径；未配置origin则使用location.origin
      * - 自动基于version追加版本到querystring中

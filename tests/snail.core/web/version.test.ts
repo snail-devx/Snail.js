@@ -5,8 +5,6 @@ import { IVersionManager } from '../../../packages/snail.core/src/web/models/ver
 const defaultVersion = version.getVersion();
 
 function tmpFunc(vm: IVersionManager): void {
-    vm.config({ version: "1x3", query: "_snvxx" });
-
     expect(vm.getVersion()).toStrictEqual("1x3");
     expect(() => vm.formart("")).toThrow("file must be a string and cannot be empty");
     expect(vm.formart("url?")).toStrictEqual("url?_snvxx=1x3");
@@ -30,20 +28,17 @@ function tmpFunc(vm: IVersionManager): void {
     vm.addFile("/app/test.html?1", "/app/test.html?x=1");
     expect(vm.formart("/app/test.html")).toStrictEqual("/app/test.html?x=1");
 
-    //  
-    vm.config({ version: undefined, query: undefined });
-    expect(vm.formart("url?")).toMatch(/\?_snv=/);
-    expect(vm.getVersion()).toStrictEqual(defaultVersion);
+
 }
 //  全局、私有作用域
+version.config({ version: "1x3", query: "_snvxx" });
 test("global", () => tmpFunc(version));
-test("newScope", () => tmpFunc(version.newScope()));
-test("newScope1", () => tmpFunc(version.newScope()));
+test("newScope", () => tmpFunc(version.newScope({ version: "1x3", query: "_snvxx" })));
+test("newScope1", () => tmpFunc(version.newScope({ version: "1x3", query: "_snvxx" })));
 //  测试隔离性
 test("private", () => {
-    let vm1 = version, vm2 = version.newScope(), vm3 = version.newScope();
+    let vm1 = version.config({ version: "0" }), vm2 = version.newScope({ version: "1" }), vm3 = version.newScope({ version: "2" });
     [vm1, vm2, vm3].forEach((vm, index) => {
-        vm.config({ version: index + "" });
         vm.addFile("/test?x", "/test?x=" + index)
     });
     [vm1, vm2, vm3].forEach((vm, index) => {

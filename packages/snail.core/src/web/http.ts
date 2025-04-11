@@ -1,9 +1,8 @@
-import { ensureString, getType, hasOwnProperty, isFunction, isNullOrUndefined, isObject, isPromise, isRegexp, isStringNotEmpty, tidyString } from "../base/data";
+import { ensureString, extract, hasOwnProperty, tidyString } from "../base/data";
+import { isFunction, isNullOrUndefined, isObject, isPromise, isRegexp, isStringNotEmpty } from "../base/data";
 import { throwIfTrue, throwIfUndefined } from "../base/error";
 import { defer } from "../base/promise";
 import { HttpOptions, HttpInterceptor, IHttpClient, HttpRequest, HttpResponse, HttpError } from "./models/http";
-import { IServerManager, ServerOptions } from "./models/server";
-import { server } from "./server";
 
 /**
  * HTTP模块：实现HTTP请求的封装
@@ -12,41 +11,30 @@ import { server } from "./server";
  */
 export namespace http {
     /** 全局HTTP请求配置 */
-    const CONFIG: HttpOptions = { contentType: undefined, accept: undefined };
+    const CONFIG: HttpOptions = { origin: undefined, contentType: undefined, accept: undefined };
     /** 全局HTTP请求拦截器 */
     const INTERCEPTORS: HttpInterceptor[] = [];
 
+    //#region ************************************* HTTP 公共方法、变量*************************************
     /**
      * 创建HTTP请求客户端
-     * @param origin 请求服务器地址；不传则发送请求时需要显示指定
+     * @param options HTTP配置选项
      * @returns HTTP客户端实例
      */
-    export function create(origin: string): IHttpClient {
-        /** HTTP客户端实例配置选项 */
-        const hcConfig: HttpOptions = Object.create(null);
+    export function create(options?: Partial<HttpOptions>): IHttpClient {
+        options = Object.freeze(checkHttpOptions(options));
         /** HTTP客户端实例拦截器 */
-        const hcInterceptors: HttpInterceptor[] = [];
-        /** 默认的服务器地址 */
-        origin = tidyString(origin);
+        const scopeInterceptors: HttpInterceptor[] = [];
 
         //#region *************************************接口方法：IHttpClient具体实现*************************************
-        /**
-         * 配置Http客户端
-         * @param options 配置选项
-         * @returns Http请求客户端
-         */
-        function config(options: Partial<HttpOptions>): IHttpClient {
-            Object.assign(hcConfig, options);
-            return hc;
-        }
         /**
          * 配置客户端HTTP拦截器
          * @param interceptor 
          * @returns Http请求客户端
          */
         function intercept(interceptor: HttpInterceptor): IHttpClient {
-            interceptor = helper.checkInterceptor(interceptor);
-            hcInterceptors.push(interceptor);
+            interceptor = checkInterceptor(interceptor);
+            scopeInterceptors.push(interceptor);
             return hc;
         }
 
@@ -57,7 +45,7 @@ export namespace http {
          */
         function send<T>(request: HttpRequest): Promise<T> {
             //  正则匹配，若外部加了g，则可能存在全局缓存；得清理lastIndex
-            const interceptors: HttpInterceptor[] = [...INTERCEPTORS, ...hcInterceptors]
+            const interceptors: HttpInterceptor[] = [...INTERCEPTORS, ...scopeInterceptors]
                 .filter(item => typeof (item.match) == "string"
                     ? request.url.toLowerCase() == item.match
                     : (item.match.lastIndex = 0, item.match.test(request.url))
@@ -65,18 +53,18 @@ export namespace http {
             //  1、执行HTTP请求：运行请求拦截器，若拦截成功则不用执行实际的http请求了
             let requestPromise: Promise<HttpResponse<T>> = undefined;
             for (var interceptor of interceptors) {
-                requestPromise = helper.runRequestInterceptor(request, interceptor);
+                requestPromise = runRequestInterceptor(request, interceptor);
                 if (requestPromise) {
                     break;
                 }
             }
             if (requestPromise == undefined) {
                 const defaultHeaders: Record<string, string> = {
-                    "accept": hcConfig.accept || CONFIG.accept || "application/json, text/plain, */*",
-                    "content-type": hcConfig.contentType || CONFIG.contentType || "application/json",
+                    "accept": options.accept || CONFIG.accept || "application/json, text/plain, */*",
+                    "content-type": options.contentType || CONFIG.contentType || "application/json",
                 }
-                request.origin = tidyString(request.origin) || origin;
-                requestPromise = helper.runHttpRequest(request, defaultHeaders);
+                request.origin = tidyString(request.origin) || options.origin || CONFIG.origin;
+                requestPromise = runHttpRequest(request, defaultHeaders);
             }
             //  2、分析结果返回；然后分发执行resolve和reject
             let response: HttpResponse<T> = undefined;
@@ -86,8 +74,8 @@ export namespace http {
             )
             interceptors.forEach(interceptor => {
                 responsePromise = responsePromise.then(
-                    data => helper.runResponseInterceptor(data, response, request, interceptor, true),
-                    reason => helper.runResponseInterceptor(reason, response, request, interceptor, false)
+                    data => runResponseInterceptor(data, response, request, interceptor, true),
+                    reason => runResponseInterceptor(reason, response, request, interceptor, false)
                 );
             });
             return responsePromise;
@@ -111,36 +99,17 @@ export namespace http {
         }
         //#endregion
 
-        //#region *************************************助手方法：处理HTTP请求*************************************
-
-        //#endregion
-
         //  返回构建对象
-        const hc: IHttpClient = { config, intercept, send, get, post };
+        const hc: IHttpClient = Object.freeze({ intercept, send, get, post });
         return hc;
     }
-    /**
-     * 基于服务器配置创建HTTP请求客户端
-     * @param code 服务器编码
-     * @param type 服务器类型值，不传入则走默认的"DEFAULT_ServerType"；不存在报错
-     * @param sm 服务器管理器，不传则默认全局server
-     * @returns HTTP客户端实例
-     */
-    export function createByServer(code: string, type: keyof (ServerOptions) = "api", sm: IServerManager = server): IHttpClient {
-        const orign: string = sm.getUrl(code, type);
-        return create(orign);
-    }
-
-    /** 备份的配置；在config时若传入undefined等值，做还原 */
-    const BAKCONFIG: HttpOptions = Object.freeze(Object.assign({}, CONFIG));
     /**
      * HTTP全局配置
      * @param options 
      */
-    export function config(options: HttpOptions): void {
-        for (var key in CONFIG) {
-            CONFIG[key] = options[key] || BAKCONFIG[key];
-        }
+    export function config(options: Partial<HttpOptions>): void {
+        options = checkHttpOptions(options);
+        Object.assign(CONFIG, options);
     }
     /**
      * HTTP全局拦截器
@@ -148,7 +117,7 @@ export namespace http {
      * @returns 拦截器句柄，可根据需要销毁此拦截器
      */
     export function intercept(interceptor: HttpInterceptor): { destroy(): void } {
-        interceptor = helper.checkInterceptor(interceptor);
+        interceptor = checkInterceptor(interceptor);
         INTERCEPTORS.push(interceptor);
         return {
             destroy() {
@@ -157,32 +126,52 @@ export namespace http {
             },
         }
     }
-}
+    //#endregion
 
-/**
- * HTTP的助手类方法
- * - 完成http请求拦截等逻辑
- * - 不对外提供逻辑，仅为简化http中相关方法逻辑
- */
-namespace helper {
-    /** 允许的METHOD值 */
-    const HTTP_METHODS: Array<String> = ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"];
+    //#region ************************************* HTTP 私有方法  *************************************
     /**
-     * 正则表达式：Content-Type为“application/json”
+     * 检查HTTP请求配置参数
+     * @param options 
+     * @returns 校验后的配置参数
      */
-    const REGEX_JSON_CONTENTTYPE: RegExp = /application\/json/i;
+    function checkHttpOptions(options: Partial<HttpOptions>): HttpOptions {
+        //  仅提取指定key数据，避免外部传入object无效key影响
+        options = extract<HttpOptions>(Object.keys(CONFIG), options);
+        //  清理空数据
+        options.origin = tidyString(options.origin);
+        options.contentType = tidyString(options.contentType);
+        options.accept = tidyString(options.accept);
+
+        return options as HttpOptions;
+    }
     /**
-     * 正则表达式：Content-Type为“application/x-www-form-urlencoded”
+     * 验证拦截器；验证不通过报错
+     * @param interceptor 
+     * @returns 新的拦截器对象；和传入拦截器脱离，避免外部修改影响内部逻辑
      */
-    const REGEX_FORM_CONTENTTYPE: RegExp = /application\/x\-www\-form\-urlencoded/i;
-    /**
-     * 正则表达式：Content-Type为“application/xml”
-    const REGEX_XML_CONTENTTYPE: RegExp = /application\/xml/i;
-     */
-    /**
-     * 正则表达式：Content-Type为“text/*”
-     */
-    const REGEX_TEXT_CONTENTTYPE: RegExp = /text\/*/i;
+    function checkInterceptor(interceptor: HttpInterceptor): HttpInterceptor {
+        isObject(interceptor) || (interceptor = undefined);
+        throwIfUndefined(interceptor, "interceptor must be an Object,like {match,request,resolve,reject}");
+        interceptor.match = isStringNotEmpty(interceptor.match)
+            ? String(interceptor.match).toLowerCase()
+            : isRegexp(interceptor.match) ? interceptor.match : undefined;
+        throwIfUndefined(interceptor.match, "interceptor.match must be a RegExp or not empty string");
+        //  request、resolve、reject不能同时为空
+        interceptor.request = isFunction(interceptor.request) ? interceptor.request : null;
+        interceptor.resolve = isFunction(interceptor.resolve) ? interceptor.resolve : null;
+        interceptor.reject = isFunction(interceptor.reject) ? interceptor.reject : null;
+        let bValue = interceptor.request === null && interceptor.resolve === null && interceptor.reject === null;
+        throwIfTrue(bValue, "interceptor.request/resolve/reject cannot be null at the same time");
+        //  冻结并返回，避免外部修改影响
+        interceptor = {
+            match: interceptor.match,
+            request: interceptor.request,
+            resolve: interceptor.resolve,
+            reject: interceptor.reject
+        };
+        return Object.freeze(interceptor);
+    }
+
     /**
      * 执行HTTP请求
      * @param request 
@@ -190,7 +179,7 @@ namespace helper {
      * @param controller 停止控制器，完成超时时间设置
      * @returns 
      */
-    export function runHttpRequest<T>(request: HttpRequest, defaultHeaders: Record<string, string>): Promise<HttpResponse<T>> {
+    function runHttpRequest<T>(request: HttpRequest, defaultHeaders: Record<string, string>): Promise<HttpResponse<T>> {
         const deferred = defer<HttpResponse<T>>();
         //  1、验证并格式化request
         const headers: Headers = new Headers();
@@ -202,7 +191,7 @@ namespace helper {
             // @ts-ignore 格式化method
             request.method = tidyString(request.method) || "GET";
             throwIfTrue(
-                HTTP_METHODS.indexOf(request.method.toUpperCase()) == -1,
+                ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"].indexOf(request.method.toUpperCase()) == -1,
                 `not support request.method value[${request.method}]`
             )
             //  超时时间：默认1分钟；传入0，不超时
@@ -243,10 +232,10 @@ namespace helper {
         //      body格式化：json和form做处理，其他的原样写入
         if (isNullOrUndefined(request.data) == false) {
             const contentType: string = headers.get("content-type");
-            if (REGEX_JSON_CONTENTTYPE.test(contentType) == true) {
+            if (/application\/json/i.test(contentType) == true) {
                 fOptions.body = JSON.stringify(request.data);
             }
-            else if (REGEX_FORM_CONTENTTYPE.test(contentType) == true) {
+            else if (/application\/x\-www\-form\-urlencoded/i.test(contentType) == true) {
                 fOptions.body = typeof request.data === "object" && String(request.data) !== "[object File]"
                     ? buildFormSubmitData(request.data)
                     : request.data;
@@ -281,10 +270,10 @@ namespace helper {
                 const resolve = (data: any) => {
                     deferred.resolve({ data, status: hr.status, body: hr.body, headers: hr.headers });
                 }
-                if (REGEX_JSON_CONTENTTYPE.test(contentType) == true) {
+                if (/application\/json/i.test(contentType) == true) {
                     hr.json().then(resolve);
                 }
-                else if (REGEX_TEXT_CONTENTTYPE.test(contentType) == true) {
+                else if (/text\/*/i.test(contentType) == true) {
                     hr.text().then(resolve);
                 }
                 else {
@@ -299,7 +288,6 @@ namespace helper {
                 deferred.reject<HttpError>({ type: "response", status: -200, message, request });
             }
         ).finally(() => timeoutId !== undefined && clearTimeout(timeoutId));
-
         return deferred.promise;
     }
     /**
@@ -376,39 +364,12 @@ namespace helper {
     }
 
     /**
-     * 验证拦截器；验证不通过报错
-     * @param interceptor 
-     * @returns 新的拦截器对象；和传入拦截器脱离，避免外部修改影响内部逻辑
-     */
-    export function checkInterceptor(interceptor: HttpInterceptor): HttpInterceptor {
-        isObject(interceptor) || (interceptor = undefined);
-        throwIfUndefined(interceptor, "interceptor must be an Object,like {match,request,resolve,reject}");
-        interceptor.match = isStringNotEmpty(interceptor.match)
-            ? String(interceptor.match).toLowerCase()
-            : isRegexp(interceptor.match) ? interceptor.match : undefined;
-        throwIfUndefined(interceptor.match, "interceptor.match must be a RegExp or not empty string");
-        //  request、resolve、reject不能同时为空
-        interceptor.request = isFunction(interceptor.request) ? interceptor.request : null;
-        interceptor.resolve = isFunction(interceptor.resolve) ? interceptor.resolve : null;
-        interceptor.reject = isFunction(interceptor.reject) ? interceptor.reject : null;
-        let bValue = interceptor.request === null && interceptor.resolve === null && interceptor.reject === null;
-        throwIfTrue(bValue, "interceptor.request/resolve/reject cannot be null at the same time");
-        //  冻结并返回，避免外部修改影响
-        interceptor = {
-            match: interceptor.match,
-            request: interceptor.request,
-            resolve: interceptor.resolve,
-            reject: interceptor.reject
-        };
-        return Object.freeze(interceptor);
-    }
-    /**
      * 执行指定的请求拦截器
      * @param request 
      * @param interceptor 
      * @returns 
      */
-    export function runRequestInterceptor<T>(request: HttpRequest, interceptor: HttpInterceptor): Promise<HttpResponse<T>> | undefined {
+    function runRequestInterceptor<T>(request: HttpRequest, interceptor: HttpInterceptor): Promise<HttpResponse<T>> | undefined {
         var promise: Promise<HttpResponse<T>> = undefined;
         if (interceptor.request) {
             try {
@@ -441,7 +402,7 @@ namespace helper {
      * @param isResolve 是resolve，还是reject
      * @returns 新的promise
      */
-    export function runResponseInterceptor<T>(data: any, response: HttpResponse<T>, request: HttpRequest, interceptor: HttpInterceptor, isResolve: boolean): Promise<T> {
+    function runResponseInterceptor<T>(data: any, response: HttpResponse<T>, request: HttpRequest, interceptor: HttpInterceptor, isResolve: boolean): Promise<T> {
         try {
             const func = isResolve ? interceptor.resolve : interceptor.reject;
             func && (data = func(data, response, request));
@@ -472,4 +433,5 @@ namespace helper {
         }
         return Promise.reject<HttpError>(reason);
     }
+    //#endregion
 }

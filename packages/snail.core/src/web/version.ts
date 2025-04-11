@@ -2,7 +2,7 @@
  * 版本模块：支持url地址版本管理、全局版本号+特定文件版本号
  */
 
-import { ensureString, hasOwnProperty, isObject } from "../base/data";
+import { ensureString, extract, hasOwnProperty, isObject, tidyString } from "../base/data";
 import { throwIfUndefined } from "../base/error";
 import { url } from "./url";
 import { IVersionManager, VersionOptions } from "./models/version";
@@ -14,33 +14,31 @@ import { UrlParseResult } from "./models/url";
  * - 支持新作用域 newScope ，和全局配置隔离
  */
 export namespace version {
+    /** 默认的版本值 */
+    const DEFAULT_VERSION = String(new Date().getTime());
     /** 全局默认版本配置*/
-    const CONFIG: VersionOptions = { query: "_snv", version: String(new Date().getTime()) };
+    const CONFIG: VersionOptions = { query: undefined, version: undefined };
+    /** 全局版本管理 */
+    const global: IVersionManager = newScope();
+
+    //#region ************************************* 公共方法、变量 *************************************
     /**
      * 新的版本作用域：执行后返回一个全新的管理器对象
+     * @param options 配置选项
      * @returns 新的管理器对象
      */
-    export function newScope(): IVersionManager {
-        /** 配置选项：作用域级别 */
-        var scopeConfig: VersionOptions = Object.create(null);
+    export function newScope(options?: Partial<VersionOptions>): IVersionManager {
+        options = Object.freeze(checkVersionOptions(options));
         /** 版本文件：用于指定特定文件的版本信息；key为文件路径（不带查询参数和锚点），value为带有版本的url地址 */
         const versionFiles: { [key in string]: string } = Object.create(null);
 
-        /**
-          * 配置版本管理器
-          * @param options 默认配置选项，将options中的key覆盖配置中
-          * @returns 管理器自身
-          */
-        function config(options: Partial<VersionOptions>): IVersionManager {
-            Object.assign(scopeConfig, options);
-            return manager;
-        }
+        //#region *************************************实现接口：IVersionManager接口方法*************************************
         /**
          * 获取版本值
          * @returns 版本值，未设置则返回全局的
          */
         function getVersion(): string {
-            return scopeConfig.version || CONFIG.version;
+            return options.version || CONFIG.version || DEFAULT_VERSION;
         }
         /**
          * 添加文本版本；满足特定文件走固定版本规则
@@ -67,14 +65,14 @@ export namespace version {
             //  1、准备工作：如果url自带版本号了，则不用处理直接返回
             let upr: UrlParseResult = url.parse(file);
             throwIfUndefined(upr, "file must be a string and cannot be empty");
-            let vQuery = scopeConfig.query || CONFIG.query;
+            let vQuery = options.query || CONFIG.query || "_snv";
             if (upr.queryMap.get(vQuery) !== null) {
                 return file;
             }
             //  2、取文件级别配置，若存在则合并query和hash信息；否则直接追加
             let target = versionFiles[upr.file.toLowerCase()];
             if (target === undefined) {
-                upr.queryMap.append(vQuery, scopeConfig.version || CONFIG.version);
+                upr.queryMap.append(vQuery, getVersion());
             }
             else {
                 let tUpr: UrlParseResult = url.parse(target);
@@ -88,30 +86,21 @@ export namespace version {
                 ? `${upr.file}?${upr.queryMap}#${upr.hash}`
                 : `${upr.file}?${upr.queryMap}`;
         }
+        //#endregion
 
         /** 管理器对象 */
         const manager: IVersionManager = Object.freeze({ config, getVersion, addFile, formart });
         return manager;
     }
-
-    /** 全局版本管理 */
-    const global: IVersionManager = newScope();
-    /** 备份的配置；在config时若传入undefined等值，做还原 */
-    const BAKCONFIG: VersionOptions = Object.freeze(Object.assign({}, CONFIG));
     /**
      * 配置全局版本管理器
      * @param options 默认配置选项
      * @returns 管理器自身
      */
     export function config(options: Partial<VersionOptions>): IVersionManager {
-        //  更新给自己实例，然后再同步到全局；全局配置，只有有值时才更新
-        if (isObject(options) == true) {
-            global.config(options);
-            for (var key in CONFIG) {
-                hasOwnProperty(options, key)
-                    && (CONFIG[key] = options[key] || BAKCONFIG[key]);
-            }
-        }
+        options = checkVersionOptions(options);
+        Object.assign(CONFIG, options);
+
         return global;
     }
     /**
@@ -140,4 +129,22 @@ export namespace version {
     export function formart(url: string): string {
         return global.formart(url);
     }
+    //#endregion
+
+    //#region ************************************* 私有方法 *************************************
+    /**
+     * 检测脚本配置选项
+     * @param options 
+     * @returns 
+     */
+    function checkVersionOptions(options: Partial<VersionOptions>): VersionOptions {
+        //  仅提取指定key数据，避免外部传入object无效key影响
+        options = extract<VersionOptions>(Object.keys(CONFIG), options);
+        //  清理空数据
+        options.query = tidyString(options.query);
+        options.version = tidyString(options.version);
+
+        return options as VersionOptions;
+    }
+    //#endregion
 }

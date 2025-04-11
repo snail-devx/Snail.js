@@ -4,7 +4,7 @@ import { IHttpClient } from '../../../packages/snail.core/src/web/models/http';
 import { delay } from '../../../packages/snail.core/src/base/promise';
 import { server } from '../../../packages/snail.core/src/web/server';
 
-const hc: IHttpClient = http.create("https://fanyi.baidu.com/");
+const hc: IHttpClient = http.create({ origin: "https://fanyi.baidu.com/" });
 //  默认配置：百度接口，没做其他配置，虽然后返回值，状态码200，
 test("default", async () => {
     var data = await hc.send({
@@ -26,13 +26,6 @@ test("default", async () => {
     expect(data).toMatch(/<title>百度翻译-您的超级翻译伙伴（文本、文档翻译）<\/title>/);
     //  无超时时间
     data = await hc.send({ url: "/mtpe-individual/multimodal", timeout: 0, method: "GET", keepalive: true });
-    expect(data).toMatch(/<title>百度翻译-您的超级翻译伙伴（文本、文档翻译）<\/title>/);
-});
-//  createByServer
-test("createByServer", async () => {
-    server.register("test", { "api": "https://fanyi.baidu.com/" });
-    const hc = http.createByServer("test", "api");
-    var data = await hc.send({ url: "/mtpe-individual/multimodal", method: "GET" });
     expect(data).toMatch(/<title>百度翻译-您的超级翻译伙伴（文本、文档翻译）<\/title>/);
 });
 
@@ -84,8 +77,8 @@ test("throwError", async () => {
     await expect(() => hc.send({ url: "/mtpe-individual/multimodal?11", timeout: 1, method: "GET" }))
         .rejects.toThrow("request is timeout");
     //  @ts-ignore
-    await expect(() => http.create("").send({ url: "/mtpe-individual/multimodal" }))
-        .rejects.toThrow("invalid.url:/mtpe-individual/multimodal,orign:null");
+    await expect(() => http.create().send({ url: "/mtpe-individual/multimodal" }))
+        .rejects.toThrow("invalid.url:/mtpe-individual/multimodal,orign:undefined");
     //  @ts-ignore
     await expect(() => http.create("").send({ url: "https://mp.weixin.qq.com/1" }))
         .rejects.toThrow("response status is not ok:404 Not Found");
@@ -103,7 +96,6 @@ test("config", async () => {
     http.config({ accept: "application/json", contentType: "application/json;charset=utf-8" });
     var data = await hc.get("/mtpe-individual/multimodal");
     expect(data).toMatch(/<title>百度翻译-您的超级翻译伙伴（文本、文档翻译）<\/title>/);
-    hc.config({ accept: "application/json", contentType: "application/json;charset=utf-8" });
     var data = await hc.get("/mtpe-individual/multimodal");
     expect(data).toMatch(/<title>百度翻译-您的超级翻译伙伴（文本、文档翻译）<\/title>/);
     http.config({ accept: "application/json", contentType: undefined! });

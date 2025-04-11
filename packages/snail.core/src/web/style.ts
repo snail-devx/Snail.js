@@ -1,4 +1,4 @@
-import { ensureString, isArrayNotEmpty, isObject, isStringNotEmpty } from "../base/data";
+import { ensureString, extract, isArrayNotEmpty, isObject, isStringNotEmpty, tidyString } from "../base/data";
 import { event } from "../base/event";
 import { IStyleHandle, IStyleManager, StyleElement, StyleFile, StyleOptions } from "./models/style";
 import { version } from "./version";
@@ -11,28 +11,24 @@ export namespace style {
     const CONFIG: StyleOptions = { theme: undefined, container: undefined, origin: undefined, version: undefined };
     /** 事件：改变样式主题 */
     const EVENT_ChangeTheme = "Snail.Style.ChangeTheme";
+    /** 全局样式管理 */
+    const global: IStyleManager = newScope();
 
+    //#region ************************************* 公共方法、变量*************************************
     /**
      * 新的样式作用域：执行后返回一个全新的管理器对象
+     * @param options 配置选项
      * @returns 新的管理器对象
      */
-    export function newScope(): IStyleManager {
-        /**  配置选项：作用域级别*/
-        const scopeConfig: StyleOptions = Object.create(null);
+    export function newScope(options?: Partial<StyleOptions>): IStyleManager {
+        /** 脚本配置选项 */
+        options = Object.freeze(checkStyoleOptions(options));
         /** 当前样式主题 */
         var scopeTheme: string = undefined;
         /** 管理的样式文件 */
         const scopeStyles: StyleElement[] = [];
 
         //#region *************************************接口方法：IStyleManager具体实现*************************************
-        /**
-         * 配置样式管理器
-         * @param options 配置选项
-         */
-        function config(options: Partial<StyleOptions>): IStyleManager {
-            Object.assign(scopeConfig, options);
-            return manager;
-        }
         /**
          * 注册样式文件
          * @param files 样式文件；可通过theme指定样式，不指定则是公共样式
@@ -46,7 +42,7 @@ export namespace style {
                 let href: string = typeof (file) == "string" ? file : file.file;
                 ensureString(href, "href");
                 const theme: string = typeof (file) == "string" ? undefined : (file.theme || undefined);
-                let tmpStr: string = scopeConfig.origin || CONFIG.origin;
+                let tmpStr: string = options.origin || CONFIG.origin;
                 isStringNotEmpty(tmpStr) && (href = new URL(href, tmpStr).toString());
                 //  2、基于file（不处理query和hash）+theme查重，若已经存在则不用新加入到syleFiles中，此时判断element是否有效
                 tmpStr = href.toLowerCase();
@@ -61,12 +57,12 @@ export namespace style {
                 if (!style.element) {
                     //  基于version,构建href版本信息
                     style.element = document.createElement("link");
-                    style.element.href = (scopeConfig.version || CONFIG.version || version).formart(style.file);
+                    style.element.href = (options.version || CONFIG.version || version).formart(style.file);
                     style.element.rel = "stylesheet";
                     style.element.disabled = true;
                     theme && style.element.setAttribute("data-theme", theme);
                     //  自己的Container-》global-》默认body下创建一个固定的
-                    let container: HTMLElement = scopeConfig.container || CONFIG.container
+                    let container: HTMLElement = options.container || CONFIG.container
                         || document.getElementById("snail_style_container");
                     if (!container) {
                         container = document.createElement("div");
@@ -120,7 +116,7 @@ export namespace style {
                     || (style.theme != undefined && style.theme != code);
             });
             //  组件没实现指定主题时，则基于默认主题做一下匹配，启用默认主题支持
-            let defaultTheme: string = hasMatchTheme ? undefined : (scopeConfig.theme || CONFIG.theme);
+            let defaultTheme: string = hasMatchTheme ? undefined : (options.theme || CONFIG.theme);
             defaultTheme && styles.forEach(style => {
                 style.theme == defaultTheme && (style.element.disabled = style.ref == 0)
             });
@@ -154,21 +150,13 @@ export namespace style {
         const manager: IStyleManager = Object.freeze({ config, register, theme, destroy });
         return manager;
     }
-
-    /** 全局样式管理 */
-    const global: IStyleManager = newScope();
-    /** 备份的配置；在config时若传入undefined等值，做还原 */
-    const BAKCONFIG: StyleOptions = Object.freeze(Object.assign({}, CONFIG));
     /**
      * 配置样式管理器
      * @param options 配置选项
      */
     export function config(options: Partial<StyleOptions>): IStyleManager {
-        /*更新给自己实例，然后再同步到全局；全局配置，只有有值时才更新*/
-        global.config(options);
-        for (var key in CONFIG) {
-            CONFIG[key] = options[key] || BAKCONFIG[key];
-        }
+        options = checkStyoleOptions(options);
+        Object.assign(CONFIG, options);
         return global;
     }
     /**
@@ -197,4 +185,23 @@ export namespace style {
     export function destroy(): void {
         global.destroy();
     }
+    //#endregion
+
+
+    //#region ************************************* 私有方法  *************************************
+    /**
+     * 检测样式配置选项
+     * @param options 
+     * @returns
+     */
+    function checkStyoleOptions(options: Partial<StyleOptions>): StyleOptions {
+        //  仅提取指定key数据，避免外部传入object无效key影响
+        options = extract<StyleOptions>(Object.keys(CONFIG), options);
+        //  清理空数据
+        options.theme = tidyString(options.theme);
+        options.origin = tidyString(options.origin);
+
+        return options as StyleOptions;
+    }
+    //#endregion
 }

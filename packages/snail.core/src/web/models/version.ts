@@ -3,12 +3,6 @@
  */
 export interface IVersionManager {
     /**
-     * 配置版本管理器
-     * @param options 默认配置选项，将options中的key覆盖配置中
-     * @returns 管理器自身
-     */
-    config(options: Partial<VersionOptions>): IVersionManager;
-    /**
      * 获取版本值
      * @returns 版本值，未设置则返回全局的
      */

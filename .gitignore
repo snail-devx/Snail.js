@@ -7,8 +7,8 @@
 # 自定义
 node_modules
 release/
-packages/**/dist
-temp/**
+/packages/**/dist
+/temp
 
 
 ## Modelica-specific files

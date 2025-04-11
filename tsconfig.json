@@ -19,6 +19,7 @@
         "lib": [
             "ES2019",
             "DOM",
+            "ESNext"
         ],
         //      不允许编译器编译JS，JSX文件；避免出现：(!) Plugin typescript: @rollup/plugin-typescript TS5055: Cannot write file '/Common/Core/LM.js' because it would overwrite input file.
         "allowJs": false,

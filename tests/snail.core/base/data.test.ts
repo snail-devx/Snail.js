@@ -1,5 +1,5 @@
 import { assert, describe, expect, test } from 'vitest'
-import { drilling, ensureFunction, ensureString, getType, hasAny, hasOwnProperty, isArray, isArrayNotEmpty, isBoolean, isDate, isFalsey, isFunction, isNull, isNullOrUndefined, isNumber, isNumberNotNaN, isObject, isPromise, isRegexp, isString, isStringNotEmpty, isUndefined, isWindow, newId, tidyFunction, tidyString } from "../../../packages/snail.core/src/base/data"
+import { drill, extract, ensureFunction, ensureString, getType, hasAny, hasOwnProperty, isArray, isArrayNotEmpty, isBoolean, isDate, isFalsey, isFunction, isNull, isNullOrUndefined, isNumber, isNumberNotNaN, isObject, isPromise, isRegexp, isString, isStringNotEmpty, isUndefined, isWindow, newId, tidyFunction, tidyString } from "../../../packages/snail.core/src/base/data"
 
 //  getType、isXX测试
 [
@@ -149,13 +149,21 @@ describe("newId", () => {
         }
     })
 })
-test("drilling", () => {
-    expect(drilling.call(undefined)).toBeUndefined();
-    expect(drilling(1)).toBe(1);
-    expect(drilling({}, ["1", "2"])).toBeUndefined();
-    expect(drilling(undefined, ["1", "2"])).toBeUndefined();
-    expect(drilling({ "toBen": "11" }, ["toBen"])).toBe("11");
-    expect(drilling({ "toBen": undefined }, ["toBen"])).toBeUndefined();
-    expect(drilling({ "toBen": { drilling: 33 } }, ["toBen", "drilling"])).toBe(33);
-    expect(drilling({ "toBen": {} }, ["toBen", "drilling"])).toBe(undefined);
+test("drill", () => {
+    expect(drill.call(undefined)).toBeUndefined();
+    expect(drill(1)).toBe(1);
+    expect(drill({}, ["1", "2"])).toBeUndefined();
+    expect(drill(undefined, ["1", "2"])).toBeUndefined();
+    expect(drill({ "toBen": "11" }, ["toBen"])).toBe("11");
+    expect(drill({ "toBen": undefined }, ["toBen"])).toBeUndefined();
+    expect(drill({ "toBen": { drilling: 33 } }, ["toBen", "drilling"])).toBe(33);
+    expect(drill({ "toBen": {} }, ["toBen", "drilling"])).toBe(undefined);
+});
+test("extract", () => {
+    expect(extract([])).toMatchObject({});
+    expect(extract(["1", "2"], undefined)).toMatchObject({});
+    expect(extract([], {})).toMatchObject({});
+    expect(extract(["1", "2"], {})).toMatchObject({});
+    expect(extract(["1", "2"], {})).toMatchObject({});
+    expect(extract(["1", "2"], { 1: "123" })).toMatchObject({ 1: "123" });
 });

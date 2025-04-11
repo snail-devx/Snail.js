@@ -263,7 +263,7 @@ export function newId(): string {
  * @param paths 钻取数据的key路径集合
  * @returns T|undefined
  */
-export function drilling<T>(data: any, paths?: string[]): T {
+export function drill<T>(data: any, paths?: string[]): T {
     if (isArrayNotEmpty(paths) == true) {
         for (let key of paths) {
             data = (data || {})[key];
@@ -274,5 +274,21 @@ export function drilling<T>(data: any, paths?: string[]): T {
         }
     }
     return data as T;
+}
+/**
+ * 提取指定key数据组装JSON对象返回
+ * - 类似Object.assign方法
+ * @param keys 要提取的key集合
+ * @param sources 提取数据源
+ * @returns 提取后的数据对象；若key、source无效则返回空对象{}
+ */
+export function extract<T>(keys: any[], ...sources: any[]): T {
+    const ret = Object.create(null);
+    isArrayNotEmpty(keys) && isArrayNotEmpty(sources) && keys.forEach(key => {
+        for (const source of sources) {
+            hasOwnProperty(source, key) && (ret[key] = source[key]);
+        }
+    });
+    return ret;
 }
 //#endregion

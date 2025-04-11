@@ -1,5 +1,5 @@
-import { isArray, isArrayNotEmpty, isNullOrUndefined, isObject, isStringNotEmpty, hasOwnProperty } from "../base/data";
-import { drilling, ensureFunction, ensureString, tidyString, } from "../base/data";
+import { isArray, isArrayNotEmpty, isNullOrUndefined, isObject, isStringNotEmpty, hasOwnProperty, extract } from "../base/data";
+import { drill, ensureFunction, ensureString, tidyString, } from "../base/data";
 import { getMessage, throwIfNullOrUndefined, throwIfTrue } from "../base/error";
 import { defer } from "../base/promise";
 import { url } from "./url";
@@ -18,7 +18,10 @@ export namespace script {
     const CONFIG: ScriptOptions = { origin: undefined, version: undefined };
     /** 脚本HTTP客户端：用于从网络下载js脚本做动态构建*/
     const HC: IHttpClient = http.create(undefined);
+    /** 全局脚本管理器 */
+    const global: IScriptManager = newScope(undefined);
 
+    //#region *************************************script 公共方法、变量 *************************************
     /**
      * 新的脚本作用域：执行后返回一个全新的管理器对象
      * @param options 配置选项
@@ -26,7 +29,7 @@ export namespace script {
      */
     export function newScope(options?: Partial<ScriptOptions>): IScriptManager {
         /** 脚本配置选项 */
-        options = isObject(options) ? Object.freeze(Object.assign({}, options)) : Object.create(null);
+        options = Object.freeze(checkScriptOptions(options));
         /** 注册的脚本信息：key为脚本id,value为脚本信息 */
         const SCRIPTS: Record<string, ScriptFile> = Object.create(null);
         /** http加载脚本任务字典：key为脚本id，value为promise对象：避免同一个脚本重复加载 */
@@ -203,29 +206,18 @@ export namespace script {
         const manager: IScriptManager = Object.freeze({ register, has, load, loads, destroy });
         return manager;
     }
-
-    //#region *************************************script 导出方法 *************************************
-    /** 全局脚本管理器 */
-    const global: IScriptManager = newScope(undefined);
-    /** 备份的配置；在config时若传入undefined等值，做还原 */
-    const BACKCONFIG: ScriptOptions = Object.freeze(Object.assign({}, CONFIG));
     /**
-     * 配置脚本管理器
+     * 脚本全局配置
      * @param config 
+     * @returns 全局管理器对象
      */
-    export function config(config: Partial<ScriptOptions>): void {
-        //  不能使用 CONFIG[key] = options[key] || BAKCONFIG[key]；内部有true、false值的的key
-        if (isObject(config) == true) {
-            for (const key in CONFIG) {
-                hasOwnProperty(CONFIG, key) && (CONFIG[key] = config[key] == undefined
-                    ? BACKCONFIG[key]
-                    : config[key]
-                );
-            }
-        }
+    export function config(options: Partial<ScriptOptions>): IScriptManager {
+        options = checkScriptOptions(options);
+        Object.assign(CONFIG, options);
+        return global;
     }
     /**
-     * 注册脚本
+     * 全局注册脚本
      * - 重复注册同一脚本，报错
      * @param files 脚本文件数组
      * @returns 脚本句柄，支持对注册的脚本做销毁等操作
@@ -234,7 +226,7 @@ export namespace script {
         return global.register(...files);
     }
     /**
-     * 指定脚本是否已注册
+     * 全局判断指定脚本是否已注册
      * @param id 脚本id；传入模块名（如：vue），或者脚本url地址（如：/xx/xhs/test.js）
      * @returns 存在返回true；否则false
      */
@@ -242,7 +234,7 @@ export namespace script {
         return global.has(id);
     }
     /**
-     * 加载指定脚本：获取脚本内容并执行，返回export对象信息
+     * 从全局加载指定脚本：获取脚本内容并执行，返回export对象信息
      * @param id 脚本id；传入模块名（如：vue），或者脚本url地址（如：/xx/xhs/test.js）
      * - id 支持锚点模式，逐级钻取export下的key信息，如 #components.dialog
      * - id 锚点支持批量，使用#号分隔，如 #components.dialog#components.follow#components.isFunction
@@ -253,7 +245,7 @@ export namespace script {
         return global.load<T>(id);
     }
     /**
-     * 批量加载脚本：获取脚本内容并执行，返回export对象信息
+     * 从全局批量加载脚本：获取脚本内容并执行，返回export对象信息
      * @param ids 脚本id集合：传入模块名（如：vue），或者脚本url地址（如：/xx/xhs/test.js）
      * - id 支持锚点模式，逐级钻取export下的key信息，如 #components.dialog
      * - id 锚点支持批量，使用#号分隔，如 #components.dialog#components.follow#components.isFunction
@@ -265,7 +257,20 @@ export namespace script {
     }
     //#endregion 
 
-    //#region *************************************script全局私有助手方法*************************************
+    //#region *************************************script全局私有方法*************************************
+    /**
+     * 检测脚本配置选项
+     * @param options 
+     * @returns 
+     */
+    function checkScriptOptions(options: Partial<ScriptOptions>): ScriptOptions {
+        //  仅提取指定key数据，避免外部传入object无效key影响
+        options = extract<ScriptOptions>(Object.keys(CONFIG), options);
+        //  清理空数据
+        options.origin = tidyString(options.origin);
+
+        return options as ScriptOptions;
+    }
     /**
      * 格式化脚本url
      * @param file 脚本文件路径
@@ -418,11 +423,11 @@ export namespace script {
      * @param hash hash锚点值
      * @returns 
      */
-    export function drillScriptByHash<T>(exports: any, hash: string): T | undefined {
+    function drillScriptByHash<T>(exports: any, hash: string): T | undefined {
         const hashes: string[] = (hash || "").split('#').map(item => item.trim()).filter(item => item !== "");
         if (hashes.length > 0) {
             const ret = Object.create(null);
-            hashes.forEach(item => ret[item] = drilling(exports, item.split(".")));
+            hashes.forEach(item => ret[item] = drill(exports, item.split(".")));
             return hashes.length == 1
                 ? ret[Object.keys(ret)[0]]
                 : ret;
