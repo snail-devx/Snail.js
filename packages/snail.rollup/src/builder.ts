@@ -7,6 +7,7 @@ import { PluginBuilder } from "./models/component";
 import { ensureString } from "snail.core"
 import { resolve } from "path";
 
+//#region ************************************* 公共方法 *************************************
 /**
  * 获取默认的构建器配置对象
  * @param root 项目根目录；用于构建siteRoot等参数
@@ -30,5 +31,21 @@ export function getDefaultOptions(root: string): BuilderOptions {
  * @returns 构建器对象
  */
 export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRollupBuilder {
-    return null;
+    /** 构建器对象 */
+    const builder: IRollupBuilder = Object.freeze({});
+
+
+    //#region *************************************实现接口：IRollupBuilder接口方法***************
+    //#endregion
+
+    //#region ************************************* 私有方法 *************************************
+    //#endregion
+
+
+    return builder;
 }
+//#endregion
+
+
+//#region ************************************* 私有方法 *************************************
+//#endregion

@@ -24,6 +24,7 @@ export namespace event {
         /** 事件监听信息：key为事件名，value为监听的事件集合 */
         const events: { [key in string]: EventHandle<any>[] } = Object.create(null);
 
+        //#region *************************************实现接口：IEventManager接口方法*************************************
         /**
          * 监听事件
          * @param name 事件名称
@@ -96,6 +97,9 @@ export namespace event {
             );
             return manager;
         }
+        //#endregion
+
+        //#region ************************************* 私有方法 *************************************
         /**
          * 执行事件句柄
          * @param name     事件名
@@ -118,6 +122,7 @@ export namespace event {
                 }
             }
         }
+        //#endregion
 
         //  构建对象属性返回：先定义变量，这样进行型接口约束
         /** 管理器对象 */
