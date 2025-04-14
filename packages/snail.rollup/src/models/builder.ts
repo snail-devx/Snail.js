@@ -1,28 +1,39 @@
+import { RollupOptions } from "rollup";
+import { ComponentOptions } from "./component";
+
 /**
  * 全局打包配置
  * - 约束项目src、dist、site目录等信息
  */
 export type BuilderOptions = {
     /**
-     * 【必填】所有js组件源文件路径
+     * 【必填】项目根目录
+     */
+    root: string;
+
+    /**
+     * 所有js组件源文件路径
      * - 用于分析路径，实现组件源文件、目标输出同目录结构
      * - 取值约束：绝对地址，或相对项目根路径
+     * - 不传则默认 root+src
      */
-    srcRoot: string;
+    srcRoot?: string;
     /**
-     * 【必填】站点根目录
+     * 站点根目录
      * - 用于分析组件、资源在web站点中使用时的URL绝对路径
      * - 所有输出文件，必须在此目录下；否则会强制报错
      * - 取值约束：绝对地址，或相对项目根路径；不是srcRoot值、且不在srcRoot目录下
+     * - 不传则默认 root+dist
      */
-    siteRoot: string;
+    siteRoot?: string;
     /**
-     * 【必填】组件输出根目录
+     * 组件输出根目录
      * - srcRoot下组件源文件同目录结构输出到此目录下
      * - 结合siteRoot分析分析组件依赖资源路径URL绝对路径
-     * - 取值约束：绝对地址，或相对项目根路径；在siteRoot下（直接输出到站点根目录下结构不好）
+     * - 取值约束：绝对地址，或相对项目根路径；在siteRoot下
+     * - 不传则默认 root+dist
      */
-    distRoot: string;
+    distRoot?: string;
 
     /**
      * 通用js库
@@ -41,7 +52,7 @@ export type BuilderOptions = {
      * 是否是生产环境
      * - 默认false
      */
-    isProduction?: string;
+    isProduction?: boolean;
 }
 
 /**
@@ -74,5 +85,27 @@ export type CommonLibOptions = {
  * 接口：rollup构建器
  */
 export interface IRollupBuilder {
-
+    /**
+     * 批量构建组件Rollup打包配置选项
+     * @param components 组件对象数组
+     * @param commonLib 公共js库；和component.commonLib做合并
+     * @returns rollup打包配置数组
+     */
+    build(components: ComponentOptions[], commonLib?: CommonLibOptions[]): RollupOptions[];
+    /**
+     * 构建项目下的组件Rollup打包配置选项
+     * - 自动分析项目下的打包组件信息
+     * - 自动分析依赖的项目文件
+     * @param projects 项目文件地址；绝对路径，或者向对BuilderOptions.root的向对路径
+     * @returns rollup打包配置数组
+     */
+    buildProject(...projects: string[]): Promise<RollupOptions[]>;
+    /**
+     * 从命令行参数构建项目下的组件Rollup打包配置选项
+     * - 自动从 --project 参数中分析要构建的项目的项目文件地址
+     * - 内部执行 buildProject方法，完成实际项目打包配置构建
+     * - 多个项目用空格分开；如 rollup --project ./.projects/common.js ./.projects/service.js
+     * @returns rollup打包配置数组
+     */
+    buildFromCmd(): Promise<RollupOptions[]>;
 }

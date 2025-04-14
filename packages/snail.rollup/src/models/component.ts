@@ -44,7 +44,7 @@ export type ComponentOptions = {
     /**
      * 是否是公共js库
      * - 为公共js库时，将可以被其他js组件引入
-     * - 默认true；为true时format推荐umd/amd/iife；为true时，name值需指定，否则无效
+     * - 默认false；为true时format推荐umd/amd/iife；为true时，name值需指定，否则无效
      * - 无特殊情况，推荐为true，方便js组件复用
      */
     isCommonLib?: boolean;
@@ -68,7 +68,7 @@ export type ComponentOptions = {
      * - 取值约束：绝对地址，或者相对srcRoot的路径；srcRoot的子目录
      * - 若未传入，则直接使用组件src目录
      */
-    root: string;
+    root?: string;
 
     /**
      * 是否生成sourceMap
@@ -117,22 +117,22 @@ export type ComponentOptions = {
      * js组件初始化方法
      * - 在rollupbuilder环境初始化加载完成后，调用此方法，完成js组件自身的一些环境依赖信息初始化
      * - 调用前component数据已检测好、并做了默认值构建，请谨慎修改组件值，避免影响功能
-     * @param builder 构建器全局配置
+     * @param options 构建器全局配置
      */
-    init?: (component: ComponentOptions, builder: BuilderOptions) => void;
+    init?: (component: ComponentOptions, options: BuilderOptions) => void;
 
     /**
      * 【忽略】js组件输出路径
      * - 内部会自动根据src分析构建；外部写入值无效
      * - 放到这里单纯是为了智能提示
      */
-    dist: string;
+    dist?: string;
     /**
      * 【忽略】js组件在siteRoot下的网络路径
      *  - 内部自动分析构建；外部写入值无效
      *  - 放到这里单纯是为了智能提示
      */
-    url: string;
+    url?: string;
 }
 /**
  * 资源配置选项
@@ -148,7 +148,7 @@ export type AssetOptions = {
      * 【选填】资源输出路径；
      * - 无特殊传null即可，内部自动基于src和组件src分析映射
      * - 取值约束：绝对地址，或者相对distRoot的路径；需要在siteRoot目录下
-     * - 填写固定值“_SITEROOT_”；表示输出到站点根路径下，如做站点首页使用的html文件
+     * - 填写固定值"\_SITEROOT_"；表示输出到站点根路径下，如做站点首页使用的html文件
      */
     dist: string;
 
@@ -164,12 +164,12 @@ export type AssetOptions = {
 export type ViewOptions = AssetOptions & {
     /**
      * 句柄：用于外部再次处理视图html文件内容
-     * @param builder 打包全局配置
+     * @param options 打包全局配置
      * @param src 视图源文件地址
      * @param content 视图html文件内容
      * @returns 处理完的html文件内容
      */
-    handle?: (builder: BuilderOptions, src: string, content: string) => string;
+    handle?: (options: BuilderOptions, src: string, content: string) => string;
 }
 
 /** 
@@ -195,7 +195,7 @@ export type ComponentContext = {
  * - 执行时传递参数
  * - - component：当前组件的配置信息
  * - - context：组件上下文，用于组件打包各处共享一些数据
- * - - builder：打包全局配置
+ * - - options：打包全局配置
  * - 返回值：rollup插件数组
  */
-export type PluginBuilder = (component: CommonLibOptions, context: ComponentContext, builder: BuilderOptions) => InputPluginOption[];
+export type PluginBuilder = (component: ComponentOptions, context: ComponentContext, options: BuilderOptions) => InputPluginOption[];

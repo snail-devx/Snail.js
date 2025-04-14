@@ -55,8 +55,8 @@ async function testFunc(em: IEventManager) {
 
 //  测试全局的
 test("global", async () => testFunc(event));
-test("newScope", async () => testFunc(event.newScope(undefined)));
-test("mountScope", async () => testFunc(event.newScope(Object.create(null))));
+test("newScope", async () => testFunc(event.newScope()));
+test("mountScope", async () => testFunc(event.newScope()));
 
 //  测试各个事件对象的隔离性；
 test("test-private", async () => {
@@ -64,7 +64,7 @@ test("test-private", async () => {
 
     event.on<number>("private", number => global_number = number!);
     const event1 = event.newScope().on<number>("private", number => scope1_number = number!);
-    const event2 = event.newScope(Object.create(null)).on<number>("private", number => scope2_number = number!);
+    const event2 = event.newScope().on<number>("private", number => scope2_number = number!);
 
     event.trigger<number>("private", 100);
     event1.trigger<number>("private", 200);

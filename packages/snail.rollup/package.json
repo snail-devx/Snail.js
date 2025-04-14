@@ -11,7 +11,9 @@
   "private": "false",
   "scripts": {},
   "dependencies": {
-    "snail.core": "^1.0.0"
+    "snail.core": "^1.0.0",
+    "picocolors": "^1.1.1",
+    "minimist": "^1.2.8"
   },
   "peerDependencies": {
     "typescript": ">=5.8.2"
