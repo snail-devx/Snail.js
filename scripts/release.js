@@ -7,7 +7,7 @@
 
 import { fileURLToPath } from "url";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from "fs";
-import { resolve } from "path";
+import { basename, dirname, resolve } from "path";
 import { execaSync } from "execa";
 import { checkExists, log, reMakeDir, step } from "../shared/io.js";
 import { DIR_RELEASEROOT, DIR_TEMPROOT, allPackages, getPackages } from '../shared/packages.js';
@@ -32,11 +32,11 @@ function releasePackage(pkg) {
     step(`👉 生成NPM包：${pkg.releaseRoot}`);
     reMakeDir(pkg.releaseRoot);
     //      递增版本号：后续看情况精确处理
-    execaSync(
-        "npm",
-        ["version", "patch"],
-        { cwd: pkg.root, stdio: "inherit" }
-    );
+    // execaSync(
+    //     "npm",
+    //     ["version", "patch"],
+    //     { cwd: pkg.root, stdio: "inherit" }
+    // );
     //      1、  默认文件：package.json，license，README、、、
     DEFAULT_FILES.forEach(file => {
         const src = resolve(pkg.root, file);
@@ -45,10 +45,8 @@ function releasePackage(pkg) {
     //      2、copy dist目录；忽略src目录（此目录是生成.d.ts文件用的）
     checkExists(pkg.distRoot, "dist目录") && readdirSync(pkg.distRoot).forEach(item => {
         const src = resolve(pkg.distRoot, item);
-        if (statSync(src).isDirectory() && item == "src") {
-            return;
-        }
-        cpSync(src, resolve(pkg.releaseRoot, item), { recursive: true });
+        const target = resolve(pkg.releaseRoot, basename(dirname(src)), item);
+        cpSync(src, target, { recursive: true });
     });
     //      3、生成、合并.d.ts文件 
     step(`👉 生成并合并.d.ts文件：${pkg.typesRoot}`);
@@ -101,11 +99,11 @@ function releasePackage(pkg) {
         existsSync(src) && (existsSync(dest) || cpSync(src, dest));
     });
     //  3、发布npm包：后续看情况实现
-    execaSync(
-        "npm",
-        ["publish"],
-        { cwd: pkg.releaseRoot, stdio: "inherit" }
-    );
+    // execaSync(
+    //     "npm",
+    //     ["publish"],
+    //     { cwd: pkg.releaseRoot, stdio: "inherit" }
+    // );
 }
 
 
@@ -132,7 +130,7 @@ if (fileURLToPath(import.meta.url) === process.argv[1]) {
         }
     );
     //  2、遍历需要发布的包：打包生成js、合并.d.ts文件，生成npm包文件
-    (argMap._.length > 0 ? getPackages(argMap._) : allPackages)
+    (argMap._.length > 0 ? getPackages(argMap._, false) : allPackages)
         .forEach(releasePackage);
     //  3、生成完成后，输入release目录，删除临时目录
     // existsSync(DIR_TEMPROOT) && rmSync(DIR_TEMPROOT, { recursive: true });

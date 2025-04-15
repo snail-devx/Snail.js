@@ -49,7 +49,7 @@ export const allPackages = readdirSync(resolve(__dirname, "../packages"))
 
             root,
             srcRoot: resolve(root, "src"),
-            distRoot: resolve(DIR_TEMPROOT, dir),
+            distRoot: resolve(root, "dist"),
             typesRoot: resolve(DIR_TEMPROOT, dir, "src"),
             releaseRoot: resolve(DIR_RELEASEROOT, dir),
 

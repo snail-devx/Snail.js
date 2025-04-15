@@ -3,7 +3,7 @@
   "description": "配合【snail.rollup】使用的插件，支持打包过程中进行动态模块注入；完成一些高阶定制功能；默认支持Vue最新版本",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "type": "module",
   "main": "index.js",
   "module": "dist/index.js",

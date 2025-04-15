@@ -91,37 +91,37 @@ importers:
         specifier: ^1.0.8
         version: link:../snail.core
       snail.rollup:
-        specifier: ^1.0.0
+        specifier: ^1.0.3
         version: link:../snail.rollup
 
   packages/snail.rollup-html:
     dependencies:
       snail.rollup:
-        specifier: ^1.0.0
+        specifier: ^1.0.3
         version: link:../snail.rollup
 
   packages/snail.rollup-inject:
     dependencies:
       snail.rollup:
-        specifier: ^1.0.0
+        specifier: ^1.0.3
         version: link:../snail.rollup
 
   packages/snail.rollup-script:
     dependencies:
       snail.rollup:
-        specifier: ^1.0.0
+        specifier: ^1.0.3
         version: link:../snail.rollup
 
   packages/snail.rollup-style:
     dependencies:
       snail.rollup:
-        specifier: ^1.0.0
+        specifier: ^1.0.3
         version: link:../snail.rollup
 
   packages/snail.rollup-vue:
     dependencies:
       snail.rollup:
-        specifier: ^1.0.0
+        specifier: ^1.0.3
         version: link:../snail.rollup
 
   packages/snail.vue:

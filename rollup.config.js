@@ -24,7 +24,7 @@ const pkg = (() => {
     return pkg
         ? pkg
         : error(`无法取到打包项目信息：${packageDir}`);
-})()
+})();
 /** 默认的rollup配置 */
 const defaultRollup = await importFile(pkg.rollupFile, "加载rollup配置");
 
@@ -78,15 +78,18 @@ function mergeRollupOutput(item) {
     //  如果没有output，则基于input分析一个出来
     item.output = item.output || {};
     isArrayNotEmpty(item.output) || (item.output = [item.output || {}]);
-    item.output.forEach(/**@param {import("rollup").OutputOptions} out*/function (out) {
-        out.format = out.format || "es";
-        //  对输出路径进行决定路径处理；都没指定是，基于input路径进行拼接
-        out.dir && (out.dir = resolve(pkg.root, out.dir));
-        out.file && (out.file = resolve(pkg.distRoot, out.file));
-        !out.dir && !out.file && (out.file = resolve(pkg.distRoot, relative(pkg.srcRoot, item.input)));
-        //  如果是ts文件，则强制.js
-        out.file && (out.file = out.file.replace(/\.ts$/i, ".js"));
-    });
+    item.output.forEach(
+        /**@param {import("rollup").OutputOptions} out*/
+        function (out) {
+            out.format = out.format || "es";
+            //  对输出路径进行决定路径处理；都没指定是，基于input路径进行拼接
+            out.dir && (out.dir = resolve(pkg.root, out.dir));
+            out.file && (out.file = resolve(pkg.root, out.file));
+            !out.dir && !out.file && (out.file = resolve(pkg.distRoot, relative(pkg.srcRoot, item.input)));
+            //  如果是ts文件，则强制.js
+            out.file && (out.file = out.file.replace(/\.ts$/i, ".js"));
+        }
+    );
 }
 /**
  * 合并rollup的插件信息

@@ -44,5 +44,5 @@ export function buildPackage(pkg, clearDistBefore = true) {
 //  自执行，执行打包操作：直接运行此文件时才执行
 if (fileURLToPath(import.meta.url) === process.argv[1]) {
     (argMap._.length > 0 ? getPackages(argMap._) : allPackages)
-        .forEach(buildPackage);
+        .forEach(pkg => buildPackage(pkg, false));
 }

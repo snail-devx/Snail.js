@@ -10,5 +10,5 @@
         //  输出路径；这个通过命令行外部自己传入： --rootDir "...\snail.core\src" --declarationDir "...\snail.core\dist\types"
         // "declarationDir": "./dist/types",
         // "outFile": "./dist/index.d.ts",
-    },
+    }
 }

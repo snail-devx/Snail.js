@@ -1,6 +1,6 @@
 import { InputPluginOption } from "rollup"
-import { BuilderOptions, ComponentContext, getBuilder, getFileOptions } from "snail.rollup"
-import { ComponentOptions } from "snail.rollup"
+import { getBuilder, getFileOptions } from "snail.rollup"
+import { ComponentOptions, BuilderOptions, ComponentContext } from "snail.rollup"
 
 /**
  * 资源管理插件

@@ -3,7 +3,7 @@
   "description": "配合【snail.rollup】使用的插件，支持组件绑定html文件，并自动将组件js加入html的依赖script标签中",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "type": "module",
   "main": "index.js",
   "module": "dist/index.js",
