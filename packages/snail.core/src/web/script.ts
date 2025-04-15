@@ -8,6 +8,9 @@ import { version } from "./version";
 import { IScriptHandle, IScriptManager, ScriptFile, ScriptLoadOptions, ScriptOptions } from "./models/script";
 import { IHttpClient } from "./models/http";
 
+/** 把自己的类型共享出去 */
+export * from "./models/script"
+
 /**
  * 脚本模块：支持动态加载指定js模块，支持锚点
  * - 支持amd、umd和iife方式加载js模块

@@ -4,6 +4,9 @@
 
 import { FlatPromise } from "./models/promise";
 
+/** 把自己的类型共享出去 */
+export * from "./models/promise"
+
 /**
  * 延迟对象
  * @returns 

@@ -1,15 +1,14 @@
-/**
- * 版本模块：支持url地址版本管理、全局版本号+特定文件版本号
- */
-
 import { mustString, extract, hasOwnProperty, isObject, tidyString } from "../base/data";
 import { throwIfUndefined } from "../base/error";
 import { url } from "./url";
 import { IVersionManager, VersionOptions } from "./models/version";
 import { UrlParseResult } from "./models/url";
 
+/** 把自己的类型共享出去 */
+export * from "./models/version"
+
 /**
- * 管理管理模块
+ * 版本管理模块
  * - 支持全局配置版本号，特定文件自定义版本
  * - 支持新作用域 newScope ，和全局配置隔离
  */

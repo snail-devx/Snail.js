@@ -1,14 +1,17 @@
 /**
- * rollup构建器：实现多项目构建能力
+ * RollupBuilder构建器
+ *  1、支持按照项目、组件、命令行等方式构建RollUpOptions对象
+ *  2、支持项目依赖管理；需配合snail.rollup-*相关插件实现
  */
 
-import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "./models/builder";
-import { AssetOptions, ComponentContext, ComponentOptions, PluginBuilder } from "./models/component";
+//#region ************************************* 导入、导出 *************************************
 import { dirname, relative, resolve } from "path";
-import { buildDist, buildNetPath, checkExists, checkSrc, forceExt, getLen, importFile, isChild, isFile, isNetPath, isProduction, log, logIfAny, step, trace, traceIfAny, warn } from "./utils/helper";
 import { RollupOptions } from "rollup";
 import minimist from "minimist";
-import { ProjectOptions } from "./models/project";
+import {
+    buildDist, buildNetPath, checkExists, checkSrc, forceExt, getLen, importFile,
+    isChild, isNetPath, isProduction, log, logIfAny, step, trace, traceIfAny, warn
+} from "./utils/helper";
 import {
     mustString, mustFunction, mustObject, hasOwnProperty,
     throwError, throwIfFalse, throwIfTrue,
@@ -16,8 +19,17 @@ import {
     tidyString,
     url,
     mustArray,
-    hasAny,
 } from "snail.core"
+import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "./models/builder";
+import { AssetOptions, ComponentContext, ComponentOptions, PluginBuilder } from "./models/component";
+import { ProjectOptions } from "./models/project";
+
+/** 把自己的类型共享出去 */
+export * from "./models/builder"
+export * from "./models/component"
+export * from "./models/module"
+export * from "./models/project"
+//#endregion
 
 //#region ************************************* 公共方法 *************************************
 /**
@@ -199,9 +211,7 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
 }
 //#endregion
 
-
 //#region ************************************* 私有方法 *************************************
-
 /**
  * 检测构建器配置选项
  * @param options 

@@ -2,6 +2,9 @@ import { mustFunction, mustString, hasAny, hasOwnProperty, isFunction, isObject,
 import { run } from "./function";
 import { EventHandle, EventSender, IEventManager } from "./models/event";
 
+/** 把自己的类型共享出去 */
+export * from "./models/event"
+
 /**
  * 事件模块：提供事件注册、分发相关功能 <br />
  * - 支持全局事件监听处理，on、off、、、

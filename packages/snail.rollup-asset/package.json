@@ -11,6 +11,6 @@
   "scripts": {},
   "dependencies": {
     "snail.core": "^1.0.8",
-    "snail.rollup": "^1.0.0"
+    "snail.rollup": "^1.0.3"
   }
 }

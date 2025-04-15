@@ -1,11 +1,10 @@
-/**
- * 函数模块：针对js方法的相关封装
- */
-
 import { mustFunction, isFunction, isPromise } from "./data";
 import { getMessage } from "./error";
 import { RunResult } from "./models/function";
 import { defer } from "./promise";
+
+/** 把自己的类型共享出去 */
+export * from "./models/function"
 
 /**
  * 运行执行方法；内部自动拦截异常

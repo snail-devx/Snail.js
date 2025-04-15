@@ -4,6 +4,9 @@ import { throwIfTrue, throwIfUndefined } from "../base/error";
 import { defer } from "../base/promise";
 import { HttpOptions, HttpInterceptor, IHttpClient, HttpRequest, HttpResponse, HttpError } from "./models/http";
 
+/** 把自己的类型共享出去 */
+export * from "./models/http"
+
 /**
  * HTTP模块：实现HTTP请求的封装
  * - 支持拦截器、请求配置、响应配置等功能

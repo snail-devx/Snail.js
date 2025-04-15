@@ -2,6 +2,9 @@ import { mustString, hasOwnProperty, isObject, isStringNotEmpty } from "../base/
 import { throwError, throwIfNullOrUndefined } from "../base/error";
 import { IServerManager, ServerOptions } from "./models/server";
 
+/** 把自己的类型共享出去 */
+export * from "./models/server"
+
 /**
  * 服务器模块：支持服务器器地址管理
  * - 支持全局服务器配置管理 addServer、
