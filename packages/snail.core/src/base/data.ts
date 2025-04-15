@@ -188,59 +188,85 @@ export function hasOwnProperty(data: any, prop: string): boolean {
 }
 /**
  * 是否有任意值；.length>0
- * @param data 
+ * @param data 要判断的对象
  * @returns data长度大于0返回true；否则返回false
  */
-export function hasAny(data: string | any[]): boolean {
-    //  之前叫做isAny，但ts中有any类型关键字，容易产生误解
-    return data ? data.length > 0 : false;
+export function hasAny(data: any): boolean {
+    /* 之前叫做isAny，但ts中有any类型关键字，容易产生误解*/
+    return hasOwnProperty(data, "length")
+        ? data.length > 0
+        : false;
 }
 
 /**
- * 确保是有效字符串；否则报错
+ * data必须字符串，且不能为空；否则报错
  * @param data 要验证的数据
- * @param paramName 参数名，用于拼接报错信息。paramName + "must be a string and cannot be empty"
+ * @param paramName 参数名，用于拼接报错信息。paramName + " must be a non-empty string."
  * @returns 是有效字符串返回true
  */
-export function ensureString(data: any, paramName: string): boolean {
-    if (isStringNotEmpty(data) != true) {
-        throw new Error(`${paramName} must be a string and cannot be empty`)
+export function mustString(data: any, paramName: string): boolean {
+    if (isStringNotEmpty(data) == true) {
+        return true;
     }
-    return true;
+    throw new Error(`${paramName} must be a non-empty string.`);
 }
 /**
- * 确保是Function方法，否则报错
+ * data必须是Array数组，且不能为空；否则报错
  * @param data 要验证的数据
- * @param paramName 参数名，用于拼接报错信息。paramName + "must be a function"
+ * @param paramName 参数名，用于拼接报错信息。paramName + " must be a non-empty array."
+ * @param paramName 
+ * @returns 
+ */
+export function mustArray(data: any, paramName: string): boolean {
+    if (isArrayNotEmpty(data) == true) {
+        return true;
+    }
+    throw new Error(`${paramName} must be a non-empty array.`);
+}
+/**
+ * data必须是Function方法，否则报错
+ * @param data 要验证的数据
+ * @param paramName 参数名，用于拼接报错信息。paramName + " must be a function."
  * @returns 是function返回true
  */
-export function ensureFunction(data: any, paramName: string): boolean {
-    if (isFunction(data) != true) {
-        throw new Error(`${paramName} must be a function`);
+export function mustFunction(data: any, paramName: string): boolean {
+    if (isFunction(data) == true) {
+        return true;
     }
-    return true;
+    throw new Error(`${paramName} must be a function.`);
 }
-
+/**
+ * data必须是Object类型值，否则报错
+ * - 必须是【object Object】类型，不能是【object Array】、【object Date】等
+ * @param data 要验证的数据
+ * @param paramName 参数名，用于拼接报错信息。paramName + " must be an object."
+ * @returns 是function返回true
+ */
+export function mustObject(data: any, paramName: string, lenient?: boolean): boolean {
+    if (isObject(data) == true) {
+        return true;
+    }
+    throw new Error(`${paramName} must be an object.`);
+}
 //#endregion
 
 //#region *************************************        数据值处理        *************************************
 /**
- * 整理字符串；去除前后空格；空字符串/非字符串强制null
- * @param str 
+ * 整理字符串；去除前后空格，空或者非字符串强制undeined
+ * @param str 要处理的字符串数据
  * @returns 去除前后空格的字符串
  */
-export function tidyString(str: any): string | null {
-    str = isString(str) == true ? str.trim() : null;
-    // return str?.length > 0 ? str : null;
-    return hasAny(str) ? str : null;
+export function tidyString(str: any): string | undefined {
+    str = isString(str) ? (str as string).trim() : undefined;
+    return hasAny(str) ? str : undefined;
 }
 /**
- * 整理Function；
+ * 整理Function
  * @param func 
- * @returns func不是Function时，返回null；否则自身
+ * @returns func不是Function时，返回undefined；否则自身
  */
-export function tidyFunction(func: any): Function | null {
-    return isFunction(func) ? func : null;
+export function tidyFunction(func: any): Function | undefined {
+    return isFunction(func) ? func : undefined;
 }
 
 /**

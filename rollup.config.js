@@ -3,7 +3,6 @@ import { relative, resolve } from "path";
 import { fileURLToPath } from "url";
 import { isArrayNotEmpty, isStringNotEmpty } from "./shared/base.js";
 import { error, importFile } from "./shared/io.js";
-//  rollup处理相关插件
 //      依赖npm包支持：add -D  @rollup/plugin-node-resolve
 import nodeResolve from "@rollup/plugin-node-resolve";
 //      typescript支撑：add -D  @rollup/plugin-typescript typescript tslib
@@ -60,14 +59,14 @@ function mergeRollupOptions(item) {
     //  plugins 处理：先构建默认的，然后将item自身追加过来
     mergeRollupPlugins(item);
     //  external 处理；加上默认忽略项目
-    item.external = [
-        /** 
-         * 包含“node_modules”；这样编译出来的模块，才会把【node_modules】中的引用代码合并过来
-         *  如snaile.core中使用await关键字等，如不带过来，则需要使用方做引入，不独立
-         */
-        // /node_modules/gi,
-        ...(item.external || [])
-    ]
+    // item.external = [
+    //     /** 
+    //      * 包含“node_modules”；这样编译出来的模块，才会把【node_modules】中的引用代码合并过来
+    //      *  如snaile.core中使用await关键字等，如不带过来，则需要使用方做引入，不独立
+    //      */
+    //     // /node_modules/gi,
+    //     ...(item.external || [])
+    // ]
     //  返回自身
     return item;
 }
@@ -108,14 +107,13 @@ function mergeRollupPlugins(item) {
             declaration: false,
             declarationDir: undefined,
         }),
-        //  执行babel编译，加入垫片等；强制支持ts
-        babel({
-            extensions: [".ts", ...DEFAULT_EXTENSIONS],
-            configFile: resolve(__dirname, '.babelrc.json'),
-            comments: false,
-        })
     ];
-
+    //  根据需要显式指定babel转码：执行babel编译，加入垫片等；强制支持ts
+    defaultRollup?.START_BabelPlugin === true && plugins.push(babel({
+        extensions: [".ts", ...DEFAULT_EXTENSIONS],
+        configFile: resolve(__dirname, '.babelrc.json'),
+        comments: false,
+    }));
     //  合并插件
     item.plugins = [
         ...plugins,

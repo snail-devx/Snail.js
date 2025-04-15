@@ -3,6 +3,7 @@
  */
 export default {
     components: [
-        { src: "./index.ts" }
-    ]
+        { src: "./index.ts", isCommonLib: true, name: "index" }
+    ],
+    projectDeps: []
 }

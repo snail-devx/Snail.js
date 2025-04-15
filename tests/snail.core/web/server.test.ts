@@ -13,7 +13,7 @@ function testFunc(sr: IServerManager): void {
     expect(() => expect(sr.getUrl("test", "api"))).toThrow("the server[test] is not registered");
 
     //  注册判断
-    expect(() => sr.register(null!, {})).toThrow("code must be a string and cannot be empty");
+    expect(() => sr.register(null!, {})).toThrow("code must be a non-empty string.");
     expect(() => sr.register("test", null!)).toThrow("server must be a json");
     sr.register("test", { api: "test-11" });
     expect(sr.has("test")).toStrictEqual(true);

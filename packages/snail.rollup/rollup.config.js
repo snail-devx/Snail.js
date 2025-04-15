@@ -1,5 +1,6 @@
-/** 是否禁用默认的插件配置；配合工作空间根目录下的【rollup.config】使用 */
-export const DISABLE_DefaultPlugins = false;
+
+//  后期考虑直接读取 package.json
+const external = [/node_modules/, "snail.core"];
 
 /**
  * 打包的组件配置
@@ -9,13 +10,15 @@ export default [
     {
         input: "./src/builder.ts",
         output: [//  Valid values are "amd", "cjs", "system", "es", "iife" or "umd".
-            { file: "./dist/index.js", format: "es" },
+            { file: "./dist/builder.js", format: "es" },
         ],
+        external
     },
     {
         input: "./src/plugin.ts",
         output: [//  Valid values are "amd", "cjs", "system", "es", "iife" or "umd".
             { file: "./dist/plugin.js", format: "es" },
         ],
+        external
     }
 ];

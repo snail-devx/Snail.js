@@ -1,7 +1,7 @@
 import { existsSync, statSync } from "fs";
 import { extname, format, relative, resolve } from "path";
 import { fileURLToPath } from "url";
-import { ensureString, hasOwnProperty, throwIfFalse, tidyString, url } from "snail.core"
+import { mustString, hasOwnProperty, throwIfFalse, tidyString, url } from "snail.core"
 import pc from "picocolors";
 import { BuilderOptions } from "../models/builder";
 
@@ -19,6 +19,17 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
  */
 export function isProduction(): boolean {
     return process.env.NODE_ENV === "production";
+}
+
+/**
+ * 获取数据长度
+ * @param data 如array、string等有length属性的数据
+ * @returns 数据长度，无则返回0
+ */
+export function getLen(data: any): number {
+    return data && hasOwnProperty(data, "length")
+        ? data.length
+        : 0;
 }
 //#endregion
 
@@ -58,12 +69,6 @@ export function importFile<T>(file: string, title: string): Promise<T> {
 
 //#region  *****************************************   👉 路径处理    *****************************************
 /**
- * 已经判断过的物理文件集合
- * 存储物理文件绝对路径，不区分大小写
- * 存储起来，方便做Linux下isNetPath判断的性能优化
- */
-const physicalFileMap: { [key in string]: number } = Object.create(null);
-/**
  * 判断是否是物理文件
  * @param path 要判断的路径
  * @returns 
@@ -80,27 +85,17 @@ export function isPhysicalFile(path: string): boolean {
      *  2、和node的进程目录比较，是否是此进程目录下的文件；若是则判定为物理文件
      *  3、后续加入缓存机制，把已经判定过的文件做一下缓存，避免vue等情况
      */
+
     path = tidyString(path);
+    /* v8 ignore next 3  忽略覆盖率测试*/
     if (!path) {
         return false;
     }
     //  1、缓存查找：不区分大小写找；看是否是 ? #相关
     const _path = path.toLowerCase();
-    if (hasOwnProperty(physicalFileMap, _path) == true) {
-        return true;
-    }
-    let ret: boolean;
-    for (const key in physicalFileMap) {
-        ret = _path.startsWith(`${key}?`) || _path.startsWith(`${key}#`) == true;
-        if (ret == true) {
-            break;
-        }
-    }
     //  2、看在磁盘中是否存在：做一下？和#号截取
-    if (ret != true) {
-        const [tmp] = path.split("?", 1);
-        ret = existsSync(tmp);
-    }
+    const [tmp] = path.split("?", 1);
+    let ret = existsSync(tmp);
     if (ret != true) {
         const [tmp] = path.split("#", 1);
         ret = existsSync(tmp);
@@ -111,8 +106,6 @@ export function isPhysicalFile(path: string): boolean {
         ret = _path.startsWith(cwd);
     }
 
-    //  若是物理路径，则更新字段
-    ret && (physicalFileMap[_path] = 1);
     return ret;
 }
 
@@ -138,7 +131,7 @@ export function isNetPath(path: string): boolean {
 export function forceExt(file: string, extName: string): string {
     extName = tidyString(extName);
     if (extName) {
-        extName = extName.startsWith(".") ? extName : `.${extName}`;
+        extName = `.${extName.replace(/^\.+/, "")}`;
         file = file.replace(new RegExp(`\\${extname(file)}`, "i"), extName);
     }
     return file;
@@ -165,10 +158,10 @@ export function buildDist(options: BuilderOptions, src: string): string {
  */
 export function buildNetPath(options: BuilderOptions, dist: string): string {
     dist = resolve(options.distRoot, dist);
-    if (isChild(options.siteRoot, dist) == false) {
-        const message = `dist must be child of siteRoot. siteRoot:${options.siteRoot}, dist:${dist}.`;
-        throw new Error(message);
-    }
+    throwIfFalse(
+        isChild(options.siteRoot, dist),
+        `dist must be child of siteRoot. siteRoot:${options.siteRoot}, dist:${dist}.`
+    )
     dist = relative(options.siteRoot, dist);
     return `/${url.format(dist)}`;
 }
@@ -197,7 +190,7 @@ export function isChild(parent: string, child: string): boolean {
 export function checkSrc(options: BuilderOptions, src: string, title: string): string {
     title = title + ": src";
     src = tidyString(src);
-    ensureString(src, title);
+    mustString(src, title);
     src = resolve(options.srcRoot, src);
     throwIfFalse(
         isChild(options.srcRoot, src),
@@ -205,7 +198,6 @@ export function checkSrc(options: BuilderOptions, src: string, title: string): s
     );
     checkExists(src, title);
     throwIfFalse(isFile(src), `${title} must be file. path:${src}.`);
-
     return src;
 }
 //#endregion
@@ -213,30 +205,57 @@ export function checkSrc(options: BuilderOptions, src: string, title: string): s
 //#region  *****************************************   👉 日志输出    *****************************************
 /**
  * 输出步骤信息
- * @param {string} message 
+ * @param  message 
  */
-export function step(message) {
+export function step(message: string) {
     console.log(pc.cyan(message));
 }
 /**
  * 输出日志信息
- * @param {string} message 
+ * @param  message 
  */
-export function log(message) {
+export function log(message: string) {
     console.log(pc.green(message));
 }
 /**
- * 输出警告信息
- * @param {string} message 
+ * 输出日志信息，在data为非空
+ * - 输出结果：message+": data.length"
+ * @param data 
+ * @param message 
  */
-export function warn(message) {
-    console.warn(pc.yellow(message));
+export function logIfAny(data: any, message: string): void {
+    let len = getLen(data);
+    len > 0 && log(`${message} \t|\tlength:${len}`);
 }
 /**
- * 抛错，输出错误信息
- * @param {string} message 
+ * 输出跟踪日志
+ * @param message 
  */
-export function error(message) {
-    throw new Error(pc.red(message));
+export function trace(message: string) {
+    console.log(pc.gray(message));
 }
+/**
+ * 输出跟踪日志，在data为非空
+ * - 输出结果：message+": data.length"
+ * @param data 
+ * @param message 
+ */
+export function traceIfAny(data: any, message: string): void {
+    let len = getLen(data);
+    len > 0 && trace(`${message} \t|\tlength:${len}`);
+}
+/**
+ * 输出警告信息
+ * @param message 
+ */
+export function warn(message: string) {
+    console.log(pc.yellow(message));
+}
+// /**
+//  * 抛错，输出错误信息
+//  * @param {string} message
+//  */
+// export function error(message) {
+//     throw new Error(pc.red(message));
+// }
 //#endregion

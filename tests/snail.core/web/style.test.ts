@@ -53,7 +53,7 @@ describe("style-base", () => {
         expect(ele4.getAttribute("data-theme")).toStrictEqual("Cd");
         expect(ele4.getAttribute("data-ref")).toStrictEqual("2");
         //      修改一下主题
-        expect(() => sm.theme("")).toThrow("code must be a string and cannot be empty");
+        expect(() => sm.theme("")).toThrow("code must be a non-empty string.");
         sm.theme("Cd");
         expect(ele1.disabled).toStrictEqual(false);
         expect(ele2.disabled).toStrictEqual(false);
@@ -127,7 +127,7 @@ describe("style-config", () => {
         globalThis.document.body.appendChild(container2);
         //  全局配置
         const sm1: IStyleManager = style;
-        sm1.config({ theme: "CD", container: container1, origin: "http://snail.dev", version })
+        style.config({ theme: "CD", container: container1, origin: "http://snail.dev", version })
         sm1.register("file.css", { file: "http://file.css", theme: "CD" });
         //      href断言
         expect((container1.children[0] as HTMLLinkElement).href.startsWith("http://snail.dev/file.css?_snv=")).toStrictEqual(true);

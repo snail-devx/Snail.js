@@ -1,4 +1,4 @@
-import { ensureString, hasOwnProperty, isObject, isStringNotEmpty } from "../base/data";
+import { mustString, hasOwnProperty, isObject, isStringNotEmpty } from "../base/data";
 import { throwError, throwIfNullOrUndefined } from "../base/error";
 import { IServerManager, ServerOptions } from "./models/server";
 
@@ -27,7 +27,7 @@ export namespace server {
          * @returns 管理器自身，方便链式调用
          */
         function register(code: string, server: ServerOptions): IServerManager {
-            ensureString(code, "code");
+            mustString(code, "code");
             isObject(server) || throwError("server must be a json");
             servers[code] = Object.freeze({ ...server });
             return manager;

@@ -1,4 +1,4 @@
-import { ensureString, extract, isArrayNotEmpty, isObject, isStringNotEmpty, tidyString } from "../base/data";
+import { mustString, extract, isArrayNotEmpty, isObject, isStringNotEmpty, tidyString } from "../base/data";
 import { event } from "../base/event";
 import { IStyleHandle, IStyleManager, StyleElement, StyleFile, StyleOptions } from "./models/style";
 import { version } from "./version";
@@ -40,27 +40,27 @@ export namespace style {
             isArrayNotEmpty(files) && files.forEach((file: string | StyleFile) => {
                 //  1、解析配置；生成文件地址：考虑服务器地址相关配置
                 let href: string = typeof (file) == "string" ? file : file.file;
-                ensureString(href, "href");
+                mustString(href, "href");
                 const theme: string = typeof (file) == "string" ? undefined : (file.theme || undefined);
                 let tmpStr: string = options.origin || CONFIG.origin;
                 isStringNotEmpty(tmpStr) && (href = new URL(href, tmpStr).toString());
                 //  2、基于file（不处理query和hash）+theme查重，若已经存在则不用新加入到syleFiles中，此时判断element是否有效
                 tmpStr = href.toLowerCase();
-                let style: StyleElement = scopeStyles.find(s => s.theme == theme && s.file.toLowerCase() == tmpStr);
-                if (!style) {
-                    style = { file: href, theme, ref: 0 };
-                    scopeStyles.push(style);
+                let styleEle: StyleElement = scopeStyles.find(s => s.theme == theme && s.file.toLowerCase() == tmpStr);
+                if (!styleEle) {
+                    styleEle = { file: href, theme, ref: 0 };
+                    scopeStyles.push(styleEle);
                 }
-                style.ref += 1;
-                funcStyles.push(style);
+                styleEle.ref += 1;
+                funcStyles.push(styleEle);
                 //  3、创建Element数据：加入到dom中，
-                if (!style.element) {
+                if (!styleEle.element) {
                     //  基于version,构建href版本信息
-                    style.element = document.createElement("link");
-                    style.element.href = (options.version || CONFIG.version || version).formart(style.file);
-                    style.element.rel = "stylesheet";
-                    style.element.disabled = true;
-                    theme && style.element.setAttribute("data-theme", theme);
+                    styleEle.element = document.createElement("link");
+                    styleEle.element.href = (options.version || CONFIG.version || version).formart(styleEle.file);
+                    styleEle.element.rel = "stylesheet";
+                    styleEle.element.disabled = true;
+                    theme && styleEle.element.setAttribute("data-theme", theme);
                     //  自己的Container-》global-》默认body下创建一个固定的
                     let container: HTMLElement = options.container || CONFIG.container
                         || document.getElementById("snail_style_container");
@@ -72,9 +72,9 @@ export namespace style {
                         container.style.width = "0px";
                         document.body.appendChild(container);
                     }
-                    container.appendChild(style.element);
+                    container.appendChild(styleEle.element);
                 }
-                style.element.setAttribute("data-ref", style.ref.toString());
+                styleEle.element.setAttribute("data-ref", styleEle.ref.toString());
             });
             //  基于主题设置sytle；并构建Style句柄返回
             funcStyles.length > 0 && setStyleByTheme(funcStyles, scopeTheme);
@@ -88,7 +88,7 @@ export namespace style {
          * @returns 管理器自身
          */
         function theme(code: string): IStyleManager {
-            ensureString(code, "code");
+            mustString(code, "code");
             scopeTheme != code && setStyleByTheme(scopeStyles, scopeTheme = code), true;
             return manager;
         }

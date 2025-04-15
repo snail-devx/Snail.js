@@ -8,7 +8,7 @@ test("run", () => {
     var rt = run(undefined as any);
     expect(rt).toBeTypeOf("object");
     expect(rt.success).toStrictEqual(false);
-    expect(rt.reason).toEqual("func must be a function");
+    expect(rt.reason).toEqual("func must be a function.");
 
     rt = run(data => data, 100);
     expect(rt.success).toStrictEqual(true);

@@ -1,5 +1,5 @@
-/** 是否禁用默认的插件配置；配合工作空间根目录下的【rollup.config】使用 */
-export const DISABLE_DefaultPlugins = false;
+/** 是否启用babel转码 */
+export const START_BabelPlugin = true;
 
 /**
  * 打包的组件配置

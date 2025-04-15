@@ -2,7 +2,7 @@
  * 函数模块：针对js方法的相关封装
  */
 
-import { ensureFunction, isFunction, isPromise } from "./data";
+import { mustFunction, isFunction, isPromise } from "./data";
 import { getMessage } from "./error";
 import { RunResult } from "./models/function";
 import { defer } from "./promise";
@@ -16,7 +16,7 @@ import { defer } from "./promise";
 export function run<T>(func: (...args: any[]) => T, ...args: any[]): RunResult<T> {
     const ret: RunResult<T> = Object.create(null);
     try {
-        ensureFunction(func, "func");
+        mustFunction(func, "func");
         // @ts-ignore
         ret.data = func.apply(this, args);
         ret.success = true;
@@ -38,7 +38,7 @@ export function run<T>(func: (...args: any[]) => T, ...args: any[]): RunResult<T
 export async function runAsync<T>(func: (...args: any[]) => Promise<T> | T, ...args: any[]): Promise<RunResult<T>> {
     const ret: RunResult<T> = Object.create(null);
     try {
-        ensureFunction(func, "func");
+        mustFunction(func, "func");
         // @ts-ignore
         ret.data = await func.apply(this, args);
         ret.success = true;
@@ -108,7 +108,7 @@ export function debounce(fn: Function, delay: number): (...args: any[]) => void 
  */
 export function polling<T>(fn: (...args: any[]) => Promise<T> | T, check: (data: T) => boolean, interval: number, timeout: number, ...args: any[]): Promise<T> {
     //  准备工作：数据验证，变量定义
-    ensureFunction(fn, "fn") && ensureFunction(check, "check");
+    mustFunction(fn, "fn") && mustFunction(check, "check");
     interval = (interval > 0 ? interval : 5) * 1000;
     timeout = timeout > 0 ? (timeout * 1000) : 0;
     const deferred = defer<T>();

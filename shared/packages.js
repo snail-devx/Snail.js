@@ -34,7 +34,7 @@ export const allPackages = readdirSync(resolve(__dirname, "../packages"))
             return undefined;
         }
         const pkgJson = require(resolve(root, "package.json"));
-        if (pkgJson.private) {
+        if (pkgJson.private == true || pkgJson.private == "true") {
             return undefined;
         }
         const rollupFile = resolve(root, "rollup.config.js");

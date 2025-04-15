@@ -2,7 +2,7 @@
  * 版本模块：支持url地址版本管理、全局版本号+特定文件版本号
  */
 
-import { ensureString, extract, hasOwnProperty, isObject, tidyString } from "../base/data";
+import { mustString, extract, hasOwnProperty, isObject, tidyString } from "../base/data";
 import { throwIfUndefined } from "../base/error";
 import { url } from "./url";
 import { IVersionManager, VersionOptions } from "./models/version";
@@ -48,8 +48,8 @@ export namespace version {
          */
         function addFile(file: string, fileUrl: string): IVersionManager {
             let upr: UrlParseResult = url.parse(file);
-            throwIfUndefined(upr, "file must be a string and cannot be empty");
-            ensureString(fileUrl, "fileUrl");
+            throwIfUndefined(upr, "file must be a non-empty string.");
+            mustString(fileUrl, "fileUrl");
             //  加入版本，不区分大小写
             versionFiles[upr.file.toLowerCase()] = fileUrl;
             return manager;
@@ -63,8 +63,8 @@ export namespace version {
          */
         function formart(file: string): string {
             //  1、准备工作：如果url自带版本号了，则不用处理直接返回
+            mustString(file, "file");
             let upr: UrlParseResult = url.parse(file);
-            throwIfUndefined(upr, "file must be a string and cannot be empty");
             let vQuery = options.query || CONFIG.query || "_snv";
             if (upr.queryMap.get(vQuery) !== null) {
                 return file;

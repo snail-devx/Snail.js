@@ -1,4 +1,4 @@
-import { ensureString, extract, hasOwnProperty, tidyString } from "../base/data";
+import { mustString, extract, hasOwnProperty, tidyString } from "../base/data";
 import { isFunction, isNullOrUndefined, isObject, isPromise, isRegexp, isStringNotEmpty } from "../base/data";
 import { throwIfTrue, throwIfUndefined } from "../base/error";
 import { defer } from "../base/promise";
@@ -156,12 +156,14 @@ export namespace http {
             ? String(interceptor.match).toLowerCase()
             : isRegexp(interceptor.match) ? interceptor.match : undefined;
         throwIfUndefined(interceptor.match, "interceptor.match must be a RegExp or not empty string");
-        //  request、resolve、reject不能同时为空
-        interceptor.request = isFunction(interceptor.request) ? interceptor.request : null;
-        interceptor.resolve = isFunction(interceptor.resolve) ? interceptor.resolve : null;
-        interceptor.reject = isFunction(interceptor.reject) ? interceptor.reject : null;
-        let bValue = interceptor.request === null && interceptor.resolve === null && interceptor.reject === null;
-        throwIfTrue(bValue, "interceptor.request/resolve/reject cannot be null at the same time");
+        //  request、resolve、reject；可以同时为空，不判断，为空就是不生效即可
+        interceptor.request = isFunction(interceptor.request) ? interceptor.request : undefined;
+        interceptor.resolve = isFunction(interceptor.resolve) ? interceptor.resolve : undefined;
+        interceptor.reject = isFunction(interceptor.reject) ? interceptor.reject : undefined;
+        // throwIfTrue(
+        //     !interceptor.request && !interceptor.resolve && !interceptor.reject,
+        //     "interceptor.request/resolve/reject cannot be not function at the same time"
+        // )
         //  冻结并返回，避免外部修改影响
         interceptor = {
             match: interceptor.match,
@@ -186,7 +188,7 @@ export namespace http {
         try {
             //  格式化url：先不format，传入siteUrl会有问题
             request.url = tidyString(request.url);
-            ensureString(request.url, "request.url");
+            mustString(request.url, "request.url");
             // request.url = url.format(request.url);
             // @ts-ignore 格式化method
             request.method = tidyString(request.method) || "GET";

@@ -1,5 +1,5 @@
 import { isArray, isArrayNotEmpty, isNullOrUndefined, isObject, isStringNotEmpty, hasOwnProperty, extract } from "../base/data";
-import { drill, ensureFunction, ensureString, tidyString, } from "../base/data";
+import { drill, mustFunction, mustString, tidyString, } from "../base/data";
 import { getMessage, throwIfNullOrUndefined, throwIfTrue } from "../base/error";
 import { defer } from "../base/promise";
 import { url } from "./url";
@@ -59,7 +59,7 @@ export namespace script {
                         : formScriptUrl(file.url, undefined, defaultOrign);
                     sf.id = tidyString(file.id) || sf.id;
                 }
-                ensureString(sf.id, "sf.id");
+                mustString(sf.id, "sf.id");
                 //  注册：判断存在性；注册前锁定对象
                 throwIfTrue(hasOwnProperty(SCRIPTS, sf.id), `files[${sf.id}] has been registered`);
                 sf = Object.freeze(sf);
@@ -179,7 +179,7 @@ export namespace script {
                     id = id.substring(0, index);
                 }
             }
-            ensureString(id = tidyString(id), "id");
+            mustString(id = tidyString(id), "id");
             //  直接基于id查找
             let sf: ScriptFile = SCRIPTS[id];
             if (!sf) {
@@ -291,10 +291,10 @@ export namespace script {
         //  推导构建脚本文件的baseUrl信息
         let scriptUrl: URL = undefined;
         {
-            ensureString(file, "file");
+            mustString(file, "file");
             referUrl = tidyString(referUrl);
             defaultOrign = tidyString(defaultOrign) || location.origin;
-            const baseUrl: string = referUrl == null
+            const baseUrl: string = referUrl == undefined
                 ? defaultOrign
                 : url.isSite(referUrl)
                     ? referUrl
@@ -367,7 +367,7 @@ export namespace script {
                 const deps: string[] | string = arguments[arguments.length - 2] || undefined;
                 const factory: Function = arguments[arguments.length - 1] || undefined;
                 id && console.warn(`define does not support id[${id}] argument,will ignore it`, { id, deps, factory });
-                ensureFunction(factory, "define arguments 'factory'");
+                mustFunction(factory, "define arguments 'factory'");
                 //  加载依赖脚本；exports依赖，直接返回amdExports对象，用于导出模块
                 let hasExportsDep = false;
                 const depTasks: Promise<any>[] = (typeof (deps) == "string" ? [deps] : (deps || []))

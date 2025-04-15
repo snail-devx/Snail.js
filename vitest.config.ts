@@ -13,7 +13,7 @@ export default defineConfig({
         ],
         include: [
             // "packages/*/__test__/**",
-            "tests/**"
+            "tests/**/*.test.ts"
         ]
     },
 })

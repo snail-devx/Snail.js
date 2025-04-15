@@ -1,4 +1,4 @@
-import { ensureFunction, ensureString, hasAny, hasOwnProperty, isFunction, isObject, newId, tidyString } from "./data";
+import { mustFunction, mustString, hasAny, hasOwnProperty, isFunction, isObject, newId, tidyString } from "./data";
 import { run } from "./function";
 import { EventHandle, EventSender, IEventManager } from "./models/event";
 
@@ -33,8 +33,8 @@ export namespace event {
          * @returns  返回自身，方便链式调用
          */
         function on<T>(name: string, handle: EventHandle<T>): IEventManager {
-            ensureString(name = tidyString(name), "name")
-            ensureFunction(handle, "handle");
+            mustString(name = tidyString(name), "name")
+            mustFunction(handle, "handle");
             //  若name为第一次添加，直接赋值；否则判断是否存在相同 handle
             const handles = events[name] || [];
             if (handles.length == 0 || handles.indexOf(handle) == -1) {
@@ -89,7 +89,7 @@ export namespace event {
          * @returns  返回自身，方便链式调用
          */
         function trigger<T>(name: string, data?: T, sync?: boolean): IEventManager {
-            ensureString(name = tidyString(name), "name");
+            mustString(name = tidyString(name), "name");
             const handles = events[name] || [];
             handles.length > 0 && (sync === true
                 ? runHandles(name, handles, data)

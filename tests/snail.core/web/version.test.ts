@@ -6,7 +6,7 @@ const defaultVersion = version.getVersion();
 
 function tmpFunc(vm: IVersionManager): void {
     expect(vm.getVersion()).toStrictEqual("1x3");
-    expect(() => vm.formart("")).toThrow("file must be a string and cannot be empty");
+    expect(() => vm.formart("")).toThrow("file must be a non-empty string.");
     expect(vm.formart("url?")).toStrictEqual("url?_snvxx=1x3");
     expect(vm.formart("?")).toStrictEqual("?_snvxx=1x3");
     expect(vm.formart("#")).toStrictEqual("?_snvxx=1x3");
@@ -18,9 +18,9 @@ function tmpFunc(vm: IVersionManager): void {
     expect(vm.formart("html.xxx?_snvxx=x12")).toStrictEqual("html.xxx?_snvxx=x12");
 
     //  添加一个特定文件
-    expect(() => vm.addFile(undefined!, undefined!)).toThrow("file must be a string and cannot be empty");
-    expect(() => vm.addFile("", undefined!)).toThrow("file must be a string and cannot be empty");
-    expect(() => vm.addFile("1", undefined!)).toThrow("fileUrl must be a string and cannot be empty");
+    expect(() => vm.addFile(undefined!, undefined!)).toThrow("file must be a non-empty string.");
+    expect(() => vm.addFile("", undefined!)).toThrow("file must be a non-empty string.");
+    expect(() => vm.addFile("1", undefined!)).toThrow("fileUrl must be a non-empty string.");
     vm.addFile("/app/test.html", "/app/test.html?x=1");
     expect(vm.formart("/app/test.html")).toStrictEqual("/app/test.html?x=1");
     expect(vm.formart("/app/Test.html")).toStrictEqual("/app/test.html?x=1");

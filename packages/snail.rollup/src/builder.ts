@@ -5,18 +5,19 @@
 import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "./models/builder";
 import { AssetOptions, ComponentContext, ComponentOptions, PluginBuilder } from "./models/component";
 import { dirname, relative, resolve } from "path";
-import { buildDist, buildNetPath, checkExists, checkSrc, forceExt, importFile, isChild, isFile, isNetPath, isProduction, log } from "./utils/helper";
+import { buildDist, buildNetPath, checkExists, checkSrc, forceExt, getLen, importFile, isChild, isFile, isNetPath, isProduction, log, logIfAny, step, trace, traceIfAny, warn } from "./utils/helper";
 import { RollupOptions } from "rollup";
 import minimist from "minimist";
 import { ProjectOptions } from "./models/project";
 import {
-    ensureFunction, ensureString, hasOwnProperty,
+    mustString, mustFunction, mustObject, hasOwnProperty,
     throwError, throwIfFalse, throwIfTrue,
     isArrayNotEmpty, isString, isStringNotEmpty, isArray, isObject, isBoolean, isFunction,
     tidyString,
     url,
+    mustArray,
+    hasAny,
 } from "snail.core"
-import { CommonOptions } from "child_process";
 
 //#region ************************************* 公共方法 *************************************
 /**
@@ -29,7 +30,7 @@ import { CommonOptions } from "child_process";
  * - isProduction 为 process.env.NODE_ENV === "production"
  */
 export function getDefaultOptions(root: string): BuilderOptions {
-    ensureString(root, "root");
+    mustString(root, "root");
     return checkBuilder({ root, isProduction: isProduction() });
 }
 /**
@@ -39,10 +40,9 @@ export function getDefaultOptions(root: string): BuilderOptions {
  * @returns 构建器配置对象
  */
 export async function getFileOptions(file: string): Promise<BuilderOptions> {
-    ensureString(file, "file");
+    mustString(file, "file");
     log(`👉 load builder options from file:${file}`)
     const options = await importFile<BuilderOptions>(file, "file");
-
     return checkBuilder(hasOwnProperty(options, "default")
         ? options["default"]
         : options
@@ -60,8 +60,14 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
     //  1、验证Builder配置选项：srcRoot必须存在，验证后将数据冻结，避免被修改
     options = checkBuilder(options);
     options = Object.freeze(Object.assign(Object.create(null), options));
+    log("BuilderOptions:")
+    trace(`    root:${options.root}`);
+    trace(`    srcRoot:${options.srcRoot}`);
+    trace(`    sitRoot:${options.siteRoot}`);
+    trace(`    distRoot:${options.distRoot}`);
+    log("");
     //  2、验证plugin是否有效
-    ensureFunction(plugin, "plugin");
+    mustFunction(plugin, "plugin");
     //#endregion
 
     //#region *************************************实现接口：IRollupBuilder接口方法***************
@@ -72,12 +78,15 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
      * @returns rollup打包配置数组
      */
     function build(components: ComponentOptions[], commonLib?: CommonLibOptions[]): RollupOptions[] {
+        logIfAny(components, `build components`);
+        mustArray(components, "components");
         //  检测组件相关信息：检测完成后commonLib等数组强制数值，不会存在null、undefined情况
-        log("👉 validate component");
+        traceIfAny(components, "--check components");
         components = checkComponent(components, options);
-        log("👉 validate commonLib");
+        traceIfAny(commonLib, "--check commonLib");
         checkCommonLib(commonLib, "commonLib");
         //  整理CommonLib：components 自身如果是commonLib，也需要整理一下
+        traceIfAny(commonLib, "--merge commonLib");
         commonLib = components
             .map(component => convertToCommonLib(component, options))
             .filter(lib => lib != undefined)
@@ -104,10 +113,12 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
                     outro: component.outro,
                     banner: component.banner,
                     footer: component.footer,
-                    /*  全局公共js库映射
+                    /*
+                     *  全局公共js库映射
                      *      基于插件梳理出来全局使用到的公共js
                      *      做动态处理，而不是一开始指定
                      */
+                    /* v8 ignore next 3  globals 不进行代码覆盖率测试*/
                     globals: (id) => context.globals[id]?.name,
                     /*  amd模式下的特殊控制：
                      *      本地脚本强制加上“.js”后缀作为模块名，避免出现：define(['vue', '../Core']);
@@ -128,6 +139,7 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
                 plugins: plugin.call(component, component, context, options),
                 /*  拦截特定警告：后续会添加一些自定义参数，减少警告信息输出
                  */
+                /* v8 ignore next 3  onwarn 不进行代码覆盖率测试*/
                 onwarn: function (warning, warn) {
                     warning.code === "UNKNOWN_OPTION" || warn(warning);
                 }
@@ -142,20 +154,23 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
      * @returns rollup打包配置数组
      */
     async function buildProject(...projects: string[]): Promise<RollupOptions[]> {
-        throwIfFalse(isArrayNotEmpty(projects), "projects must be an array and cannot be empty")
-        //  遍历项目
-        const tasks: Promise<RollupOptions[]>[] = projects.map(async (project, index) => {
+        trace(`build projects: ${projects.join(" ")}`);
+        mustArray(projects, "projects");
+        //  遍历项目：按照顺序遍历，避免map返回promise时的异步导致的日志输出混乱，调试麻烦
+        const rullupOptions: RollupOptions[] = [];
+        for (let index = 0; index < projects.length; index++) {
+            let project = projects[index];
+            step(`👉 build projects[${index}]: ${project}`);
             project = tidyString(project);
-            ensureString(project, `projects[${index}] is invalid:`);
+            mustString(project, `projects[${index}] is invalid:`);
             project = resolve(options.root, project);
-            log(`👉 build project: ${project}`);
+            //  加载项目自身，分析依赖项转换成commonLib，然后构建rollup配置
             const { components, projectDeps } = await importProject(project);
+            logIfAny(projectDeps, "load dependency projects");
             const commonLib: CommonLibOptions[] = await loadProjectDeps(project, projectDeps, options);
-            return build(components, commonLib);
-        });
-        //  等待任务完成，合并项目
-        const taskDatas: RollupOptions[][] = await Promise.all(tasks);
-        return taskDatas.reduce((prev, curr) => prev.concat(curr), []);
+            rullupOptions.push(...build(components, commonLib));
+        }
+        return rullupOptions;
     }
     /**
      * 从命令行参数构建项目下的组件Rollup打包配置选项
@@ -165,15 +180,15 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
      * @returns rollup打包配置数组
      */
     async function buildFromCmd(): Promise<RollupOptions[]> {
+        trace(`build from cmd: ${process.argv.slice(2).join(" ")}`);
         const argMap = minimist(process.argv.slice(2));
         const projectFiles: string[] = isArray(argMap.project)
             ? argMap.project
             : isStringNotEmpty(argMap.project) ? [argMap.project] : undefined;
-        if (isArrayNotEmpty(projectFiles) == false) {
-            const message = "--project argument invalid. example: --project ./.projects/common.js ./.projects/service.js";
-            throw new Error(message);
-        }
-        log(`👉 build from cmd: --project ${projectFiles.join(" ")}}`);
+        throwIfFalse(
+            isArrayNotEmpty(projectFiles),
+            "--project argument invalid. example: --project ./.projects/common.js ./.projects/service.js"
+        );
         return buildProject(...projectFiles);
     }
     //#endregion
@@ -186,6 +201,7 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
 
 
 //#region ************************************* 私有方法 *************************************
+
 /**
  * 检测构建器配置选项
  * @param options 
@@ -195,7 +211,7 @@ function checkBuilder(options: BuilderOptions): BuilderOptions {
     typeof (options) == "object" || throwError(`options must be an object.`);
     options = Object.assign(Object.create(null), options);
     options.root = tidyString(options.root);
-    ensureString(options.root, "options.root");
+    mustString(options.root, "options.root");
     checkExists(options.root, "options.root");
 
     options.srcRoot = tidyString(options.srcRoot) || resolve(options.root, "src");
@@ -222,24 +238,22 @@ function checkCommonLib(libs: CommonLibOptions[], title: string): CommonLibOptio
     /* 遍历验证；id的唯一性 */
     const idMap: Map<string, boolean> = new Map();
     libs.forEach((lib, index) => {
-        const errorMessage = `${title}[${index}] is invalid`;
-        isObject(lib) || throwError(`${errorMessage}: must be an object.`);
+        trace(`------check commonLib[${index}]: ${JSON.stringify(lib)}`);
+        const errorMessage = `${title}[${index}] invalid`;
+        mustObject(lib, `${errorMessage}:`);
         //  id必填，不能重复
         lib.id = tidyString(lib.id);
-        ensureString(lib.id, errorMessage + ": id");
+        mustString(lib.id, `${errorMessage}: id`);
         idMap.has(lib.id) && throwError(`${errorMessage}: id is duplicated. id:${lib.id}.`);
         idMap.set(lib.id, true);
         //  name必填
         lib.name = tidyString(lib.name);
-        ensureString(lib.name, errorMessage + ": name");
+        mustString(lib.name, `${errorMessage}: name`);
         //  url必填，优先考虑验证必须是网络绝对路径，或者http等协议路径
         lib.url = tidyString(lib.url);
-        ensureString(lib.url, errorMessage + ": url");
+        mustString(lib.url, `${errorMessage}: url`);
         lib.url = url.format(lib.url);
-        throwIfFalse(
-            isNetPath(lib.url),
-            `${errorMessage}: url must be a valid url. url:${lib.url}.`
-        );
+        isNetPath(lib.url) || throwError(`${errorMessage}: url must be a valid url. url:${lib.url}.`);
     });
     return libs;
 }
@@ -266,21 +280,18 @@ async function importProject(project: string): Promise<ProjectOptions> {
 async function loadProjectDeps(project: string, deps: string[], options: BuilderOptions): Promise<CommonLibOptions[]> {
     /* 先仅加载自身项目依赖；不钻取依赖项目的依赖配置文件 */
     const commonLib: CommonLibOptions[] = [];
-    if (isArrayNotEmpty(deps) == true) {
-        const depTasks = deps.map(async depFile => {
-            depFile = resolve(project, depFile);
-            log(`--load dep project: ${depFile}`);
-            const depsProj: ProjectOptions = (await importProject(depFile)) || {} as any;
-            depsProj.components = isArrayNotEmpty(depsProj.components)
-                ? checkComponent(depsProj.components, options)
-                : [];
-            (depsProj.components || []).forEach(component => {
-                component.isCommonLib && commonLib.push({ id: component.src, name: component.name, url: component.url });
-                const lib = convertToCommonLib(component, options);
-                lib && commonLib.push(lib);
-            });
+    for (let index = 0; index < getLen(deps); index++) {
+        let depFile: string = deps[index];
+        depFile = resolve(project, "..", depFile);
+        trace(`--load dependency projects[${index}]: ${depFile}`);
+        const depsProj: ProjectOptions = await importProject(depFile);
+        depsProj.components = isArrayNotEmpty(depsProj.components)
+            ? checkComponent(depsProj.components, options)
+            : [];
+        depsProj.components.forEach(component => {
+            const lib = convertToCommonLib(component, options);
+            lib && commonLib.push(lib);
         });
-        await Promise.all(depTasks);
     }
     return commonLib;
 }
@@ -305,14 +316,13 @@ function convertToCommonLib(component: ComponentOptions, options: BuilderOptions
  * @returns 检测好的js组件自身；经过assign处理
  */
 function checkComponent(components: ComponentOptions[], options: BuilderOptions): ComponentOptions[] {
-    throwIfFalse(isArrayNotEmpty(components), "components must be an array and cannot be empty");
     return components.map((component, index) => {
-        const errorMessage = `components[${index}] is invalid`;
-        isObject(component) || throwError(`${errorMessage}: must be an object`);
-        log(`\component:${component.src}`);
+        trace(`----check components[${index}]: ${component?.src}`);
+        const errorMessage = `components[${index}] invalid`;
+        mustObject(component, `${errorMessage}:`);
         component = Object.assign({ format: "umd", exports: "named" }, component);
         //  src+root
-        component.src = checkSrc(options, component.src, `${errorMessage}: src`);
+        component.src = checkSrc(options, component.src, `${errorMessage}`);
         component.root = tidyString(component.root);
         component.root = component.root
             ? resolve(options.srcRoot, component.root)
@@ -322,25 +332,30 @@ function checkComponent(components: ComponentOptions[], options: BuilderOptions)
             `${errorMessage}: root must be child of srcRoot. srcRoot:${options.srcRoot}, root:${component.root}.`
         );
         //  dist+url
+        if (component.dist) {
+            debugger;
+            warn(`------components[${index}].url no need assign. url:${component.url}`);
+        }
         component.dist = buildDist(options, component.src);
         component.dist = forceExt(component.dist, ".js");
         component.url = buildNetPath(options, component.dist);
         //  打包相关验证
         component.isCommonLib = component.isCommonLib === true;
         component.sourceMap = component.sourceMap === true;
-        //      format验证
+        //      @ts-ignore format验证
+        component.format = tidyString(component.format) || "umd";
         const formats = ["amd", "cjs", "es", "iife", "system", "umd"];
         throwIfTrue(
             formats.indexOf(component.format) == -1,
-            `${errorMessage} :format must be one of ${formats.join(",")}.`
+            `${errorMessage}: format must be one of ${formats.join(",")}.`
         );
         //      name、extend、exports验证：name有值时，若extend无效，则强制默认true
         component.name = tidyString(component.name);
         throwIfTrue(
-            component.isCommonLib == true && component.name == null,
-            `${errorMessage} :name must be a string and cannot be empty when component.isCommonLib is true.`
+            component.isCommonLib == true && component.name == undefined,
+            `${errorMessage}: name must be a non-empty string when component.isCommonLib is true.`
         );
-        component.extend = component.name != null && isBoolean(component.extend) == false
+        component.extend = component.name != undefined && isBoolean(component.extend) == false
             ? true
             : component.extend;
         //      打包头部、尾部代码追加
@@ -349,8 +364,11 @@ function checkComponent(components: ComponentOptions[], options: BuilderOptions)
         component.banner = tidyString(component.banner);
         component.footer = tidyString(component.footer);
         //  组件views、asserts、commonLib处理
+        traceIfAny(component.commonLib, `------check component.commonLib`);
         component.commonLib = checkCommonLib(component.commonLib, `components[${index}].commonLib`);
+        traceIfAny(component.assets, `------check component.assets`);
         component.assets = checkAssets(component.assets, `components[${index}].assets`, options);
+        traceIfAny(component.views, `------check component.views`);
         component.views = checkAssets(component.views, `components[${index}].views`, options);
         //  执行初始化方法
         isFunction(component.init) && component.init.call(component, component, options);
@@ -368,8 +386,10 @@ function checkComponent(components: ComponentOptions[], options: BuilderOptions)
 function checkAssets(assets: Array<AssetOptions | string>, title: string, options: BuilderOptions): AssetOptions[] {
     assets = isArray(assets) ? assets : [];
     return assets.map((at, index) => {
-        const errorMessage = `${title}[${index}]is invalid`;
-        let asset: AssetOptions = typeof (at) == "string" ? { src: at } as AssetOptions : at;
+        const errorMessage = `${title}[${index}] invalid`;
+        let asset: AssetOptions = typeof (at) == "string"
+            ? { src: at } as AssetOptions
+            : (mustObject(at, `${errorMessage}:`), at);
         //  src 文件在srcRoot下存在性验证；dist在siteRoot目录下
         checkSrc(options, asset.src, errorMessage);
         asset.dist = tidyString(asset.dist);
@@ -380,7 +400,7 @@ function checkAssets(assets: Array<AssetOptions | string>, title: string, option
             : buildDist(options, asset.src);
         throwIfFalse(
             isChild(options.siteRoot, asset.dist),
-            `${errorMessage}: dist must be child of siteRoot.siteRoot: ${options.siteRoot}, dist: ${asset.dist}`
+            `${errorMessage}: dist must be child of siteRoot. siteRoot: ${options.siteRoot}, dist: ${asset.dist}`
         );
         //  返回校正后的资源信息
         return asset;
