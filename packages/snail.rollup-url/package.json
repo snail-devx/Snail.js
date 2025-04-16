@@ -1,15 +1,16 @@
 {
-  "name": "snail.rollup-style",
-  "description": "配合【snail.rollup】使用的插件，支持less、css、scss、sass等样式文件打包编译",
+  "name": "snail.rollup-url",
+  "description": "配合【snail.rollup】使用的插件，支持使用过程中，将import文件转换成url返回",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.0.8",
+  "version": "1.0.1",
   "type": "module",
   "main": "index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {},
   "dependencies": {
+    "snail.core": "^1.0.11",
     "snail.rollup": "^1.0.5"
   }
 }

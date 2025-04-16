@@ -2,8 +2,10 @@ import { execaSync } from "execa"
 import { resolve } from "path";
 import { fileURLToPath } from 'url';
 import minimist from "minimist";
-import { step, log, reMakeDir } from "../shared/io.js";
-import { allPackages, getPackages } from '../shared/packages.js';
+import {
+    step, log, reMakeDir,
+    allPackages, getPackages
+} from "./util.js";
 
 /** 文件所处目录路径  */
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -21,8 +23,9 @@ export const argMap = minimist(process.argv.slice(2));
  */
 export function buildPackage(pkg, clearDistBefore = true) {
     step(`👉 构建项目：${pkg.dir}\t\t包名：${pkg.name}`);
-    log(`  rollupfile : ${pkg.rollupFile}`);
-    clearDistBefore === true && reMakeDir(pkg.distRoot);
+    log(`--releaseRoot \t${pkg.releaseRoot}`);
+    log(`--rollupfile \t${pkg.rollupFile}`);
+    clearDistBefore === true && reMakeDir(pkg.releaseRoot);
     //  执行rollup构建
     execaSync(
         "rollup",
@@ -44,5 +47,5 @@ export function buildPackage(pkg, clearDistBefore = true) {
 //  自执行，执行打包操作：直接运行此文件时才执行
 if (fileURLToPath(import.meta.url) === process.argv[1]) {
     (argMap._.length > 0 ? getPackages(argMap._) : allPackages)
-        .forEach(pkg => buildPackage(pkg, false));
+        .forEach(pkg => buildPackage(pkg, true));
 }

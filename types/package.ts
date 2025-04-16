@@ -18,8 +18,9 @@ export type Package = {
     srcRoot: string,
     /**
      * dist目录路径
+     * 使用releaseRoot替换掉
+     * distRoot: string,
      */
-    distRoot: string,
     /**
      * types目录路径
      */

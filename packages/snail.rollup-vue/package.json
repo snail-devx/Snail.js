@@ -10,6 +10,6 @@
   "types": "dist/index.d.ts",
   "scripts": {},
   "dependencies": {
-    "snail.rollup": "^1.0.3"
+    "snail.rollup": "^1.0.5"
   }
 }

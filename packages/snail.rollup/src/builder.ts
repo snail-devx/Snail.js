@@ -110,7 +110,11 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
         return components.map(component => {
             component.commonLib = [].concat(component.commonLib, commonLib);
             component = Object.freeze(component);
-            const context: ComponentContext = Object.freeze({ assets: [], globals: {} });
+            const context: ComponentContext = Object.freeze({
+                assets: [],
+                globals: new Map<string, CommonLibOptions>(),
+                caches: new Map<string, any>(),
+            });
             return {
                 input: component.src,
                 output: {

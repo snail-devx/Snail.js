@@ -11,7 +11,7 @@ import { ComponentOptions } from "snail.rollup"
  * @param options 全局打包配置选项：约束siteRoot、srcRoot等
  * @returns rollup插件实例
  */
-export function vuePlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
+export default function vuePlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
     return {
         name: "snail.rollup-vue",
     }

@@ -5,11 +5,8 @@
 export type ModuleOptions = {
     /**
      * 模块类型
-     *  - net：网络url
-     *  - src：项目源码
-     *  - npm：node_modules目录下npm包
      */
-    type: "net" | "src" | "npm";
+    type: ModuleType;
     /**
      * 模块id
      * - src时，为绝对路径地址
@@ -34,6 +31,14 @@ export type ModuleOptions = {
      */
     query?: { [key: string]: string };
 }
+/**
+ * 模块类型
+ *  - net：网络url
+ *  - src：项目源码
+ *  - npm：node_modules目录下npm包
+ */
+export type ModuleType = "net" | "src" | "npm";
+
 /**
  * 模块转码编译结果
  */

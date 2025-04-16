@@ -5,9 +5,11 @@
 import { resolve } from "path";
 import { readdirSync, statSync } from "fs";
 import dts from 'rollup-plugin-dts'
-import { isStringNotEmpty } from "./shared/base.js";
-import { checkExists, error } from "./shared/io.js";
-import { getPackage } from "./shared/packages.js";
+import {
+    isStringNotEmpty,
+    checkExists, error, log, trace,
+    getPackage
+} from "./scripts/util.js";
 
 /** 需要构建的项目包信息 @type {import("./types/package").Package} */
 const pkg = (() => {
@@ -25,18 +27,23 @@ const pkg = (() => {
  */
 const dtsFiles = [];
 {
+    log(`--.d.ts root \t${pkg.typesRoot}`);
     checkExists(pkg.typesRoot) && readdirSync(pkg.typesRoot).forEach(item => {
         const dtsFile = resolve(pkg.typesRoot, item);
-        statSync(dtsFile).isFile() && dtsFile.endsWith(".d.ts") && dtsFiles.push({
-            input: dtsFile,
-            output: { file: resolve(pkg.releaseRoot, "dist", item), format: 'es' },
-            plugins: [
-                dts()
-            ],
-            external: [
-                /node_modules/gi,
-            ],
-        });
+        if (statSync(dtsFile).isFile() && dtsFile.endsWith(".d.ts")) {
+            const target = resolve(pkg.releaseRoot, "dist", item);
+            trace(`--build file \t${dtsFile} \t➡️\t ${target}`);
+            dtsFiles.push({
+                input: dtsFile,
+                output: { file: target, format: 'es' },
+                plugins: [
+                    dts()
+                ],
+                external: [
+                    /node_modules/gi,
+                ],
+            });
+        }
     });
     dtsFiles.length || error(`目录下无.d.ts文件，无法进行dt构建，目录：${typesRoot}`);
 }

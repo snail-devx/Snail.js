@@ -1,8 +1,6 @@
 //  构建rollup配置所需组件
 import { relative, resolve } from "path";
 import { fileURLToPath } from "url";
-import { isArrayNotEmpty, isStringNotEmpty } from "./shared/base.js";
-import { error, importFile } from "./shared/io.js";
 //      依赖npm包支持：add -D  @rollup/plugin-node-resolve
 import nodeResolve from "@rollup/plugin-node-resolve";
 //      typescript支撑：add -D  @rollup/plugin-typescript typescript tslib
@@ -10,7 +8,12 @@ import typescript from "@rollup/plugin-typescript";
 //      babel支持： add -D @rollup/plugin-babel  
 import babel from "@rollup/plugin-babel";
 import { DEFAULT_EXTENSIONS } from "@babel/core";
-import { getPackage } from "./shared/packages.js";
+
+import {
+    isArrayNotEmpty, isStringNotEmpty,
+    error, importFile, log, trace,
+    getPackage
+} from "./scripts/util.js";
 
 /** 文件所处目录路径  */
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -25,15 +28,17 @@ const pkg = (() => {
         ? pkg
         : error(`无法取到打包项目信息：${packageDir}`);
 })();
-/** 默认的rollup配置 */
-const defaultRollup = await importFile(pkg.rollupFile, "加载rollup配置");
+/** 要打包的rollup配置
+ * @type {import("./types/rollup-build").RollupBuildOptions;}
+ */
+const pkgRollup = await importFile(pkg.rollupFile, "加载rollup配置");
 
 /**
  * 构建Rollup的打包配置信息
  * @returns {import("rollup").RollupOptions[]}
  */
 function buildRollupConfig() {
-    let defaultConfig = defaultRollup?.default;
+    let defaultConfig = pkgRollup?.default;
     if (!defaultConfig) {
         error(`\t无法从Rollup配置文件加载default配置：${pkg.rollupFile}`);
         return;
@@ -59,14 +64,16 @@ function mergeRollupOptions(item) {
     //  plugins 处理：先构建默认的，然后将item自身追加过来
     mergeRollupPlugins(item);
     //  external 处理；加上默认忽略项目
-    // item.external = [
-    //     /** 
-    //      * 包含“node_modules”；这样编译出来的模块，才会把【node_modules】中的引用代码合并过来
-    //      *  如snaile.core中使用await关键字等，如不带过来，则需要使用方做引入，不独立
-    //      */
-    //     // /node_modules/gi,
-    //     ...(item.external || [])
-    // ]
+    item.external ??= [];
+    item.external = [].concat(
+        pkgRollup.DISABLE_DefaultExternal == true
+            ? []
+            : [/node_modules/],
+        Array.isArray(item.external)
+            ? item.external
+            : [item.external]
+    );
+    item.external.push();
     //  返回自身
     return item;
 }
@@ -82,12 +89,14 @@ function mergeRollupOutput(item) {
         /**@param {import("rollup").OutputOptions} out*/
         function (out) {
             out.format = out.format || "es";
-            //  对输出路径进行决定路径处理；都没指定是，基于input路径进行拼接
-            out.dir && (out.dir = resolve(pkg.root, out.dir));
-            out.file && (out.file = resolve(pkg.root, out.file));
-            !out.dir && !out.file && (out.file = resolve(pkg.distRoot, relative(pkg.srcRoot, item.input)));
+            //  对输出路径进行处理，相对releaseRoot路径
+            out.dir && (out.dir = resolve(pkg.releaseRoot, out.dir));
+            out.file && (out.file = resolve(pkg.releaseRoot, out.file));
+            !out.dir && !out.file && (out.file = resolve(pkg.releaseRoot, relative(pkg.srcRoot, item.input)));
             //  如果是ts文件，则强制.js
             out.file && (out.file = out.file.replace(/\.ts$/i, ".js"));
+            //  输出结果
+            trace(`--build file \t${item.input} \t➡️\t ${out.dir || out.file}`);
         }
     );
 }
@@ -96,10 +105,6 @@ function mergeRollupOutput(item) {
  * @param {import("rollup").RollupOptions} item 
  */
 function mergeRollupPlugins(item) {
-    //  项目rollup.config.js显示指定【禁用默认插件】，则不做处理
-    if (defaultRollup?.DISABLE_DefaultPlugins === true) {
-        return;
-    }
     //  默认插件配置
     const plugins = [
         nodeResolve({ preferBuiltins: true }),
@@ -112,7 +117,7 @@ function mergeRollupPlugins(item) {
         }),
     ];
     //  根据需要显式指定babel转码：执行babel编译，加入垫片等；强制支持ts
-    defaultRollup?.START_BabelPlugin === true && plugins.push(babel({
+    pkgRollup?.START_BabelPlugin === true && plugins.push(babel({
         extensions: [".ts", ...DEFAULT_EXTENSIONS],
         configFile: resolve(__dirname, '.babelrc.json'),
         comments: false,

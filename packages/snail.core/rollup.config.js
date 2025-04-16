@@ -1,5 +1,7 @@
 /** 是否启用babel转码 */
 export const START_BabelPlugin = true;
+/** 禁用默认external，引用的三方包代码一并合并打包 */
+export const DISABLE_DefaultExternal = false;
 
 /**
  * 打包的组件配置

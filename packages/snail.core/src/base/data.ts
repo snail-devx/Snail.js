@@ -242,7 +242,7 @@ export function mustFunction(data: any, paramName: string): boolean {
  * @param paramName 参数名，用于拼接报错信息。paramName + " must be an object."
  * @returns 是function返回true
  */
-export function mustObject(data: any, paramName: string, lenient?: boolean): boolean {
+export function mustObject(data: any, paramName: string): boolean {
     if (isObject(data) == true) {
         return true;
     }

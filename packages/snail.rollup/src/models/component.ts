@@ -186,7 +186,13 @@ export type ComponentContext = {
      * - key为模块id；value为对应的commonLib配置
      * - 配合rollup的globals属性使用，方便一键得到全局依赖
      */
-    globals: Record<string, CommonLibOptions>;
+    globals: Map<string, CommonLibOptions>;
+
+    /**
+     * 组件上下文的缓存字典
+     * - 插件可以使用此缓存，避免重复分析计算
+     */
+    caches: Map<string, any>;
 }
 
 /**
