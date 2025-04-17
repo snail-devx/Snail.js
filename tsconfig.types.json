@@ -10,5 +10,14 @@
         //  输出路径；这个通过命令行外部自己传入： --rootDir "...\snail.core\src" --declarationDir "...\snail.core\dist\types"
         // "declarationDir": "./dist/types",
         // "outFile": "./dist/index.d.ts",
-    }
+        /**忽略库文件的类型检查，否则 vite中引入的rollup会在检查时报错：
+         *      error TS2307: Cannot find module 'rollup/parseAst' or its corresponding type declarations.
+         *      There are types at '/Snail.js/node_modules/.pnpm/vite@6.3.0_@types+node@22.14.1/node_modules/rollup/dist/parseAst.d.ts',
+         *      but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'. 
+        */
+        "skipLibCheck": true,
+    },
+    "exclude": [
+        "node_modules",
+    ]
 }

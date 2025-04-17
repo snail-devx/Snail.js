@@ -2,7 +2,7 @@ import { ResolveIdResult } from "rollup";
 import { hasOwnProperty } from "snail.core";
 import { BuilderOptions, ComponentContext, getBuilder, getFileOptions, ModuleOptions } from "snail.rollup"
 import { ComponentOptions } from "snail.rollup"
-import { buildDist, buildNetPath, forceFileExt, resolveModule } from "snail.rollup/dist/plugin";
+import { buildDist, buildNetPath, forceFileExt, mustInSrcRoot, resolveModule } from "snail.rollup/dist/plugin";
 
 /** URL前缀标记 */
 const FLAG_URL = "URL:";
@@ -39,6 +39,7 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
                     return buildUrlResolve(module.id, false);
                 }
                 case "src": {
+                    mustInSrcRoot(module, source, importer, component, options);
                     let url = buildDist(options, module.id);
                     url = buildNetPath(options, url);
                     url = forceFileExt(url, options);

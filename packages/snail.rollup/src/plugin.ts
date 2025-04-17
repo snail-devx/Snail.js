@@ -178,19 +178,30 @@ export function resolveModule(source: string, importer: string, context: Compone
  * @param importer 由谁引入的source文件
  * @param component 打包的组件信息
  * @param options 打包器相关信息
+ * @param reasons 补充一些原因说明
  */
-export function triggerRule(rule: string, source: string, importer: string, component: ComponentOptions, options: BuilderOptions): void {
+export function triggerRule(rule: string, source: string, importer: string,
+    component: ComponentOptions, options: BuilderOptions, ...reasons: string[]): void {
     //  输出错误提示信息
     const msgs: string[] = [
         pc.bold(` * ${rule}`),
         `source         ${source}`,
-        `组件src        ${component.src}`,
-        `组件Root       ${component.root}`,
+        `componentSrc        ${component.src}`,
+        `componentRoot       ${component.root}`,
         `srcRoot        ${options.srcRoot}`
     ];
     importer && msgs.splice(1, 0, `importer       ${importer}`);
     console.log(pc.red(msgs.join('\r\n\t')), "\r\n")
     isWatchMode || process.exit(0);
+
+    // console.log(pc.red("import style file must be child of componentRoot when it is child of srcRoot."));
+    // trace(`----component \t${this.component.src}`);
+    // trace(`----source \t${from}`);
+    // console.log(pc.bold('invalid @import files:'));
+    // outRuleFiles.forEach(file => trace(`----${file}`));
+    // console.log(pc.bold('all @import files:'));
+    // preResult.dependencies.forEach(file => trace(`----${file}`))
+    // isWatchMode || process.exit(1);
 }
 /**
  * 必须在SrcRoot目录下，否则报错
@@ -202,10 +213,11 @@ export function triggerRule(rule: string, source: string, importer: string, comp
  */
 export function mustInSrcRoot(module: ModuleOptions, source: string, importer: string, component: ComponentOptions, options: BuilderOptions): void {
     if (isChild(options.srcRoot, module.id) == false) {
-        const rule = "import file must be child or srcRoot: cannot analysis url of outside file.";
+        const rule = "import file must be child of srcRoot: cannot analysis url of outside file.";
         triggerRule(rule, source, importer, component, options);
     }
 }
+
 //#endregion
 
 //#region ************************************* 私有方法、变量 *************************************

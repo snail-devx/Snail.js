@@ -27,7 +27,7 @@
         //  .d.ts文件；相关配置；默认不生成，使用专有dts文件生成命令
         "declaration": false,
         //  解决import fs from "fs" 报错的问题
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
     },
     "exclude": [
         "node_modules"

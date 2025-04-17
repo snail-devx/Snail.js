@@ -178,6 +178,7 @@ export type ViewOptions = AssetOptions & {
 export type ComponentContext = {
     /**
      * 组件打包过程中分析出来的依赖资源；如图片，这些自动copy到输出目录
+     * - 需借助【snail.rollup-asset】包插件完成
      */
     assets: AssetOptions[];
 

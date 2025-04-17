@@ -70,3 +70,11 @@ export function registerDynamicModule(id: string, code: string): void {
     )
     DYNAMIC_MODULES[id] = code;
 }
+/**
+ * 移除动态注入的模块
+ * @param id 模块id，区分大小写，确保唯一
+ */
+export function removeDynamicModule(id: string): void {
+    mustString(id = tidyString(id), "id");
+    delete DYNAMIC_MODULES[id];
+}

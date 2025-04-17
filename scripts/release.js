@@ -22,6 +22,9 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const DEFAULT_FILES = ["index.js", "package.json", "LICENSE", "README.md"];
 /** 默认共享的文件 */
 const DEFAULT_SHARED = ["LICENSE"];
+/** 是否需要发布 */
+// const needPublish = existsSync(resolve(__dirname, "../.snail.publish"));
+const needPublish = false;
 
 /**
  * 发布指定包；构建npm项目，自动版本号、自动publish
@@ -34,7 +37,7 @@ function releasePackage(pkg) {
     //  2、生成npm包文件
     step(`\r\n👉 生成NPM包：${pkg.releaseRoot}`);
     //      递增版本号：后续看情况精确处理
-    execaSync(
+    needPublish && execaSync(
         "npm",
         ["version", "patch"],
         { cwd: pkg.root, stdio: "inherit" }
@@ -108,13 +111,12 @@ function releasePackage(pkg) {
         existsSync(src) && (existsSync(dest) || cpSync(src, dest));
     });
     //  3、发布npm包：后续看情况实现
-    execaSync(
+    needPublish && execaSync(
         "npm",
         ["publish"],
         { cwd: pkg.releaseRoot, stdio: "inherit" }
     );
 }
-
 
 //  自执行，执行打包操作：直接运行此文件时才执行
 if (fileURLToPath(import.meta.url) === process.argv[1]) {

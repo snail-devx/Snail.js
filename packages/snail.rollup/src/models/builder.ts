@@ -44,7 +44,7 @@ export type BuilderOptions = {
     /**
      * css样式块合并提取成文件时的目录
      * - 使用相对路径，相对组件打包src路径；默认 ./css
-     * - 在提取js组件库中使用vue文件时，基于此合并vue组件style样式：./css/[componentFileName].Vue.css
+     * - 在提取js组件库中使用vue文件时，基于此合并vue组件style样式：./css/[componentFileName].vue.css
      */
     cssChunkFolder?: string;
 
