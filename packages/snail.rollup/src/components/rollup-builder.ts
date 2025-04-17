@@ -1,85 +1,93 @@
-/**
- * RollupBuilder构建器
- *  1、支持按照项目、组件、命令行等方式构建RollUpOptions对象
- *  2、支持项目依赖管理；需配合snail.rollup-*相关插件实现
- */
-
-//#region ************************************* 导入、导出 *************************************
 import { dirname, relative, resolve } from "path";
 import { RollupOptions } from "rollup";
 import minimist from "minimist";
 import {
-    buildDist, buildNetPath, checkExists, checkSrc, forceExt, getLen, importFile,
-    isChild, isNetPath, isProduction, log, logIfAny, step, trace, traceIfAny, warn
-} from "./utils/helper";
-import {
-    mustString, mustFunction, mustObject, hasOwnProperty,
+    mustString, mustFunction, mustArray, mustObject,
     throwError, throwIfFalse, throwIfTrue,
-    isArrayNotEmpty, isString, isStringNotEmpty, isArray, isObject, isBoolean, isFunction,
+    isArrayNotEmpty, isStringNotEmpty, isArray, isBoolean, isFunction, hasOwnProperty,
     tidyString,
     url,
-    mustArray,
 } from "snail.core"
-import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "./models/builder";
-import { AssetOptions, ComponentContext, ComponentOptions, PluginBuilder } from "./models/component";
-import { ProjectOptions } from "./models/project";
-
-/** 把自己的类型共享出去 */
-export * from "./models/builder"
-export * from "./models/component"
-export * from "./models/module"
-export * from "./models/project"
-//#endregion
-
-//#region ************************************* 公共方法 *************************************
-/**
- * 获取默认的构建器配置对象
- * @param root 项目根目录；用于构建siteRoot等参数
- * @returns 构建器配置对象；构建规则
- * - srcRoot 为 root+src
- * - siteRoot 为 root+dist
- * - distRoot 为 root+dist
- * - isProduction 为 process.env.NODE_ENV === "production"
- */
-export function getDefaultOptions(root: string): BuilderOptions {
-    mustString(root, "root");
-    return checkBuilder({ root, isProduction: isProduction() });
-}
-/**
- * 获取基于文件的构建器配置对象
- * - root必填；若srcRoot、siteRoot、distRoot为空，则构建默认，规则和getDefaultOptions一致
- * @param file 文件路径，绝对路径，如 snail.rollup.js
- * @returns 构建器配置对象
- */
-export async function getFileOptions(file: string): Promise<BuilderOptions> {
-    mustString(file, "file");
-    log(`👉 load builder options from file:${file}`)
-    const options = await importFile<BuilderOptions>(file, "file");
-    return checkBuilder(hasOwnProperty(options, "default")
-        ? options["default"]
-        : options
-    );
-}
+import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../models/builder";
+import { AssetOptions, ComponentContext, ComponentOptions, PluginBuilder } from "../models/component";
+import { ProjectOptions } from "../models/project";
+import {
+    buildDist, buildNetPath, checkExists, checkSrc, forceExt, getLen, importFile,
+    isChild, isNetPath, isProduction, log, logIfAny, step, trace, traceIfAny, warn
+} from "../utils/helper";
 
 /**
- * 获取构建器对象
- * @param options   打包全局配置选项
- * @param plugin    插件构建器：组件打包时，执行此方法，构建组件打包所需插件
- * @returns 构建器对象
+ * Rollup构建器
  */
-export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRollupBuilder {
-    //#region ************************************* 初始化代码 *************************************
-    //  1、验证Builder配置选项：srcRoot必须存在，验证后将数据冻结，避免被修改
-    options = checkBuilder(options);
-    options = Object.freeze(Object.assign(Object.create(null), options));
-    log("BuilderOptions:")
-    trace(`    root:${options.root}`);
-    trace(`    srcRoot:${options.srcRoot}`);
-    trace(`    sitRoot:${options.siteRoot}`);
-    trace(`    distRoot:${options.distRoot}`);
-    log("");
-    //  2、验证plugin是否有效
-    mustFunction(plugin, "plugin");
+export class Builder implements IRollupBuilder {
+
+    //#region *************************************属性、构造方法***************************************
+    /** 打包全局配置选项 */
+    private readonly options: BuilderOptions;
+    /** 插件构建器：组件打包时，执行此方法，构建组件打包所需插件 */
+    private readonly plugin: PluginBuilder;
+
+    /**
+     * 构造方法
+     * @param options   打包全局配置选项
+     * @param plugin    插件构建器：组件打包时，执行此方法，构建组件打包所需插件
+     */
+    private constructor(options: BuilderOptions, plugin: PluginBuilder) {
+        this.options = options;
+        this.plugin = plugin
+    }
+    //#endregion
+
+    //#region ************************************* 公共方法***************************************
+    /**
+         * 获取默认的构建器配置对象
+         * @param root 项目根目录；用于构建siteRoot等参数
+         * @returns 构建器配置对象；构建规则
+         * - srcRoot 为 root+src
+         * - siteRoot 为 root+dist
+         * - distRoot 为 root+dist
+         * - isProduction 为 process.env.NODE_ENV === "production"
+         */
+    public static getDefaultOptions(root: string): BuilderOptions {
+        mustString(root, "root");
+        return checkBuilder({ root, isProduction: isProduction() });
+    }
+    /**
+     * 获取基于文件的构建器配置对象
+     * - root必填；若srcRoot、siteRoot、distRoot为空，则构建默认，规则和getDefaultOptions一致
+     * @param file 文件路径，绝对路径，如 snail.rollup.js
+     * @returns 构建器配置对象
+     */
+    public static async getFileOptions(file: string): Promise<BuilderOptions> {
+        mustString(file, "file");
+        log(`👉 load builder options from file:${file}`)
+        const options = await importFile<BuilderOptions>(file, "file");
+        return checkBuilder(hasOwnProperty(options, "default")
+            ? options["default"]
+            : options
+        );
+    }
+    /**
+     * 获取构建器对象
+     * @param options   打包全局配置选项
+     * @param plugin    插件构建器：组件打包时，执行此方法，构建组件打包所需插件
+     * @returns 构建器对象
+     */
+    public static getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRollupBuilder {
+        //  1、验证Builder配置选项：srcRoot必须存在，验证后将数据冻结，避免被修改
+        options = checkBuilder(options);
+        options = Object.freeze(Object.assign(Object.create(null), options));
+        log("BuilderOptions:")
+        trace(`    root:${options.root}`);
+        trace(`    srcRoot:${options.srcRoot}`);
+        trace(`    sitRoot:${options.siteRoot}`);
+        trace(`    distRoot:${options.distRoot}`);
+        log("");
+        //  2、验证plugin是否有效
+        mustFunction(plugin, "plugin");
+        //  3、构建实例返回
+        return new Builder(options, plugin);
+    }
     //#endregion
 
     //#region *************************************实现接口：IRollupBuilder接口方法***************
@@ -89,22 +97,22 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
      * @param commonLib 公共js库；和component.commonLib做合并
      * @returns rollup打包配置数组
      */
-    function build(components: ComponentOptions[], commonLib?: CommonLibOptions[]): RollupOptions[] {
+    public build(components: ComponentOptions[], commonLib?: CommonLibOptions[]): RollupOptions[] {
         logIfAny(components, `build components`);
         mustArray(components, "components");
         //  检测组件相关信息：检测完成后commonLib等数组强制数值，不会存在null、undefined情况
         traceIfAny(components, "--check components");
-        components = checkComponent(components, options);
+        components = checkComponent(components, this.options);
         traceIfAny(commonLib, "--check commonLib");
         checkCommonLib(commonLib, "commonLib");
         //  整理CommonLib：components 自身如果是commonLib，也需要整理一下
         traceIfAny(commonLib, "--merge commonLib");
         commonLib = components
-            .map(component => convertToCommonLib(component, options))
+            .map(component => convertToCommonLib(component, this.options))
             .filter(lib => lib != undefined)
             .concat(
                 isArray(commonLib) ? commonLib : [],
-                options.commonLib
+                this.options.commonLib
             );
         //  构建rollup配置选项：为每个组件生成自己的上下文
         return components.map(component => {
@@ -152,7 +160,7 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
                 /*  构建插件：执行外部传入的插件构建器
                  *      显示指定上下文this为组件自身
                  */
-                plugins: plugin.call(component, component, context, options),
+                plugins: this.plugin.call(component, component, context, this.options),
                 /*  拦截特定警告：后续会添加一些自定义参数，减少警告信息输出
                  */
                 /* v8 ignore next 3  onwarn 不进行代码覆盖率测试*/
@@ -169,7 +177,7 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
      * @param projects 项目文件地址；绝对路径，或者向对BuilderOptions.root的向对路径
      * @returns rollup打包配置数组
      */
-    async function buildProject(...projects: string[]): Promise<RollupOptions[]> {
+    public async buildProject(...projects: string[]): Promise<RollupOptions[]> {
         trace(`build projects: ${projects.join(" ")}`);
         mustArray(projects, "projects");
         //  遍历项目：按照顺序遍历，避免map返回promise时的异步导致的日志输出混乱，调试麻烦
@@ -179,12 +187,12 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
             step(`👉 build projects[${index}]: ${project}`);
             project = tidyString(project);
             mustString(project, `projects[${index}] is invalid:`);
-            project = resolve(options.root, project);
+            project = resolve(this.options.root, project);
             //  加载项目自身，分析依赖项转换成commonLib，然后构建rollup配置
             const { components, projectDeps } = await importProject(project);
             logIfAny(projectDeps, "load dependency projects");
-            const commonLib: CommonLibOptions[] = await loadProjectDeps(project, projectDeps, options);
-            rullupOptions.push(...build(components, commonLib));
+            const commonLib: CommonLibOptions[] = await loadProjectDeps(project, projectDeps, this.options);
+            rullupOptions.push(...this.build(components, commonLib));
         }
         return rullupOptions;
     }
@@ -195,7 +203,7 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
      * - 多个项目用空格分开；如 rollup --project ./.projects/common.js ./.projects/service.js
      * @returns rollup打包配置数组
      */
-    async function buildFromCmd(): Promise<RollupOptions[]> {
+    public async buildFromCmd(): Promise<RollupOptions[]> {
         trace(`build from cmd: ${process.argv.slice(2).join(" ")}`);
         const argMap = minimist(process.argv.slice(2));
         const projectFiles: string[] = isArray(argMap.project)
@@ -205,17 +213,18 @@ export function getBuilder(options: BuilderOptions, plugin: PluginBuilder): IRol
             isArrayNotEmpty(projectFiles),
             "--project argument invalid. example: --project ./.projects/common.js ./.projects/service.js"
         );
-        return buildProject(...projectFiles);
+        return this.buildProject(...projectFiles);
     }
     //#endregion
 
-    /** 构建器对象 */
-    const builder: IRollupBuilder = Object.freeze({ build, buildProject, buildFromCmd });
-    return builder;
+    // /** 构建器对象 */
+    // const builder: IRollupBuilder = Object.freeze({ build, buildProject, buildFromCmd });
+    // return builder;
+    //#endregion
 }
-//#endregion
 
 //#region ************************************* 私有方法 *************************************
+/* 常规做法是和Builder一起，做成私有静态方法；但这样里面调用的时候，还需要做一层Builder.XXX，不方便，先保留在外面*/
 /**
  * 检测构建器配置选项
  * @param options 

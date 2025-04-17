@@ -1,10 +1,12 @@
-import { assert, describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 
-import { getBuilder, getDefaultOptions, getFileOptions } from "../../packages/snail.rollup/src/builder";
+import { Builder, helper } from "../../packages/snail.rollup/src/index";
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { BuilderOptions, CommonLibOptions, IRollupBuilder } from '../../packages/snail.rollup/src/models/builder';
 import { ComponentOptions } from '../../packages/snail.rollup/src/models/component';
+
+const { getBuilder, getDefaultOptions, getFileOptions } = Builder;
 
 /** 不使用如下方式获取dirName，会在末尾存在 "/"；但resolve等不会存在 "/"；会导致断言出问题
  * const __dirname = fileURLToPath(new URL('.', import.meta.url)); 

@@ -1,5 +1,5 @@
 import { isFunction } from "snail.core";
-import { AssetOptions } from "../builder";
+import { AssetOptions } from "../models/component";
 
 /**
  * 资产文件管理器

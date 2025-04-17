@@ -4,15 +4,9 @@
  */
 export default [
     {
-        input: "./src/builder.ts",
+        input: "./src/index.ts",
         output: [//  Valid values are "amd", "cjs", "system", "es", "iife" or "umd".
-            { file: "./dist/builder.js", format: "es" },
-        ],
-    },
-    {
-        input: "./src/plugin.ts",
-        output: [//  Valid values are "amd", "cjs", "system", "es", "iife" or "umd".
-            { file: "./dist/plugin.js", format: "es" },
+            { file: "./dist/index.js", format: "es" },
         ],
     }
 ];
