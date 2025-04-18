@@ -1,5 +1,5 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "fs";
-import { dirname, extname, format, join, relative, resolve, sep } from "path";
+import { existsSync, statSync } from "fs";
+import { extname, relative, resolve } from "path";
 import { fileURLToPath } from "url";
 import { mustString, hasOwnProperty, throwIfFalse, tidyString, url } from "snail.core"
 import pc from "picocolors";
@@ -12,15 +12,6 @@ const __dirname = path.dirname(__filename);
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 //#region  *****************************************   👉 基础操作    *****************************************
-/**
- * 是否是【生产环境】
- * - process.env.NODE_ENV === "production";
- * @returns 是生产环境，返回true，否则返回false
- */
-export function isProduction(): boolean {
-    return process.env.NODE_ENV === "production";
-}
-
 /**
  * 获取数据长度
  * @param data 如array、string等有length属性的数据
@@ -65,67 +56,6 @@ export function importFile<T>(file: string, title: string): Promise<T> {
     file = url.format(relative(__dirname, file));
     return import(file);
 }
-
-/**
- * 构建目录，若不存在则自动构建
- * @param dir 要构建的目录；绝对路径，否则会先resolve
- */
-export function buildDir(dir: string): void {
-    //  先resolve，确保格式统一；存在了则不创建
-    dir = resolve(dir);
-    if (existsSync(dir) === true) {
-        return;
-    }
-    //  针对linux做一下兼容：linux文件路径绝对路径以"/"开头，截取后会导致开头的“丢失”。
-    const dirNames = dir.split(sep);
-    dir.startsWith(sep) && dirNames[0] == "" && (dirNames[0] = sep);
-    let allPath: string = null;
-    for (let index = 0; index < dirNames.length; index++) {
-        if (allPath === null) {
-            allPath = dirNames[index];
-        }
-        else {
-            allPath = join(allPath, dirNames[index]);
-            existsSync(allPath) || mkdirSync(allPath);
-        }
-    }
-}
-/**
- * 复制文件
- * @param src 源文件
- * @param dist 目标输出路径
- * @param options 构建器配置选项
- */
-export function copyFile(src: string, dist: string, options: BuilderOptions): void {
-    trace(`--copy \t${src} \t➡️\t ${dist}`);
-    checkExists(src, `src`);
-    try {
-        buildDir(dirname(dist));
-        cpSync(src, dist, { recursive: true });
-    }
-    catch (ex: any) {
-        console.log(pc.red(`----error:${ex.message}`));
-    }
-}
-
-/**
- * 读取文件文本数据；默认utf-8模式读取
- * @param file 
- */
-export function readFileText(file: string): string {
-    //  后续在这里加上异常等处理逻辑，进一步完善功能
-    return readFileSync(file, "utf-8");
-}
-
-/**
- * 写文件
- * @param dist 文件路径
- * @param data 文件内容
- */
-export function writeFile(dist: string, data: string | NodeJS.ArrayBufferView) {
-    buildDir(dirname(dist));
-    writeFileSync(dist, data)
-}
 //#endregion
 
 //#region  *****************************************   👉 路径处理    *****************************************
@@ -134,7 +64,7 @@ export function writeFile(dist: string, data: string | NodeJS.ArrayBufferView) {
  * @param path 要判断的路径
  * @returns 
  */
-export function isPhysicalFile(path: string): boolean {
+function isPhysicalFile(path: string): boolean {
     /**
      * linux下，路径为和网络绝对路径一致，需要做一下兼容处理；判断文件是否存在，若存在则判定为物理文件
      *  实例1：/work/rollup/test/Index.ts

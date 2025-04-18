@@ -19,25 +19,17 @@ import cssnano from "cssnano";
 import url, { CustomTransformFunction } from "postcss-url";
 import nested from "postcss-nested";
 import { compileStyleAsync, SFCStyleCompileOptions } from "@vue/compiler-sfc"
-
-import { BuilderOptions, ComponentContext, ComponentOptions, ModuleTransformResult } from "snail.rollup";
-import { buildDist, buildNetPath, isChild, isNetPath, isWatchMode, mustInSrcRoot, readFileText, trace, triggerRule } from "snail.rollup/dist/plugin";
 import { hasOwnProperty, isBoolean, url as sUrl, version } from "snail.core";
 import { processors, StylePreprocessorResults } from "./preprocessors";
-
-/* postcss需要的根节点类型 */
-declare type RootNode = postcss.Document | postcss.Root;
+//  导入rollup包，并对helper做解构
+import { BuilderOptions, ComponentContext, ComponentOptions, ModuleTransformResult } from "snail.rollup"
+import { helper, PluginAssistant } from "snail.rollup"
+const { buildDist, isNetPath, isChild, buildNetPath } = helper
 
 /**
  * 样式编译处理程序：实现less、css等样式处理
  */
-export class StyleProcessor {
-    /** 全局配置 */
-    private readonly options: BuilderOptions;
-    /** 要打包的组件配置 */
-    private readonly component: ComponentOptions;
-    /** 组件上下文 */
-    private readonly context: ComponentContext;
+export class StyleProcessor extends PluginAssistant {
     /** postcss处理相关插件 */
     private readonly postcssPlugins: AcceptedPlugin[];
 
@@ -48,11 +40,8 @@ export class StyleProcessor {
      * @param options            全局配置 
      */
     constructor(component: ComponentOptions, context: ComponentContext, options: BuilderOptions) {
-        this.options = options;
-        this.component = component;
-        this.context = context;
-
-        this.context.assets ??= [];
+        context.assets ??= [];
+        super(component, context, options);
         //  组装postcss插件
         this.postcssPlugins = [
             //  检测url资源引入
@@ -86,7 +75,7 @@ export class StyleProcessor {
         }
         //  2、构建postcss执行相关插件、配置选项
         const postcssPlugins: AcceptedPlugin[] = this.postcssPlugins;
-        const postcssOptions: ProcessOptions<RootNode> = {
+        const postcssOptions: ProcessOptions<postcss.Document | postcss.Root> = {
             from,
             to,
             map: isBoolean(map)
@@ -116,7 +105,7 @@ export class StyleProcessor {
      * @returns 
      */
     async transformFile(file: string): Promise<ModuleTransformResult> {
-        const css = readFileText(file);
+        const css = this.readFileText(file);
         const to = buildDist(this.options, file);
         return await this.transform(css, file, to);
     }
@@ -142,7 +131,7 @@ export class StyleProcessor {
                 });
                 return reasons.join('\r\n\t');
             });
-            triggerRule(title, from, undefined, this.component, this.options, ...reasons);
+            this.triggerRule(title, from, undefined, ...reasons);
         }
     }
 
@@ -168,9 +157,9 @@ export class StyleProcessor {
             //  物理路径：走规则逻辑；不存在报错，必须在srcRoot目录下，同时在component.root目录下时copy资源
             if (existsSync(asset.absolutePath) == false) {
                 const msg = "@import file in style file is  not exists";
-                triggerRule(msg, asset.url, undefined, this.component, this.options);
+                this.triggerRule(msg, asset.url, undefined);
             }
-            mustInSrcRoot({ id: asset.absolutePath } as any, asset.url, undefined, this.component, this.options);
+            this.mustInSrcRoot({ id: asset.absolutePath } as any, asset.url, undefined);
             const dist = buildDist(this.options, asset.absolutePath);
             isChild(this.component.root, asset.absolutePath) && this.context.assets.push({ src: asset.absolutePath, dist });
             const url = buildNetPath(this.options, dist);
@@ -209,9 +198,9 @@ export class StyleProcessor {
                 file => isChild(this.options.srcRoot, file) == true
                     && isChild(this.component.root, file) == false
             );
-            outRuleFiles.length > 0 && triggerRule(
+            outRuleFiles.length > 0 && this.triggerRule(
                 "import style file must be child of componentRoot when it is child of srcRoot.",
-                from, undefined, this.component, this.options,
+                from, undefined,
                 //------ 附带补充信息
                 pc.bold('invalid @import files:'),
                 ...outRuleFiles.map(file => `----${file}`),

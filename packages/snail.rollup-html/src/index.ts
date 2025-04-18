@@ -1,10 +1,10 @@
 import { readFileSync } from "fs";
-import { relative } from "path";
 import { InputPluginOption } from "rollup"
 import { isFunction, mustString } from "snail.core";
-import { getBuilder, getFileOptions, ViewOptions } from "snail.rollup"
-import { ComponentOptions, BuilderOptions, ComponentContext, } from "snail.rollup"
-import { AssetManager, trace, writeFile } from "snail.rollup/dist/plugin";
+//  导入rollup包，并对helper做解构
+import { ViewOptions, BuilderOptions, ComponentContext, ComponentOptions } from "snail.rollup"
+import { helper, PluginAssistant, AssetManager } from "snail.rollup"
+const { trace } = helper;
 
 /**
  * 资源管理插件
@@ -18,6 +18,7 @@ import { AssetManager, trace, writeFile } from "snail.rollup/dist/plugin";
  * @returns rollup插件实例
  */
 export default function htmlPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions, injectScript: string): InputPluginOption {
+    const { writeFile } = new PluginAssistant(component, context, options);
     /** 视图管理器 */
     const viewMgr: AssetManager<ViewOptions> = new AssetManager<ViewOptions>(component.views as any);
     mustString(injectScript, "injectScript");

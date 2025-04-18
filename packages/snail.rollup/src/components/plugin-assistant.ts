@@ -1,12 +1,20 @@
 import { BuilderOptions } from "../models/builder";
 import { ComponentContext, ComponentOptions } from "../models/component";
 import { ModuleOptions, ModuleType } from "../models/module";
-import { forceExt, isChild, isNetPath } from "../utils/helper";
-import { dirname, extname, isAbsolute, resolve } from "path";
+import { checkExists, forceExt, isChild, isNetPath, trace } from "../utils/helper";
+import { dirname, extname, isAbsolute, join, resolve, sep } from "path";
 import pc from "picocolors";
-import { existsSync } from "fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { isArrayNotEmpty, throwIfFalse, throwIfUndefined, url } from "snail.core";
 
+/** 模块解析缓存：key为模块id，value为模块信息 */
+const moduleResolveCache: Map<string, ModuleOptions> = new Map();
+/** 扩展名：脚本文件 */
+const EXTS_SCRIPT = Object.freeze([".ts", ".js", ".cjs", ".mjs"]);
+/** 扩展名：资产文件 */
+const EXTS_ASSET = Object.freeze([".png", ".jpg", ".jpeg", ".gif", ".svg", ".html"]);
+/** 扩展名：样式文件 */
+const EXTS_STYLES = Object.freeze([".css", ".less", ".scss", ".sass"]);
 /**
  * 插件辅助类
  * - 提供rollup插件常用功能
@@ -15,11 +23,11 @@ import { isArrayNotEmpty, throwIfFalse, throwIfUndefined, url } from "snail.core
 export class PluginAssistant {
     //#region ************************************** 属性、构造方法 *************************************
     /** 打包组件配置选项 */
-    private readonly component: ComponentOptions;
+    public readonly component: ComponentOptions;
     /** 组件打包上下文；用于一些资源共享 */
-    private readonly context: ComponentContext;
+    public readonly context: ComponentContext;
     /** 全局打包配置选项：约束siteRoot、srcRoot等 */
-    private readonly options: BuilderOptions;
+    public readonly options: BuilderOptions;
     /** 是否生产环境 */
     public readonly isProduction: boolean;
     /** 是否watch模式 */
@@ -79,11 +87,11 @@ export class PluginAssistant {
          *          3、优化措施：后续基于source（小写}做一下缓存处理，内部做了不少的存在性判断等逻辑，直接返回结果
          *      2、其他情况，简化处理，不用处理太多
          */
-        const cacheKey = `RESOLVE_MODULE:${source.toLowerCase()}`;
-        if (this.context.caches.has(cacheKey)) {
-            return this.context.caches.get(cacheKey);
+        const cacheKey = source.toLowerCase();
+        let module = moduleResolveCache.get(cacheKey);
+        if (module != undefined) {
+            return module;
         }
-        let module: ModuleOptions = undefined;
         switch (type) {
             //  src项目源码文件：E:\Snail.js\packages\snail.rollup\src\plugin.ts
             case "src": {
@@ -94,7 +102,7 @@ export class PluginAssistant {
                 let id = url.format(filename);
                 if (existsSync(id) === false) {
                     /\.js$/i.test(id) && (id = id.substring(0, id.length - 3));
-                    const ext = [".ts", ".js", ".cjs", ".mjs"].find(ext => existsSync(id.concat(ext)));
+                    const ext = EXTS_SCRIPT.find(ext => existsSync(id.concat(ext)));
                     id = ext ? id.concat(ext) : undefined;
                 }
                 module = id
@@ -113,11 +121,11 @@ export class PluginAssistant {
             }
             //  兜底，避免以后再加类型时不好适配
             default: {
-                const message = `invalid type:${type}. source:${source}, importer:${importer}.`;
+                const message = `resolve module failed: not support module.type value. type:${module.type}.`;
                 throw new Error(message);
             }
         }
-        module && this.context.caches.set(cacheKey, module);
+        module && moduleResolveCache.set(cacheKey, module);
         return module;
     }
 
@@ -126,7 +134,7 @@ export class PluginAssistant {
      * @param module 模块信息，分析启后缀名称，与exts比配
      * @param exts 后缀数组
      */
-    public isExtFile(module: ModuleOptions | string, exts: string[]): boolean {
+    public isExtFile(module: ModuleOptions | string, exts: string[] | readonly string[]): boolean {
         if (module && isArrayNotEmpty(exts)) {
             const ext = typeof (module) == "string" ? extname(module).toLowerCase() : module.ext;
             return exts.indexOf(ext) !== -1;
@@ -140,7 +148,7 @@ export class PluginAssistant {
      */
     public isAsset(module: ModuleOptions | string): boolean {
         /* 后期支持从这里扩充 文件后缀 */
-        return this.isExtFile(module, [".png", ".jpg", ".jpeg", ".gif", ".svg", ".html"]);
+        return this.isExtFile(module, EXTS_ASSET);
     }
     /**
      * 是否是js脚本模块
@@ -149,7 +157,7 @@ export class PluginAssistant {
      */
     public isScript(module: ModuleOptions | string): boolean {
         /* 后期支持从这里扩充 文件后缀 */
-        return this.isExtFile(module, [".ts", ".js", ".cjs", ".mjs"]);;
+        return this.isExtFile(module, EXTS_SCRIPT);
     }
     /**
      * 是否是css样式模块
@@ -158,7 +166,7 @@ export class PluginAssistant {
      */
     public isStyle(module: ModuleOptions | string): boolean {
         /* 后期支持从这里扩充 文件后缀 */
-        return this.isExtFile(module, [".css", ".less", ".sass", ".scss"]);
+        return this.isExtFile(module, EXTS_STYLES);
     }
     //#endregion
 
@@ -179,6 +187,41 @@ export class PluginAssistant {
         }
         return file;
     }
+    /**
+     * 读取文件文本数据；默认utf-8模式读取
+     * @param file 
+     */
+    public readFileText(file: string): string {
+        //  后续在这里加上异常等处理逻辑，进一步完善功能
+        return readFileSync(file, "utf-8");
+    }
+    /**
+     * 复制文件
+     * @param src 源文件
+     * @param dist 目标输出路径
+     */
+    public copyFile(src: string, dist: string): void {
+        // 输出文件信息后期分析输出路径必须在 distRoot下
+        trace(`--copy \t${src} \t➡️\t ${dist} `);
+        checkExists(src, `src`);
+        try {
+            buildDir(dirname(dist));
+            cpSync(src, dist, { recursive: true });
+        }
+        catch (ex: any) {
+            console.log(pc.red(`----error:${ex.message} `));
+        }
+    }
+    /**
+     * 写文件
+     * @param dist 文件路径
+     * @param data 文件内容
+     */
+    public writeFile(dist: string, data: string | NodeJS.ArrayBufferView) {
+        // 输出文件信息后期分析输出路径必须在 distRoot下
+        buildDir(dirname(dist));
+        writeFileSync(dist, data)
+    }
     //#endregion
 
     //#region ************************************** 规则验证 *************************************
@@ -192,23 +235,23 @@ export class PluginAssistant {
     public triggerRule(rule: string, source: string, importer: string, ...reasons: string[]): void {
         //  输出错误提示信息
         const msgs: string[] = [
-            pc.bold(` * ${rule}`),
-            `source         ${source}`,
-            `componentSrc        ${this.component.src}`,
-            `componentRoot       ${this.component.root}`,
-            `srcRoot        ${this.options.srcRoot}`
+            pc.bold(` * ${rule} `),
+            `source         ${source} `,
+            `componentSrc        ${this.component.src} `,
+            `componentRoot       ${this.component.root} `,
+            `srcRoot        ${this.options.srcRoot} `
         ];
-        importer && msgs.splice(1, 0, `importer       ${importer}`);
+        importer && msgs.splice(1, 0, `importer       ${importer} `);
         console.log(pc.red(msgs.join('\r\n\t')), "\r\n")
         this.isWatchMode || process.exit(0);
 
         // console.log(pc.red("import style file must be child of componentRoot when it is child of srcRoot."));
-        // trace(`----component \t${this.component.src}`);
-        // trace(`----source \t${from}`);
+        // trace(`----component \t${ this.component.src } `);
+        // trace(`----source \t${ from } `);
         // console.log(pc.bold('invalid @import files:'));
-        // outRuleFiles.forEach(file => trace(`----${file}`));
+        // outRuleFiles.forEach(file => trace(`----${ file } `));
         // console.log(pc.bold('all @import files:'));
-        // preResult.dependencies.forEach(file => trace(`----${file}`))
+        // preResult.dependencies.forEach(file => trace(`----${ file } `))
         // isWatchMode || process.exit(1);
     }
 
@@ -226,3 +269,31 @@ export class PluginAssistant {
     }
     //#endregion
 }
+
+//#region ************************************** 私有方法 *************************************
+
+/**
+ * 构建目录，若不存在则自动构建
+ * @param dir 要构建的目录；绝对路径，否则会先resolve
+ */
+function buildDir(dir: string): void {
+    //  先resolve，确保格式统一；存在了则不创建
+    dir = resolve(dir);
+    if (existsSync(dir) === true) {
+        return;
+    }
+    //  针对linux做一下兼容：linux文件路径绝对路径以"/"开头，截取后会导致开头的“丢失”。
+    const dirNames = dir.split(sep);
+    dir.startsWith(sep) && dirNames[0] == "" && (dirNames[0] = sep);
+    let allPath: string = null;
+    for (let index = 0; index < dirNames.length; index++) {
+        if (allPath === null) {
+            allPath = dirNames[index];
+        }
+        else {
+            allPath = join(allPath, dirNames[index]);
+            existsSync(allPath) || mkdirSync(allPath);
+        }
+    }
+}
+//#endregion

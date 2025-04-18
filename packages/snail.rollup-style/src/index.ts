@@ -1,12 +1,13 @@
 import { InputPluginOption } from "rollup"
-import { BuilderOptions, ComponentContext, getBuilder, getFileOptions } from "snail.rollup"
-import { ComponentOptions } from "snail.rollup"
 import { StyleTransformResult } from "./models/style";
 import { StyleProcessor } from "./components/processor";
-import { buildDist, buildNetPath, forceExt, isChild, isStyle, mustInSrcRoot, resolveModule, triggerRule, writeFile } from "snail.rollup/dist/plugin";
 import { buildUrlResolve } from "snail.rollup-url"
-import { isString, isStringNotEmpty } from "snail.core";
+import { isString, isStringNotEmpty, version } from "snail.core";
 import { hasDynamicModule, registerDynamicModule } from "snail.rollup-inject"
+//  导入rollup包，并对helper做解构
+import { BuilderOptions, ComponentContext, ComponentOptions } from "snail.rollup"
+import { helper, PluginAssistant } from "snail.rollup"
+const { forceExt, buildDist, buildNetPath, isChild } = helper;
 
 //#region *************************************        导出接口        *************************************
 /** 把自己的类型共享出去 */
@@ -25,6 +26,7 @@ export * from "./components/processor"
  * @returns rollup插件实例
  */
 export default function stylePlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
+    const { resolveModule, isStyle, mustInSrcRoot, triggerRule, writeFile } = new PluginAssistant(component, context, options);
     /** 要编译的样式文件 */
     const transformMap: Map<string, StyleTransformResult> = Object.create(null);
     /** Style样式提供程序 */
@@ -39,8 +41,8 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
          * @returns string || false || null
          */
         resolveId(source: string, importer: string) {
-            const module = importer ? resolveModule(source, importer, context, options) : undefined;
-            if (isStyle(module, options) == false) {
+            const module = importer ? resolveModule(source, importer) : undefined;
+            if (isStyle(module) == false) {
                 return;
             }
             switch (module.type) {
@@ -48,7 +50,7 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
                     return buildUrlResolve(module.id, true);
                 }
                 case "src": {
-                    mustInSrcRoot(module, source, importer, component, options);
+                    mustInSrcRoot(module, source, importer);
                     const dist = forceExt(buildDist(options, module.id), ".css");
                     const ret = buildUrlResolve(buildNetPath(options, dist), true);
                     if (isChild(component.root, module.id) === true) {
@@ -59,7 +61,7 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
                 }
                 default: {
                     const rule: string = `resolve style failed: not support module.type value. type:${module.type}.`;
-                    triggerRule(rule, source, importer, component, options);
+                    triggerRule(rule, source, importer);
                 }
             }
         },
@@ -138,7 +140,7 @@ export function buildAddLinkCode(url: string): string {
 }
 //#endregion
 
-//#region *************************************        私有处理逻辑        *************************************
+//#region *************************************        私有逻辑        *************************************
 //  注册默认的 添加样式 文件方法
 hasDynamicModule(MODULE_INJECT_LINK) || registerDynamicModule(MODULE_INJECT_LINK, `
 const linkMap = Object.create(null);
@@ -148,13 +150,11 @@ export default function (href) {
     if (Object.prototype.hasOwnProperty.call(linkMap, id) === false) {
         var element = document.createElement("link");
         element.href = href.indexOf('?') == -1
-            ? href.concat("?_snv=f", new Date().getTime().toString())
-            : href.concat("&_snv=f", new Date().getTime().toString());
+            ? href.concat("?_snv=f${version.getVersion()}")
+            : href.concat("&_snv=f${version.getVersion()}");
         element.rel = "stylesheet";
         document.head.appendChild(element);
         linkMap[id] = element;
     }
 }`);
 //#endregion
-
-

@@ -1,11 +1,15 @@
 import { ResolveIdResult } from "rollup";
-import { hasOwnProperty } from "snail.core";
-import { BuilderOptions, ComponentContext, getBuilder, getFileOptions, ModuleOptions } from "snail.rollup"
-import { ComponentOptions } from "snail.rollup"
-import { buildDist, buildNetPath, forceFileExt, mustInSrcRoot, resolveModule } from "snail.rollup/dist/plugin";
+import { hasOwnProperty, version } from "snail.core";
+//  导入rollup包，并对helper做解构
+import { BuilderOptions, ComponentContext, ComponentOptions, ModuleOptions } from "snail.rollup"
+import { helper, PluginAssistant } from "snail.rollup"
+const { buildDist, buildNetPath } = helper
 
-/** URL前缀标记 */
+/** 标记：URL */
 const FLAG_URL = "URL:";
+/** 标记：URL+版本 */
+const FLAG_URL_VERSION = "URL_VERSION:";
+
 /**
  * url注入插件：
  * - 支持通过在 import 模块时，指定 url参数，然后返回url地址字符串
@@ -17,6 +21,7 @@ const FLAG_URL = "URL:";
  * @returns rollup插件实例
  */
 export default function urlPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): any {
+    const { resolveModule, mustInSrcRoot, forceFileExt } = new PluginAssistant(component, context, options);
     return {
         name: "snail.rollup-plugin",
         /**
@@ -30,7 +35,7 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
             if (!importer) {
                 return;
             }
-            const module: ModuleOptions = resolveModule(source, importer, context, options);
+            const module: ModuleOptions = resolveModule(source, importer);
             if (!module || hasOwnProperty(module.query, "url") == false) {
                 return;
             }
@@ -39,14 +44,14 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
                     return buildUrlResolve(module.id, false);
                 }
                 case "src": {
-                    mustInSrcRoot(module, source, importer, component, options);
+                    mustInSrcRoot(module, source, importer);
                     let url = buildDist(options, module.id);
                     url = buildNetPath(options, url);
-                    url = forceFileExt(url, options);
+                    url = forceFileExt(url);
                     return buildUrlResolve(url, false);
                 }
                 default: {
-                    const message = `build url mode failed: not support module.type value. type:${module.type}.`;
+                    const message = `resolve url failed: not support module.type value. type:${module.type}.`;
                     throw new Error(message);
                 }
             }
@@ -57,6 +62,13 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
          * @returns 
          */
         load(id) {
+            //  带版本的url地址；进行version格式化
+            if (id.startsWith(FLAG_URL_VERSION) === true) {
+                id = id.substring(FLAG_URL_VERSION.length);
+                id = version.formart(id);
+                return `export default "${id}"`;
+            }
+            //  不带版本的url地址；直接返回
             if (id.startsWith(FLAG_URL) === true) {
                 id = id.substring(FLAG_URL.length);
                 return `export default "${id}"`;
@@ -72,8 +84,6 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
  * @returns 
  */
 export function buildUrlResolve(id: string, needVersion: boolean): { id: string, external: false } {
-    return {
-        id: `${FLAG_URL}${id}`,
-        external: false,
-    }
+    id = needVersion ? `${FLAG_URL_VERSION}${id}` : `${FLAG_URL}${id}`;
+    return { id, external: false, }
 }

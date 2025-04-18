@@ -15,7 +15,7 @@ export type ComponentOptions = {
     src: string;
     /**
      * 【必填】组件打包文件格式
-     * - 默认umd模式
+     * - 默认amd模式
      */
     format?: "amd" | "cjs" | "es" | "iife" | "system" | "umd";
     /**
@@ -188,12 +188,6 @@ export type ComponentContext = {
      * - 配合rollup的globals属性使用，方便一键得到全局依赖
      */
     globals: Map<string, CommonLibOptions>;
-
-    /**
-     * 组件上下文的缓存字典
-     * - 插件可以使用此缓存，避免重复分析计算
-     */
-    caches: Map<string, any>;
 }
 
 /**

@@ -3,14 +3,14 @@
   "description": "配合【snail.rollup】使用的插件，支持使用过程中，将import文件转换成url返回",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.1.0",
+  "version": "1.1.4",
   "type": "module",
-  "main": "index.js",
+  "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {},
   "dependencies": {
-    "snail.core": "^1.1.0",
-    "snail.rollup": "^1.1.0"
+    "snail.core": "^1.1.1",
+    "snail.rollup": "^1.1.6"
   }
 }

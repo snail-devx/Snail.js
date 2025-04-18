@@ -1,9 +1,9 @@
 import { InputPluginOption } from "rollup"
-import { isFunction, isObject, mustObject, throwError } from "snail.core"
-import { AssetOptions, getBuilder, getFileOptions, ModuleOptions } from "snail.rollup"
-import { ComponentOptions, BuilderOptions, ComponentContext } from "snail.rollup"
-import { isChild, resolveModule, triggerRule, mustInSrcRoot, buildDist, buildNetPath, copyFile, isAsset, AssetManager } from "snail.rollup/dist/plugin"
 import { buildUrlResolve } from "snail.rollup-url"
+//  导入rollup包，并对helper做解构
+import { AssetOptions, BuilderOptions, ComponentContext, ComponentOptions } from "snail.rollup"
+import { helper, PluginAssistant, AssetManager } from "snail.rollup"
+const { buildDist, buildNetPath, isChild } = helper;
 
 /**
  * 资源管理插件
@@ -17,6 +17,7 @@ import { buildUrlResolve } from "snail.rollup-url"
 export default function assetPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
     context.assets ??= [];
     const assetMgr: AssetManager<AssetOptions> = new AssetManager<AssetOptions>(component.assets as any);
+    const { isAsset, resolveModule, mustInSrcRoot, copyFile } = new PluginAssistant(component, context, options);
 
     return {
         name: "snail.rollup-asset",
@@ -59,8 +60,8 @@ export default function assetPlugin(component: ComponentOptions, context: Compon
              */
 
             //  资源文件不会作为入口文件存在，直接忽略；importer为undefined，则说明是入口文件
-            const module = importer ? resolveModule(source, importer, context, options) : undefined;
-            if (module == undefined || isAsset(module, options) == false) {
+            const module = importer ? resolveModule(source, importer) : undefined;
+            if (module == undefined || isAsset(module) == false) {
                 return;
             }
             switch (module.type) {
@@ -68,7 +69,7 @@ export default function assetPlugin(component: ComponentOptions, context: Compon
                     return buildUrlResolve(module.id, true);
                 }
                 case "src": {
-                    mustInSrcRoot(module, source, importer, component, options);
+                    mustInSrcRoot(module, source, importer);
                     const dist = buildDist(options, module.id);
                     isChild(component.root, module.id) && context.assets.push({ src: module.id, dist });
                     const url = buildNetPath(options, dist);
@@ -82,7 +83,7 @@ export default function assetPlugin(component: ComponentOptions, context: Compon
          */
         buildEnd(error) {
             !error && assetMgr.forEach(asset => {
-                asset.writed || copyFile(asset.src, asset.dist, options);
+                asset.writed || copyFile(asset.src, asset.dist);
                 asset.writed = true;
             });
         }

@@ -13,7 +13,7 @@ import { AssetOptions, ComponentContext, ComponentOptions, PluginBuilder } from 
 import { ProjectOptions } from "../models/project";
 import {
     buildDist, buildNetPath, checkExists, checkSrc, forceExt, getLen, importFile,
-    isChild, isNetPath, isProduction, log, logIfAny, step, trace, traceIfAny, warn
+    isChild, isNetPath, log, logIfAny, step, trace, traceIfAny, warn
 } from "../utils/helper";
 
 /**
@@ -50,7 +50,7 @@ export class Builder implements IRollupBuilder {
          */
     public static getDefaultOptions(root: string): BuilderOptions {
         mustString(root, "root");
-        return checkBuilder({ root, isProduction: isProduction() });
+        return checkBuilder({ root });
     }
     /**
      * 获取基于文件的构建器配置对象
@@ -115,6 +115,8 @@ export class Builder implements IRollupBuilder {
                 this.options.commonLib
             );
         //  构建rollup配置选项：为每个组件生成自己的上下文
+        log("\r\nbuild success, use rollup to generate...");
+        trace(new Array(100).join("-").concat("\r\n\r\n"));
         return components.map(component => {
             component.commonLib = [].concat(component.commonLib, commonLib);
             component = Object.freeze(component);
@@ -248,6 +250,9 @@ function checkBuilder(options: BuilderOptions): BuilderOptions {
     options.commonLib = checkCommonLib(options.commonLib, "options.commonLib");
     options.cssChunkFolder = tidyString(options.cssChunkFolder);
 
+    //  检测是否是生产环境：外部没传入，则基于上下文环境参数分析
+    options.isProduction ??= process.env.NODE_ENV === "production";
+
     return options;
 }
 /**
@@ -366,7 +371,7 @@ function checkComponent(components: ComponentOptions[], options: BuilderOptions)
         component.isCommonLib = component.isCommonLib === true;
         component.sourceMap = component.sourceMap === true;
         //      @ts-ignore format验证
-        component.format = tidyString(component.format) || "umd";
+        component.format = tidyString(component.format) || "amd";
         const formats = ["amd", "cjs", "es", "iife", "system", "umd"];
         throwIfTrue(
             formats.indexOf(component.format) == -1,
@@ -414,7 +419,7 @@ function checkAssets(assets: Array<AssetOptions | string>, title: string, option
             ? { src: at } as AssetOptions
             : (mustObject(at, `${errorMessage}:`), at);
         //  src 文件在srcRoot下存在性验证；dist在siteRoot目录下
-        checkSrc(options, asset.src, errorMessage);
+        asset.src = checkSrc(options, asset.src, errorMessage);
         asset.dist = tidyString(asset.dist);
         asset.dist = asset.dist
             ? asset.dist.indexOf("_SITEROOT_") == -1

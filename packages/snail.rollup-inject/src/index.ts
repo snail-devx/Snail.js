@@ -1,8 +1,9 @@
 import { ResolveIdResult, InputPluginOption } from "rollup"
 import { hasOwnProperty, mustString, throwIfTrue, tidyString } from "snail.core"
-import { BuilderOptions, ComponentContext, getBuilder, getFileOptions } from "snail.rollup"
-import { ComponentOptions } from "snail.rollup"
-import { buildDist, buildNetPath, ModuleOptions, resolveModule } from "snail.rollup/dist/plugin"
+//  导入rollup包，并对helper做解构
+import { BuilderOptions, ComponentContext, ComponentOptions } from "snail.rollup"
+// import { helper } from "snail.rollup"
+// const { buildDist, buildNetPath, isChild } = helper;
 
 /** 动态注册的模块：key为模块id：value为动态代码 */
 const DYNAMIC_MODULES: Record<string, string> = Object.create(null);

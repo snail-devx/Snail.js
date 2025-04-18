@@ -1,14 +1,14 @@
 import { basename, dirname, extname, relative, resolve } from "path";
 import { InputPluginOption, ResolveIdHook, TransformHook } from "rollup"
 import vue from "@vitejs/plugin-vue"
-import compiler, { SFCDescriptor, SFCParseOptions, SFCParseResult } from "@vue/compiler-sfc"
-
-import { BuilderOptions, ComponentContext, getBuilder, getFileOptions } from "snail.rollup"
-import { ComponentOptions } from "snail.rollup"
+import compiler, { SFCParseOptions, SFCParseResult } from "@vue/compiler-sfc"
 import { buildAddLinkCode, StyleProcessor, StyleTransformResult } from "snail.rollup-style"
 import { transformScript } from "snail.rollup-script"
-import { buildDist, buildNetPath, forceExt, isChild, isWatchMode, resolveModule, triggerRule, writeFile } from "snail.rollup/dist/plugin";
 import { hasOwnProperty, tidyString } from "snail.core";
+//  导入rollup包，并对helper做解构
+import { BuilderOptions, ComponentContext, ComponentOptions, ModuleOptions } from "snail.rollup"
+import { helper, PluginAssistant } from "snail.rollup"
+const { buildDist, forceExt, isChild, buildNetPath } = helper;
 
 /**
  * 编译vue文件：
@@ -20,6 +20,7 @@ import { hasOwnProperty, tidyString } from "snail.core";
  * @returns rollup插件实例
  */
 export default function vuePlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
+    const { isWatchMode, triggerRule, resolveModule, writeFile } = new PluginAssistant(component, context, options);
     /** style样式处理器 */
     const styleProcessor = new StyleProcessor(component, context, options);
     /** vue组件注入的css文件源路径，虚拟的 */
@@ -46,16 +47,17 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
             * @returns 
             */
             parse(source: string, vpOptions: SFCParseOptions): SFCParseResult {
-                const descriptor = compiler.parse(source, vpOptions);
+                const parseResult = compiler.parse(source, vpOptions);
                 // style标签若未显式指定lang属性值，强制报错
-                if (descriptor.descriptor.styles?.length > 0) {
-                    const inValidStyle = descriptor.descriptor.styles.filter(st => tidyString(st.attrs?.lang) === null);
-                    inValidStyle.length && triggerRule(
-                        `.vue file must set lang attribute value in style tag`,
-                        vpOptions.filename, undefined, component, options
-                    );
+                if (parseResult.descriptor.styles?.length > 0) {
+                    const inValidStyle = parseResult.descriptor.styles
+                        .filter(st => tidyString(st.attrs?.lang) === null);
+                    if (inValidStyle.length > 0) {
+                        const rule = `.vue file must set lang attribute value in style tag`;
+                        triggerRule(rule, vpOptions.filename, undefined);
+                    }
                 }
-                return descriptor;
+                return parseResult;
             }
         },
     });
@@ -71,18 +73,18 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
         async resolveId(source, importer, rOptions) {
             /* plugin的原始代码；做一下优化改动：如果是.vue文件，则直接返回物理文件路径，避免再调用其他插件的resolveId方法   */
             //  1、检测.vue文件的引入规则：仅针对无query查询参数的模块id；避免干扰插件?vue&type=style等加载处理
-            const module = resolveModule(source, importer, context, options);
+            const module = resolveModule(source, importer);
             if (module && module.query === undefined && module.ext === ".vue") {
                 switch (module.type) {
                     case "net": {
-                        const rule: string = `import vue component failed: cannot load from network path.`;
-                        triggerRule(rule, source, importer, component, options);
+                        const rule = `import vue component failed: cannot load from network path.`;
+                        triggerRule(rule, source, importer);
                     }
                     //  src下文件，需要进行规则处理；并直接返回文件物理路径，避免再调用其他插件的resolveId方法
                     case "src": {
                         if (isChild(options.srcRoot, module.id) == true && isChild(component.root, module.id) == false) {
                             const rule: string = `import vue component failed: file must be child of componentRoot.`;
-                            triggerRule(rule, source, importer, component, options);
+                            triggerRule(rule, source, importer);
                         }
                         transformMap[module.id.toLowerCase()] = 1;
                         return { id: module.id, external: false };

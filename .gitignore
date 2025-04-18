@@ -6,8 +6,10 @@
 
 # 自定义
 node_modules
-release/
 /packages/**/dist
+/tests/**/dist
+/tests/**/coverage
+/release
 /temp
 
 

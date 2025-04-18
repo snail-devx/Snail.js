@@ -3,17 +3,17 @@
   "description": "配合【snail.rollup】使用的插件，支持ts、js、cjs、mjs等js脚本文件打包编译",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.1.0",
+  "version": "1.1.4",
   "type": "module",
-  "main": "index.js",
+  "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {},
   "dependencies": {
     "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
-    "snail.core": "^1.1.0",
-    "snail.rollup": "^1.1.0",
+    "snail.core": "^1.1.1",
+    "snail.rollup": "^1.1.6",
     "vite": "^6.3.0"
   },
   "devDependencies": {

@@ -1,12 +1,12 @@
 import { extname, resolve } from "path"
-import { OutputChunk, SourceMap } from "rollup"
-import { InputPluginOption, OutputBundle } from "rollup"
+import { OutputChunk, InputPluginOption, OutputBundle } from "rollup"
 import { transformWithEsbuild } from "vite"
 import { transformAsync } from "@babel/core"
-import { BuilderOptions, CommonLibOptions, ComponentContext, getBuilder, getFileOptions, ModuleOptions } from "snail.rollup"
-import { ComponentOptions } from "snail.rollup"
-import { forceExt, isChild, isScript, ModuleTransformResult, mustInSrcRoot, readFileText, resolveModule, triggerRule } from "snail.rollup/dist/plugin"
-import { hasOwnProperty, isArray, isArrayNotEmpty, isStringNotEmpty } from "snail.core"
+import { hasOwnProperty, isArrayNotEmpty, isStringNotEmpty } from "snail.core"
+//  导入rollup包，并对helper做解构
+import { BuilderOptions, ComponentContext, ComponentOptions, CommonLibOptions, ModuleOptions, ModuleTransformResult } from "snail.rollup"
+import { helper, PluginAssistant } from "snail.rollup"
+const { isChild, forceExt } = helper;
 
 /**
  * 脚本管理插件：
@@ -18,6 +18,7 @@ import { hasOwnProperty, isArray, isArrayNotEmpty, isStringNotEmpty } from "snai
  * @returns rollup插件实例
  */
 export default function scriptPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
+    const { resolveModule, isScript, triggerRule, readFileText } = new PluginAssistant(component, context, options);
     /** 当前组件的公共js库，固化，避免外部再次修改 */
     const commonLib: CommonLibOptions[] = [];
     isArrayNotEmpty(component.commonLib) && commonLib.push(...component.commonLib);
@@ -39,7 +40,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
              *      npm 时，无法分析出ext，无法直接基于isScript判断，做一下兼容，得先分析module
              *      src 时，死循环判断：引入 component 自身，则强制报错，避免死循环依赖；后期考虑做引用地图，完成更细粒度的死循环判断
              */
-            const module: ModuleOptions = resolveModule(source, importer, context, options);
+            const module: ModuleOptions = resolveModule(source, importer);
             if (!module) {
                 return;
             }
@@ -49,7 +50,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
             switch (module.type) {
                 //  src 时，必须在srcRoot下，组件根之外的必须配置为commonLib，否则报错
                 case "src": {
-                    if (isScript(module, options) == false) {
+                    if (isScript(module) == false) {
                         return;
                     }
                     //  非入口文件查找commonLib、判断死循环、引用规则判断
@@ -75,7 +76,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
                 }
                 //  net 时，必须得是commonLib，无法加载net路径代码；后期可考虑如果是siteUrl，则下载文件，前期先忽略
                 case "net": {
-                    if (isScript(module, options) == false) {
+                    if (isScript(module) == false) {
                         return;
                     }
                     const idKey: string = module.id.toLowerCase();
@@ -95,7 +96,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
                 }
             }
             if (isStringNotEmpty(errorrRule)) {
-                triggerRule(importer, source, importer, component, options);
+                triggerRule(importer, source, importer);
                 return;
             }
             /** 分析commonLib，并告知rollup无需分析此脚本了
@@ -187,6 +188,13 @@ export async function transformScript(code: string, id: string, component: Compo
             charset: "utf8",
             //  生产环境下，去掉debugger
             drop: options.isProduction ? ["debugger"] : [],
+            //  不使用原始ts.config文件，但强制指定严格模式
+            tsconfigRaw: {
+                compilerOptions: {
+                    strict: true,
+                    alwaysStrict: true,
+                }
+            },
         });
         code = ret.code;
         map = ret.map;
