@@ -3,7 +3,7 @@
   "description": "配合【snail.rollup】使用的插件，支持Vue文件编译打包",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -13,9 +13,9 @@
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/compiler-sfc": "^3.5.13",
     "snail.core": "^1.1.1",
-    "snail.rollup": "^1.1.6",
-    "snail.rollup-script": "^1.1.4",
-    "snail.rollup-style": "^1.1.5"
+    "snail.rollup": "^1.1.7",
+    "snail.rollup-script": "^1.1.5",
+    "snail.rollup-style": "^1.1.6"
   },
   "devDependencies": {
     "vue": "^3.5.13"

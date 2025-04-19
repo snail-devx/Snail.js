@@ -26,7 +26,7 @@ export * from "./components/processor"
  * @returns rollup插件实例
  */
 export default function stylePlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
-    const { resolveModule, isStyle, mustInSrcRoot, triggerRule, writeFile } = new PluginAssistant(component, context, options);
+    const pa = new PluginAssistant(component, context, options);
     /** 要编译的样式文件 */
     const transformMap: Map<string, StyleTransformResult> = Object.create(null);
     /** Style样式提供程序 */
@@ -41,8 +41,8 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
          * @returns string || false || null
          */
         resolveId(source: string, importer: string) {
-            const module = importer ? resolveModule(source, importer) : undefined;
-            if (isStyle(module) == false) {
+            const module = importer ? pa.resolveModule(source, importer) : undefined;
+            if (pa.isStyle(module) == false) {
                 return;
             }
             switch (module.type) {
@@ -50,7 +50,7 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
                     return buildUrlResolve(module.id, true);
                 }
                 case "src": {
-                    mustInSrcRoot(module, source, importer);
+                    pa.mustInSrcRoot(module, source, importer);
                     const dist = forceExt(buildDist(options, module.id), ".css");
                     const ret = buildUrlResolve(buildNetPath(options, dist), true);
                     if (isChild(component.root, module.id) === true) {
@@ -61,7 +61,7 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
                 }
                 default: {
                     const rule: string = `resolve style failed: not support module.type value. type:${module.type}.`;
-                    triggerRule(rule, source, importer);
+                    pa.triggerRule(rule, source, importer);
                 }
             }
         },
@@ -111,8 +111,8 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
             /* 将编译好的样式文件写入目标目录；仅处理未写入的数据；写入完成后，清理缓存，节省内存 */
             !error && transformMap.forEach(style => {
                 if (style.writed != true) {
-                    style.css && writeFile(style.dist, style.css);
-                    style.map && writeFile(`${style.dist}.map`, style.map);
+                    style.css && pa.writeFile(style.dist, style.css);
+                    style.map && pa.writeFile(`${style.dist}.map`, style.map);
                     style.writed = true;
                     style.css = undefined;
                     style.map = undefined;

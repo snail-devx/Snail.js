@@ -17,7 +17,7 @@ const { buildDist, buildNetPath, isChild } = helper;
 export default function assetPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
     context.assets ??= [];
     const assetMgr: AssetManager<AssetOptions> = new AssetManager<AssetOptions>(component.assets as any);
-    const { isAsset, resolveModule, mustInSrcRoot, copyFile } = new PluginAssistant(component, context, options);
+    const pa = new PluginAssistant(component, context, options);
 
     return {
         name: "snail.rollup-asset",
@@ -60,8 +60,8 @@ export default function assetPlugin(component: ComponentOptions, context: Compon
              */
 
             //  资源文件不会作为入口文件存在，直接忽略；importer为undefined，则说明是入口文件
-            const module = importer ? resolveModule(source, importer) : undefined;
-            if (module == undefined || isAsset(module) == false) {
+            const module = importer ? pa.resolveModule(source, importer) : undefined;
+            if (module == undefined || pa.isAsset(module) == false) {
                 return;
             }
             switch (module.type) {
@@ -69,7 +69,7 @@ export default function assetPlugin(component: ComponentOptions, context: Compon
                     return buildUrlResolve(module.id, true);
                 }
                 case "src": {
-                    mustInSrcRoot(module, source, importer);
+                    pa.mustInSrcRoot(module, source, importer);
                     const dist = buildDist(options, module.id);
                     isChild(component.root, module.id) && context.assets.push({ src: module.id, dist });
                     const url = buildNetPath(options, dist);
@@ -83,7 +83,7 @@ export default function assetPlugin(component: ComponentOptions, context: Compon
          */
         buildEnd(error) {
             !error && assetMgr.forEach(asset => {
-                asset.writed || copyFile(asset.src, asset.dist);
+                asset.writed || pa.copyFile(asset.src, asset.dist);
                 asset.writed = true;
             });
         }

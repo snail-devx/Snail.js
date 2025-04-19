@@ -17,7 +17,7 @@
     "release snail": "node scripts/release.js snail.core --environment NODE_ENV:production",
     "release vue": "node scripts/release.js snail.vue --environment NODE_ENV:production",
     "release rollup": "node scripts/release.js snail.rollup --environment NODE_ENV:production",
-    "release rollup-*": "node scripts/release.js snail.rollup--* --environment NODE_ENV:production",
+    "release rollup-*": "node scripts/release.js snail.rollup-vue --environment NODE_ENV:production",
     "init": "pnpm install --no-link",
     "update": "pnpm update"
   },

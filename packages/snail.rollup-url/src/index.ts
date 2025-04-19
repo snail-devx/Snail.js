@@ -21,7 +21,7 @@ const FLAG_URL_VERSION = "URL_VERSION:";
  * @returns rollup插件实例
  */
 export default function urlPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): any {
-    const { resolveModule, mustInSrcRoot, forceFileExt } = new PluginAssistant(component, context, options);
+    const pa = new PluginAssistant(component, context, options);
     return {
         name: "snail.rollup-plugin",
         /**
@@ -35,7 +35,7 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
             if (!importer) {
                 return;
             }
-            const module: ModuleOptions = resolveModule(source, importer);
+            const module: ModuleOptions = pa.resolveModule(source, importer);
             if (!module || hasOwnProperty(module.query, "url") == false) {
                 return;
             }
@@ -44,10 +44,10 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
                     return buildUrlResolve(module.id, false);
                 }
                 case "src": {
-                    mustInSrcRoot(module, source, importer);
+                    pa.mustInSrcRoot(module, source, importer);
                     let url = buildDist(options, module.id);
                     url = buildNetPath(options, url);
-                    url = forceFileExt(url);
+                    url = pa.forceFileExt(url);
                     return buildUrlResolve(url, false);
                 }
                 default: {

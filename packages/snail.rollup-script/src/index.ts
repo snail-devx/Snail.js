@@ -18,7 +18,7 @@ const { isChild, forceExt } = helper;
  * @returns rollup插件实例
  */
 export default function scriptPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
-    const { resolveModule, isScript, triggerRule, readFileText } = new PluginAssistant(component, context, options);
+    const pa = new PluginAssistant(component, context, options);
     /** 当前组件的公共js库，固化，避免外部再次修改 */
     const commonLib: CommonLibOptions[] = [];
     isArrayNotEmpty(component.commonLib) && commonLib.push(...component.commonLib);
@@ -40,7 +40,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
              *      npm 时，无法分析出ext，无法直接基于isScript判断，做一下兼容，得先分析module
              *      src 时，死循环判断：引入 component 自身，则强制报错，避免死循环依赖；后期考虑做引用地图，完成更细粒度的死循环判断
              */
-            const module: ModuleOptions = resolveModule(source, importer);
+            const module: ModuleOptions = pa.resolveModule(source, importer);
             if (!module) {
                 return;
             }
@@ -50,7 +50,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
             switch (module.type) {
                 //  src 时，必须在srcRoot下，组件根之外的必须配置为commonLib，否则报错
                 case "src": {
-                    if (isScript(module) == false) {
+                    if (pa.isScript(module) == false) {
                         return;
                     }
                     //  非入口文件查找commonLib、判断死循环、引用规则判断
@@ -76,7 +76,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
                 }
                 //  net 时，必须得是commonLib，无法加载net路径代码；后期可考虑如果是siteUrl，则下载文件，前期先忽略
                 case "net": {
-                    if (isScript(module) == false) {
+                    if (pa.isScript(module) == false) {
                         return;
                     }
                     const idKey: string = module.id.toLowerCase();
@@ -96,7 +96,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
                 }
             }
             if (isStringNotEmpty(errorrRule)) {
-                triggerRule(importer, source, importer);
+                pa.triggerRule(importer, source, importer);
                 return;
             }
             /** 分析commonLib，并告知rollup无需分析此脚本了
@@ -124,7 +124,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
         load(id) {
             /** 是resolveid过来的脚本。自动读取文件返回；避免rollup调用其他插件挨个遍历做处理 */
             return transformMap.has(id.toLowerCase())
-                ? readFileText(id)
+                ? pa.readFileText(id)
                 : undefined;
         },
         /**

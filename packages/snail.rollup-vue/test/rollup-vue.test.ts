@@ -11,7 +11,7 @@ import { Builder, helper } from "../../snail.rollup/src/index";
 import { rollup } from "rollup";
 import { existsSync, rmSync } from 'fs';
 
-import scriptPlugin from "../../snail.rollup-script/src/index";
+import scriptPlugin from "snail.rollup-script";
 import vuePlugin from "../src/index"
 
 describe('rollup-vue', async () => {

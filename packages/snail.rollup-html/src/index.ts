@@ -18,7 +18,7 @@ const { trace } = helper;
  * @returns rollup插件实例
  */
 export default function htmlPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions, injectScript: string): InputPluginOption {
-    const { writeFile } = new PluginAssistant(component, context, options);
+    const pa = new PluginAssistant(component, context, options);
     /** 视图管理器 */
     const viewMgr: AssetManager<ViewOptions> = new AssetManager<ViewOptions>(component.views as any);
     mustString(injectScript, "injectScript");
@@ -54,7 +54,7 @@ export default function htmlPlugin(component: ComponentOptions, context: Compone
                 isFunction(view.handle) && (content = view.handle(options, view.src, content));
                 //  直接使用writeFile写文件数据，不使用 emitFile。
                 trace(`--copy \t${view.src} \t➡️\t ${view.dist}`);
-                writeFile(view.dist, content);
+                pa.writeFile(view.dist, content);
 
                 /** 利用 emitFile 告知rollup需要新增输出资源文件
                  * !!!!!!!!!! 屏蔽 emitFile 模式，和asset、style的写入保持一致，

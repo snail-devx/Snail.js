@@ -20,7 +20,7 @@ const { buildDist, forceExt, isChild, buildNetPath } = helper;
  * @returns rollup插件实例
  */
 export default function vuePlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
-    const { isWatchMode, triggerRule, resolveModule, writeFile } = new PluginAssistant(component, context, options);
+    const pa = new PluginAssistant(component, context, options);
     /** style样式处理器 */
     const styleProcessor = new StyleProcessor(component, context, options);
     /** vue组件注入的css文件源路径，虚拟的 */
@@ -54,7 +54,7 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
                         .filter(st => tidyString(st.attrs?.lang) === null);
                     if (inValidStyle.length > 0) {
                         const rule = `.vue file must set lang attribute value in style tag`;
-                        triggerRule(rule, vpOptions.filename, undefined);
+                        pa.triggerRule(rule, vpOptions.filename, undefined);
                     }
                 }
                 return parseResult;
@@ -73,18 +73,18 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
         async resolveId(source, importer, rOptions) {
             /* plugin的原始代码；做一下优化改动：如果是.vue文件，则直接返回物理文件路径，避免再调用其他插件的resolveId方法   */
             //  1、检测.vue文件的引入规则：仅针对无query查询参数的模块id；避免干扰插件?vue&type=style等加载处理
-            const module = resolveModule(source, importer);
+            const module = pa.resolveModule(source, importer);
             if (module && module.query === undefined && module.ext === ".vue") {
                 switch (module.type) {
                     case "net": {
                         const rule = `import vue component failed: cannot load from network path.`;
-                        triggerRule(rule, source, importer);
+                        pa.triggerRule(rule, source, importer);
                     }
                     //  src下文件，需要进行规则处理；并直接返回文件物理路径，避免再调用其他插件的resolveId方法
                     case "src": {
                         if (isChild(options.srcRoot, module.id) == true && isChild(component.root, module.id) == false) {
                             const rule: string = `import vue component failed: file must be child of componentRoot.`;
-                            triggerRule(rule, source, importer);
+                            pa.triggerRule(rule, source, importer);
                         }
                         transformMap[module.id.toLowerCase()] = 1;
                         return { id: module.id, external: false };
@@ -136,7 +136,7 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
                  *      js组件引入了多个vue组件，此时修改第一个组件，因为hasInjectStyle为true，不会再注册，其他vue组件也不会注册css
                  */
                 const href = hasInjectStyle == true ? undefined : buildNetPath(options, cssChunkDist);
-                hasInjectStyle = isWatchMode === true ? false : true;
+                hasInjectStyle = pa.isWatchMode === true ? false : true;
                 code = buildAddLinkCode(href) || "";
                 //      始终给出map属性值；避免rollup给出警告提示
                 /** 
@@ -172,7 +172,7 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
             /** 合并sourcemap；还没实现，输出个警告提示；考虑参照compile-sfc中的source-map包做合并操作
              *      this.warn("o(╥﹏╥)o css的sourceMap合并还没实现...");
              */
-            !error && cssChunks.length && writeFile(cssChunkDist, cssChunks
+            !error && cssChunks.length && pa.writeFile(cssChunkDist, cssChunks
                 .map(chunk => `/* ${relative(options.srcRoot, chunk.src)} */\r\n${chunk.css.trim()}`)
                 .join("\r\n")
             );
