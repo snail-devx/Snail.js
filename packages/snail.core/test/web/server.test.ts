@@ -1,6 +1,6 @@
 import { assert, describe, expect, test } from 'vitest'
-import { server } from "../../../packages/snail.core/src/web/server"
-import { IServerManager } from '../../../packages/snail.core/src/web/models/server'
+import { server } from "../../src/web/server"
+import { IServerManager } from '../../src/web/models/server'
 
 /**
  * 测试方法

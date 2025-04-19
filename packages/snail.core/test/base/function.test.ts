@@ -1,7 +1,7 @@
 import { assert, describe, expect, it, test, vi } from 'vitest'
-import { run, runAsync, debounce, polling } from "../../../packages/snail.core/src/base/function"
+import { run, runAsync, debounce, polling } from "../../src/base/function"
 
-vi.mock("../../../packages/snail.core/src/base/function", { spy: true });
+vi.mock("../../src/base/function", { spy: true });
 
 
 test("run", () => {

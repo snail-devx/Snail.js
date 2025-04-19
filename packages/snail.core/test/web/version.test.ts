@@ -1,6 +1,6 @@
 import { assert, describe, expect, test, it, afterEach } from 'vitest'
-import { version } from "../../../packages/snail.core/src/web/version"
-import { IVersionManager } from '../../../packages/snail.core/src/web/models/version'
+import { version } from "../../src/web/version"
+import { IVersionManager } from '../../src/web/models/version'
 
 const defaultVersion = version.getVersion();
 

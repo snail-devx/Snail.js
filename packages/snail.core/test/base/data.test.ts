@@ -5,7 +5,7 @@ import {
     isUndefined, isNull, isNullOrUndefined, isObject, isPromise, isRegexp, isWindow,
     newId, tidyFunction, tidyString,
     mustArray, mustFunction, mustString, mustObject
-} from "../../../packages/snail.core/src/base/data"
+} from "../../src/base/data"
 
 //  getType、isXX测试
 describe("getType、isXX", () => {

@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'vitest'
 
-import { Builder, helper } from "../../packages/snail.rollup/src/index";
+import { Builder, helper } from "../src/index";
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import { BuilderOptions, CommonLibOptions, IRollupBuilder } from '../../packages/snail.rollup/src/models/builder';
-import { ComponentOptions } from '../../packages/snail.rollup/src/models/component';
+import { BuilderOptions, CommonLibOptions, IRollupBuilder } from '../src/models/builder';
+import { ComponentOptions } from '../src/models/component';
 
 const { getBuilder, getDefaultOptions, getFileOptions } = Builder;
 

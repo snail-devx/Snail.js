@@ -1,5 +1,8 @@
 import { assert, describe, expect, test } from 'vitest'
-import { getMessage, throwError, throwIfFalse, throwIfNull, throwIfNullOrUndefined, throwIfTrue, throwIfUndefined, } from "../../../packages/snail.core/src/base/error"
+import {
+    getMessage, throwError, throwIfFalse, throwIfNull, throwIfNullOrUndefined, throwIfTrue, throwIfUndefined,
+
+} from "../../src/base/error"
 
 test("throwError", () => expect(() => throwError("测试throwError")).toThrowError("测试throwError"));
 test("throwError", () => expect(() => throwError(undefined)).toThrowError(""));

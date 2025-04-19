@@ -1,8 +1,8 @@
 import { afterAll, assert, describe, expect, test } from 'vitest'
-import { script } from "../../../packages/snail.core/src/web/script"
-import { http } from '../../../packages/snail.core/src/web/http';
-import { HttpRequest } from '../../../packages/snail.core/src/web/models/http';
-import { version } from '../../../packages/snail.core/src/web/version';
+import { script } from "../../src/web/script"
+import { http } from '../../src/web/http';
+import { HttpRequest } from '../../src/web/models/http';
+import { version } from '../../src/web/version';
 
 //  HTTP全局拦截：支持的几种加载模式，返回代码
 let counterAMD = 0, counterIIFE = 0, counterUMD = 0;

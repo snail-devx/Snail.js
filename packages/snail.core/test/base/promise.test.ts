@@ -1,7 +1,7 @@
 import { assert, describe, expect, test } from 'vitest'
 
 
-import { defer, delay } from "../../../packages/snail.core/src/base/promise"
+import { defer, delay } from "../../src/base/promise"
 
 test("defer", async () => {
 

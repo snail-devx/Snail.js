@@ -1,6 +1,6 @@
 import { assert, describe, expect, test } from 'vitest'
-import { url } from "../../../packages/snail.core/src/web/url"
-import { UrlParseResult } from '../../../packages/snail.core/src/web/models/url';
+import { url } from "../../src/web/url"
+import { UrlParseResult } from '../../src/web/models/url';
 
 test("isSite", () => {
     expect(url.isSite(undefined!)).toStrictEqual(false);

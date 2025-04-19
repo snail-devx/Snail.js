@@ -1,7 +1,7 @@
 import { assert, describe, expect, test } from 'vitest'
-import { event } from "../../../packages/snail.core/src/base/event"
-import { EventHandle, IEventManager } from '../../../packages/snail.core/src/base/models/event'
-import { delay } from '../../../packages/snail.core/src/base/promise';
+import { event } from "../../src/base/event"
+import { EventHandle, IEventManager } from '../../src/base/models/event'
+import { delay } from '../../src/base/promise';
 
 /**
  * 测试方法

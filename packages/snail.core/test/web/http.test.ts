@@ -1,8 +1,8 @@
 import { assert, describe, expect, test } from 'vitest'
-import { http } from "../../../packages/snail.core/src/web/http"
-import { IHttpClient } from '../../../packages/snail.core/src/web/models/http';
-import { delay } from '../../../packages/snail.core/src/base/promise';
-import { server } from '../../../packages/snail.core/src/web/server';
+import { http } from "../../src/web/http"
+import { IHttpClient } from '../../src/web/models/http';
+import { delay } from '../../src/base/promise';
+import { server } from '../../src/web/server';
 
 const hc: IHttpClient = http.create({ origin: "https://fanyi.baidu.com/" });
 //  默认配置：百度接口，没做其他配置，虽然后返回值，状态码200，

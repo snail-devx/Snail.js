@@ -1,8 +1,8 @@
 import { assert, describe, expect, test, it, afterEach, vi, afterAll } from 'vitest'
 import { JSDOM } from "jsdom";
-import { style } from "../../../packages/snail.core/src/web/style"
-import { StyleOptions, IStyleHandle, IStyleManager } from '../../../packages/snail.core/src/web/models/style';
-import { version } from '../../../packages/snail.core/src/web/version';
+import { style } from "../../src/web/style"
+import { StyleOptions, IStyleHandle, IStyleManager } from '../../src/web/models/style';
+import { version } from '../../src/web/version';
 
 //@ts-ignore
 const window = global.window, document = global.document;

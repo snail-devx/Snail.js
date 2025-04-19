@@ -7,10 +7,13 @@
 ## 1.1 目录规划
 
 - packages 核心代码，npm 包源码；下面每个子文件就是一个 npm 包
+  - src 源码目录
+  - test vitest 测试代码目录
+    - web 测试插件代码生成的源码目录
+    - dist 测试插件代码生成的输出目录
 - release 存放用于 npm 包发布时的文件
 - scripts 源码构建时用到的 js 脚本代码
 - temp 构建过程中需要临时存放的文件目录
-- tests `packages`下项目的测试包；开辟专有目录，不再 `packages`对应下
 - types 整个项目打包构建过程中定义的类型文件；非 packages 下 npm 包生产的 `.d.ts` 文件
 
 ## 1.2 解决方案

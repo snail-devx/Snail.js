@@ -1,14 +1,12 @@
 import { describe, expect, test } from 'vitest'
-
-import { Builder, helper } from "../../packages/snail.rollup/src/index";
-import assetPlugin from "../../packages/snail.rollup-asset/src/index";
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
-import { BuilderOptions, CommonLibOptions, IRollupBuilder } from '../../packages/snail.rollup/src/models/builder';
-import { ComponentOptions } from '../../packages/snail.rollup/src/models/component';
-
 import { rollup } from "rollup";
 import { existsSync, rmSync } from 'fs';
+import assetPlugin from "../src/index";
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "snail.rollup"
+import { ComponentOptions } from 'snail.rollup';
+import { Builder, helper } from "snail.rollup";
 
 describe('rollup-asset', async () => {
     const options = Builder.getDefaultOptions(resolve(__dirname));
