@@ -107,4 +107,8 @@ export default [
 
 ## 3.2 代码测试
 
+1、默认使用根目录下的`vitest.config.js`配置；若涉及到项目独立配置时，再在`package`下自身目录下构建`vitest.conig.js`文件
+
+2、测试代码放到`package`下项目的 test 目录下，命名规范 `xxx.test.ts`
+
 ## 3.3 发布 NPM 包
