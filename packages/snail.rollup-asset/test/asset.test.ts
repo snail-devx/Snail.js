@@ -4,12 +4,19 @@ import { existsSync, rmSync } from 'fs';
 import assetPlugin from "../src/index";
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "snail.rollup"
-import { ComponentOptions } from 'snail.rollup';
-import { Builder, helper } from "snail.rollup";
+//  snail.rollup 采用源码引用方式，方便错误调试；整体测试完成后，再换成包形式
+// import { Builder, helper } from "snail.rollup";
+import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../../snail.rollup/src/index"
+import { ComponentOptions } from '../../snail.rollup/src/index';
+import { Builder, helper } from "../../snail.rollup/src/index";
 
 describe('rollup-asset', async () => {
-    const options = Builder.getDefaultOptions(resolve(__dirname));
+    const options: BuilderOptions = {
+        root: __dirname,
+        srcRoot: resolve(__dirname, "web"),
+        siteRoot: resolve(__dirname, "dist"),
+        distRoot: resolve(__dirname, "dist"),
+    };
     const builder = Builder.getBuilder(options, (component, context, options) => {
         return [
             assetPlugin(component, context, options)
