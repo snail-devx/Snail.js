@@ -114,10 +114,12 @@ export class PluginAssistant {
             case "net": {
                 const [filename] = source.split(`?`, 1);
                 module = { type, id: source, src: source, ext: extname(filename) };
+                break;
             }
             //  npm包：vue、snail.core
             case "npm": {
                 module = { type, id: source, src: source };
+                break;
             }
             //  兜底，避免以后再加类型时不好适配
             default: {

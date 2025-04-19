@@ -8,14 +8,25 @@ import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../../snail.ro
 import { ComponentOptions } from '../../snail.rollup/src/index';
 import { Builder, helper } from "../../snail.rollup/src/index";
 
-
 import { rollup } from "rollup";
 import { existsSync, rmSync } from 'fs';
 
+import scriptPlugin from "../../snail.rollup-script/src/index";
+import vuePlugin from "../src/index"
+
 describe('rollup-vue', async () => {
-    const options: BuilderOptions = { root: __dirname, srcRoot: resolve(__dirname, 'web') }
+    const options: BuilderOptions = {
+        root: __dirname,
+        srcRoot: resolve(__dirname, 'web'),
+        commonLib: [
+            { id: 'vue', name: 'Vue', url: 'https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js' }
+        ]
+    }
     const builder = Builder.getBuilder(options, (component, context, options) => {
-        return []
+        return [
+            scriptPlugin(component, context, options),
+            vuePlugin(component, context, options),
+        ]
     });
 
     test("default", async () => {

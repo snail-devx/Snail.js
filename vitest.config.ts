@@ -16,7 +16,6 @@ export default defineConfig({
         testTimeout: 1000 * 100,
         exclude: [
             ...configDefaults.exclude,
-            "packages/snail.rollup-vue/test/**/*.test.ts"
         ],
         include: [
             // "packages/*/__test__/**",
