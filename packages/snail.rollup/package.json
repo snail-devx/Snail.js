@@ -3,7 +3,7 @@
   "description": "基于Rollup封装的打包工具，基于项目化方式，管理文件依赖边界；脚本输出为独立组件，适合大型Library项目",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -13,12 +13,12 @@
   "dependencies": {
     "minimist": "^1.2.8",
     "picocolors": "^1.1.1",
-    "snail.core": "^1.1.1"
+    "snail.core": ">=1.1.1"
   },
   "peerDependencies": {
     "typescript": ">=5.8.2"
   },
   "devDependencies": {
-    "rollup": "^4.39.0"
+    "rollup": ">=4.39.0"
   }
 }

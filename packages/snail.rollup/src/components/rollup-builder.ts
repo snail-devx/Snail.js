@@ -144,7 +144,7 @@ export class Builder implements IRollupBuilder {
                      *      基于插件梳理出来全局使用到的公共js
                      *      做动态处理，而不是一开始指定
                      */
-                    /* v8 ignore next 3  globals 不进行代码覆盖率测试*/
+                    /* v8 ignore next 1  globals 不进行代码覆盖率测试*/
                     globals: (id) => context.globals[id]?.name,
                     /*  amd模式下的特殊控制：
                      *      本地脚本强制加上“.js”后缀作为模块名，避免出现：define(['vue', '../Core']);
@@ -330,11 +330,12 @@ async function loadProjectDeps(project: string, deps: string[], options: Builder
  * @returns CommonLib；组件不是公共js库返回undefined
  */
 function convertToCommonLib(component: ComponentOptions, options: BuilderOptions): CommonLibOptions | undefined {
-    /* 构建CommonLib：针对component.dist做补偿;避免dependencies组件构建url失败 
+    /** 构建CommonLib：针对component.dist做补偿; 避免dependencies组件构建url失败
      *      确保component已经做了checkComponent逻辑
+     *      component.src需要进行路径格式化，强制分隔符为“/”；和resolveModule配合，否则会出问题
      */
     return component.isCommonLib
-        ? { id: component.src, name: component.name, url: component.url }
+        ? { id: component.src.replace(/\\/g, "/"), name: component.name, url: component.url }
         : undefined;
 }
 /**

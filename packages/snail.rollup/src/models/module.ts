@@ -21,7 +21,6 @@ export type ModuleOptions = {
 
     /**
      * 模块文件扩展名
-     * - 仅在src时生效
      */
     ext?: string;
 

@@ -60,6 +60,7 @@ export class PluginAssistant {
          *      2、否则基于importer分析判定为src源码引入
          *      2、最后 npm 兜底
          */
+        const fixedError: string = `source:${source}, importer:${importer}`;
         let type: ModuleType = undefined;
         {
             if (isNetPath(source) === true) {
@@ -70,14 +71,14 @@ export class PluginAssistant {
                 source = importer == undefined ? source : resolve(dirname(importer), source);
                 throwIfFalse(
                     isAbsolute(source),
-                    `analysis source's physical path failed in src mode. source:${source}, importer:${importer}.`
+                    `analysis source's physical path failed in src mode. ${fixedError}.`
                 );
                 type = "src";
             }
             else {
                 type = "npm";
             }
-            throwIfUndefined(type, `analysis source's type failed. source:${source}, importer:${importer}.`);
+            throwIfUndefined(type, `analysis source's type failed. ${fixedError}.`);
         }
         /** 解析import模块信息；先走缓存处理
          *  实际分析时基于不同type分析ret值
@@ -92,12 +93,18 @@ export class PluginAssistant {
         if (module != undefined) {
             return module;
         }
+        //  分析query参数，并做url参数处理
+        let filename, query;
+        {
+            let rawQuery;
+            [filename, rawQuery] = source.split(`?`, 2);
+            const urlParams = new URLSearchParams(rawQuery);
+            query = urlParams.size > 0 ? Object.fromEntries(urlParams) : undefined;
+        }
+        //  根据类型细化module信息
         switch (type) {
             //  src项目源码文件：E:\Snail.js\packages\snail.rollup\src\plugin.ts
             case "src": {
-                const [filename, rawQuery] = source.split(`?`, 2);
-                const urlParams = new URLSearchParams(rawQuery);
-                const query = urlParams.size > 0 ? Object.fromEntries(urlParams) : undefined;
                 //  进行id存在性验证，基于ext做补偿；后续考虑补偿ext数组能够全局配置
                 let id = url.format(filename);
                 if (existsSync(id) === false) {
@@ -108,22 +115,22 @@ export class PluginAssistant {
                 module = id
                     ? { type, id, src: source, query, ext: extname(id).toLowerCase() }
                     : undefined;
+                throwIfUndefined(module, `resolve module failed: src module not exists. ${fixedError}.`);
                 break;
             }
             //  网络路径文件：/api/test/server.js?a=1&b=2 ；http://www.baidu.com/api/scripts/xx.js
             case "net": {
-                const [filename] = source.split(`?`, 1);
-                module = { type, id: source, src: source, ext: extname(filename) };
+                module = { type, id: source, src: source, query, ext: extname(filename) };
                 break;
             }
             //  npm包：vue、snail.core
             case "npm": {
-                module = { type, id: source, src: source };
+                module = { type, id: source, src: source, query, ext: extname(filename) };
                 break;
             }
             //  兜底，避免以后再加类型时不好适配
             default: {
-                const message = `resolve module failed: not support module.type value. type:${module.type}.`;
+                const message = `resolve module failed: not support module.type value. type:${module.type}, ${fixedError}.`;
                 throw new Error(message);
             }
         }
