@@ -35,6 +35,7 @@ export default function htmlPlugin(component: ComponentOptions, context: Compone
          * watch模式支持
          * @param id 
          */
+        /* v8 ignore next 3  开发模式在vitest下无法测试，先忽略*/
         watchChange(id) {
             viewMgr.find(id).forEach(view => view.writed = undefined);
         },
@@ -43,6 +44,7 @@ export default function htmlPlugin(component: ComponentOptions, context: Compone
          */
         generateBundle() {
             viewMgr.forEach(view => {
+                /* v8 ignore next 3  开发模式在vitest下无法测试，先忽略*/
                 if (view.writed === true) {
                     return;
                 }
