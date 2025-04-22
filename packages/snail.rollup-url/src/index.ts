@@ -36,13 +36,10 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
                 return;
             }
             const module: ModuleOptions = pa.resolveModule(source, importer);
-            if (!module || hasOwnProperty(module.query, "url") == false) {
+            if (hasOwnProperty(module.query, "url") == false) {
                 return;
             }
             switch (module.type) {
-                case "net": {
-                    return buildUrlResolve(module.id, false);
-                }
                 case "src": {
                     pa.mustInSrcRoot(module, source, importer);
                     let url = buildDist(options, module.id);
@@ -50,9 +47,14 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
                     url = pa.forceFileExt(url);
                     return buildUrlResolve(url, false);
                 }
+                /** net 资源，再分析url地址没有意义，本身就是url路径
+                 case "net": {
+                     return buildUrlResolve(module.id, false);
+                 }
+                 */
                 default: {
-                    const message = `resolve url failed: not support module.type value. type:${module.type}.`;
-                    throw new Error(message);
+                    pa.triggerRule(`resolve url failed: not support module.type value. type:${module.type}.`, source, importer);
+                    break;
                 }
             }
         },
