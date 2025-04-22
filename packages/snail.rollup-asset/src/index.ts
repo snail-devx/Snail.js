@@ -37,6 +37,7 @@ export default function assetPlugin(component: ComponentOptions, context: Compon
          * @param id 
          * @param change 
          */
+        /* v8 ignore next 4  开发模式在vitest下无法测试，先忽略*/
         watchChange(id, change) {
             /* 仅是当前组件依赖资源的变化，才重写，做性能优化使用 */
             assetMgr.find(id).forEach(file => file.writed = undefined);
@@ -75,7 +76,10 @@ export default function assetPlugin(component: ComponentOptions, context: Compon
                     const url = buildNetPath(options, dist);
                     return buildUrlResolve(url, true);
                 }
-                default: break;
+                default: {
+                    pa.triggerRule(`resolve asset failed: not support module.type value. type:${module.type}`, source, importer);
+                    break;
+                };
             }
         },
         /**
