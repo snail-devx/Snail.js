@@ -4,10 +4,12 @@ import vue from "@vitejs/plugin-vue"
 import compiler, { SFCParseOptions, SFCParseResult } from "@vue/compiler-sfc"
 import { buildAddLinkCode, StyleProcessor, StyleTransformResult } from "snail.rollup-style"
 import { transformScript } from "snail.rollup-script"
-import { hasOwnProperty, tidyString } from "snail.core";
+import { hasOwnProperty, isArrayNotEmpty, tidyString } from "snail.core";
 //  导入rollup包，并对helper做解构
 import { BuilderOptions, ComponentContext, ComponentOptions, ModuleOptions } from "snail.rollup"
 import { helper, PluginAssistant } from "snail.rollup"
+import { VueStyleTransformResult } from "./models/vue-style";
+import { existsSync, rmSync } from "fs";
 const { buildDist, forceExt, isChild, buildNetPath } = helper;
 
 /**
@@ -29,15 +31,15 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
     const cssChunkDist = buildDist(options, cssChunksSrc);
     /** 是否已经css样式文件 */
     let hasInjectStyle: boolean;
-    /** vue组件中动态引入的css文件内容 */
-    const cssChunks: StyleTransformResult[] = [];
+    /** vue中使用到的css片段代码字段；key为vue文件路径（小写，物理绝对路径），value为此vue文件下的css片段 */
+    const cssChunkMap: Map<string, VueStyleTransformResult[]> = new Map();
     /** 记录需要进行编译的脚本字典；key为模块id小写（src绝对物理路径）*/
     const transformMap: { [key: string]: 1 } = Object.create(null);
 
     /**
      * 借助vue官方插件，完成.vue文件编译；强制指定生产环境，精简胆码
      */
-    const vuePlugin = vue({
+    const originPlugin: InputPluginOption = vue({
         isProduction: true/* options.isProduction*/,
         compiler: {
             ...compiler,
@@ -48,21 +50,41 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
             */
             parse(source: string, vpOptions: SFCParseOptions): SFCParseResult {
                 const parseResult = compiler.parse(source, vpOptions);
-                // style标签若未显式指定lang属性值，强制报错
-                if (parseResult.descriptor.styles?.length > 0) {
+                //  style标签处理
+                //      style标签若未显式指定lang属性值，强制报错
+                if (parseResult.descriptor.styles.length > 0) {
                     const inValidStyle = parseResult.descriptor.styles
-                        .filter(st => tidyString(st.attrs?.lang) === null);
+                        .filter(st => tidyString(st.attrs?.lang) == undefined);
                     if (inValidStyle.length > 0) {
-                        const rule = `.vue file must set lang attribute value in style tag`;
+                        const rule = `.vue file must set lang attribute value in style tag.`;
                         pa.triggerRule(rule, vpOptions.filename, undefined);
                     }
                 }
+                //      整理构建css片段类型信息；方便在watch模式时，将已有无变化css片段合并过来
+                const id = vpOptions.filename.toLowerCase();
+                const oldChunks: VueStyleTransformResult[] = cssChunkMap.get(id) || [];
+                cssChunkMap.set(id, parseResult.descriptor.styles.map((style, index) => {
+                    const scoped = hasOwnProperty(style.attrs, "scoped");
+                    const oldChunk = oldChunks[index];
+                    return oldChunk && oldChunk.scoped === scoped
+                        ? oldChunk
+                        : { src: vpOptions.filename, dist: cssChunkDist, scoped };
+                }));
+                //  script标签处理
+                //      script标签若未显式指定lang属性值，强制报错
+                if (parseResult.descriptor.script && tidyString(parseResult.descriptor.script.attrs?.lang) == undefined) {
+                    const rule = `.vue file must set lang attribute value in script tag.`;
+                    pa.triggerRule(rule, vpOptions.filename, undefined);
+                }
+
                 return parseResult;
             }
         },
     });
-
-    return {
+    /**
+     * 自定义的vue插件，干涉逻辑vue官方插件逻辑，实现自定义规则验证
+     */
+    const rullupPlugin: InputPluginOption = {
         name: "snail.rollup-vue",
         /**
          * 解析组件；判断是否是当前插件能处理的
@@ -89,12 +111,12 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
                         transformMap[module.id.toLowerCase()] = 1;
                         return { id: module.id, external: false };
                     }
-                    //  其他情况，暂时不支持
+                    /* v8 ignore next 1 其他情况，暂时不支持；走vue原始插件逻辑 */
                     default: break;
                 }
             }
             //  2、其他情况走插件原始方法 
-            const ret = await (vuePlugin.resolveId as ResolveIdHook).call(this, source, importer, rOptions);
+            const ret = await (originPlugin.resolveId as ResolveIdHook).call(this, source, importer, rOptions);
             ret && (transformMap[source.toLowerCase()] = 1);
             return ret;
         },
@@ -118,16 +140,19 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
             const { filename, query } = parseVueRequest(id);
             //  拦截style编译；将vue中的style样式提取合并到js组件特有.css文件中
             if (query.vue && query.type === "style") {
-                //  执行样式编译；源码参照 @vitejs/vite-plugin-vue2/blob/main/src/style.ts；
+                //  执行样式编译；源码参照 @vitejs/plugin-vue
+                /* v8 ignore next 1 借助上层逻辑，这里不会出现为空的情况；这里为了保险，冗余一下 */
                 const from = filename.concat("?.", query.lang || "css");
                 const to = buildDist(options, from);
                 /*  scopeId从query.scope取值，即为vue插件内部的id值`data-v-${descriptor.id}`   const scopedQuery = hasScoped ? `&scoped=${descriptor.id}` : ``; */
                 const scopeId = query.scoped ? `data-v-${query.scopeId}` : undefined;
                 const ret = await styleProcessor.transform(code, from, to, undefined, scopeId);
-                //  提取到csschunk中，方便后续使用；并支持watch模式；这一块牵扯太多；无法做到“仅更新才编译”；后续参照ManageStyle思路琢磨琢磨（涉及到多个vue文件提取css）
-                const chunk = { src: filename, dist: cssChunkDist, css: ret.code, map: ret.map, dependencies: ret.dependencies };
-                const hasIndex = cssChunks.findIndex(item => item.src.toLowerCase() === filename.toLowerCase());
-                hasIndex === -1 ? cssChunks.push(chunk) : (cssChunks[hasIndex] = chunk);
+                //  提取到csschunk中，方便后续使用；并支持watch模式
+                const cssChunks = cssChunkMap.get(filename.toLowerCase());
+                if (isArrayNotEmpty(cssChunks) == true && cssChunks.length > query.index) {
+                    const tsResult: Partial<StyleTransformResult> = { css: ret.code, map: ret.map, dependencies: ret.dependencies };
+                    Object.assign(cssChunks[query.index], tsResult);
+                }
                 //  支持watch模式，监听依赖的style样式改变
                 ret.dependencies?.forEach(file => this.addWatchFile(file));
                 //  动态注入样式文件；确保只注入一次；
@@ -136,6 +161,7 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
                  *      js组件引入了多个vue组件，此时修改第一个组件，因为hasInjectStyle为true，不会再注册，其他vue组件也不会注册css
                  */
                 const href = hasInjectStyle == true ? undefined : buildNetPath(options, cssChunkDist);
+                /* v8 ignore next 1 vitest 下无法测试watch模式*/
                 hasInjectStyle = pa.isWatchMode === true ? false : true;
                 code = buildAddLinkCode(href) || "";
                 //      始终给出map属性值；避免rollup给出警告提示
@@ -148,6 +174,7 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
             }
             //  拦截script编译；由于vue插件未执行此编译，会导致部分ts代码无法正常编译出出去
             else if (query.vue && query.type === "script") {
+                /* v8 ignore next 1 这里为了保险，冗余一下 */
                 id = filename.concat("?.", query.lang || "js");
                 return await transformScript(code, id, component, options);
             }
@@ -157,8 +184,8 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
                  *  这样做对sourceMap不友好；后续看情况优化；最兜底的方式是在【Rollup.ManageScript】插件中生成js文件时做
                  *      但这样不精准，可能会做更多的无效转换；后续看看有没有更好的方式，如esbuild打包编译时支持低版本、、、
                  */
-                // const ret = await (vuePlugin.transform as TransformHook).call(this, code, id);
-                let ret = await (vuePlugin.transform as TransformHook).call(this, code, id);
+                // const ret = await (originPlugin.transform as TransformHook).call(this, code, id);
+                let ret = await (originPlugin.transform as TransformHook).call(this, code, id);
                 ret = !!ret && extname(id).toLowerCase() == ".vue"
                     ? await transformScript((ret as any).code, id, component, options)
                     : ret;
@@ -172,12 +199,25 @@ export default function vuePlugin(component: ComponentOptions, context: Componen
             /** 合并sourcemap；还没实现，输出个警告提示；考虑参照compile-sfc中的source-map包做合并操作
              *      this.warn("o(╥﹏╥)o css的sourceMap合并还没实现...");
              */
-            !error && cssChunks.length && pa.writeFile(cssChunkDist, cssChunks
-                .map(chunk => `/* ${relative(options.srcRoot, chunk.src)} */\r\n${chunk.css.trim()}`)
-                .join("\r\n")
-            );
+            if (error) {
+                return;
+            }
+            //  先删除，再生成，后续考虑逐行写入
+            const codes: string[] = [];
+            /* v8 ignore next 1 vitest模式下，每次都会删除dist目录，不会存在 cssChunkDist文件 */
+            existsSync(cssChunkDist) && rmSync(cssChunkDist);
+            cssChunkMap.forEach((chunks, key) => {
+                chunks.forEach((style, index) => {
+                    codes.push(`/* src:${relative(options.srcRoot, key)} \t index:${index} */`);
+                    codes.push(style.css);
+                });
+            });
+            pa.writeFile(cssChunkDist, codes.join("\r\n"))
         }
     }
+
+    //  合并插件返回
+    return { ...originPlugin, ...rullupPlugin };
 }
 
 //#region ************************************* 私有方法 *************************************

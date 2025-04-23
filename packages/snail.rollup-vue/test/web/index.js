@@ -1,8 +1,4 @@
-import { App, createApp } from "vue"
+import DV from "./core/components/default.vue";
+export default DV;
 
-const app = createApp({
-    setup() {
-
-    }
-});
-app.mount("#app");
+import "./core/components/no-style.vue";

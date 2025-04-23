@@ -12,10 +12,13 @@
   "dependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/compiler-sfc": "^3.5.13",
-    "snail.core": "^1.1.1",
-    "snail.rollup": "^1.1.7",
-    "snail.rollup-script": "^1.1.5",
-    "snail.rollup-style": "^1.1.6"
+    "snail.core": ">=1.1.3",
+    "snail.rollup": ">=1.1.7",
+    "snail.rollup-inject": ">=1.1.6",
+    "snail.rollup-url": ">=1.1.6",
+    "snail.rollup-script": ">=1.1.6",
+    "snail.rollup-style": ">=1.1.7",
+    "snail.rollup-asset": ">=1.1.6"
   },
   "devDependencies": {
     "vue": "^3.5.13"

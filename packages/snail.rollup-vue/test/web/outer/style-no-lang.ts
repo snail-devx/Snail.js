@@ -1,0 +1,1 @@
+import "./components/style-no-lang.vue"
