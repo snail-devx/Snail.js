@@ -41,9 +41,6 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
              *      src 时，死循环判断：引入 component 自身，则强制报错，避免死循环依赖；后期考虑做引用地图，完成更细粒度的死循环判断
              */
             const module: ModuleOptions = pa.resolveModule(source, importer);
-            if (!module) {
-                return;
-            }
             //  基于type判断是否为commonLib，最后做错误规则触发
             let lib: CommonLibOptions = undefined;
             let errorrRule: string = undefined;
@@ -55,24 +52,25 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
                     }
                     //  非入口文件查找commonLib、判断死循环、引用规则判断
                     const idKey: string = module.id.toLowerCase();
-                    if (importer != undefined) {
-                        if (srcKey == idKey) {
-                            errorrRule = `dead loop import entry script: ${importer}`;
-                            break;
-                        }
-                        lib = commonLib.find(lib => lib.id.toLowerCase() === idKey);
-                        if (lib != undefined) {
-                            break;
-                        }
-                        //  非commonLib时，进行引入规则判断
+                    /* v8 ignore next 4   死循环，在rollup端已经结果了，这里先忽略，不会触发此规则*/
+                    if (importer && srcKey == idKey) {
+                        errorrRule = `dead loop import entry script: ${importer}`;
+                        break;
+                    }
+                    //  入口脚本，始终不查找commonLib：按照测试用例来说，肯定能覆盖，单个测试用例执行也覆盖了，整体执行时提示没覆盖到，先忽略；
+                    lib = importer
+                        ? commonLib.find(lib => lib.id.toLowerCase() === idKey)
+                        : undefined;
+                    //  非commonLib时，进行引入规则判断
+                    if (lib == undefined) {
                         if (isChild(options.srcRoot, module.id) == true && isChild(component.root, module.id) == false) {
                             errorrRule = `import script must be child of componentRoot: it is child of srcRoot but not commonLib. `;
                             break;
                         }
+                        //  需要进行脚本编译，并告知rollup 已经作为【非公共脚本】解析了：srcRoot外的脚本，或者componentRoot下的脚本；
+                        transformMap.set(idKey, module);
+                        return { id: module.id, external: false };
                     }
-                    //  需要进行脚本编译，并告知rollup 已经作为【非公共脚本】解析了：srcRoot外的脚本，或者componentRoot下的脚本；
-                    transformMap.set(idKey, module);
-                    return { id: module.id, external: false };
                 }
                 //  net 时，必须得是commonLib，无法加载net路径代码；后期可考虑如果是siteUrl，则下载文件，前期先忽略
                 case "net": {
@@ -90,13 +88,14 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
                     break;
                 }
                 //  兜底报错
+                /* v8 ignore next 4 兜底目前不会出现，先忽略*/
                 default: {
                     errorrRule = `resolve script failed: not support module.type value. type:${module.type}.`;
                     return;
                 }
             }
             if (isStringNotEmpty(errorrRule)) {
-                pa.triggerRule(importer, source, importer);
+                pa.triggerRule(errorrRule, source, importer);
                 return;
             }
             /** 分析commonLib，并告知rollup无需分析此脚本了
