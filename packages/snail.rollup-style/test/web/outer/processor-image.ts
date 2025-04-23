@@ -1,0 +1,1 @@
+import "./styles/url-image.less";

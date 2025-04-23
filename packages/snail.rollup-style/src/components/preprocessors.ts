@@ -26,6 +26,9 @@ export interface StylePreprocessorResults {
     dependencies: string[]
 }
 
+
+/* v8 ignore next 130 copy自 @vue/compile-sfc ，不做源码覆盖率测试*/
+
 // .scss/.sass processor
 const scss: StylePreprocessor = (source, map, options) => {
     const nodeSass = require('sass')
@@ -153,8 +156,6 @@ const require = function (id: string, from?: string) {
         return from
             ? _require(_require.resolve(id, { paths: [from] }))
             : _require(id);
-    } catch (e) {
-
-    }
+    } catch (e) { }
 }
 //#region 

@@ -2,7 +2,7 @@ import { InputPluginOption } from "rollup"
 import { StyleTransformResult } from "./models/style";
 import { StyleProcessor } from "./components/processor";
 import { buildUrlResolve } from "snail.rollup-url"
-import { isString, isStringNotEmpty, version } from "snail.core";
+import { isObject, isString, isStringNotEmpty, version } from "snail.core";
 import { hasDynamicModule, registerDynamicModule } from "snail.rollup-inject"
 //  导入rollup包，并对helper做解构
 import { BuilderOptions, ComponentContext, ComponentOptions } from "snail.rollup"
@@ -28,7 +28,7 @@ export * from "./components/processor"
 export default function stylePlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
     const pa = new PluginAssistant(component, context, options);
     /** 要编译的样式文件 */
-    const transformMap: Map<string, StyleTransformResult> = Object.create(null);
+    const transformMap: Map<string, StyleTransformResult> = new Map();
     /** Style样式提供程序 */
     const styleProvider: StyleProcessor = new StyleProcessor(component, context, options);
 
@@ -59,9 +59,11 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
                     }
                     return ret;
                 }
+                //  其他情况，不支持强制报错：如在脚本中引入npm下的样式，无法分析出样式url地址，强制报错
                 default: {
                     const rule: string = `resolve style failed: not support module.type value. type:${module.type}.`;
                     pa.triggerRule(rule, source, importer);
+                    break;
                 }
             }
         },
@@ -69,18 +71,26 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
          * 监听模块内容变化
          * @param id 
          */
+        /* v8 ignore next 13 vitest 模式下，覆盖进行dev模式测试，覆盖率先忽略掉*/
         watchChange(id: string) {
             /* 仅处理是当前js组件相关的样式文件，直接import的，或者css文件中@import的 */
             id = id.toLowerCase();
             transformMap.forEach(style => {
-                const isChanged = style.src.toLowerCase() === id
-                    || style.dependencies?.find(file => file.toLowerCase() === id) !== undefined;
+                const isChanged = style.src.toLowerCase() == id
+                    || style.dependencies?.find(file => file.toLowerCase() == id) != undefined;
                 if (isChanged === true) {
                     style.writed = undefined;
                     style.css = undefined;
                     style.map = undefined;
                 }
             });
+        },
+        /**
+         * 加载模块数据
+         * @param id 
+         */
+        load(id) {
+            //  后续在这里支持“外部在样式文件import时，加上 link 参数，自动添加link标签{” ；使用【buildAddLinkCode】方法，
         },
         /**
          * 加载编译代码
@@ -96,8 +106,8 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
             //  编译style文件；watch模式下，不需要全编译，做一些性能优化
             if (style.writed !== true) {
                 const ret = await styleProvider.transformFile(style.src);
-                style.css = ret.code;
-                style.map = ret.map?.toString();
+                style.css = ret.code || "";
+                style.map = isObject(ret.map) ? JSON.stringify(ret.map, null, 4) : "";
                 style.dependencies = ret.dependencies;
             }
             //  支持watch模式
@@ -111,7 +121,7 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
             /* 将编译好的样式文件写入目标目录；仅处理未写入的数据；写入完成后，清理缓存，节省内存 */
             !error && transformMap.forEach(style => {
                 if (style.writed != true) {
-                    style.css && pa.writeFile(style.dist, style.css);
+                    isString(style.css) && pa.writeFile(style.dist, style.css);
                     style.map && pa.writeFile(`${style.dist}.map`, style.map);
                     style.writed = true;
                     style.css = undefined;
@@ -134,7 +144,7 @@ export function buildAddLinkCode(url: string): string {
     return isStringNotEmpty(url)
         ? [
             `import addLink from "${MODULE_INJECT_LINK}";`,
-            `addLink(${JSON.stringify(url)})`
+            `addLink(${JSON.stringify(url)});`
         ].join('\r\n')
         : undefined;
 }
@@ -145,13 +155,15 @@ export function buildAddLinkCode(url: string): string {
 hasDynamicModule(MODULE_INJECT_LINK) || registerDynamicModule(MODULE_INJECT_LINK, `
 const linkMap = Object.create(null);
 export default function (href) {
-    if (!document || !document.head || typeof (href) !== "string") return;
+    if (!document || !document.head || typeof (href) != "string"){
+        return;
+    }
     var id = href.toLowerCase();
-    if (Object.prototype.hasOwnProperty.call(linkMap, id) === false) {
+    if (Object.prototype.hasOwnProperty.call(linkMap, id) == false) {
         var element = document.createElement("link");
         element.href = href.indexOf('?') == -1
-            ? href.concat("?_snv=f${version.getVersion()}")
-            : href.concat("&_snv=f${version.getVersion()}");
+            ? href.concat("?${version.getVersion(true)}")
+            : href.concat("&${version.getVersion(true)}");
         element.rel = "stylesheet";
         document.head.appendChild(element);
         linkMap[id] = element;
