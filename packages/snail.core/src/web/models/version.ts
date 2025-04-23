@@ -4,9 +4,12 @@
 export interface IVersionManager {
     /**
      * 获取版本值
+     * @param needQuery 是否需要版本查询参数
      * @returns 版本值，未设置则返回全局的
+     * - false 则为 version
+     * - true 则为 query=version
      */
-    getVersion(): string;
+    getVersion(needQuery?: boolean): string;
     /**
      * 添加文本版本；满足特定文件走固定版本规则
      * @param file 文件路径：绝对路径，不区分大小写；忽略url的query和hash

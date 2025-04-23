@@ -34,10 +34,16 @@ export namespace version {
         //#region *************************************实现接口：IVersionManager接口方法*************************************
         /**
          * 获取版本值
+         * @param needQuery 是否需要版本查询参数
          * @returns 版本值，未设置则返回全局的
+         * - false 则为 version
+         * - true 则为 query=version
          */
-        function getVersion(): string {
-            return options.version || CONFIG.version || DEFAULT_VERSION;
+        function getVersion(needQuery?: boolean): string {
+            const vv = options.version || CONFIG.version || DEFAULT_VERSION;
+            return needQuery
+                ? `${options.query || CONFIG.query || "_snv"}=${vv}`
+                : vv;
         }
         /**
          * 添加文本版本；满足特定文件走固定版本规则
@@ -104,10 +110,13 @@ export namespace version {
     }
     /**
      * 获取全局版本值
+     * @param needQuery 是否需要版本查询参数
      * @returns 版本值，未设置则返回全局的
+     * - false 则为 version
+     * - true 则为 query=version
      */
-    export function getVersion(): string {
-        return global.getVersion();
+    export function getVersion(needQuery?: boolean): string {
+        return global.getVersion(needQuery);
     }
     /**
      * 添加文本版本；满足特定文件走固定版本规则

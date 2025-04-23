@@ -2,10 +2,9 @@ import { assert, describe, expect, test, it, afterEach } from 'vitest'
 import { version } from "../../src/web/version"
 import { IVersionManager } from '../../src/web/models/version'
 
-const defaultVersion = version.getVersion();
-
 function tmpFunc(vm: IVersionManager): void {
     expect(vm.getVersion()).toStrictEqual("1x3");
+    expect(vm.getVersion(true)).toStrictEqual("_snvxx=1x3");
     expect(() => vm.formart("")).toThrow("file must be a non-empty string.");
     expect(vm.formart("url?")).toStrictEqual("url?_snvxx=1x3");
     expect(vm.formart("?")).toStrictEqual("?_snvxx=1x3");
@@ -27,14 +26,23 @@ function tmpFunc(vm: IVersionManager): void {
     //      忽略query和hash信息
     vm.addFile("/app/test.html?1", "/app/test.html?x=1");
     expect(vm.formart("/app/test.html")).toStrictEqual("/app/test.html?x=1");
-
-
 }
+
 //  全局、私有作用域
-version.config({ version: "1x3", query: "_snvxx" });
-test("global", () => tmpFunc(version));
-test("newScope", () => tmpFunc(version.newScope({ version: "1x3", query: "_snvxx" })));
-test("newScope1", () => tmpFunc(version.newScope({ version: "1x3", query: "_snvxx" })));
+describe("global-scope", () => {
+    const defaultVersion = version.getVersion();
+    const defaultQueryVersion = version.getVersion(true);
+    //  什么都没配置时，做一些默认值配置验证
+    test("getVersion", () => {
+        expect(defaultQueryVersion).toStrictEqual(`_snv=${defaultVersion}`);
+    });
+
+    version.config({ version: "1x3", query: "_snvxx" });
+    test("global", () => tmpFunc(version));
+    test("newScope", () => tmpFunc(version.newScope({ version: "1x3", query: "_snvxx" })));
+    test("newScope1", () => tmpFunc(version.newScope({ version: "1x3", query: "_snvxx" })));
+})
+
 //  测试隔离性
 test("private", () => {
     let vm1 = version.config({ version: "0" }), vm2 = version.newScope({ version: "1" }), vm3 = version.newScope({ version: "2" });
