@@ -15,6 +15,8 @@ const EXTS_SCRIPT = Object.freeze([".ts", ".js", ".cjs", ".mjs"]);
 const EXTS_ASSET = Object.freeze([".png", ".jpg", ".jpeg", ".gif", ".svg", ".html"]);
 /** 扩展名：样式文件 */
 const EXTS_STYLES = Object.freeze([".css", ".less", ".scss", ".sass"]);
+
+/* v8 ignore next 291 在rollup-* 相关插件集中使用到了，但由于是在编译结果包中使用，覆盖率过不去*/
 /**
  * 插件辅助类
  * - 提供rollup插件常用功能
