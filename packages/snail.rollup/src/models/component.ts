@@ -1,5 +1,6 @@
 import { InputPluginOption } from "rollup"
 import { BuilderOptions, CommonLibOptions } from "./builder";
+import { ModuleOptions } from "./module";
 
 /**
  * 构建组件的配置选项
@@ -172,22 +173,146 @@ export type ViewOptions = AssetOptions & {
     handle?: (options: BuilderOptions, src: string, content: string) => string;
 }
 
-/** 
- * 组件上下文，用于组件打包各处共享一些数据
+/**
+ * 接口：组件上下文
+ * - 组件打包的各个组件中进行上下文数据共享
+ * - 提供打包插件的一些助手类方法，方便插件基于组件环境构建信息
  */
-export type ComponentContext = {
+export interface IComponentContext {
     /**
      * 组件打包过程中分析出来的依赖资源；如图片，这些自动copy到输出目录
      * - 需借助【snail.rollup-asset】包插件完成
      */
     assets: AssetOptions[];
-
     /**
      * 组件打包过程中依赖的commonLib字典
      * - key为模块id；value为对应的commonLib配置
      * - 配合rollup的globals属性使用，方便一键得到全局依赖
      */
     globals: Map<string, CommonLibOptions>;
+    /** 
+     * 是否watch模式
+     */
+    isWatchMode: boolean;
+    /** 
+     * 是否生产环境 
+     */
+    isProduction: boolean;
+
+    //#region ************************************** 助手类方法 *************************************
+    /**
+     * 是否是动态模块；id以 DMI:开头
+     * @param id 模块Id
+     * @returns 是则返回true，否则返回false
+     */
+    isDynamicModule(id: string): boolean;
+    /**
+     * 是否是Url模块：id以url开头
+     * @param id 模块Id
+     * @returns 是则返回true，否则返回false
+     */
+    isUrlModule(id: string): boolean;
+    /**
+     * 解析处理模块Id信息，基于id分析模块类型；如模块的url地址、类型等，ext等
+     * @param 模块来源，如通过import引入
+     * @param importer  谁引入了source
+     * @returns 引入的模块信息
+     */
+    resolveModule(source: string, importer: string): ModuleOptions;
+    /**
+     * 输出模块跟踪信息
+     * @param who 谁要跟踪模块信息，一般传入插件名称
+     * @param type 跟踪类型，如 asset、html、script、dynamic、、、
+     * @param module resolve的模块对象
+     */
+    traceModule(who: string, type: string, module: ModuleOptions);
+    /**
+    * 是否是资源文件模块
+    * @param module 
+    * @returns 
+    */
+    isAsset(module: ModuleOptions | string): boolean;
+    /**
+     * 是否是js脚本模块
+     * @param module 
+     * @returns true/false
+     */
+    isScript(module: ModuleOptions | string): boolean;
+    /**
+     * 是否是css样式模块
+     * @param module 
+     * @returns true/false
+     */
+    isStyle(module: ModuleOptions | string): boolean;
+    /**
+     * child是否是指定parent的子，或者子的子
+     * @param parent 父级目录路径
+     * @param child  文件/目录路径
+     * @returns  子返回true；否则返回false
+     */
+    isChild(parent: string, child: string): boolean;
+    /**
+     * 是否是网络路径
+     * - 完整网址：如https://cdn.jsdelivr.net/npm/vue@2
+     * - 网络绝对路径：如 /xxx/x/x/x/xss.js、/xxxtest.css
+     * @param path 
+     */
+    isNetPath(path: string): boolean;
+
+    /**
+     * 强制文件路径；若不是则替换掉
+     * @param file 要换或追的文件
+     * @param extName 期望的输出文件后缀名，如“.ts” ；不传则使用src中的后缀名
+     */
+    forceExt(file: string, extName: string): string;
+    /**
+     * 强制文件的后缀
+     * - 将一些预编译文件输出后的后缀做一下强制修改
+     * - 如 .ts强制.js,.less强制.css
+     * @param file 文件路径
+     * @returns 整理后缀后的新文件路径
+     */
+    forceFileExt(file: string): string;
+    /**
+     * 读取文件文本数据；默认utf-8模式读取
+     * @param file 
+     */
+    readFileText(file: string): string;
+    /**
+     * 复制文件
+     * @param src 源文件
+     * @param dist 目标输出路径
+     */
+    copyFile(src: string, dist: string): void;
+    /**
+     * 写文件
+     * @param dist 文件路径
+     * @param data 文件内容
+     */
+    writeFile(dist: string, data: string | NodeJS.ArrayBufferView);
+    /**
+     * 构建src的输出路径
+     * @param src 
+     * @returns dist为输出路径，url为网络路径
+     */
+    buildPath(src: string): { dist: string, url: string };
+
+    /**
+     * 必须在SrcRoot目录下，否则报错
+     * @param module 模块信息
+     * @param source 源文件
+     * @param importer 由谁引入的source文件
+     */
+    mustInSrcRoot(module: ModuleOptions, source: string, importer: string): void;
+    /**
+     * 触发指定规则输出错误信息，非watch模式下，直接退出
+     * @param rule 规则信息
+     * @param source 源文件
+     * @param importer 由谁引入的source文件
+     * @param reasons 补充一些原因说明
+     */
+    triggerRule(rule: string, source: string, importer: string, ...reasons: string[]);
+    //#endregion
 }
 
 /**
@@ -199,4 +324,4 @@ export type ComponentContext = {
  * - - options：打包全局配置
  * - 返回值：rollup插件数组
  */
-export type PluginBuilder = (component: ComponentOptions, context: ComponentContext, options: BuilderOptions) => InputPluginOption[];
+export type PluginBuilder = (component: ComponentOptions, context: IComponentContext, options: BuilderOptions) => InputPluginOption[];

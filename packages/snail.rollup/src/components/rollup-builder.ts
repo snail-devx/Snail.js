@@ -1,6 +1,10 @@
-import { dirname, relative, resolve } from "path";
-import { RollupOptions } from "rollup";
+import { dirname, resolve } from "path";
+import pc from "picocolors";
+import { InputPluginOption, RollupOptions } from "rollup";
 import minimist from "minimist";
+import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../models/builder";
+import { AssetOptions, ComponentOptions, IComponentContext, PluginBuilder } from "../models/component";
+import { ProjectOptions } from "../models/project";
 import {
     mustString, mustFunction, mustArray, mustObject,
     throwError, throwIfFalse, throwIfTrue,
@@ -8,13 +12,12 @@ import {
     tidyString,
     url,
 } from "snail.core"
-import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../models/builder";
-import { AssetOptions, ComponentContext, ComponentOptions, PluginBuilder } from "../models/component";
-import { ProjectOptions } from "../models/project";
 import {
     buildDist, buildNetPath, checkExists, checkSrc, forceExt, getLen, importFile,
     isChild, isNetPath, log, logIfAny, step, trace, traceIfAny, warn
 } from "../utils/helper";
+import { getContext } from "./component-context";
+import { startPointPlugin, endpointPlugin } from "./point-plugin";
 
 /**
  * Rollup构建器
@@ -77,11 +80,11 @@ export class Builder implements IRollupBuilder {
         //  1、验证Builder配置选项：srcRoot必须存在，验证后将数据冻结，避免被修改
         options = checkBuilder(options);
         options = Object.freeze(Object.assign(Object.create(null), options));
-        log("BuilderOptions:")
-        trace(`    root:${options.root}`);
-        trace(`    srcRoot:${options.srcRoot}`);
-        trace(`    sitRoot:${options.siteRoot}`);
-        trace(`    distRoot:${options.distRoot}`);
+        console.log(pc.magentaBright(`👉 BuilderOptions`));
+        trace(`\troot:         ${options.root}`);
+        trace(`\tsrcRoot:      ${options.srcRoot}`);
+        trace(`\tsitRoot:      ${options.siteRoot}`);
+        trace(`\tdistRoot:     ${options.distRoot}`);
         log("");
         //  2、验证plugin是否有效
         mustFunction(plugin, "plugin");
@@ -115,16 +118,15 @@ export class Builder implements IRollupBuilder {
                 this.options.commonLib
             );
         //  构建rollup配置选项：为每个组件生成自己的上下文
-        log("\r\nbuild success, use rollup to generate...");
-        trace(new Array(100).join("-").concat("\r\n\r\n"));
         return components.map(component => {
             component.commonLib = [].concat(component.commonLib, commonLib);
             component = Object.freeze(component);
-            const context: ComponentContext = Object.freeze({
-                assets: [],
-                globals: new Map<string, CommonLibOptions>(),
-                caches: new Map<string, any>(),
-            });
+            const context: IComponentContext = getContext(component, this.options);
+            const plugins: InputPluginOption[] = [
+                startPointPlugin(component, context, this.options),
+                ...this.plugin.call(component, component, context, this.options) || [],
+                endpointPlugin(component, context, this.options),
+            ];
             return {
                 input: component.src,
                 output: {
@@ -159,15 +161,13 @@ export class Builder implements IRollupBuilder {
                     freeze: false,
                     externalLiveBindings: false,
                 },
-                /*  构建插件：执行外部传入的插件构建器
-                 *      显示指定上下文this为组件自身
-                 */
-                plugins: this.plugin.call(component, component, context, this.options),
+                plugins,
                 /*  拦截特定警告：后续会添加一些自定义参数，减少警告信息输出
                  */
                 /* v8 ignore next 3  onwarn 不进行代码覆盖率测试*/
                 onwarn: function (warning, warn) {
-                    warning.code === "UNKNOWN_OPTION" || warn(warning);
+                    warning.code !== "UNKNOWN_OPTION"
+                        && warn(pc.yellow(`  --build warn:       ${warning?.message}`));
                 }
             }
         });

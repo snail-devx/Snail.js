@@ -1,5 +1,5 @@
-import { existsSync, statSync } from "fs";
-import { extname, relative, resolve } from "path";
+import { existsSync, mkdir, mkdirSync, statSync } from "fs";
+import { dirname, extname, relative, resolve } from "path";
 import { fileURLToPath } from "url";
 import { mustString, hasOwnProperty, throwIfFalse, tidyString, url } from "snail.core"
 import pc from "picocolors";
@@ -10,6 +10,24 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 */
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
+
+/**
+ * 常亮：一些基础的标记信息，作为固化规则对外提供
+ */
+export const FLAG = Object.freeze({
+    /**
+     * 动态模块标识
+     */
+    DYNAMIC_MODULE: "DMI:",
+    /**
+     * URL模块标识
+     */
+    URL_MODULE: "URL:",
+    /**
+     * 带有URL+版本号的模块标记
+     */
+    URLVERSION_MODULE: "URL_VERSION:"
+});
 
 //#region  *****************************************   👉 基础操作    *****************************************
 /**
@@ -35,6 +53,17 @@ export function checkExists(path: string, paramName: string) {
         var msg = `${paramName} not exists. path:${path}`;
         throw new Error(msg);
     }
+}
+/**
+ * 创建路径的所在目录
+ * - 基于dirname（path）得到所在目录
+ * - 所在目录不存在时自动递归创建
+ * @param path 路径
+ */
+export function createDir(path: string): void {
+    mustString(path, "path");
+    const dir = dirname(path);
+    existsSync(dir) || mkdirSync(dir, { recursive: true });
 }
 /**
  * 判断指定路径是否是文件

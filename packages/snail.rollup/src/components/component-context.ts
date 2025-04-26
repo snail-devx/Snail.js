@@ -1,11 +1,11 @@
-import { BuilderOptions } from "../models/builder";
-import { ComponentContext, ComponentOptions } from "../models/component";
-import { ModuleOptions, ModuleType } from "../models/module";
-import { checkExists, forceExt, isChild, isNetPath, trace } from "../utils/helper";
-import { dirname, extname, isAbsolute, join, resolve, sep } from "path";
-import pc from "picocolors";
+import { dirname, extname, isAbsolute, relative, resolve } from "path";
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import pc from "picocolors";
 import { isArrayNotEmpty, throwIfFalse, throwIfUndefined, url } from "snail.core";
+import { BuilderOptions, CommonLibOptions } from "../models/builder";
+import { AssetOptions, ComponentOptions, IComponentContext } from "../models/component";
+import { ModuleOptions, ModuleType } from "../models/module";
+import { buildDist, buildNetPath, checkExists, createDir, forceExt, isChild, isNetPath, trace } from "../utils/helper";
 
 /** 模块解析缓存：key为模块id，value为模块信息 */
 const moduleResolveCache: Map<string, ModuleOptions> = new Map();
@@ -16,38 +16,22 @@ const EXTS_ASSET = Object.freeze([".png", ".jpg", ".jpeg", ".gif", ".svg", ".htm
 /** 扩展名：样式文件 */
 const EXTS_STYLES = Object.freeze([".css", ".less", ".scss", ".sass"]);
 
-/* v8 ignore next 291 在rollup-* 相关插件集中使用到了，但由于是在编译结果包中使用，覆盖率过不去*/
+/* v8 ignore next 260 在rollup-*中使用，内部先不做覆盖率测试*/
 /**
- * 插件辅助类
- * - 提供rollup插件常用功能
- * - 集成一些基础的组件打包验证工作
+ * 获取组件上下文
+ * @param component 组件对象
+ * @param options 打包全局配置选项
+ * @returns 组件上下文对象
  */
-export class PluginAssistant {
-    //#region ************************************** 属性、构造方法 *************************************
-    /** 打包组件配置选项 */
-    public readonly component: ComponentOptions;
-    /** 组件打包上下文；用于一些资源共享 */
-    public readonly context: ComponentContext;
-    /** 全局打包配置选项：约束siteRoot、srcRoot等 */
-    public readonly options: BuilderOptions;
+export function getContext(component: ComponentOptions, options: BuilderOptions): IComponentContext {
+    /** 组件打包过程中分析出来的依赖资源；如图片，这些自动copy到输出目录 */
+    const assets: AssetOptions[] = [];
+    /** 组件打包过程中依赖的commonLib字典 */
+    const globals: Map<string, CommonLibOptions> = new Map();
     /** 是否生产环境 */
-    public readonly isProduction: boolean;
+    const isProduction = options.isProduction;
     /** 是否watch模式 */
-    public readonly isWatchMode: boolean;
-    /**
-     * 构造方法
-     * @param component 打包组件配置选项
-     * @param context 组件打包上下文；用于一些资源共享
-     * @param options 全局打包配置选项：约束siteRoot、srcRoot等
-     */
-    public constructor(component: ComponentOptions, context: ComponentContext, options: BuilderOptions) {
-        this.component = component;
-        this.context = context;
-        this.options = options;
-        this.isProduction = options.isProduction;
-        this.isWatchMode = process.env["ROLLUP_WATCH"] == 'true';
-    }
-    //#endregion
+    const isWatchMode = process.env["ROLLUP_WATCH"] == 'true';
 
     //#region ************************************** 组件分析 *************************************
     /**
@@ -56,7 +40,7 @@ export class PluginAssistant {
      * @param importer  谁引入了source
      * @returns 引入的模块信息
      */
-    public resolveModule(source: string, importer: string): ModuleOptions | undefined {
+    function resolveModule(source: string, importer: string): ModuleOptions | undefined {
         /** 格式化source，并分析type值；基于source和importer分析实际物理路径赋值给source；
          *      1、网络路径，自动net；注意甄别 linux下的路径（/root/x/x.tx)
          *      2、否则基于importer分析判定为src源码引入
@@ -139,13 +123,22 @@ export class PluginAssistant {
         module && moduleResolveCache.set(cacheKey, module);
         return module;
     }
-
     /**
-     * 是否是指定后缀的模块
-     * @param module 模块信息，分析启后缀名称，与exts比配
-     * @param exts 后缀数组
+     * 输出模块跟踪信息
+     * @param who 谁要跟踪模块信息，一般传入插件名称
+     * @param type 跟踪类型，如 asset、html、script、dynamic、、、
+     * @param module resolve的模块对象
      */
-    public isExtFile(module: ModuleOptions | string, exts: string[] | readonly string[]): boolean {
+    function traceModule(who: string, type: string, module: ModuleOptions) {
+        const id = module.type == "src" ? relative(options.srcRoot, module.id) : module.id;
+        console.log(pc.cyan(`  ----  ${who}`), pc.gray(`resolve ${type} module: ${id}`));
+    }
+    /**
+    * 是否是指定后缀的模块
+    * @param module 模块信息，分析启后缀名称，与exts比配
+    * @param exts 后缀数组
+    */
+    function isExtFile(module: ModuleOptions | string, exts: string[] | readonly string[]): boolean {
         if (module && isArrayNotEmpty(exts)) {
             const ext = typeof (module) == "string" ? extname(module).toLowerCase() : module.ext;
             return exts.indexOf(ext) !== -1;
@@ -157,27 +150,27 @@ export class PluginAssistant {
      * @param module 
      * @returns 
      */
-    public isAsset(module: ModuleOptions | string): boolean {
+    function isAsset(module: ModuleOptions | string): boolean {
         /* 后期支持从这里扩充 文件后缀 */
-        return this.isExtFile(module, EXTS_ASSET);
+        return isExtFile(module, EXTS_ASSET);
     }
     /**
      * 是否是js脚本模块
      * @param module 
      * @returns true/false
      */
-    public isScript(module: ModuleOptions | string): boolean {
+    function isScript(module: ModuleOptions | string): boolean {
         /* 后期支持从这里扩充 文件后缀 */
-        return this.isExtFile(module, EXTS_SCRIPT);
+        return isExtFile(module, EXTS_SCRIPT);
     }
     /**
      * 是否是css样式模块
      * @param module 
      * @returns true/false
      */
-    public isStyle(module: ModuleOptions | string): boolean {
+    function isStyle(module: ModuleOptions | string): boolean {
         /* 后期支持从这里扩充 文件后缀 */
-        return this.isExtFile(module, EXTS_STYLES);
+        return isExtFile(module, EXTS_STYLES);
     }
     //#endregion
 
@@ -189,11 +182,11 @@ export class PluginAssistant {
      * @param file 文件路径
      * @returns 整理后缀后的新文件路径
      */
-    public forceFileExt(file: string): string {
-        if (this.isScript(file) == true) {
+    function forceFileExt(file: string): string {
+        if (isScript(file) == true) {
             return forceExt(file, ".js");
         }
-        if (this.isStyle(file) == true) {
+        if (isStyle(file) == true) {
             return forceExt(file, ".css");
         }
         return file;
@@ -202,7 +195,7 @@ export class PluginAssistant {
      * 读取文件文本数据；默认utf-8模式读取
      * @param file 
      */
-    public readFileText(file: string): string {
+    function readFileText(file: string): string {
         //  后续在这里加上异常等处理逻辑，进一步完善功能
         return readFileSync(file, "utf-8");
     }
@@ -211,27 +204,34 @@ export class PluginAssistant {
      * @param src 源文件
      * @param dist 目标输出路径
      */
-    public copyFile(src: string, dist: string): void {
+    function copyFile(src: string, dist: string): void {
         // 输出文件信息后期分析输出路径必须在 distRoot下
-        trace(`--copy \t${src} \t➡️\t ${dist} `);
+        trace(`\t${relative(options.srcRoot, src)}    \t---->    ${relative(options.distRoot, dist)}`);
         checkExists(src, `src`);
-        try {
-            buildDir(dirname(dist));
-            cpSync(src, dist, { recursive: true });
-        }
-        catch (ex: any) {
-            console.log(pc.red(`----error:${ex.message} `));
-        }
+        createDir(dist);
+        cpSync(src, dist, { recursive: true });
     }
     /**
      * 写文件
      * @param dist 文件路径
      * @param data 文件内容
      */
-    public writeFile(dist: string, data: string | NodeJS.ArrayBufferView) {
+    function writeFile(dist: string, data: string | NodeJS.ArrayBufferView) {
         // 输出文件信息后期分析输出路径必须在 distRoot下
-        buildDir(dirname(dist));
+        createDir(dist);
         writeFileSync(dist, data)
+    }
+
+    /**
+     * 构建src的输出路径
+     * @param src 
+     * @returns dist为输出路径，url为网络路径
+     */
+    function buildPath(src: string): { dist: string, url: string } {
+        //  后期验证src必须在srcRoot目录下
+        const dist = buildDist(options, src);
+        const url = buildNetPath(options, dist);
+        return { dist, url };
     }
     //#endregion
 
@@ -243,27 +243,12 @@ export class PluginAssistant {
      * @param importer 由谁引入的source文件
      * @param reasons 补充一些原因说明
      */
-    public triggerRule(rule: string, source: string, importer: string, ...reasons: string[]): void {
-        //  输出错误提示信息
-        const msgs: string[] = [
-            pc.bold(` * ${rule} `),
-            `source         ${source} `,
-            `componentSrc        ${this.component.src} `,
-            `componentRoot       ${this.component.root} `,
-            `srcRoot        ${this.options.srcRoot} `
-        ];
-        importer && msgs.splice(1, 0, `importer       ${importer} `);
-        console.log(pc.red(msgs.join('\r\n\t')), "\r\n")
-        this.isWatchMode || process.exit(0);
-
-        // console.log(pc.red("import style file must be child of componentRoot when it is child of srcRoot."));
-        // trace(`----component \t${ this.component.src } `);
-        // trace(`----source \t${ from } `);
-        // console.log(pc.bold('invalid @import files:'));
-        // outRuleFiles.forEach(file => trace(`----${ file } `));
-        // console.log(pc.bold('all @import files:'));
-        // preResult.dependencies.forEach(file => trace(`----${ file } `))
-        // isWatchMode || process.exit(1);
+    function triggerRule(rule: string, source: string, importer: string, ...reasons: string[]): void {
+        console.log(pc.redBright(`  ----  error rule:   ${rule}`));
+        source && console.log(pc.gray(`\tsource:       ${source}`));
+        importer && console.log(pc.gray(`\timporter:     ${importer}`));
+        isArrayNotEmpty(reasons) && reasons.forEach(reason => console.log(pc.gray(`\t${reason}`)));
+        isWatchMode || process.exit(0);
     }
 
     /**
@@ -272,39 +257,20 @@ export class PluginAssistant {
      * @param source 源文件
      * @param importer 由谁引入的source文件
      */
-    public mustInSrcRoot(module: ModuleOptions, source: string, importer: string): void {
-        if (isChild(this.options.srcRoot, module.id) == false) {
+    function mustInSrcRoot(module: ModuleOptions, source: string, importer: string): void {
+        if (isChild(options.srcRoot, module.id) == false) {
             const rule = "import file must be child of srcRoot: cannot analysis url of outside file.";
-            this.triggerRule(rule, source, importer);
+            triggerRule(rule, source, importer);
         }
     }
     //#endregion
-}
 
-//#region ************************************** 私有方法 *************************************
-
-/**
- * 构建目录，若不存在则自动构建
- * @param dir 要构建的目录；绝对路径，否则会先resolve
- */
-function buildDir(dir: string): void {
-    //  先resolve，确保格式统一；存在了则不创建
-    dir = resolve(dir);
-    if (existsSync(dir) === true) {
-        return;
-    }
-    //  针对linux做一下兼容：linux文件路径绝对路径以"/"开头，截取后会导致开头的“丢失”。
-    const dirNames = dir.split(sep);
-    dir.startsWith(sep) && dirNames[0] == "" && (dirNames[0] = sep);
-    let allPath: string = null;
-    for (let index = 0; index < dirNames.length; index++) {
-        if (allPath === null) {
-            allPath = dirNames[index];
-        }
-        else {
-            allPath = join(allPath, dirNames[index]);
-            existsSync(allPath) || mkdirSync(allPath);
-        }
-    }
+    return {
+        assets, globals, isProduction, isWatchMode,
+        isDynamicModule: id => id.startsWith("DMI:"),
+        isUrlModule: id => id.startsWith("url:"),
+        resolveModule, traceModule, isAsset, isScript, isStyle, isChild, isNetPath,
+        forceExt, forceFileExt, readFileText, copyFile, writeFile, buildPath,
+        mustInSrcRoot, triggerRule
+    };
 }
-//#endregion

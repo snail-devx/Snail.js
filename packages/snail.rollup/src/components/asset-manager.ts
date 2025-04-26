@@ -1,7 +1,7 @@
 import { isFunction } from "snail.core";
 import { AssetOptions } from "../models/component";
 
-/* v8 ignore next 49 在rollup-* 相关插件集中使用到了，但由于是在编译结果包中使用，覆盖率过不去*/
+/* v8 ignore next 55 在rollup-* 相关插件集中使用到了，但由于是在编译结果包中使用，覆盖率过不去*/
 /**
  * 资产文件管理器
  */
@@ -42,7 +42,13 @@ export class AssetManager<T extends AssetOptions> {
         const sKey = src.toLowerCase();
         return this.files.filter(file => file.sKey == sKey).map(file => file.file);
     }
-
+    /**
+     * 资源数量
+     * @returns  
+     */
+    public size(): number {
+        return this.files.length;
+    }
     /**
      * 遍历所有的资产文件
      * @param func 

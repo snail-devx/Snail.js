@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { Builder, helper } from "../src/index";
+import { Builder } from "../src/index";
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { BuilderOptions, CommonLibOptions, IRollupBuilder } from '../src/models/builder';

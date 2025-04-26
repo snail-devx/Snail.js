@@ -15,9 +15,8 @@ export * from "./models/project"
 
 /** 构建器 */
 export { Builder } from "./components/rollup-builder";
-/** 构建器相关助手方法 */
-export * as helper from "./utils/helper";
 /** 资产文件管理器 */
 export { AssetManager } from "./components/asset-manager";
-/** 插件辅助类 */
-export { PluginAssistant } from "./components/plugin-assistant";
+
+//  助手类中部分常量、方法共享
+export { FLAG } from "./utils/helper"
