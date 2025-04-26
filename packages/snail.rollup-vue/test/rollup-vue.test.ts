@@ -2,10 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 //  snail.rollup 采用源码引用方式，方便错误调试；整体测试完成后，再换成包形式
-// import { Builder, helper } from "snail.rollup";
 import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../../snail.rollup/src/index"
 import { ComponentOptions } from '../../snail.rollup/src/index';
-import { Builder, helper } from "../../snail.rollup/src/index";
+import { Builder } from "../../snail.rollup/src/index";
 
 import { OutputOptions, rollup, watch } from "rollup";
 import { existsSync, readFileSync, rmSync } from 'fs';
@@ -37,20 +36,23 @@ const builder = Builder.getBuilder(options, (component, context, options) => {
         vuePlugin(component, context, options),
     ]
 });
-
+let ruleMessage: string;
+{
+    const tmpFunc = console.log;
+    console.log = (...args) => {
+        ruleMessage = ruleMessage
+            ? ruleMessage.concat("\r\n", args.join("\r\n"))
+            : args.join("\r\n");
+        tmpFunc(...args);
+    };
+}
 beforeEach(() => {
+    ruleMessage = "";
     existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
 afterEach(() => {
-    // existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
+    existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
-
-let ruleMessage: string = undefined!;
-const tmpFunc = console.log;
-console.log = (...args) => {
-    ruleMessage = args[0];
-    tmpFunc(...args);
-};
 //#endregion
 
 //  默认情况测试：仅测试代码是否按照要求合并，不用测试vue代码编译的正确性，这是Vue自身组件逻辑
@@ -94,14 +96,14 @@ test("error-rule", async () => {
     ]);
     await expect(rollup(components[0])).rejects.toThrowError('process.exit unexpectedly called with "0"');
     expect(ruleMessage).toContain("import vue component failed: file must be child of componentRoot.");
-    expect(ruleMessage).toContain("source         ../core/components/default.vue ");
+    expect(ruleMessage).toContain("source:       ../core/components/default.vue");
     //  引入network网络vue组件
     components = builder.build([
         { src: "./outer/import-net-vue.ts", format: "es" }
     ]);
     await expect(rollup(components[0])).rejects.toThrowError('process.exit unexpectedly called with "0"');
     expect(ruleMessage).toContain("import vue component failed: cannot load from network path.");
-    expect(ruleMessage).toContain("source         /aaa/x.vue");
+    expect(ruleMessage).toContain("source:       /aaa/x.vue");
 });
 
 

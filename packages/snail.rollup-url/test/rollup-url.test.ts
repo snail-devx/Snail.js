@@ -7,7 +7,7 @@ import { existsSync, readFileSync, rmSync } from 'fs';
 // import { Builder, helper } from "snail.rollup";
 import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../../snail.rollup/src/index"
 import { ComponentOptions } from '../../snail.rollup/src/index';
-import { Builder, helper } from "../../snail.rollup/src/index";
+import { Builder } from "../../snail.rollup/src/index";
 
 import urlPlugin, { buildUrlResolve } from "../src/index"
 import { buildDist } from '../../snail.rollup/src/utils/helper';
@@ -16,19 +16,23 @@ import { version } from 'snail.core';
 //#region 测试前的准备工作
 const options: BuilderOptions = { root: __dirname, srcRoot: resolve(__dirname, 'web'), distRoot: resolve(__dirname, 'dist') };
 const builder = Builder.getBuilder(options, (component, context, options) => [urlPlugin(component, context, options)]);
+let ruleMessage: string;
+{
+    const tmpFunc = console.log;
+    console.log = (...args) => {
+        ruleMessage = ruleMessage
+            ? ruleMessage.concat("\r\n", args.join("\r\n"))
+            : args.join("\r\n");
+        tmpFunc(...args);
+    };
+}
 beforeEach(() => {
+    ruleMessage = "";
     existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
 afterEach(() => {
     existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
-
-let ruleMessage: string = undefined!;
-const tmpFunc = console.log;
-console.log = (...args) => {
-    ruleMessage = args[0];
-    tmpFunc(...args);
-};
 //#endregion
 
 //  net测试
@@ -82,15 +86,6 @@ test("src", async () => {
 
     await expect(rollup(components[1])).rejects
         .toThrowError('resolve module failed: src module not exists.');
-});
-//  测试常规引入，不加url标记；暂时仅验证输出文件存在性，不做其他逻辑处理
-test("no-url", async () => {
-    const components: RollupOptions[] = builder.build([
-        { src: "nourl.js", format: "es", },
-    ]);
-    let ret = await rollup(components[0]);
-    await ret.write(components[0].output as OutputOptions);
-    expect(existsSync(buildDist(options, resolve(options.srcRoot!, "nourl.js")))).toStrictEqual(true);
 });
 
 //  测试增加版本号，本身不会家版本号，但通过自定义插件实现

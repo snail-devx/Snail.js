@@ -4,10 +4,10 @@ import { transformWithEsbuild } from "vite"
 import { transformAsync } from "@babel/core"
 import { hasOwnProperty, isArrayNotEmpty, isStringNotEmpty } from "snail.core"
 //  导入rollup包，并对helper做解构
-import { BuilderOptions, ComponentContext, ComponentOptions, CommonLibOptions, ModuleOptions, ModuleTransformResult } from "snail.rollup"
-import { helper, PluginAssistant } from "snail.rollup"
-const { isChild, forceExt } = helper;
+import { BuilderOptions, IComponentContext, ComponentOptions, CommonLibOptions, ModuleOptions, ModuleTransformResult } from "snail.rollup"
 
+/** 插件名称 */
+const PLUGINNAME = "snail.rollup-script";
 /**
  * 脚本管理插件：
  * - 完成ts、js等脚本管理和编译
@@ -17,8 +17,7 @@ const { isChild, forceExt } = helper;
  * @param options 全局打包配置选项：约束siteRoot、srcRoot等
  * @returns rollup插件实例
  */
-export default function scriptPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
-    const pa = new PluginAssistant(component, context, options);
+export default function scriptPlugin(component: ComponentOptions, context: IComponentContext, options: BuilderOptions): InputPluginOption {
     /** 当前组件的公共js库，固化，避免外部再次修改 */
     const commonLib: CommonLibOptions[] = [];
     isArrayNotEmpty(component.commonLib) && commonLib.push(...component.commonLib);
@@ -28,7 +27,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
     const transformMap: Map<string, ModuleOptions> = new Map();
 
     return {
-        name: "snail.rollup-script",
+        name: PLUGINNAME,
         /**
          * 解析组件；判断是否是当前插件能处理的
          * @param source 解析的模块的名称
@@ -40,16 +39,17 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
              *      npm 时，无法分析出ext，无法直接基于isScript判断，做一下兼容，得先分析module
              *      src 时，死循环判断：引入 component 自身，则强制报错，避免死循环依赖；后期考虑做引用地图，完成更细粒度的死循环判断
              */
-            const module: ModuleOptions = pa.resolveModule(source, importer);
+            const module: ModuleOptions = context.resolveModule(source, importer);
             //  基于type判断是否为commonLib，最后做错误规则触发
             let lib: CommonLibOptions = undefined;
             let errorrRule: string = undefined;
             switch (module.type) {
                 //  src 时，必须在srcRoot下，组件根之外的必须配置为commonLib，否则报错
                 case "src": {
-                    if (pa.isScript(module) == false) {
+                    if (context.isScript(module) == false) {
                         return;
                     }
+                    context.traceModule(PLUGINNAME, "script", module);
                     //  非入口文件查找commonLib、判断死循环、引用规则判断
                     const idKey: string = module.id.toLowerCase();
                     /* v8 ignore next 4   死循环，在rollup端已经结果了，这里先忽略，不会触发此规则*/
@@ -63,7 +63,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
                         : undefined;
                     //  非commonLib时，进行引入规则判断
                     if (lib == undefined) {
-                        if (isChild(options.srcRoot, module.id) == true && isChild(component.root, module.id) == false) {
+                        if (context.isChild(options.srcRoot, module.id) == true && context.isChild(component.root, module.id) == false) {
                             errorrRule = `import script must be child of componentRoot: it is child of srcRoot but not commonLib. `;
                             break;
                         }
@@ -74,9 +74,10 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
                 }
                 //  net 时，必须得是commonLib，无法加载net路径代码；后期可考虑如果是siteUrl，则下载文件，前期先忽略
                 case "net": {
-                    if (pa.isScript(module) == false) {
+                    if (context.isScript(module) == false) {
                         return;
                     }
+                    context.traceModule(PLUGINNAME, "script", module);
                     const idKey: string = module.id.toLowerCase();
                     lib = commonLib.find(lib => lib.id.toLowerCase() === idKey);
                     lib || (errorrRule = `import network script must be commonLib: cannot load code from network.`);
@@ -95,7 +96,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
                 }
             }
             if (isStringNotEmpty(errorrRule)) {
-                pa.triggerRule(errorrRule, source, importer);
+                context.triggerRule(errorrRule, source, importer);
                 return;
             }
             /** 分析commonLib，并告知rollup无需分析此脚本了
@@ -110,7 +111,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
                     return { id: lib.url, external: "absolute" };
                 }
                 else {
-                    const libId = module.type === "src" ? forceExt(lib.id, ".js") : lib.id;
+                    const libId = module.type === "src" ? context.forceExt(lib.id, ".js") : lib.id;
                     context.globals[libId] = lib;
                     return { id: libId, external: true };
                 }
@@ -123,7 +124,7 @@ export default function scriptPlugin(component: ComponentOptions, context: Compo
         load(id) {
             /** 是resolveid过来的脚本。自动读取文件返回；避免rollup调用其他插件挨个遍历做处理 */
             return transformMap.has(id.toLowerCase())
-                ? pa.readFileText(id)
+                ? context.readFileText(id)
                 : undefined;
         },
         /**

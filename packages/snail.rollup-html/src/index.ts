@@ -1,10 +1,10 @@
 import { readFileSync } from "fs";
 import { InputPluginOption } from "rollup"
+import pc from "picocolors";
 import { isFunction, mustString } from "snail.core";
-//  导入rollup包，并对helper做解构
-import { ViewOptions, BuilderOptions, ComponentContext, ComponentOptions } from "snail.rollup"
-import { helper, PluginAssistant, AssetManager } from "snail.rollup"
-const { trace } = helper;
+import { ViewOptions, BuilderOptions, IComponentContext, ComponentOptions } from "snail.rollup"
+import { AssetManager } from "snail.rollup"
+import { relative } from "path";
 
 /**
  * 资源管理插件
@@ -17,8 +17,7 @@ const { trace } = helper;
  * - 特定标记为“${InjectScript}”，不区分大小写
  * @returns rollup插件实例
  */
-export default function htmlPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions, injectScript: string): InputPluginOption {
-    const pa = new PluginAssistant(component, context, options);
+export default function htmlPlugin(component: ComponentOptions, context: IComponentContext, options: BuilderOptions, injectScript: string): InputPluginOption {
     /** 视图管理器 */
     const viewMgr: AssetManager<ViewOptions> = new AssetManager<ViewOptions>(component.views as any);
     mustString(injectScript, "injectScript");
@@ -43,6 +42,10 @@ export default function htmlPlugin(component: ComponentOptions, context: Compone
          * 准备生成js组件：每个组件输出只会调用一次
          */
         generateBundle() {
+            if (viewMgr.size() == 0) {
+                return;
+            }
+            console.log(pc.green(`  --build views: ${viewMgr.size()}`))
             viewMgr.forEach(view => {
                 /* v8 ignore next 3  开发模式在vitest下无法测试，先忽略*/
                 if (view.writed === true) {
@@ -55,8 +58,9 @@ export default function htmlPlugin(component: ComponentOptions, context: Compone
                 //  交给外部句柄做自定义处理
                 isFunction(view.handle) && (content = view.handle(options, view.src, content));
                 //  直接使用writeFile写文件数据，不使用 emitFile。
-                trace(`--copy \t${view.src} \t➡️\t ${view.dist}`);
-                pa.writeFile(view.dist, content);
+                const msg = `\t${relative(options.srcRoot, view.src)}    \t---->    ${relative(options.distRoot, view.dist)}`;
+                console.log(pc.gray(msg));
+                context.writeFile(view.dist, content);
 
                 /** 利用 emitFile 告知rollup需要新增输出资源文件
                  * !!!!!!!!!! 屏蔽 emitFile 模式，和asset、style的写入保持一致，

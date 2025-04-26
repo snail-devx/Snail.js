@@ -6,4 +6,4 @@ import "./core/core";
 import { dateNow } from "./core/components/com"
 export const dd = dateNow;
 
-import "/app.css"
+import "/app.png"

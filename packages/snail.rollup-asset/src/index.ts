@@ -1,9 +1,11 @@
 import { InputPluginOption } from "rollup"
 import { buildUrlResolve } from "snail.rollup-url"
-//  导入rollup包，并对helper做解构
-import { AssetOptions, BuilderOptions, ComponentContext, ComponentOptions } from "snail.rollup"
-import { helper, PluginAssistant, AssetManager } from "snail.rollup"
-const { buildDist, buildNetPath, isChild } = helper;
+import { AssetOptions, BuilderOptions, IComponentContext, ComponentOptions } from "snail.rollup"
+import { AssetManager } from "snail.rollup"
+import pc from "picocolors";
+
+/** 插件名称 */
+const PLUGINNAME: string = "snail.rollup-asset";
 
 /**
  * 资源管理插件
@@ -14,13 +16,12 @@ const { buildDist, buildNetPath, isChild } = helper;
  * @param options 全局打包配置选项：约束siteRoot、srcRoot等
  * @returns rollup插件实例
  */
-export default function assetPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
+export default function assetPlugin(component: ComponentOptions, context: IComponentContext, options: BuilderOptions): InputPluginOption {
     context.assets ??= [];
     const assetMgr: AssetManager<AssetOptions> = new AssetManager<AssetOptions>(component.assets as any);
-    const pa = new PluginAssistant(component, context, options);
 
     return {
-        name: "snail.rollup-asset",
+        name: PLUGINNAME,
         /**
          * 准备构建，用于支持watch模式
          */
@@ -61,23 +62,24 @@ export default function assetPlugin(component: ComponentOptions, context: Compon
              */
 
             //  资源文件不会作为入口文件存在，直接忽略；importer为undefined，则说明是入口文件
-            const module = importer ? pa.resolveModule(source, importer) : undefined;
-            if (module == undefined || pa.isAsset(module) == false) {
+            const module = importer ? context.resolveModule(source, importer) : undefined;
+            if (module == undefined || context.isAsset(module) == false) {
                 return;
             }
+            context.traceModule(PLUGINNAME, "asset", module);
             switch (module.type) {
                 case "net": {
                     return buildUrlResolve(module.id, true);
                 }
                 case "src": {
-                    pa.mustInSrcRoot(module, source, importer);
-                    const dist = buildDist(options, module.id);
-                    isChild(component.root, module.id) && context.assets.push({ src: module.id, dist });
-                    const url = buildNetPath(options, dist);
+                    context.mustInSrcRoot(module, source, importer);
+                    const { dist, url } = context.buildPath(module.id);
+                    context.isChild(component.root, module.id) && context.assets.push({ src: module.id, dist });
                     return buildUrlResolve(url, true);
                 }
                 default: {
-                    pa.triggerRule(`resolve asset failed: not support module.type value. type:${module.type}`, source, importer);
+                    const rule = `resolve asset failed: not support module.type value. type:${module.type}`;
+                    context.triggerRule(rule, source, importer);
                     break;
                 };
             }
@@ -86,8 +88,12 @@ export default function assetPlugin(component: ComponentOptions, context: Compon
          * 构建完成；未发生错误时，拷贝资源文件
          */
         buildEnd(error) {
-            !error && assetMgr.forEach(asset => {
-                asset.writed || pa.copyFile(asset.src, asset.dist);
+            if (error || assetMgr.size() == 0) {
+                return;
+            }
+            console.log(pc.green(`  --copy assets: ${assetMgr.size()}`));
+            assetMgr.forEach(asset => {
+                asset.writed || context.copyFile(asset.src, asset.dist);
                 asset.writed = true;
             });
         }

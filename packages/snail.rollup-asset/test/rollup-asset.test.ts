@@ -7,7 +7,7 @@ import { existsSync, readFileSync, rmSync } from 'fs';
 // import { Builder, helper } from "snail.rollup";
 import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../../snail.rollup/src/index"
 import { ComponentOptions } from '../../snail.rollup/src/index';
-import { Builder, helper } from "../../snail.rollup/src/index";
+import { Builder } from "../../snail.rollup/src/index";
 
 import assetPlugin from "../src/index"
 import { buildDist } from '../../snail.rollup/src/utils/helper';
@@ -20,19 +20,23 @@ const builder = Builder.getBuilder(options, (component, context, options) => [
     urlPlugin(component, context, options),
     assetPlugin(component, context, options)
 ]);
+let ruleMessage: string;
+{
+    const tmpFunc = console.log;
+    console.log = (...args) => {
+        ruleMessage = ruleMessage
+            ? ruleMessage.concat("\r\n", args.join("\r\n"))
+            : args.join("\r\n");
+        tmpFunc(...args);
+    };
+}
 beforeEach(() => {
+    ruleMessage = "";
     existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
 afterEach(() => {
     existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
-
-let ruleMessage: string = undefined!;
-const tmpFunc = console.log;
-console.log = (...args) => {
-    ruleMessage = args[0];
-    tmpFunc(...args);
-};
 //#endregion
 
 //  符合所有规则的引入，正常验证存在性；测试import和显式指定的资源文件
@@ -133,12 +137,12 @@ test("error-coverage", async () => {
     }]);
     await expect(rollup(components[0])).rejects.toThrowError('process.exit unexpectedly called with "0"');
     expect(ruleMessage).toContain("import file must be child of srcRoot: cannot analysis url of outside file.");
-    expect(ruleMessage).toContain("source         ../../asset.png ");
+    expect(ruleMessage).toContain("source:       ../../asset.png");
 
     components = builder.build([{
         src: "./error.ts",
         format: "es",
     }]);
     await expect(rollup(components[0])).rejects.toThrowError('process.exit unexpectedly called with "0"');
-    expect(ruleMessage).toContain("source         vue/x.png ");
+    expect(ruleMessage).toContain("source:       vue/x.png");
 });

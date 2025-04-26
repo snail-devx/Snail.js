@@ -10,6 +10,8 @@
  *      2、postcss自身不支持less相关语法，需要进行编译前处理
  */
 
+import Less from "less"
+
 import { dirname, extname } from "path";
 import { existsSync } from "fs";
 import pc from "picocolors";
@@ -22,39 +24,29 @@ import { compileStyleAsync, SFCStyleCompileOptions } from "@vue/compiler-sfc"
 import { hasOwnProperty, isBoolean, isObject, url as sUrl, version } from "snail.core";
 import { processors, StylePreprocessorResults } from "./preprocessors";
 //  导入rollup包，并对helper做解构
-import { BuilderOptions, ComponentContext, ComponentOptions, ModuleTransformResult } from "snail.rollup"
-import { helper, PluginAssistant } from "snail.rollup"
-const { buildDist, isNetPath, isChild, buildNetPath } = helper
+import { BuilderOptions, IComponentContext, ComponentOptions, ModuleTransformResult } from "snail.rollup"
+import { IStyleProcessor } from "../models/style";
 
 /**
- * 样式编译处理程序：实现less、css等样式处理
+ * 获取样式处理器
+ * @param component         要打包的组件配置
+ * @param context           组件上下文
+ * @param options            全局配置 
+ * @returns 样式处理器对象
  */
-export class StyleProcessor extends PluginAssistant {
+export function getStyleProcessor(component: ComponentOptions, context: IComponentContext, options: BuilderOptions): IStyleProcessor {
     /** postcss处理相关插件 */
-    private readonly postcssPlugins: AcceptedPlugin[];
+    const postcssPlugins: AcceptedPlugin[] = [
+        //  检测url资源引入
+        buildUrlCheckerPlugin(),
+        //  嵌套展开+浏览器兼容前缀
+        nested(),
+        autoprefixer(),
+        //  生产环境，做压缩处理
+        ...(options.isProduction ? [cssnano()] : [])
+    ];
 
-    /**
-     * 构造方法
-     * @param component         要打包的组件配置
-     * @param context           组件上下文
-     * @param options            全局配置 
-     */
-    constructor(component: ComponentOptions, context: ComponentContext, options: BuilderOptions) {
-        context.assets ??= [];
-        super(component, context, options);
-        //  组装postcss插件
-        this.postcssPlugins = [
-            //  检测url资源引入
-            this.buildUrlCheckerPlugin(),
-            //  嵌套展开+浏览器兼容前缀
-            nested(),
-            autoprefixer(),
-            //  生产环境，做压缩处理
-            ...(options.isProduction ? [cssnano()] : [])
-        ]
-    }
-
-    //#region ************************************* 公共方法、变量 *************************************
+    //#region ************************************* IStyleProcessor *************************************
     /**
      * 转换编译文本样式
      * @param style 样式文本内容
@@ -64,11 +56,11 @@ export class StyleProcessor extends PluginAssistant {
      * @param scopeId 支持外部传入scopeId值，支持Vue的scope样式
      * @returns 
      */
-    async transform(style: string, from: string, to?: string, map?: any, scopeId?: string): Promise<ModuleTransformResult> {
+    async function transform(style: string, from: string, to?: string, map?: any, scopeId?: string): Promise<ModuleTransformResult> {
         //  1、style样式预处理：进行路径拦截，依赖合法性验证
         let dependencies: string[];
         {
-            const preRet = this.preprocessStyle(style, from, map);
+            const preRet = preprocessStyle(style, from, map);
             style = preRet.code;
             map = preRet.map || map;
             dependencies = preRet.dependencies;
@@ -76,10 +68,9 @@ export class StyleProcessor extends PluginAssistant {
         //  2、构建postcss执行相关插件、配置选项
         /* v8 ignore next 1 vitest map在vue的时候才会存在，这里先忽略覆盖率，在vue编译时做验证*/
         map = isBoolean(map) ? map != false : map;
-        map = this.component.sourceMap == true && map == undefined
+        map = component.sourceMap == true && map == undefined
             ? true
             : map;
-        const postcssPlugins: AcceptedPlugin[] = this.postcssPlugins;
         const postcssOptions: ProcessOptions<postcss.Document | postcss.Root> = {
             from,
             to,
@@ -87,7 +78,7 @@ export class StyleProcessor extends PluginAssistant {
             map: isBoolean(map) ? map === false ? false : { inline: false } : map
         };
         //  3、执行style编译：借助vue/compile-sfc完成；前面已经进行了预编译处理，这里忽略掉
-        const options: SFCStyleCompileOptions = {
+        const sfcStyleOptions: SFCStyleCompileOptions = {
             source: style,
             map: isBoolean(map) ? undefined : map,
             filename: from,
@@ -98,8 +89,8 @@ export class StyleProcessor extends PluginAssistant {
             postcssPlugins,
             postcssOptions
         };
-        const ret = await compileStyleAsync(options);
-        this.logErrors("use postcss compile style failed", from, ret.errors);
+        const ret = await compileStyleAsync(sfcStyleOptions);
+        logErrors("use postcss compile style failed", from, ret.errors);
         //  4、返回：强制带上依赖style信息
         return { ...ret, dependencies }
     }
@@ -108,10 +99,10 @@ export class StyleProcessor extends PluginAssistant {
      * @param file 样式文件地址
      * @returns 
      */
-    async transformFile(file: string): Promise<ModuleTransformResult> {
-        const css = this.readFileText(file);
-        const to = buildDist(this.options, file);
-        return await this.transform(css, file, to, undefined);
+    async function transformFile(file: string): Promise<ModuleTransformResult> {
+        const css = context.readFileText(file);
+        const { dist } = context.buildPath(file);
+        return await transform(css, file, dist, undefined);
     }
     //#endregion
 
@@ -122,7 +113,7 @@ export class StyleProcessor extends PluginAssistant {
     * @param from 
     * @param errors 
     */
-    private logErrors(title: string, from: string, errors: string[] | Error[]): void {
+    function logErrors(title: string, from: string, errors: string[] | Error[]): void {
         if (errors && errors.length > 0) {
             /* 将错误信息错一些分类整理；确保输出格式 */
             const reasons: string[] = errors.map(err => {
@@ -136,7 +127,7 @@ export class StyleProcessor extends PluginAssistant {
                 });
                 return reasons.join('\r\n\t');
             });
-            this.triggerRule(title, from, undefined, ...reasons);
+            context.triggerRule(title, from, undefined, ...reasons);
         }
     }
 
@@ -144,7 +135,7 @@ export class StyleProcessor extends PluginAssistant {
      * 构建css中url检测器插件：对url引入文件路径做格式化和检测处理
      * @returns 
      */
-    private buildUrlCheckerPlugin(): AcceptedPlugin {
+    function buildUrlCheckerPlugin(): AcceptedPlugin {
         /** 
          * 检测css中的url引入，如 background-image: url("../Images/topswitch.png");
          *  对文件路径做比对，和资产文件的规则一致，物理文件时需在srcRoot目录下
@@ -155,19 +146,19 @@ export class StyleProcessor extends PluginAssistant {
             if (/^data\:image\//i.test(asset.url) === true) {
                 return asset.url;
             }
-            if (isNetPath(asset.url) === true) {
+            if (context.isNetPath(asset.url) === true) {
                 const url = sUrl.format(asset.url);
                 return version.formart(url);
             }
             //  物理路径：走规则逻辑；不存在报错，必须在srcRoot目录下，同时在component.root目录下时copy资源
             if (existsSync(asset.absolutePath) == false) {
-                const msg = "@import file in style file is  not exists";
-                this.triggerRule(msg, asset.url, undefined);
+                const msg = "@import file in style file is not exists";
+                context.triggerRule(msg, asset.url, undefined, `absolutePath: ${asset.absolutePath}`);
             }
-            this.mustInSrcRoot({ id: asset.absolutePath } as any, asset.url, undefined);
-            const dist = buildDist(this.options, asset.absolutePath);
-            isChild(this.component.root, asset.absolutePath) && this.context.assets.push({ src: asset.absolutePath, dist });
-            const url = buildNetPath(this.options, dist);
+            context.mustInSrcRoot({ id: asset.absolutePath } as any, asset.url, undefined);
+            const { dist, url } = context.buildPath(asset.absolutePath);
+            context.isChild(component.root, asset.absolutePath)
+                && context.assets.push({ src: asset.absolutePath, dist });
             return version.formart(url);
         }
 
@@ -180,7 +171,7 @@ export class StyleProcessor extends PluginAssistant {
      * @param from 样式内容来自哪里，用于分析内部的url文件地址、@import 等物理文件等
      * @param map 已有的sourcemap；为false时不生成sourceMap值
      */
-    private preprocessStyle(style: string, from?: string, map?: any): ModuleTransformResult {
+    function preprocessStyle(style: string, from?: string, map?: any): ModuleTransformResult {
         /* v8 ignore next 1 查找是否存在预编译处理器；不存在直接返回*/
         const extName = (extname(from) || ".css").replace(/^\.*/, "").toLowerCase();
         if (hasOwnProperty(processors, extName) != true) {
@@ -188,30 +179,30 @@ export class StyleProcessor extends PluginAssistant {
         }
         //  执行预处理:不同extName的预处理配置选项不一样，做一下区分
         /* v8 ignore next 1 */
-        const options = this.buildPreprocessOptions(extName) ?? {};
+        const bpOptions = buildPreprocessOptions(extName) ?? {};
         const preResult: StylePreprocessorResults = processors[extName](style, map, {
             filename: from,
             map,
-            ...{ options },
+            ...{ bpOptions },
             //  less分析@import需要，否则会报错
             paths: [dirname(from)],
         });
         //  判断是否有错误信息，存在则中断执行
-        this.logErrors("preprocess style file failed", from, preResult.errors);
+        logErrors("preprocess style file failed", from, preResult.errors);
         //  处理完成后，分析dependence，查看是否引入了规则之外的less文件
         if (preResult.dependencies?.length > 0) {
             const outRuleFiles = preResult.dependencies.filter(
-                file => isChild(this.options.srcRoot, file) == true
-                    && isChild(this.component.root, file) == false
+                file => context.isChild(options.srcRoot, file) == true
+                    && context.isChild(component.root, file) == false
             );
-            outRuleFiles.length > 0 && this.triggerRule(
+            outRuleFiles.length > 0 && context.triggerRule(
                 "import style file must be child of componentRoot when it is child of srcRoot.",
                 from, undefined,
                 //------ 附带补充信息
-                pc.bold('invalid @import files:'),
-                ...outRuleFiles.map(file => `----${file}`),
-                pc.bold('all @import files:'),
-                ...preResult.dependencies.map(file => `----${file}`)
+                'all @import:',
+                ...preResult.dependencies.map(file => `\t      ${file}`),
+                pc.yellow('error @import:'),
+                ...outRuleFiles.map(file => `\t      ${file}`)
             );
         }
         //  
@@ -225,17 +216,17 @@ export class StyleProcessor extends PluginAssistant {
      * @param lang style语言，less、css、、、
      * @returns 
      */
-    private buildPreprocessOptions(lang: string): any {
+    function buildPreprocessOptions(lang: string): any {
         switch (lang) {
             case "less": {
-                const options: Less.Options = {
+                const lessOptions: Less.Options = {
                     syncImport: true,
                     /* 重写url地址，避免后续分析url地址不正确 */
                     //@ts-ignore 传递给less内部使用，在Less.Options不存在这些属性
                     rewriteUrls: true,
                     processImports: true,
                 }
-                return options;
+                return lessOptions;
             }
             /* v8 ignore next 3 vitest 其他的先返回空对象；后续用到了再完善*/
             default: {
@@ -244,4 +235,7 @@ export class StyleProcessor extends PluginAssistant {
         }
     }
     //#endregion
+
+    //  构建实例返回
+    return Object.freeze({ transform, transformFile });
 }

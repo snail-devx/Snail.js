@@ -7,7 +7,7 @@ import { existsSync, readFileSync, rmSync } from 'fs';
 // import { Builder, helper } from "snail.rollup";
 import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../../snail.rollup/src/index"
 import { ComponentOptions } from '../../snail.rollup/src/index';
-import { Builder, helper } from "../../snail.rollup/src/index";
+import { Builder } from "../../snail.rollup/src/index";
 
 import scriptPlugin, { transformScript } from "../src/index"
 import { buildDist, buildNetPath, forceExt } from '../../snail.rollup/src/utils/helper';
@@ -27,19 +27,23 @@ const builder = Builder.getBuilder(options, (component, context, options) => [
     urlPlugin(component, context, options),
     assetPlugin(component, context, options),
 ]);
+let ruleMessage: string;
+{
+    const tmpFunc = console.log;
+    console.log = (...args) => {
+        ruleMessage = ruleMessage
+            ? ruleMessage.concat("\r\n", args.join("\r\n"))
+            : args.join("\r\n");
+        tmpFunc(...args);
+    };
+}
 beforeEach(() => {
+    ruleMessage = "";
     existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
 afterEach(() => {
     existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
-
-let ruleMessage: string = undefined!;
-const tmpFunc = console.log;
-console.log = (...args) => {
-    ruleMessage = args[0];
-    tmpFunc(...args);
-};
 //#endregion
 
 //  默认常规情况测试，验证引用代码+commonLib配置
@@ -167,17 +171,17 @@ test("import-error", async () => {
     await expect(rollup(components[0])).rejects
         .toThrowError('process.exit unexpectedly called with "0"');
     expect(ruleMessage).toContain("import network script must be commonLib: cannot load code from network.");
-    expect(ruleMessage).toContain("source         /a.x/x.js ");
+    expect(ruleMessage).toContain("source:       /a.x/x.js");
 
     await expect(rollup(components[1])).rejects
         .toThrowError('process.exit unexpectedly called with "0"');
     expect(ruleMessage).toContain("import network script must be commonLib: cannot load code from network.");
-    expect(ruleMessage).toContain("source         http://www/baidu.com/a.x/x.js?X=1 ");
+    expect(ruleMessage).toContain("source:       http://www/baidu.com/a.x/x.js?X=1");
 
     await expect(rollup(components[2])).rejects
         .toThrowError('process.exit unexpectedly called with "0"');
     expect(ruleMessage).toContain("import script must be child of componentRoot: it is child of srcRoot but not commonLib.");
-    expect(ruleMessage).toContain("source         ../core/core");
+    expect(ruleMessage).toContain("source:       ../core/core");
 
 });
 //  代码覆盖率补偿

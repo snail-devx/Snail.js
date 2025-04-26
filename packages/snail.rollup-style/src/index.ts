@@ -1,13 +1,11 @@
 import { InputPluginOption } from "rollup"
-import { StyleTransformResult } from "./models/style";
-import { StyleProcessor } from "./components/processor";
+import { IStyleProcessor, StyleTransformResult } from "./models/style";
+import { getStyleProcessor } from "./components/processor";
 import { buildUrlResolve } from "snail.rollup-url"
 import { isObject, isString, isStringNotEmpty, version } from "snail.core";
 import { hasDynamicModule, registerDynamicModule } from "snail.rollup-inject"
 //  导入rollup包，并对helper做解构
-import { BuilderOptions, ComponentContext, ComponentOptions } from "snail.rollup"
-import { helper, PluginAssistant } from "snail.rollup"
-const { forceExt, buildDist, buildNetPath, isChild } = helper;
+import { BuilderOptions, IComponentContext, ComponentOptions, FLAG } from "snail.rollup"
 
 //#region *************************************        导出接口        *************************************
 /** 把自己的类型共享出去 */
@@ -15,6 +13,8 @@ export * from "./models/style";
 /** 将样式处理器共享出去*/
 export * from "./components/processor"
 
+/** 插件名称 */
+const PLUGINNAME = "snail.rollup-style";
 /**
  * 样式管理插件：
  *  - 编译css、less等样式文件
@@ -25,15 +25,14 @@ export * from "./components/processor"
  * @param options 全局打包配置选项：约束siteRoot、srcRoot等
  * @returns rollup插件实例
  */
-export default function stylePlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
-    const pa = new PluginAssistant(component, context, options);
+export default function stylePlugin(component: ComponentOptions, context: IComponentContext, options: BuilderOptions): InputPluginOption {
     /** 要编译的样式文件 */
     const transformMap: Map<string, StyleTransformResult> = new Map();
     /** Style样式提供程序 */
-    const styleProvider: StyleProcessor = new StyleProcessor(component, context, options);
+    const styleProcessor: IStyleProcessor = getStyleProcessor(component, context, options);
 
     return {
-        name: "snail.rollup-style",
+        name: PLUGINNAME,
         /**
          * 解析组件；判断是否是当前插件能处理的
          * @param source 解析的模块的名称
@@ -41,19 +40,22 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
          * @returns string || false || null
          */
         resolveId(source: string, importer: string) {
-            const module = importer ? pa.resolveModule(source, importer) : undefined;
-            if (pa.isStyle(module) == false) {
+            const module = importer ? context.resolveModule(source, importer) : undefined;
+            if (context.isStyle(module) == false) {
                 return;
             }
+            context.traceModule(PLUGINNAME, "style", module);
             switch (module.type) {
                 case "net": {
                     return buildUrlResolve(module.id, true);
                 }
                 case "src": {
-                    pa.mustInSrcRoot(module, source, importer);
-                    const dist = forceExt(buildDist(options, module.id), ".css");
-                    const ret = buildUrlResolve(buildNetPath(options, dist), true);
-                    if (isChild(component.root, module.id) === true) {
+                    context.mustInSrcRoot(module, source, importer);
+                    let { dist, url } = context.buildPath(module.id);
+                    dist = context.forceExt(dist, ".css");
+                    url = context.forceExt(url, ".css");
+                    const ret = buildUrlResolve(url, true);
+                    if (context.isChild(component.root, module.id) === true) {
                         const key = ret.id.toLowerCase();
                         transformMap.set(key, { src: module.id, dist: dist });
                     }
@@ -62,7 +64,7 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
                 //  其他情况，不支持强制报错：如在脚本中引入npm下的样式，无法分析出样式url地址，强制报错
                 default: {
                     const rule: string = `resolve style failed: not support module.type value. type:${module.type}.`;
-                    pa.triggerRule(rule, source, importer);
+                    context.triggerRule(rule, source, importer);
                     break;
                 }
             }
@@ -105,7 +107,7 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
             }
             //  编译style文件；watch模式下，不需要全编译，做一些性能优化
             if (style.writed !== true) {
-                const ret = await styleProvider.transformFile(style.src);
+                const ret = await styleProcessor.transformFile(style.src);
                 style.css = ret.code || "";
                 style.map = isObject(ret.map) ? JSON.stringify(ret.map, null, 4) : "";
                 style.dependencies = ret.dependencies;
@@ -121,8 +123,8 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
             /* 将编译好的样式文件写入目标目录；仅处理未写入的数据；写入完成后，清理缓存，节省内存 */
             !error && transformMap.forEach(style => {
                 if (style.writed != true) {
-                    isString(style.css) && pa.writeFile(style.dist, style.css);
-                    style.map && pa.writeFile(`${style.dist}.map`, style.map);
+                    isString(style.css) && context.writeFile(style.dist, style.css);
+                    style.map && context.writeFile(`${style.dist}.map`, style.map);
                     style.writed = true;
                     style.css = undefined;
                     style.map = undefined;
@@ -133,7 +135,7 @@ export default function stylePlugin(component: ComponentOptions, context: Compon
 }
 
 /** 模块名：动态注入link标签 */
-export const MODULE_INJECT_LINK = "DMI:SNAIL_ADD_LINK";
+export const MODULE_INJECT_LINK = `${FLAG.DYNAMIC_MODULE}SNAIL_ADD_LINK`;
 /**
  * 构建添加link标签的代码
  * - 内部使用 import addLink from "${MODULE_INJECT_LINK}"; addLink(url);

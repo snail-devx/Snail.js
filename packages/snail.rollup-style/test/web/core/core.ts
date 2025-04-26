@@ -9,7 +9,7 @@ console.log(netStyle);
 // @ts-ignore   引入srcRoot下，componentRoot外的src样式
 import outStyle1 from "../outer/styles/1.less";
 console.log(outStyle1);
-// @ts-ignore  
+// @ts-ignore
 import outStyle2 from "../outer/styles/2.css";
 console.log(outStyle2);
 //  引入空less

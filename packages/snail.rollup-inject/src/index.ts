@@ -1,12 +1,11 @@
 import { ResolveIdResult, InputPluginOption } from "rollup"
 import { hasOwnProperty, mustString, throwIfTrue, tidyString } from "snail.core"
-//  导入rollup包，并对helper做解构
-import { BuilderOptions, ComponentContext, ComponentOptions } from "snail.rollup"
-// import { helper } from "snail.rollup"
-// const { buildDist, buildNetPath, isChild } = helper;
+import { FLAG, BuilderOptions, IComponentContext, ComponentOptions } from "snail.rollup"
 
 /** 动态注册的模块：key为模块id：value为动态代码 */
 const DYNAMIC_MODULES: Record<string, string> = Object.create(null);
+/** 插件名称 */
+const PLUGINNAME = "snail.rollup-inject";
 
 /**
  * 动态脚本注入插件：
@@ -17,9 +16,9 @@ const DYNAMIC_MODULES: Record<string, string> = Object.create(null);
  * @param options 全局打包配置选项：约束siteRoot、srcRoot等
  * @returns rollup插件实例
  */
-export default function injectPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): InputPluginOption {
+export default function injectPlugin(component: ComponentOptions, context: IComponentContext, options: BuilderOptions): InputPluginOption {
     return {
-        name: "snail.rollup-inject",
+        name: PLUGINNAME,
         /**
          * 解析组件；判断是否是当前插件能处理的
          * @param source 解析的模块的名称
@@ -30,6 +29,7 @@ export default function injectPlugin(component: ComponentOptions, context: Compo
         resolveId(source, importer): ResolveIdResult {
             // 入口文件不用做注入判断，没有意义
             if (importer && hasOwnProperty(DYNAMIC_MODULES, source) == true) {
+                context.traceModule(PLUGINNAME, "dynamic", { type: "npm", id: source, src: undefined! });
                 return { id: source, external: false };
             }
         },

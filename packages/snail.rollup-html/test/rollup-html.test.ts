@@ -7,7 +7,7 @@ import { existsSync, readFileSync, rmSync } from 'fs';
 // import { Builder, helper } from "snail.rollup";
 import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../../snail.rollup/src/index"
 import { ComponentOptions } from '../../snail.rollup/src/index';
-import { Builder, helper } from "../../snail.rollup/src/index";
+import { Builder } from "../../snail.rollup/src/index";
 
 import htmlPlugin from "../src/index"
 import { buildDist } from '../../snail.rollup/src/utils/helper';
@@ -59,3 +59,15 @@ test("default", async () => {
     expect(content[7].trim()).toStrictEqual('');
     expect(content[8].trim()).toStrictEqual('</html>');
 });
+
+//  为了覆盖率，不报错即可
+test("coverage", async () => {
+    const components: RollupOptions[] = builder.build([
+        {
+            src: "html.ts",
+            format: "es",
+        },
+    ]);
+    let ret = await rollup(components[0]);
+    await ret.write(components[0].output as OutputOptions);
+})

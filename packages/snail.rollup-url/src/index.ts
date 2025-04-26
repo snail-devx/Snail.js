@@ -1,15 +1,9 @@
 import { ResolveIdResult } from "rollup";
 import { hasOwnProperty, version } from "snail.core";
-//  导入rollup包，并对helper做解构
-import { BuilderOptions, ComponentContext, ComponentOptions, ModuleOptions } from "snail.rollup"
-import { helper, PluginAssistant } from "snail.rollup"
-const { buildDist, buildNetPath } = helper
+import { FLAG, BuilderOptions, IComponentContext, ComponentOptions, ModuleOptions } from "snail.rollup"
 
-/** 标记：URL */
-const FLAG_URL = "URL:";
-/** 标记：URL+版本 */
-const FLAG_URL_VERSION = "URL_VERSION:";
-
+/** 插件名称 */
+const PLUGINNAME = "snail.rollup-url";
 /**
  * url注入插件：
  * - 支持通过在 import 模块时，指定 url参数，然后返回url地址字符串
@@ -20,10 +14,9 @@ const FLAG_URL_VERSION = "URL_VERSION:";
  * @param options 全局打包配置选项：约束siteRoot、srcRoot等
  * @returns rollup插件实例
  */
-export default function urlPlugin(component: ComponentOptions, context: ComponentContext, options: BuilderOptions): any {
-    const pa = new PluginAssistant(component, context, options);
+export default function urlPlugin(component: ComponentOptions, context: IComponentContext, options: BuilderOptions): any {
     return {
-        name: "snail.rollup-plugin",
+        name: PLUGINNAME,
         /**
          * 解析组件；判断是否是当前插件能处理的
          * @param source 解析的模块的名称
@@ -35,16 +28,16 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
             if (!importer) {
                 return;
             }
-            const module: ModuleOptions = pa.resolveModule(source, importer);
+            const module: ModuleOptions = context.resolveModule(source, importer);
             if (hasOwnProperty(module.query, "url") == false) {
                 return;
             }
+            context.traceModule(PLUGINNAME, "url", module);
             switch (module.type) {
                 case "src": {
-                    pa.mustInSrcRoot(module, source, importer);
-                    let url = buildDist(options, module.id);
-                    url = buildNetPath(options, url);
-                    url = pa.forceFileExt(url);
+                    context.mustInSrcRoot(module, source, importer);
+                    let { url } = context.buildPath(module.id);
+                    url = context.forceFileExt(url);
                     return buildUrlResolve(url, false);
                 }
                 /** net 资源，再分析url地址没有意义，本身就是url路径
@@ -53,7 +46,8 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
                  }
                  */
                 default: {
-                    pa.triggerRule(`resolve url failed: not support module.type value. type:${module.type}.`, source, importer);
+                    const rule = `resolve url failed: not support module.type value. type:${module.type}.`;
+                    context.triggerRule(rule, source, importer);
                     break;
                 }
             }
@@ -65,14 +59,14 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
          */
         load(id) {
             //  带版本的url地址；进行version格式化
-            if (id.startsWith(FLAG_URL_VERSION) === true) {
-                id = id.substring(FLAG_URL_VERSION.length);
+            if (id.startsWith(FLAG.URLVERSION_MODULE) === true) {
+                id = id.substring(FLAG.URLVERSION_MODULE.length);
                 id = version.formart(id);
                 return `export default "${id}"`;
             }
             //  不带版本的url地址；直接返回
-            if (id.startsWith(FLAG_URL) === true) {
-                id = id.substring(FLAG_URL.length);
+            if (id.startsWith(FLAG.URL_MODULE) === true) {
+                id = id.substring(FLAG.URL_MODULE.length);
                 return `export default "${id}"`;
             }
         },
@@ -86,6 +80,6 @@ export default function urlPlugin(component: ComponentOptions, context: Componen
  * @returns 
  */
 export function buildUrlResolve(id: string, needVersion: boolean): { id: string, external: false } {
-    id = needVersion ? `${FLAG_URL_VERSION}${id}` : `${FLAG_URL}${id}`;
+    id = needVersion ? `${FLAG.URLVERSION_MODULE}${id}` : `${FLAG.URL_MODULE}${id}`;
     return { id, external: false, }
 }

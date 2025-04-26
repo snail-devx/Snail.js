@@ -4,10 +4,8 @@ import { dirname, resolve } from 'path';
 import { OutputOptions, rollup, RollupOptions } from "rollup";
 import { existsSync, readFileSync, rmSync } from 'fs';
 //  snail.rollup 采用源码引用方式，方便错误调试；整体测试完成后，再换成包形式
-// import { Builder, helper } from "snail.rollup";
 import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../../snail.rollup/src/index"
-import { ComponentOptions } from '../../snail.rollup/src/index';
-import { Builder, helper } from "../../snail.rollup/src/index";
+import { Builder } from "../../snail.rollup/src/index";
 
 import stylePlugin, { buildAddLinkCode } from "../src/index"
 import { buildDist, buildNetPath, forceExt } from '../../snail.rollup/src/utils/helper';
@@ -27,19 +25,23 @@ const builder = Builder.getBuilder(options, (component, context, options) => [
     urlPlugin(component, context, options),
     assetPlugin(component, context, options),
 ]);
+let ruleMessage: string;
+{
+    const tmpFunc = console.log;
+    console.log = (...args) => {
+        ruleMessage = ruleMessage
+            ? ruleMessage.concat("\r\n", args.join("\r\n"))
+            : args.join("\r\n");
+        tmpFunc(...args);
+    };
+}
 beforeEach(() => {
+    ruleMessage = "";
     existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
 afterEach(() => {
     existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
-
-let ruleMessage: string = undefined!;
-const tmpFunc = console.log;
-console.log = (...args) => {
-    ruleMessage = args[0];
-    tmpFunc(...args);
-};
 //#endregion
 
 //  默认情况测试：测试无报错的less、css在ts中引入，样式中url，@import引入
@@ -105,21 +107,21 @@ test("error-rule", async () => {
     ]);
     await expect(rollup(components[0])).rejects.toThrowError('process.exit unexpectedly called with "0"');
     expect(ruleMessage).toContain("import file must be child of srcRoot: cannot analysis url of outside file.");
-    expect(ruleMessage).toContain("source         ../../root.less");
+    expect(ruleMessage).toContain("source:       ../../root.less");
     //  引入npm下的样式：强制报错，如果需要，则应该在less等预编译样式文件中通过@import引入
     components = builder.build([
         { src: "./outer/outer-npm.ts", format: "es" }
     ]);
     await expect(rollup(components[0])).rejects.toThrowError('process.exit unexpectedly called with "0"');
     expect(ruleMessage).toContain("resolve style failed: not support module.type value. type:npm.");
-    expect(ruleMessage).toContain("source         vue/less.css");
+    expect(ruleMessage).toContain("source:       vue/less.css");
     //  测试less中的url、@import错误；覆盖StyleProcessor部分逻辑
     components = builder.build([
         { src: "./outer/processor-import.ts", format: "es" }
     ]);
     await expect(rollup(components[0])).rejects.toThrowError('process.exit unexpectedly called with "0"');
     expect(ruleMessage).toContain("import style file must be child of componentRoot when it is child of srcRoot.");
-    expect(ruleMessage).toContain("/test/web/outer/styles/import-core.less ");
+    expect(ruleMessage).toContain("/test/web/outer/styles/import-core.less");
     //  测试url引入image的错误情况
     components = builder.build([
         { src: "./outer/processor-image.ts", format: "es" }
