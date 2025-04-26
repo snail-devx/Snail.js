@@ -59,7 +59,7 @@ test("content-type", async () => {
     //  测试响应数据content-type
     var data = await hc.get("/mtpe-individual/multimodal");
     expect(data).toMatch(/<title>百度翻译-您的超级翻译伙伴（文本、文档翻译）<\/title>/);
-    data = await hc.get("https://fanyi-cdn.cdn.bcebos.com/static/cat/asset/logo.2481f256.png");
+    data = await hc.get("https://ts4.tc.mm.bing.net/th/id/ODLS.bd22dc3a-b4eb-46cf-979b-35f898b24468?w=16&h=16&c=10&o=6&pid=placeholderpartnerid&rm=2");
     expect(data!.toString()).toStrictEqual('[object ReadableStream]');
 });
 //  测试无效情况
