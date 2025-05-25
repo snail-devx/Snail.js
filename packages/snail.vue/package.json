@@ -10,7 +10,8 @@
   "types": "dist/index.d.ts",
   "scripts": {},
   "dependencies": {
-    "snail.core": ">=1.1.4"
+    "snail.core": ">=1.1.4",
+    "vue": "^3.5.14"
   },
   "peerDependencies": {
     "typescript": ">=5.8.2"
