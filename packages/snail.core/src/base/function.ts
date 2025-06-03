@@ -77,7 +77,7 @@ export async function runAsync<T>(func: (...args: any[]) => Promise<T> | T, ...a
 }
 
 /**
- * 防抖函数：指定延迟时间仅执行最新一次触发
+ * 防抖函数：在规定时间后执行fn方法；如果在这delay毫秒内再次执行了，则重新计时
  * @param fn 要执行的函数方法
  * @param delay 延迟时间
  * @returns 包装后的方法
@@ -90,10 +90,28 @@ export function debounce(fn: Function, delay: number): (...args: any[]) => void 
         // 每次事件被触发时，都去清除之前的旧定时器，再构建新的定时器
         timer && (clearTimeout(timer), timer = undefined);
         timer = setTimeout(() => {
-            //  @ts-ignore
-            fn.apply(this, arguments)
             timer = undefined;
+            //  @ts-ignore
+            fn.apply(this, arguments);
         }, delay, arguments);
+    }
+}
+/**
+ * 节流函数：在规定时间内只执行一次fn方法；在delay毫秒内函数被多次触发，只有一次会真正调用执行，其余的会被忽略
+ * @param fn 要执行的函数方法
+ * @param delay 延迟时间（单位毫秒）
+ * @returns 包装后的方法
+ */
+export function throttle(fn: Function, delay: number): (...args: any[]) => void {
+    let last = 0;
+    return function () {
+        let now = Date.now();
+        if (now - last >= delay) {
+            last = now;
+            //  @ts-ignore
+            fn.apply(this, arguments);
+        }
+
     }
 }
 /**
