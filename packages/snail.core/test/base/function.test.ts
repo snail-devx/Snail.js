@@ -1,9 +1,13 @@
-import { afterAll, assert, describe, expect, it, test, vi } from 'vitest'
+import { afterAll, assert, beforeAll, describe, expect, it, test, vi } from 'vitest'
 import { run, runAsync, debounce, throttle, polling } from "../../src/base/function"
 import { afterEach, beforeEach } from 'node:test';
+import { throwError } from '../../src/base/error';
 
 vi.mock("../../src/base/function", { spy: true });
 
+afterAll(() => {
+    vi.useFakeTimers(); // 测试结束后恢复默认设置
+});
 
 test("run", () => {
     var rt = run(undefined as any);
@@ -124,8 +128,7 @@ describe('debounce', () => {
 
 //  使用通义灵码生成的单元测试
 describe("throttle", async () => {
-    vi.useFakeTimers()
-    // 恢复真实定时器
+    beforeAll(() => vi.useFakeTimers());
     afterAll(vi.useRealTimers);
 
     it('should execute the function once within the delay period', () => {
@@ -194,8 +197,8 @@ describe("throttle", async () => {
 });
 
 test("polling", async () => {
+    beforeAll(() => vi.useRealTimers());
     var count: number = 0;
-
     function pFunc(number): number {
         count += number;
         return count;
@@ -215,9 +218,9 @@ test("polling", async () => {
     }
 
     //@ts-ignore  2s的超时时间，NaN轮询时间则默认5s轮询一次；每次自加1
-    count = 0, await expect(polling(pFunc, cFunc, NaN, 2, 1)).rejects.eq("超时时间已到，强制停止");
+    count = 0, await expect(polling(pFunc, cFunc, NaN, 2, 1)).rejects.eq("polling timeout");
     //@ts-ignore  2s的超时时间，1s轮询一次；每次自加1
-    count = 0, await expect(polling(pFunc, cFunc, 1, 2, 1)).rejects.eq("超时时间已到，强制停止");
+    count = 0, await expect(polling(pFunc, cFunc, 1, 2, 1)).rejects.eq("polling timeout");
     //@ts-ignore  10s的超时时间，1s轮询一次；每次自加1
     count = 0, await expect(polling(pFunc, cFunc, 1, 10, 4)).resolves.greaterThanOrEqual(10);
     //  测试then方法，promise模式
@@ -229,4 +232,14 @@ test("polling", async () => {
     }, cFunc, 1, 10, 4))).resolves.greaterThanOrEqual(10);
     //@ts-ignore  测试始终等待
     count = 0, await (expect(polling(pFunc, cFunc, 1, -1, 2))).resolves.greaterThanOrEqual(10);
+
+    count = 0, await expect(polling(() => throwError('dddddddd'), cFunc, 1, 2, 1)).rejects.eq("polling error: dddddddd");
+    // @ts-ignore
+    count = 0, await expect(polling(() => true, data => throwError('xxxxxxx'), 1, 2, 1)).rejects.eq("polling error: xxxxxxx");
+
+    //  测试stop方法
+    count = 0;
+    const xstop = polling(pFunc, cFunc, 1, -1, 2);
+    xstop.stop();
+    await expect(xstop).rejects.eq("polling stopped");
 });

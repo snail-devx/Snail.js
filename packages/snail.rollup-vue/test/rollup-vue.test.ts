@@ -74,6 +74,16 @@ test("default", async () => {
     expect(existsSync(dist)).toStrictEqual(true);
     //  后期再做更细化的验证
 });
+
+//  vue文件直接作为入口文件
+test("vue-file-entry", async () => {
+    let components = builder.build([
+        { src: "entry.vue", format: "amd" }
+    ]);
+    let ret = await rollup(components[0]);
+    await ret.write(components[0].output as OutputOptions);
+
+});
 //  错误情况测试
 test("error-rule", async () => {
     //  style标签无lang属性

@@ -1,7 +1,7 @@
 import { mustFunction, isFunction, isPromise } from "./data";
 import { getMessage } from "./error";
 import { RunResult } from "./models/function";
-import { defer } from "./promise";
+import { AsyncResult, defer } from "./promise";
 
 /** 把自己的类型共享出去 */
 export * from "./models/function"
@@ -114,51 +114,53 @@ export function throttle(fn: Function, delay: number): (...args: any[]) => void 
 
     }
 }
+
 /**
- * 轮询方法：直到方法检测通过，或者执行报错、超时
- * @param fn 要轮询的方法，返回promise对象
+ * 轮询函数：定时轮询执行fn方法，直到check检测通过，或者执行报错、超时
+ * @param fn 要轮询的方法
  * @param check 方法结果检测，是否成功，若返回false则继续轮询
- * @param interval 轮询间隔时间，单位s；<=0 则强制5s
+ * @param interval 轮询间隔时间，单位s；<=0 则强制2s
  * @param timeout 轮询超时时间，单位s；超时强制停止轮训，<=0 不停止，始终等待
  * @param args 轮询方法时传递参数
- * @returns Promise
+ * @returns 轮询方法执行结果,可通过stop方法终止轮询
  */
-export function polling<T>(fn: (...args: any[]) => Promise<T> | T, check: (data: T) => boolean, interval: number, timeout: number, ...args: any[]): Promise<T> {
+export function polling<T>(fn: (...args: any[]) => T | Promise<T> | undefined, check: (data: T | undefined) => boolean, interval: number, timeout: number, ...args: any[])
+    : AsyncResult<T> {
     //  准备工作：数据验证，变量定义
     mustFunction(fn, "fn") && mustFunction(check, "check");
-    interval = (interval > 0 ? interval : 5) * 1000;
+    interval = (interval > 0 ? interval : 2) * 1000;
     timeout = timeout > 0 ? (timeout * 1000) : 0;
     const deferred = defer<T>();
     let isEnd: boolean = false;
-    //  @ts-ignore
+    //      @ts-ignore 记录 上下文参数 
     const thisContext = this;
-    //  执行方法：检测通过则不用再执行，否则一直不停轮询
-    const runFunc = () => {
-        const ret = fn.apply(thisContext, args);
-        if (isPromise(ret) == true) {
-            (ret as Promise<T>).then(
-                data => {
-                    isEnd = check(data) == true;
-                    isEnd ? deferred.resolve(data) : setTimeout(runFunc, interval);
-                },
-                error => (isEnd = true, deferred.reject(error))
-            )
-        }
-        else {
-            isEnd = check(ret as T) == true;
-            isEnd ? deferred.resolve(ret as T) : setTimeout(runFunc, interval);
+    //  轮询方法定义
+    /**     停止执行时的操作 */
+    const runReject = (reason: any) => isEnd || (isEnd = true, deferred.reject(reason));
+    /**     执行check方法 */
+    const runCheck = (data: T | undefined) => {
+        if (isEnd != true) {
+            isEnd = check(data);
+            isEnd ? deferred.resolve(data) : setTimeout(runFunc, interval);
         }
     }
-    //  立马执行（超时则强制终止），并返回promise
+    /**     执行轮询：若为异步，则需要等待结果 */
+    function runFunc(): void {
+        try {
+            const ret = fn.apply(thisContext, args);
+            isPromise(ret)
+                ? (ret as Promise<T>).then(runCheck, runReject)
+                : runCheck(ret as T);
+        }
+        catch (ex: any) {
+            console.trace("polling error:", ex);
+            runReject(`polling error: ${getMessage(ex)}`);
+        }
+    }
+    //  执行轮询；强制超时；返回等待promise，并挂载stop方法
     setTimeout(runFunc, 0);
-    timeout > 0 && setTimeout(
-        () => {
-            if (isEnd != true) {
-                isEnd = true;
-                deferred.reject("超时时间已到，强制停止");
-            }
-        },
-        timeout
-    );
-    return deferred.promise;
+    timeout > 0 && setTimeout(runReject, timeout, "polling timeout");
+    // @ts-ignore
+    deferred.promise.stop = () => runReject("polling stopped");
+    return deferred.promise as AsyncResult<T>;
 }

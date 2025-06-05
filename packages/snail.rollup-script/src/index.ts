@@ -26,6 +26,19 @@ export default function scriptPlugin(component: ComponentOptions, context: IComp
     /** 组件引入的模块字典：key为id小写（src时为文件绝对路径） */
     const transformMap: Map<string, ModuleOptions> = new Map();
 
+    /**
+     * 模块是否是CommonLib库
+     * @param module 
+     * @param ignoreCase 查找时，是否忽略大小写
+     * @returns 公共库配置，不是则返回undefined
+     */
+    function isCommonLib(module: ModuleOptions, ignoreCase: boolean): CommonLibOptions | undefined {
+        const idKey = ignoreCase ? module.id.toLowerCase() : module.id;
+        const lib = commonLib.find(lib => ignoreCase ? lib.id.toLowerCase() === idKey : lib.id === idKey);
+        return lib;
+    }
+
+    //  rollup插件
     return {
         name: PLUGINNAME,
         /**
@@ -46,21 +59,19 @@ export default function scriptPlugin(component: ComponentOptions, context: IComp
             switch (module.type) {
                 //  src 时，必须在srcRoot下，组件根之外的必须配置为commonLib，否则报错
                 case "src": {
-                    if (context.isScript(module) == false) {
+                    //  判断是否是公共脚本：入口脚本，始终不查找commonLib；commonLib时，直接返回；不用管是否是脚本，用于支持.vue等直接作为入口文件
+                    lib = importer ? isCommonLib(module, true) : undefined;
+                    if (lib == undefined && context.isScript(module) == false) {
                         return;
                     }
                     context.traceModule(PLUGINNAME, "script", module);
-                    //  非入口文件查找commonLib、判断死循环、引用规则判断
+                    //  非入口文件判断死循环、引用规则判断
                     const idKey: string = module.id.toLowerCase();
                     /* v8 ignore next 4   死循环，在rollup端已经结果了，这里先忽略，不会触发此规则*/
                     if (importer && srcKey == idKey) {
                         errorrRule = `dead loop import entry script: ${importer}`;
                         break;
                     }
-                    //  入口脚本，始终不查找commonLib：按照测试用例来说，肯定能覆盖，单个测试用例执行也覆盖了，整体执行时提示没覆盖到，先忽略；
-                    lib = importer
-                        ? commonLib.find(lib => lib.id.toLowerCase() === idKey)
-                        : undefined;
                     //  非commonLib时，进行引入规则判断
                     if (lib == undefined) {
                         if (context.isChild(options.srcRoot, module.id) == true && context.isChild(component.root, module.id) == false) {
@@ -74,18 +85,20 @@ export default function scriptPlugin(component: ComponentOptions, context: IComp
                 }
                 //  net 时，必须得是commonLib，无法加载net路径代码；后期可考虑如果是siteUrl，则下载文件，前期先忽略
                 case "net": {
-                    if (context.isScript(module) == false) {
+                    //  commonLib时，直接返回；不用管是否是脚本，用于支持.vue等直接作为入口文件
+                    lib = isCommonLib(module, true);
+                    //  不是CommonLib的脚本的非脚本，忽略不解析
+                    if (lib == undefined && context.isScript(module) == false) {
                         return;
                     }
                     context.traceModule(PLUGINNAME, "script", module);
-                    const idKey: string = module.id.toLowerCase();
-                    lib = commonLib.find(lib => lib.id.toLowerCase() === idKey);
                     lib || (errorrRule = `import network script must be commonLib: cannot load code from network.`);
                     break;
                 }
                 //  npm 时，直接查找即可，不用做过多处理
                 case "npm": {
-                    lib = commonLib.find(lib => lib.id == module.id);
+                    // lib = commonLib.find(lib => lib.id == module.id);
+                    lib = isCommonLib(module, false);
                     break;
                 }
                 //  兜底报错
