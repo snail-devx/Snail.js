@@ -1,4 +1,5 @@
 import { RollupOptions } from "rollup"
+import { Package } from "./package"
 
 /**
  * roolup打包导出配置
@@ -25,4 +26,10 @@ export type RollupBuildOptions = {
      */
     default: RollupOptions[],
 
+    /**
+     * 构建打包配置，和default互斥，优先执行此方法构建打包配置
+     * @param pkg 
+     * @returns 
+     */
+    builder?: (pkg: Package) => Promise<RollupOptions[]>,
 }

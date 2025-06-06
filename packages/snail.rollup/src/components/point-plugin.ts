@@ -29,6 +29,14 @@ export function startPointPlugin(component: ComponentOptions, context: IComponen
 }
 
 /**
+ * 删除资产文件的输出文件
+ * @param asset 
+ */
+function deleteAssetDist(asset: AssetOptions) {
+    isStringNotEmpty(asset?.dist) && existsSync(asset.dist)
+        && rmSync(asset.dist);
+}
+/**
  * 终点插件：作为强制内置插件放到组件插件的最后，做保护措施，确保组件正确打包
  * - 如做了【动态注入】模块，但是没引入【snail.rollup-inject】插件，则提示用户引入此插件
  * - 使用了【?url】模块，但是没引入【snail.rollup-url】插件，则提示用户引入此插件
@@ -42,16 +50,18 @@ export function endpointPlugin(component: ComponentOptions, context: IComponentC
     return {
         name: "snaile.rollup-endpoint",
         buildStart() {
-            //  拦截assets.push方法
-            const pushFunc = context.assets.push;
-            context.assets.push = function (...items) {
-                items.forEach(deleteAssetDist);
-                return pushFunc.apply(this, items);
-            }
-            // @ts-ignore
-            component.assets?.forEach(deleteAssetDist);
-            // @ts-ignore
-            component.views?.forEach(deleteAssetDist);
+            /*暂时不做删除处理
+                //  拦截assets.push方法
+                const pushFunc = context.assets.push;
+                context.assets.push = function (...items) {
+                    items.forEach(deleteAssetDist);
+                    return pushFunc.apply(this, items);
+                }
+                // @ts-ignore
+                component.assets?.forEach(deleteAssetDist);
+                // @ts-ignore
+                component.views?.forEach(deleteAssetDist);
+            */
         },
         resolveId(source, importer) {
             //  1、避免外部直接使用 URL:和URL_VERSION:模块
@@ -114,13 +124,4 @@ export function endpointPlugin(component: ComponentOptions, context: IComponentC
             console.log(pc.green(`  ----  compile success.`));
         }
     }
-}
-
-/**
- * 删除资产文件的输出文件
- * @param asset 
- */
-function deleteAssetDist(asset: AssetOptions) {
-    isStringNotEmpty(asset?.dist) && existsSync(asset.dist)
-        && rmSync(asset.dist);
 }

@@ -82,6 +82,7 @@ export default function scriptPlugin(component: ComponentOptions, context: IComp
                         transformMap.set(idKey, module);
                         return { id: module.id, external: false };
                     }
+                    break;
                 }
                 //  net 时，必须得是commonLib，无法加载net路径代码；后期可考虑如果是siteUrl，则下载文件，前期先忽略
                 case "net": {
@@ -146,9 +147,12 @@ export default function scriptPlugin(component: ComponentOptions, context: IComp
          * @param id 模块id，绝对路径
          */
         async transform(code, id) {
-            return transformMap.has(id.toLowerCase())
-                ? await transformScript(code, id, component, options)
-                : undefined;
+            //  rollup新版本下，脚本需要显式指定watch
+            if (transformMap.has(id.toLowerCase()) == true) {
+                this.addWatchFile(id);
+                return await transformScript(code, id, component, options);
+            }
+            return undefined;
         },
         /**
          * 生成文件时：组装 @ sourceURL标记

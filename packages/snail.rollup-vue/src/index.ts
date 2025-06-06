@@ -4,7 +4,7 @@ import vue from "@vitejs/plugin-vue"
 import compiler, { SFCParseOptions, SFCParseResult } from "@vue/compiler-sfc"
 import { buildAddLinkCode, getStyleProcessor, IStyleProcessor, StyleTransformResult } from "snail.rollup-style"
 import { transformScript } from "snail.rollup-script"
-import { hasOwnProperty, isArrayNotEmpty, tidyString } from "snail.core";
+import { hasAny, hasOwnProperty, isArrayNotEmpty, tidyString } from "snail.core";
 import { BuilderOptions, IComponentContext, ComponentOptions, ModuleOptions } from "snail.rollup"
 import { VueStyleTransformResult } from "./models/vue-style";
 import { existsSync, rmSync } from "fs";
@@ -214,7 +214,7 @@ export default function vuePlugin(component: ComponentOptions, context: ICompone
                     codes.push(style.css);
                 });
             });
-            context.writeFile(cssChunkDist, codes.join("\r\n"))
+            hasAny(codes) && context.writeFile(cssChunkDist, codes.join("\r\n"))
         }
     }
 
