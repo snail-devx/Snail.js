@@ -1,6 +1,5 @@
 import { configDefaults, defineConfig } from 'vitest/config'
 
-
 /**
  * 全局测试项目配置，针对所用普通项目测试
  *  1、将vue npm包放到全局安装不合适，在这里独立测试

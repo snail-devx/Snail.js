@@ -3,15 +3,17 @@
   "description": "配合【snail.rollup】使用的插件，支持打包过程中进行动态模块注入；完成一些高阶定制功能；默认支持Vue最新版本",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.1.8",
+  "version": "1.2.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "rollup -c ./rollup.config.js",
+    "types": "tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
+  },
   "dependencies": {
-    "picocolors": "^1.1.1",
-    "snail.core": ">=1.1.4",
-    "snail.rollup": ">=1.1.10"
+    "snail.core": ">=1.2.1",
+    "snail.rollup": ">=1.2.1"
   }
 }

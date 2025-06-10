@@ -1,8 +1,7 @@
 import { InputPluginOption } from "rollup"
-import { buildUrlResolve } from "snail.rollup-url"
-import { AssetOptions, BuilderOptions, IComponentContext, ComponentOptions } from "snail.rollup"
-import { AssetManager } from "snail.rollup"
 import pc from "picocolors";
+import { buildUrlResolve } from "snail.rollup-url"
+import { AssetManager, AssetOptions, BuilderOptions, IComponentContext, ComponentOptions } from "snail.rollup"
 
 /** 插件名称 */
 const PLUGINNAME: string = "snail.rollup-asset";

@@ -120,9 +120,11 @@ export function checkExists(path, paramName) {
 //#endregion
 
 //#region  *****************************************   👉 打包配置    *****************************************
+/** 是否是生产环境 */
+export const isProd = process.env.NODE_ENV === "production";
 /**
  * 所有可用的Packages项目包；从根目录的【packages】目录下自动分析
- * @type {import("../types/package").Package[]}
+ * @type {import("../typings/package").Package[]}
  * @remarks 忽略私有包，忽略无package.json、rollup.config.js的项目
  */
 export const allPackages = readdirSync(resolve(__dirname, "../packages"))
@@ -143,19 +145,21 @@ export const allPackages = readdirSync(resolve(__dirname, "../packages"))
         if (existsSync(rollupFile) != true) {
             return undefined;
         }
+        /** 构建发布的输出根目录 */
+        const releaseRoot = resolve(DIR_RELEASEROOT, dir);
         //  构建包信息返回
-        /**     @type {import("../types/package").Package}*/
+        /**     @type {import("../typings/package").Package}*/
         const pkg = {
-            name: pkgJson.name || name,
+            name: pkgJson.name || dir,
+
             dir,
-
             root,
-            srcRoot: resolve(root, "src"),
-            typesRoot: resolve(DIR_TEMPROOT, dir, "src"),
-            releaseRoot: resolve(DIR_RELEASEROOT, dir),
+            // srcRoot: resolve(root, "src"),
+            releaseRoot: releaseRoot,
+            distRoot: resolve(releaseRoot, "dist"),
+            typesRoot: resolve(releaseRoot, "dist/_types"),
 
-            packageFile,
-            rollupFile
+            pkgJson: pkgJson
         };
         return Object.freeze(pkg);
 
@@ -165,7 +169,7 @@ export const allPackages = readdirSync(resolve(__dirname, "../packages"))
 /**
  * 获取符合条件的项目包集合
  * @param {string|string[]} names 项目包名，字符串或者字符串数组
- * @returns {import("../types/package").Package[]}
+ * @returns {import("../typings/package").Package[]}
  */
 export function getPackages(names) {
     names || error(`getPackages的names参数无效：${names}`);
@@ -181,8 +185,7 @@ export function getPackages(names) {
 /**
  * 获取符合条件的第一个项目包
  * @param {string|string[]} names 项目包名，字符串或者字符串数组
- * @param {boolean} startFuzzy 是否启用模糊匹配，传true时，则names可传入正则匹配字符串，如“snail.*”
- * @returns {import("../types/package").Package|undefined}
+ * @returns {import("../typings/package").Package|undefined}
  */
 export function getPackage(names) {
     var pkgs = getPackages(names);

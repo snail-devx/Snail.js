@@ -3,16 +3,18 @@
   "description": "配合【snail.rollup】使用的插件，支持静态资源文件拷贝到输出目录",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.1.8",
+  "version": "1.2.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "rollup -c ./rollup.config.js",
+    "types": "tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
+  },
   "dependencies": {
-    "picocolors": "^1.1.1",
-    "snail.core": ">=1.1.4",
-    "snail.rollup": ">=1.1.10",
-    "snail.rollup-url": ">=1.1.8"
+    "snail.core": ">=1.2.1",
+    "snail.rollup": ">=1.2.1",
+    "snail.rollup-url": ">=1.2.1"
   }
 }

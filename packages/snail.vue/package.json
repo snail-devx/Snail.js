@@ -3,17 +3,29 @@
   "description": "依赖【snail】，基于vue封装常用UI组件",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "scripts": {},
-  "dependencies": {
-    "snail.core": ">=1.1.4",
-    "vue": "^3.5.14"
+  "scripts": {
+    "build": "rollup -c ./rollup.config.js",
+    "types": "vue-tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types",
+    "build:test": "rollup --watch  -c ./test/rollup.config.js"
   },
-  "peerDependencies": {
-    "typescript": ">=5.8.2"
+  "dependencies": {
+    "vue": "^3.5.14",
+    "snail.core": ">=1.2.1"
+  },
+  "devDependencies": {
+    "vue-tsc": "^2.2.10",
+    "snail.rollup": ">=1.2.1",
+    "snail.rollup-asset": ">=1.2.1",
+    "snail.rollup-html": ">=1.2.1",
+    "snail.rollup-url": ">=1.2.1",
+    "snail.rollup-inject": ">=1.2.1",
+    "snail.rollup-script": ">=1.2.1",
+    "snail.rollup-style": ">=1.2.1",
+    "snail.rollup-vue": ">=1.2.1"
   }
 }

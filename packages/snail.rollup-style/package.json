@@ -3,28 +3,30 @@
   "description": "配合【snail.rollup】使用的插件，支持less、css、scss、sass等样式文件打包编译",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.1.10",
+  "version": "1.2.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "rollup -c ./rollup.config.js",
+    "types": "tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
+  },
   "dependencies": {
     "@vue/compiler-sfc": "^3.5.13",
     "autoprefixer": "^10.4.21",
     "cssnano": "^7.0.6",
     "less": "^4.3.0",
     "merge-source-map": "^1.1.0",
-    "picocolors": "^1.1.1",
     "postcss": "^8.5.3",
     "postcss-nested": "^7.0.2",
     "postcss-url": "^10.1.3",
-    "snail.core": ">=1.1.4",
-    "snail.rollup": ">=1.1.10",
-    "snail.rollup-asset": ">=1.1.8",
-    "snail.rollup-inject": ">=1.1.8",
-    "snail.rollup-url": ">=1.1.8",
-    "source-map": "^0.7.4"
+    "source-map": "^0.7.4",
+    "snail.core": ">=1.2.1",
+    "snail.rollup": ">=1.2.1",
+    "snail.rollup-asset": ">=1.2.1",
+    "snail.rollup-inject": ">=1.2.1",
+    "snail.rollup-url": ">=1.2.1"
   },
   "devDependencies": {
     "@types/less": "^3.0.8"

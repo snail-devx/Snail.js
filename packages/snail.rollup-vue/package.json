@@ -3,25 +3,27 @@
   "description": "配合【snail.rollup】使用的插件，支持Vue文件编译打包",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.1.7",
+  "version": "1.2.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "rollup -c ./rollup.config.js",
+    "types": "tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
+  },
   "dependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/compiler-sfc": "^3.5.13",
-    "picocolors": "^1.1.1",
-    "snail.core": ">=1.1.4",
-    "snail.rollup": ">=1.1.10",
-    "snail.rollup-script": ">=1.1.8",
-    "snail.rollup-style": ">=1.1.10"
+    "snail.core": ">=1.2.1",
+    "snail.rollup": ">=1.2.1",
+    "snail.rollup-script": ">=1.2.1",
+    "snail.rollup-style": ">=1.2.1"
   },
   "devDependencies": {
     "vue": "^3.5.13",
-    "snail.rollup-inject": ">=1.1.8",
-    "snail.rollup-url": ">=1.1.8",
-    "snail.rollup-asset": ">=1.1.8"
+    "snail.rollup-inject": ">=1.2.1",
+    "snail.rollup-url": ">=1.2.1",
+    "snail.rollup-asset": ">=1.2.1"
   }
 }

@@ -3,12 +3,15 @@
   "description": "Snail前端项目核心库，封装基础能力，无界面，无业务逻辑",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.1.5",
+  "version": "1.2.1",
   "type": "module",
   "main": "dist/snail.core.js",
   "module": "dist/snail.core.js",
   "types": "dist/snail.core.d.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "rollup -c ./rollup.config.js",
+    "types": "tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
+  },
   "peerDependencies": {
     "typescript": ">=5.8.2"
   }

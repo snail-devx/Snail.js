@@ -1,6 +1,6 @@
-//  生成 .d.ts 文件是的tsc配置文件：继承【tsconfig.json】配置，然后重写部分配置
+//  生成 .d.ts 文件是的tsc配置文件：继承【tsconfig.base.json】配置，然后重写部分配置
 {
-    "extends": "./tsconfig.json",
+    "extends": "./tsconfig.base.json",
     "compilerOptions": {
         //  不移除注释
         "removeComments": false,
@@ -16,8 +16,5 @@
          *      but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'. 
         */
         "skipLibCheck": true,
-    },
-    "exclude": [
-        "node_modules",
-    ]
+    }
 }

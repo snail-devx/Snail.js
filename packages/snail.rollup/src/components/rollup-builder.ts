@@ -23,7 +23,6 @@ import { startPointPlugin, endpointPlugin } from "./point-plugin";
  * Rollup构建器
  */
 export class Builder implements IRollupBuilder {
-
     //#region *************************************属性、构造方法***************************************
     /** 打包全局配置选项 */
     private readonly options: BuilderOptions;
@@ -217,11 +216,6 @@ export class Builder implements IRollupBuilder {
         );
         return this.buildProject(...projectFiles);
     }
-    //#endregion
-
-    // /** 构建器对象 */
-    // const builder: IRollupBuilder = Object.freeze({ build, buildProject, buildFromCmd });
-    // return builder;
     //#endregion
 }
 

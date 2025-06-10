@@ -1,6 +1,5 @@
-import { afterAll, assert, beforeAll, describe, expect, it, test, vi } from 'vitest'
+import { beforeEach, afterEach, afterAll, assert, beforeAll, describe, expect, it, test, vi } from 'vitest'
 import { run, runAsync, debounce, throttle, polling } from "../../src/base/function"
-import { afterEach, beforeEach } from 'node:test';
 import { throwError } from '../../src/base/error';
 
 vi.mock("../../src/base/function", { spy: true });
@@ -58,71 +57,78 @@ test("runAsync", async () => {
 //  通义灵码 生成的单元测试
 describe('debounce', () => {
     beforeEach(() => {
-        vi.useFakeTimers(); // 使用虚拟时钟加速测试
+        vi.useFakeTimers(); // 使用 fake timer 控制 setTimeout
     });
 
     afterEach(() => {
-        vi.useRealTimers(); // 恢复真实时钟
+        vi.runOnlyPendingTimers(); // 清理所有 pending timers
+        vi.useRealTimers(); // 恢复真实 timer
     });
 
-    test('TC01 - 单次调用后应在 delay 后执行函数', () => {
+    test('TC01: 应在 delay 后调用一次函数', () => {
         const mockFn = vi.fn();
         const debounced = debounce(mockFn, 100);
 
         debounced();
 
         expect(mockFn).not.toHaveBeenCalled(); // 尚未执行
+
         vi.advanceTimersByTime(100); // 快进时间
-        expect(mockFn).toHaveBeenCalledTimes(1); // 应该执行一次
-    });
-
-    test('TC02 - 多次调用只执行最后一次', () => {
-        const mockFn = vi.fn();
-        const debounced = debounce(mockFn, 100);
-
-        debounced();
-        debounced();
-        debounced();
-
-        vi.advanceTimersByTime(99); // 还没到时间
-        expect(mockFn).not.toHaveBeenCalled();
-
-        vi.advanceTimersByTime(1); // 到达时间
-        expect(mockFn).toHaveBeenCalledTimes(1); // 只执行一次
-    });
-
-    test('TC03 - 参数应正确传递', () => {
-        const mockFn = vi.fn();
-        const debounced = debounce(mockFn, 100);
-
-        debounced('hello', 42);
-        vi.advanceTimersByTime(100);
-
-        expect(mockFn).toHaveBeenCalledWith('hello', 42);
-    });
-
-    test('TC04 - this 上下文应保留', () => {
-        const obj = {
-            value: 'context',
-            method: vi.fn(function (this: any) {
-                expect(this.value).toBe('context');
-            }),
-        };
-        // @ts-ignore
-        obj.method = debounce(obj.method, 100);
-
-        obj.method();
-        vi.advanceTimersByTime(100);
-    });
-
-    test('TC05 - delay 为 0 时应立即执行', () => {
-        const mockFn = vi.fn();
-        const debounced = debounce(mockFn, 0);
-
-        debounced();
-        vi.runAllTimers(); // 触发所有异步任务
 
         expect(mockFn).toHaveBeenCalledTimes(1);
+    });
+
+    test('TC02: 快速多次调用，只执行一次', () => {
+        const mockFn = vi.fn();
+        const debounced = debounce(mockFn, 100);
+
+        debounced();
+        debounced();
+        debounced();
+
+        expect(mockFn).not.toHaveBeenCalled();
+
+        vi.advanceTimersByTime(100);
+
+        expect(mockFn).toHaveBeenCalledTimes(1);
+    });
+
+    test('TC03: 两次调用之间超过 delay，应执行两次', () => {
+        const mockFn = vi.fn();
+        const debounced = debounce(mockFn, 100);
+
+        debounced();
+        vi.advanceTimersByTime(100);
+        expect(mockFn).toHaveBeenCalledTimes(1);
+
+        debounced();
+        vi.advanceTimersByTime(100);
+        expect(mockFn).toHaveBeenCalledTimes(2);
+    });
+
+    test('TC04: this 上下文应正确传递', () => {
+        const obj = {
+            value: 'hello',
+            method: vi.fn(function (this: typeof obj) {
+                expect(this.value).toBe('hello');
+            }),
+        };
+
+        const debounced = debounce(obj.method, 100);
+
+        debounced.call(obj, 'arg1'); // 显式绑定 this
+        vi.advanceTimersByTime(100);
+    });
+
+    test('TC05: 参数应正确传递给原函数', () => {
+        const mockFn = vi.fn();
+        const debounced = debounce(mockFn, 100);
+
+        debounced('arg1', 'arg2');
+
+        vi.advanceTimersByTime(100);
+
+        expect(mockFn).toHaveBeenCalledWith('arg1', 'arg2');
     });
 });
 
