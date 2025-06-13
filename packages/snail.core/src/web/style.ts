@@ -1,10 +1,10 @@
 import { mustString, extract, isArrayNotEmpty, isObject, isStringNotEmpty, tidyString } from "../base/data";
 import { event } from "../base/event";
-import { IStyleHandle, IStyleManager, StyleElement, StyleFile, StyleOptions } from "./models/style";
+import { IStyleHandle, IStyleManager, StyleElement, StyleFile, StyleOptions } from "./models/style-model";
 import { version } from "./version";
 
 /** 把自己的类型共享出去 */
-export * from "./models/style"
+export * from "./models/style-model"
 
 /**
  * CSS模块：自动注册css文件、支持换肤、支持版本号注入

@@ -2,9 +2,9 @@ import { dirname, extname, isAbsolute, relative, resolve } from "path";
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import pc from "picocolors";
 import { isArrayNotEmpty, throwIfFalse, throwIfUndefined, url } from "snail.core";
-import { BuilderOptions, CommonLibOptions } from "../models/builder";
-import { AssetOptions, ComponentOptions, IComponentContext } from "../models/component";
-import { ModuleOptions, ModuleType } from "../models/module";
+import { BuilderOptions, CommonLibOptions } from "../models/builder-model";
+import { AssetOptions, ComponentOptions, IComponentContext } from "../models/component-model";
+import { ModuleOptions, ModuleType } from "../models/module-model";
 import { buildDist, buildNetPath, checkExists, createDir, forceExt, isChild, isNetPath, trace } from "../utils/helper";
 
 /** 模块解析缓存：key为模块id，value为模块信息 */

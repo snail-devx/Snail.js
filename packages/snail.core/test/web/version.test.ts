@@ -1,6 +1,6 @@
 import { assert, describe, expect, test, it, afterEach } from 'vitest'
 import { version } from "../../src/web/version"
-import { IVersionManager } from '../../src/web/models/version'
+import { IVersionManager } from '../../src/web/models/version-model'
 
 function tmpFunc(vm: IVersionManager): void {
     expect(vm.getVersion()).toStrictEqual("1x3");

@@ -1,7 +1,7 @@
 import { assert, describe, expect, test, it, afterEach, vi, afterAll } from 'vitest'
 import { JSDOM } from "jsdom";
 import { style } from "../../src/web/style"
-import { StyleOptions, IStyleHandle, IStyleManager } from '../../src/web/models/style';
+import { StyleOptions, IStyleHandle, IStyleManager } from '../../src/web/models/style-model';
 import { version } from '../../src/web/version';
 
 //@ts-ignore

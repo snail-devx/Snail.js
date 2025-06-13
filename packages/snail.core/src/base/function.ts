@@ -1,10 +1,10 @@
 import { mustFunction, isFunction, isPromise } from "./data";
 import { getMessage } from "./error";
-import { RunResult } from "./models/function";
+import { RunResult } from "./models/function-model";
 import { AsyncResult, defer } from "./promise";
 
 /** 把自己的类型共享出去 */
-export * from "./models/function"
+export * from "./models/function-model"
 
 /**
  * 运行执行方法；内部自动拦截异常

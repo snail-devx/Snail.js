@@ -36,7 +36,7 @@ function releasePackage(pkg) {
     buildPackage(pkg, true);
     //  2、生成npm包文件
     step(`\r\n👉 生成NPM包：${pkg.releaseRoot}`);
-    //      递增版本号：后续看情况精确处理
+    //      递增版本号：后续看情况精确处理；不自动增加版本号，根据情况进行自增
     // needPublish && execaSync(
     //     "npm",
     //     ["version", "patch"],

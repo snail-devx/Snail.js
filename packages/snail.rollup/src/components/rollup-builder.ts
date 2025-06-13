@@ -2,9 +2,9 @@ import { dirname, resolve } from "path";
 import pc from "picocolors";
 import { InputPluginOption, RollupOptions } from "rollup";
 import minimist from "minimist";
-import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../models/builder";
-import { AssetOptions, ComponentOptions, IComponentContext, PluginBuilder } from "../models/component";
-import { ProjectOptions } from "../models/project";
+import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../models/builder-model";
+import { AssetOptions, ComponentOptions, IComponentContext, PluginBuilder } from "../models/component-model";
+import { ProjectOptions } from "../models/project-model";
 import {
     mustString, mustFunction, mustArray, mustObject,
     throwError, throwIfFalse, throwIfTrue,
@@ -238,7 +238,7 @@ function checkBuilder(options: BuilderOptions): BuilderOptions {
     options.siteRoot = tidyString(options.siteRoot) || resolve(options.root, "dist");
     options.distRoot = tidyString(options.distRoot) || resolve(options.root, "dist");
     throwIfFalse(
-        isChild(options.distRoot, options.siteRoot),
+        isChild(options.siteRoot, options.distRoot),
         `distRoot must be child of siteRoot. siteRoot:${options.siteRoot}, distRoot:${options.distRoot}.`
     );
     options.commonLib = checkCommonLib(options.commonLib, "options.commonLib");

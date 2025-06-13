@@ -1,13 +1,16 @@
 import { basename, dirname, extname, relative, resolve } from "path";
 import { InputPluginOption, ResolveIdHook, TransformHook } from "rollup"
-import vue from "@vitejs/plugin-vue"
-import compiler, { SFCParseOptions, SFCParseResult } from "@vue/compiler-sfc"
 import { buildAddLinkCode, getStyleProcessor, IStyleProcessor, StyleTransformResult } from "snail.rollup-style"
 import { transformScript } from "snail.rollup-script"
 import { hasAny, hasOwnProperty, isArrayNotEmpty, tidyString } from "snail.core";
 import { BuilderOptions, IComponentContext, ComponentOptions, ModuleOptions } from "snail.rollup"
-import { VueStyleTransformResult } from "./models/vue-style";
+import { VueStyleTransformResult } from "./models/vue-style-model";
 import { existsSync, rmSync } from "fs";
+//  引入@vitejs编译vue相关组件方法
+import vue from "@vitejs/plugin-vue";
+/** 模拟 @vitejs/plugin-vue中加载compiler的逻辑  tryResolveCompiler，从而支持.ts类型注册 */
+import /* compiler, */ { SFCParseOptions, SFCParseResult } from "@vue/compiler-sfc"
+import * as compiler from "vue/compiler-sfc";
 
 /** 插件名称 */
 const PLUGINNAME = "snail.rollup-vue";
@@ -145,7 +148,14 @@ export default function vuePlugin(component: ComponentOptions, context: ICompone
                 //  执行样式编译；源码参照 @vitejs/plugin-vue
                 /* v8 ignore next 1 借助上层逻辑，这里不会出现为空的情况；这里为了保险，冗余一下 */
                 const from = filename.concat("?.", query.lang || "css");
-                const { dist: to } = context.buildPath(from);
+                /**
+                 * 这里不能用 buildPath ，如果引用的是srcRoot目录外的组件（如npm下）需要编译时
+                 *      构建的dist肯定在srcRoot目录外，此时构建的dist就不在distRoot目录下
+                 *      buildPath内部基于dist和siteRoot构建url地址；此时会报错，dist must be child of siteRoot
+                 * 先直接使用id作为to，style编译时，to仅为标记，不会产生影响，先使用 cssChunkDist
+                 */
+                // const { dist: to } = context.buildPath(from);
+                const to = cssChunkDist;
                 /*  scopeId从query.scope取值，即为vue插件内部的id值`data-v-${descriptor.id}`   const scopedQuery = hasScoped ? `&scoped=${descriptor.id}` : ``; */
                 const scopeId = query.scoped ? `data-v-${query.scopeId}` : undefined;
                 const ret = await styleProcessor.transform(code, from, to, undefined, scopeId);

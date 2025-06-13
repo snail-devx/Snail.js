@@ -1,7 +1,7 @@
 import { afterAll, assert, describe, expect, test } from 'vitest'
 import { script } from "../../src/web/script"
 import { http } from '../../src/web/http';
-import { HttpRequest } from '../../src/web/models/http';
+import { HttpRequest } from '../../src/web/models/http-model';
 import { version } from '../../src/web/version';
 
 //  HTTP全局拦截：支持的几种加载模式，返回代码

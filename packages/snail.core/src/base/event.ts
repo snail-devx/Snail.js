@@ -1,9 +1,9 @@
 import { mustFunction, mustString, hasAny, hasOwnProperty, isFunction, isObject, newId, tidyString } from "./data";
 import { run } from "./function";
-import { EventHandle, EventSender, IEventManager } from "./models/event";
+import { EventHandle, EventSender, IEventManager } from "./models/event-model";
 
 /** 把自己的类型共享出去 */
-export * from "./models/event"
+export * from "./models/event-model"
 
 /**
  * 事件模块：提供事件注册、分发相关功能 <br />

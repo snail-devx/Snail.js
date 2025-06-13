@@ -1,5 +1,5 @@
-import { IServerManager, ServerOptions } from "./server";
-import { IVersionManager } from "./version";
+import { IServerManager, ServerOptions } from "./server-model";
+import { IVersionManager } from "./version-model";
 
 /**
  * 接口：样式文件句柄

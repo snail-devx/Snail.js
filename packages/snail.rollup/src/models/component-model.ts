@@ -1,6 +1,6 @@
 import { InputPluginOption } from "rollup"
-import { BuilderOptions, CommonLibOptions } from "./builder";
-import { ModuleOptions } from "./module";
+import { BuilderOptions, CommonLibOptions } from "./builder-model";
+import { ModuleOptions } from "./module-model";
 
 /**
  * 构建组件的配置选项

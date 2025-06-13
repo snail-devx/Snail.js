@@ -5,10 +5,10 @@
 import { isPromise } from "./data";
 import { getMessage } from "./error";
 import { RunResult } from "./function";
-import { FlatPromise } from "./models/promise";
+import { FlatPromise } from "./models/promise-model";
 
 /** 把自己的类型共享出去 */
-export * from "./models/promise"
+export * from "./models/promise-model"
 
 /**
  * 延迟对象

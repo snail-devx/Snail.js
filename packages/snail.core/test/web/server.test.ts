@@ -1,6 +1,6 @@
 import { assert, describe, expect, test } from 'vitest'
 import { server } from "../../src/web/server"
-import { IServerManager } from '../../src/web/models/server'
+import { IServerManager } from '../../src/web/models/server-model'
 
 /**
  * 测试方法

@@ -1,4 +1,4 @@
-import { IServerManager } from "./server";
+import { IServerManager } from "./server-model";
 
 /**
  * 接口：HTTP客户端；负责进行http请求发送和结果响应解析

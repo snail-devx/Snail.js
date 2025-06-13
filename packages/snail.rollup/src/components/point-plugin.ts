@@ -1,9 +1,9 @@
 import { InputPluginOption } from "rollup";
-import { BuilderOptions } from "../models/builder";
-import { AssetOptions, ComponentOptions, IComponentContext, ViewOptions } from "../models/component";
+import { BuilderOptions } from "../models/builder-model";
+import { AssetOptions, ComponentOptions, IComponentContext, ViewOptions } from "../models/component-model";
 import { FLAG } from "../utils/helper";
 import pc from "picocolors";
-import { ModuleOptions } from "../models/module";
+import { ModuleOptions } from "../models/module-model";
 import { hasOwnProperty, isStringNotEmpty, url } from "snail.core";
 import { existsSync, rmSync } from "fs";
 import { relative } from "path";

@@ -1,11 +1,11 @@
 import { mustString, extract, hasOwnProperty, isObject, tidyString } from "../base/data";
 import { throwIfUndefined } from "../base/error";
 import { url } from "./url";
-import { IVersionManager, VersionOptions } from "./models/version";
-import { UrlParseResult } from "./models/url";
+import { IVersionManager, VersionOptions } from "./models/version-model";
+import { UrlParseResult } from "./models/url-model";
 
 /** 把自己的类型共享出去 */
-export * from "./models/version"
+export * from "./models/version-model"
 
 /**
  * 版本管理模块

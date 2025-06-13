@@ -1,4 +1,4 @@
-import { ComponentOptions } from "./component";
+import { ComponentOptions } from "./component-model";
 
 /**
  * 项目打包配置

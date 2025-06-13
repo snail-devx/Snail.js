@@ -1,5 +1,5 @@
 import { InputPluginOption } from "rollup"
-import { IStyleProcessor, StyleTransformResult } from "./models/style";
+import { IStyleProcessor, StyleTransformResult } from "./models/style-model";
 import { getStyleProcessor } from "./components/processor";
 import { buildUrlResolve } from "snail.rollup-url"
 import { isObject, isString, isStringNotEmpty, version } from "snail.core";
@@ -9,7 +9,7 @@ import { BuilderOptions, IComponentContext, ComponentOptions, FLAG } from "snail
 
 //#region *************************************        导出接口        *************************************
 /** 把自己的类型共享出去 */
-export * from "./models/style";
+export * from "./models/style-model";
 /** 将样式处理器共享出去*/
 export * from "./components/processor"
 

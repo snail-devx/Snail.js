@@ -2,10 +2,10 @@ import { mustString, extract, hasOwnProperty, tidyString } from "../base/data";
 import { isFunction, isNullOrUndefined, isObject, isPromise, isRegexp, isStringNotEmpty } from "../base/data";
 import { throwIfTrue, throwIfUndefined } from "../base/error";
 import { defer } from "../base/promise";
-import { HttpOptions, HttpInterceptor, IHttpClient, HttpRequest, HttpResponse, HttpError } from "./models/http";
+import { HttpOptions, HttpInterceptor, IHttpClient, HttpRequest, HttpResponse, HttpError } from "./models/http-model";
 
 /** 把自己的类型共享出去 */
-export * from "./models/http"
+export * from "./models/http-model"
 
 /**
  * HTTP模块：实现HTTP请求的封装
@@ -278,7 +278,7 @@ export namespace http {
                 if (/application\/json/i.test(contentType) == true) {
                     hr.json().then(resolve);
                 }
-                else if (/text\/*/i.test(contentType) == true) {
+                else if (isTextResponse(contentType)) {
                     hr.text().then(resolve);
                 }
                 else {
@@ -366,6 +366,16 @@ export namespace http {
         }
         //  去掉最后一个&连接符
         return query.length ? query.substring(0, query.length - 1) : query;
+    }
+    /**
+     * 是否是text文本响应
+     * @param contentType 
+     * @returns true 文本响应，执行.text
+     */
+    function isTextResponse(contentType: string): boolean {
+        //  text/*算是text；application/javascript js文件响应，也算作text
+        return /text\/*/i.test(contentType)
+            || /application\/javascript/.test(contentType);
     }
 
     /**

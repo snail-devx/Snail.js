@@ -5,11 +5,11 @@ import { defer } from "../base/promise";
 import { url } from "./url";
 import { http } from "./http";
 import { version } from "./version";
-import { IScriptHandle, IScriptManager, ScriptFile, ScriptLoadOptions, ScriptOptions } from "./models/script";
-import { IHttpClient } from "./models/http";
+import { IScriptHandle, IScriptManager, ScriptFile, ScriptLoadOptions, ScriptOptions } from "./models/script-model";
+import { IHttpClient } from "./models/http-model";
 
 /** 把自己的类型共享出去 */
-export * from "./models/script"
+export * from "./models/script-model"
 
 /**
  * 脚本模块：支持动态加载指定js模块，支持锚点

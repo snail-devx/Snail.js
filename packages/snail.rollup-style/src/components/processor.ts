@@ -25,7 +25,7 @@ import { hasOwnProperty, isBoolean, isObject, url as sUrl, version } from "snail
 import { processors, StylePreprocessorResults } from "./preprocessors";
 //  导入rollup包，并对helper做解构
 import { BuilderOptions, IComponentContext, ComponentOptions, ModuleTransformResult } from "snail.rollup"
-import { IStyleProcessor } from "../models/style";
+import { IStyleProcessor } from "../models/style-model";
 
 /**
  * 获取样式处理器
@@ -51,7 +51,7 @@ export function getStyleProcessor(component: ComponentOptions, context: ICompone
      * 转换编译文本样式
      * @param style 样式文本内容
      * @param from 样式内容来自哪里，用于分析内部的url文件地址、@import 等物理文件等
-     * @param from 样式内容来自哪里，用于分析内部的url文件地址、@import 等物理文件等
+     * @param to 样式文件内容输出到哪里
      * @param map 已有的sourcemap；为false时不生成sourceMap值
      * @param scopeId 支持外部传入scopeId值，支持Vue的scope样式
      * @returns 

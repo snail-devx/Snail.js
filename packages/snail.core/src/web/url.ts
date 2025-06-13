@@ -1,8 +1,8 @@
 import { isStringNotEmpty } from "../base/data";
-import { UrlParseResult } from "./models/url";
+import { UrlParseResult } from "./models/url-model";
 
 /** 把自己的类型共享出去 */
-export * from "./models/url"
+export * from "./models/url-model"
 
 /**
  * url模块：支持对URL地址做解析和格式化

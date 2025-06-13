@@ -28,15 +28,15 @@
 			"**/Thumbs.db": true,
 			//
 			//"packages/snail.rollup**": true,
-			//	纯粹生成的npm包目录，忽略package.json文件，避免干扰VSCode的怕【NPN脚本】栏目
-			"release/**/package.json": true,
 			"temp": true,
-			"release": true,
 			"LICENSE": true,
 			"pnpm-workspace.yaml": true,
 			"pnpm-lock.yaml": true,
 			"package-lock.json": true,
 			"*.code-workspace": true,
+			//	纯粹生成的npm包目录，忽略package.json文件，避免干扰VSCode的【NPN脚本】栏目
+			"release": true,
+			"release/**/package.json": true,
 		},
 		"svn.ignoreMissingSvnWarning": true
 	},

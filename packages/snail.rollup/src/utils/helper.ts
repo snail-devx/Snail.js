@@ -3,7 +3,7 @@ import { dirname, extname, relative, resolve } from "path";
 import { fileURLToPath } from "url";
 import { mustString, hasOwnProperty, throwIfFalse, tidyString, url } from "snail.core"
 import pc from "picocolors";
-import { BuilderOptions } from "../models/builder";
+import { BuilderOptions } from "../models/builder-model";
 
 /** 文件所处目录路径  
 const __filename = fileURLToPath(import.meta.url);

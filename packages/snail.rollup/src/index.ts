@@ -8,10 +8,10 @@
  */
 
 /** 把自己的类型共享出去 */
-export * from "./models/builder"
-export * from "./models/component"
-export * from "./models/module"
-export * from "./models/project"
+export * from "./models/builder-model"
+export * from "./models/component-model"
+export * from "./models/module-model"
+export * from "./models/project-model"
 
 /** 构建器 */
 export { Builder } from "./components/rollup-builder";

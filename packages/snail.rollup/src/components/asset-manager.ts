@@ -1,5 +1,5 @@
 import { isFunction } from "snail.core";
-import { AssetOptions } from "../models/component";
+import { AssetOptions } from "../models/component-model";
 
 /* v8 ignore next 55 在rollup-* 相关插件集中使用到了，但由于是在编译结果包中使用，覆盖率过不去*/
 /**

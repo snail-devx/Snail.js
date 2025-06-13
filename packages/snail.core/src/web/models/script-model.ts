@@ -1,4 +1,4 @@
-import { IVersionManager } from "./version";
+import { IVersionManager } from "./version-model";
 
 /**
  * 接口：脚本句柄

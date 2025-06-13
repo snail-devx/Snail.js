@@ -1,6 +1,6 @@
 import { assert, describe, expect, test } from 'vitest'
 import { http } from "../../src/web/http"
-import { IHttpClient } from '../../src/web/models/http';
+import { IHttpClient } from '../../src/web/models/http-model';
 import { delay } from '../../src/base/promise';
 import { server } from '../../src/web/server';
 

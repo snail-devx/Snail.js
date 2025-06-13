@@ -1,5 +1,5 @@
 import { RollupOptions } from "rollup";
-import { ComponentOptions } from "./component";
+import { ComponentOptions } from "./component-model";
 
 /**
  * 全局打包配置
