@@ -283,7 +283,7 @@ export function newId(): string {
 
 /**
  * 基于指定key路径，钻取object对象属性值；
- * - 示例：从window下取lm.script对象；则传入window，path传入 "lm","script"
+ * - 示例：从window下取snail.script对象；则传入window，path传入 "snail","script"
  * - 不支持钻取数组；若不存在则返回undefined
  * @param data 要钻取数据的对象
  * @param paths 钻取数据的key路径集合

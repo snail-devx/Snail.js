@@ -155,7 +155,7 @@ export class Builder implements IRollupBuilder {
                     },
                     /*  取消命名空间强绑定freeze
                      *      import * as core from "./Core.ts"; 
-                     *      rollup会生成_interopNamespaceDefault方法，生成全新对象freezeLM中的key
+                     *      rollup会生成_interopNamespaceDefault方法，生成全新对象freeze exports中的key
                      */
                     freeze: false,
                     externalLiveBindings: false,
