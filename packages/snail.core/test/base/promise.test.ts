@@ -1,6 +1,7 @@
-import { assert, describe, expect, test } from 'vitest'
-import { awaitx, defer, delay } from "../../src/base/promise"
+import { assert, describe, expect, it, test } from 'vitest'
+import { awaitX, defer, delay } from "../../src/base/promise"
 import { getMessage } from '../../src/base/error';
+import { RunResult } from '../../src/base/function';
 
 test("defer", async () => {
 
@@ -18,49 +19,52 @@ test("delay", async () => {
 });
 
 //  使用通义灵码生成的单元测试
-describe('awaitx', async () => {
-    // 模拟值和函数
-    const mockData = 'success-data';
-    const mockError = new Error('mock-error');
-    const mockReasonStr = 'custom-reason-string';
-
-    /** TC01: 输入不是 Promise */
-    test('should reject with error if input is not a Promise', async () => {
-        const result = await awaitx<any>('not-a-promise' as any);
-        expect(result.success).toBe(false);
-        expect(result.reason).toBe("promise is not a Promise");
-        expect(result.ex).toBeUndefined();
-    });
-    /** TC02: Promise 成功 resolve */
-    test('should return success result when promise resolves', async () => {
-        const promise = Promise.resolve(mockData);
-        const result = await awaitx(promise);
-        expect(result.success).toBe(true);
-        expect(result.data).toBe(mockData);
-        expect(result.ex).toBeUndefined();
-        expect(result.reason).toBeUndefined();
+describe('awaitX', async () => {
+    it('should resolve with success: true when given a non-Promise value', async () => {
+        const result = await awaitX(42);
+        expect(result).toEqual({ success: true, data: 42 } as RunResult<number>);
     });
 
-    /** TC03: Promise reject with Error */
-    test('should return error result with ex when promise rejects with Error', async () => {
-        const promise = Promise.reject(mockError);
-
-        const result = await awaitx(promise);
-
-        expect(result.success).toBe(false);
-        expect(result.ex).toBe(mockError);
-        expect(result.reason).toBe("mock-error");
+    it('should resolve with success: true when given a resolved Promise', async () => {
+        const result = await awaitX(Promise.resolve('hello'));
+        expect(result).toEqual({ success: true, data: 'hello' } as RunResult<string>);
     });
 
-    /** TC04: Promise reject with non-Error */
-    test('should return error result with reason when promise rejects with non-Error', async () => {
-        const rejectReason = 'string-reject-reason';
-        const promise = Promise.reject(rejectReason);
+    it('should resolve with success: false and an error when given a rejected Promise with Error', async () => {
+        const error = new Error('Test error');
+        const result = await awaitX(Promise.reject(error));
+        expect(result).toEqual({
+            success: false,
+            ex: error,
+            reason: 'Test error'
+        } as RunResult<never>);
+    });
 
-        const result = await awaitx(promise);
+    it('should resolve with success: false and string reason when given a rejected Promise with string', async () => {
+        const result = await awaitX(Promise.reject('Custom error message'));
+        expect(result).toEqual({
+            success: false,
+            ex: undefined,
+            reason: 'Custom error message'
+        } as RunResult<never>);
+    });
 
-        expect(result.success).toBe(false);
-        expect(result.ex).toBeUndefined();
-        expect(result.reason).toBe(getMessage(rejectReason)); // 应与 getMessage 返回一致
+    it('should resolve with success: false and JSON string when given a rejected Promise with object', async () => {
+        const errorObject = { code: 500, message: 'Internal Server Error' };
+        const result = await awaitX(Promise.reject(errorObject));
+        expect(result).toEqual({
+            success: false,
+            ex: undefined,
+            reason: '{"code":500,"message":"Internal Server Error"}'
+        } as RunResult<never>);
+    });
+
+    it('should handle rejection with number reason correctly', async () => {
+        const result = await awaitX(Promise.reject(404));
+        expect(result).toEqual({
+            success: false,
+            ex: undefined,
+            reason: '404'
+        } as RunResult<never>);
     });
 });

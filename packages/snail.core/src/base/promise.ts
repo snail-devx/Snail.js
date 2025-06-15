@@ -39,25 +39,23 @@ export function delay(timeout?: number): Promise<boolean> {
  * 等待Promise执行结果；
  * - 外部await此方法返回promise，不用进行try、catch异常处理
  * - 始终成功，不会发生异常；promise成功还是失败，都反映到了RunResult对象上了
- * @param promise 要等待的Promise对象
+ * @param obj 要等待的对象
  * @returns RunResult<T>执行结果Promise
  */
-export function awaitx<T>(promise: Promise<T>): Promise<RunResult<T>> {
-    if (isPromise(promise) == false) {
-        return Promise.resolve({ success: false, reason: "promise is not a Promise" });
-    }
-    //  等待promise执行完成
-    const deferred = defer<RunResult<T>>();
-    promise.then(
-        data => deferred.resolve({ success: true, data }),
-        reason => {
-            const runResult: RunResult<T> = {
-                success: false,
-                ex: reason instanceof Error ? reason : undefined,
-                reason: getMessage(reason),
-            }
-            deferred.resolve(runResult);
-        }
-    );
-    return deferred.promise;
+export function awaitX<T>(obj: Promise<T> | T): Promise<RunResult<T>> {
+    return isPromise(obj) == false
+        ? Promise.resolve({ success: true, data: obj as T })
+        : new Promise<RunResult<T>>((resolve, reject) => {
+            (obj as Promise<T>).then(
+                data => resolve({ success: true, data: data }),
+                reason => {
+                    const rt: RunResult<T> = {
+                        success: false,
+                        ex: reason instanceof Error ? reason : undefined,
+                        reason: getMessage(reason),
+                    };
+                    resolve(rt);
+                }
+            );
+        });
 }
