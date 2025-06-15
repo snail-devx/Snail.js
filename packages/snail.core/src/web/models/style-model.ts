@@ -1,20 +1,11 @@
+import { IScope } from "../../base/models/scope-model";
 import { IServerManager, ServerOptions } from "./server-model";
 import { IVersionManager } from "./version-model";
 
 /**
- * 接口：样式文件句柄
- */
-export interface IStyleHandle {
-    /**
-     * 销毁样式；将管理的样式全部移除掉
-     */
-    destroy(): void;
-}
-
-/**
  * 接口：样式管理器
  */
-export interface IStyleManager extends IStyleHandle {
+export interface IStyleManager extends IScope {
     /**
      * 注册样式文件
      * - 基于配置origin组装样式文件全路径；未配置origin则使用location.origin
@@ -22,7 +13,7 @@ export interface IStyleManager extends IStyleHandle {
      * @param files 样式文件；可通过theme指定样式，不指定则是公共样式
      * @returns 样式句柄，支持切换主题，销毁样式等操作
      */
-    register(...files: Array<StyleFile | string>): IStyleHandle;
+    register(...files: Array<StyleFile | string>): IScope;
     /**
      * 切换主题；自动将非当前主题的样式禁用掉(公共样式除外)
      * @param code 主题编码字符串

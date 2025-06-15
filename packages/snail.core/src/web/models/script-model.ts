@@ -1,25 +1,17 @@
+import { IScope } from "../../base/models/scope-model";
 import { IVersionManager } from "./version-model";
 
 /**
- * 接口：脚本句柄
- */
-export interface IScriptHandle {
-    /**
-     * 销毁脚本
-     */
-    destroy(): void;
-}
-/**
  * 接口：脚本管理器
  */
-export interface IScriptManager extends IScriptHandle {
+export interface IScriptManager extends IScope {
     /**
      * 注册脚本
      * - 重复注册同一脚本，报错
      * @param files 脚本文件数组
      * @returns 脚本句柄，支持对注册的脚本做销毁等操作
      */
-    register(...files: (string | ScriptFile)[]): IScriptHandle;
+    register(...files: (string | ScriptFile)[]): IScope;
     /**
      * 指定脚本是否已注册
      * @param id 脚本id；传入模块名（如：vue），或者脚本url地址（如：/xx/xhs/test.js）

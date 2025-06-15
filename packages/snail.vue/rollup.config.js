@@ -3,6 +3,7 @@ import { fileURLToPath } from "url";
 import minimist from "minimist";
 
 import { Builder } from "snail.rollup"
+import injectPlugin from "snail.rollup-inject";
 import scriptPlugin from "snail.rollup-script";
 import stylePlugin from "snail.rollup-style";
 import vuePlugin from "snail.rollup-vue"
@@ -26,7 +27,7 @@ const options = {
     siteRoot: resolve(outDir, "dist"),
     commonLib: [
         { id: 'vue', name: 'Vue', url: 'https://cdn.jsdelivr.net/npm/vue/vue.min.js' },
-        { id: "snail.core", name: "Snail", url: "https://unpkg.com/snail.core@1.1.5/dist/snail.core.js" }
+        { id: "snail.core", name: "snail", url: "https://unpkg.com/snail.core@1.1.5/dist/snail.core.js" }
     ]
 };
 /**
@@ -34,6 +35,7 @@ const options = {
  */
 const builder = Builder.getBuilder(options, (component, context, options) => {
     return [
+        injectPlugin(component, context, options),
         //  支持脚本、style、vue
         scriptPlugin(component, context, options),
         stylePlugin(component, context, options),
@@ -46,7 +48,7 @@ const builder = Builder.getBuilder(options, (component, context, options) => {
  */
 const components = [
     {
-        src: "snail.vue.ts", format: "iife", name: "SnailVue"
+        src: "snail.vue.ts", format: "amd", name: "SnailVue",
     }
 ];
 

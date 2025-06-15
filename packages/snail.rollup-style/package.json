@@ -22,7 +22,7 @@
     "postcss-nested": "^7.0.2",
     "postcss-url": "^10.1.3",
     "source-map": "^0.7.4",
-    "snail.core": ">=1.2.3",
+    "snail.core": ">=1.2.5",
     "snail.rollup": ">=1.2.2",
     "snail.rollup-asset": ">=1.2.1",
     "snail.rollup-inject": ">=1.2.1",

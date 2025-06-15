@@ -1,3 +1,5 @@
+import { IScope } from "./scope-model";
+
 /**
  * 钩子管理器配置选项
  */
@@ -37,13 +39,13 @@ export type HookOptions<HookCodes> = {
 /**
  * 钩子函数管理器
  */
-export interface IHookManager<HookCodes> {
+export interface IHookManager<HookCodes> extends IScope {
     /**
      * 注册钩子函数
      * @param code 钩子编码
      * @param fn 钩子处理函数
      */
-    register<T>(code: HookCodes, fn: (args?: any[]) => T): void;
+    register<T>(code: HookCodes, fn: (args?: any[]) => T): IScope;
 
     /**
      * 执行已注册的钩子函数
@@ -61,9 +63,4 @@ export interface IHookManager<HookCodes> {
      * @param args 运行时传递参数
      */
     runAsync<T>(code: HookCodes, ...args: []): Promise<T>;
-
-    /**
-     * 销毁管理器
-     */
-    destroy(): void;
 }

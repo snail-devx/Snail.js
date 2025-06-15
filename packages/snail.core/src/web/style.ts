@@ -1,6 +1,7 @@
 import { mustString, extract, isArrayNotEmpty, isObject, isStringNotEmpty, tidyString } from "../base/data";
 import { event } from "../base/event";
-import { IStyleHandle, IStyleManager, StyleElement, StyleFile, StyleOptions } from "./models/style-model";
+import { IScope } from "../base/models/scope-model";
+import { IStyleManager, StyleElement, StyleFile, StyleOptions } from "./models/style-model";
 import { version } from "./version";
 
 /** 把自己的类型共享出去 */
@@ -37,7 +38,7 @@ export namespace style {
          * @param files 样式文件；可通过theme指定样式，不指定则是公共样式
          * @returns 样式句柄，支持切换主题，销毁样式等操作
          */
-        function register(...files: Array<StyleFile | string>): IStyleHandle {
+        function register(...files: Array<StyleFile | string>): IScope {
             //  转换注入Element，需要注意元素的引用次数，若相同文件（文件相同、theme相同），重复注册，则增加引用次数
             const funcStyles: StyleElement[] = [];
             isArrayNotEmpty(files) && files.forEach((file: string | StyleFile) => {
@@ -169,7 +170,7 @@ export namespace style {
      * @param files 样式文件；可通过theme指定样式，不指定则是公共样式
      * @returns 样式句柄，支持切换主题，销毁样式等操作
      */
-    export function register(...files: Array<StyleFile | string>): IStyleHandle {
+    export function register(...files: Array<StyleFile | string>): IScope {
         return global.register(...files);
     }
     /**

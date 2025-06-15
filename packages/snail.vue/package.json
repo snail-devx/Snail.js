@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "vue": "^3.5.14",
-    "snail.core": ">=1.2.3"
+    "snail.core": ">=1.2.5"
   },
   "devDependencies": {
     "vue-tsc": "^2.2.10",

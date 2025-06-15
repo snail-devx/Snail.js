@@ -5,6 +5,9 @@
  */
 
 // ******************************      base      ******************************
+//  基础数据类型
+export * from "./base/models/scope-model"
+
 export * from "./base/data"
 export * from "./base/error"
 export * from "./base/event"

@@ -5,8 +5,9 @@ import { defer } from "../base/promise";
 import { url } from "./url";
 import { http } from "./http";
 import { version } from "./version";
-import { IScriptHandle, IScriptManager, ScriptFile, ScriptLoadOptions, ScriptOptions } from "./models/script-model";
+import { IScriptManager, ScriptFile, ScriptLoadOptions, ScriptOptions } from "./models/script-model";
 import { IHttpClient } from "./models/http-model";
+import { IScope } from "../base/models/scope-model";
 
 /** 把自己的类型共享出去 */
 export * from "./models/script-model"
@@ -45,7 +46,7 @@ export namespace script {
          * @param files 脚本文件数组
          * @returns 脚本句柄，支持对注册的脚本做销毁等操作
          */
-        function register(...files: (string | ScriptFile)[]): IScriptHandle {
+        function register(...files: (string | ScriptFile)[]): IScope {
             const sfs: Record<string, ScriptFile> = Object.create(null);
             const defaultOrign: string = options.origin || CONFIG.origin;
             isArrayNotEmpty(files) && files.forEach(file => {
@@ -225,7 +226,7 @@ export namespace script {
      * @param files 脚本文件数组
      * @returns 脚本句柄，支持对注册的脚本做销毁等操作
      */
-    export function register(...files: (string | ScriptFile)[]): IScriptHandle {
+    export function register(...files: (string | ScriptFile)[]): IScope {
         return global.register(...files);
     }
     /**
