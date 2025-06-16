@@ -14,7 +14,7 @@
     "types": "tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
   },
   "dependencies": {
-    "snail.core": ">=1.2.5"
+    "snail.core": ">=1.2.7"
   },
   "devDependencies": {
     "rollup": ">=4.39.0"

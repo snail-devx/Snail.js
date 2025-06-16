@@ -56,7 +56,9 @@ export function isObject(data: any): boolean {
  * @returns 是返回true；否则返回false
  */
 export function isFunction(data: any): boolean {
-    return getType(data) == "[object Function]";
+    //  支持异步方法
+    const type: string = getType(data);
+    return type == "[object Function]" || type == "[object AsyncFunction]";
 }
 
 /**
