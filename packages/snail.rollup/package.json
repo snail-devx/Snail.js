@@ -3,7 +3,7 @@
   "description": "基于Rollup封装的打包工具，基于项目化方式，管理文件依赖边界；脚本输出为独立组件，适合大型Library项目",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",

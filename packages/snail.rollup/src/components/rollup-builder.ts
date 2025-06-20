@@ -343,7 +343,7 @@ function checkComponent(components: ComponentOptions[], options: BuilderOptions)
         trace(`----check components[${index}]: ${component?.src}`);
         const errorMessage = `components[${index}] invalid`;
         mustObject(component, `${errorMessage}:`);
-        component = Object.assign({ format: "umd", exports: "named" }, component);
+        component = Object.assign({ format: "amd", exports: "named" }, component);
         //  src+root
         component.src = checkSrc(options, component.src, `${errorMessage}`);
         component.root = tidyString(component.root);
