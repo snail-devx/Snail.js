@@ -85,6 +85,7 @@ export namespace script {
         }
         /**
          * 加载指定脚本：获取脚本内容并执行，返回export对象信息
+         * - 若当前scope未注册此脚本，则尝试从全局的scipt执行加载
          * @param id 脚本id；传入模块名（如：vue），或者脚本url地址（如：/xx/xhs/test.js）
          * - id 支持锚点模式，逐级钻取export下的key信息，如 #components.dialog
          * - id 锚点支持批量，使用#号分隔，如 #components.dialog#components.follow#components.isFunction
