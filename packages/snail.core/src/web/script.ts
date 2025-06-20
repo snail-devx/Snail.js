@@ -270,8 +270,8 @@ export namespace script {
     function checkScriptOptions(options: Partial<ScriptOptions>): ScriptOptions {
         //  仅提取指定key数据，避免外部传入object无效key影响
         options = extract<ScriptOptions>(Object.keys(CONFIG), options);
-        //  清理空数据
-        options.origin = tidyString(options.origin);
+        //  清理无效数据：仅传入时才生效
+        hasOwnProperty(options, "origin") && (options.origin = tidyString(options.origin));
 
         return options as ScriptOptions;
     }

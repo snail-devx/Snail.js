@@ -21,6 +21,7 @@ describe("getType、isXX", () => {
         { src: () => { }, getType: "[object Function]", isFunction: true },
         { src: function () { }, getType: "[object Function]", isFunction: true },
         { src: new Function(), getType: "[object Function]", isFunction: true },
+        { src: async () => true, getType: "[object AsyncFunction]", isFunction: true },
         //  数组
         { src: [], getType: "[object Array]", isArray: true },
         { src: new Array(), getType: "[object Array]", isArray: true },

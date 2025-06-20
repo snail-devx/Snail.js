@@ -140,10 +140,10 @@ export namespace http {
     function checkHttpOptions(options: Partial<HttpOptions>): HttpOptions {
         //  仅提取指定key数据，避免外部传入object无效key影响
         options = extract<HttpOptions>(Object.keys(CONFIG), options);
-        //  清理空数据
-        options.origin = tidyString(options.origin);
-        options.contentType = tidyString(options.contentType);
-        options.accept = tidyString(options.accept);
+        //  清理无效数据：仅传入时才生效
+        hasOwnProperty(options, "origin") && (options.origin = tidyString(options.origin));
+        hasOwnProperty(options, "contentType") && (options.contentType = tidyString(options.contentType));
+        hasOwnProperty(options, "accept") && (options.accept = tidyString(options.accept));
 
         return options as HttpOptions;
     }

@@ -1,8 +1,9 @@
 import { assert, describe, expect, test, it, afterEach, vi, afterAll } from 'vitest'
 import { JSDOM } from "jsdom";
 import { style } from "../../src/web/style"
-import { StyleOptions, IStyleHandle, IStyleManager } from '../../src/web/models/style-model';
+import { StyleOptions, IStyleManager } from '../../src/web/models/style-model';
 import { version } from '../../src/web/version';
+import { IScope } from '../../src/base/models/scope-model';
 
 //@ts-ignore
 const window = global.window, document = global.document;
@@ -17,7 +18,7 @@ describe("style-base", () => {
     //  具体测试
     function tmpFunc(sm: IStyleManager, index: number) {
         //  基础测试
-        var sh1: IStyleHandle = sm.register(
+        var sh1: IScope = sm.register(
             { file: "/test.css", theme: undefined },
             "test1.css",
             { file: "/test2.css", theme: "Cx" },
@@ -142,12 +143,25 @@ describe("style-config", () => {
         expect((container1.children[1] as HTMLLinkElement).disabled).toStrictEqual(false);
     });
 
+    test("onRegister", () => {
+        const container1: HTMLDivElement = globalThis.document.createElement("div");
+        style.config({
+            container: container1,
+            onRegister(style) {
+                style.file == "file.css" && (style.file = "/xxxx/s/x/da.css");
+            },
+        });
+        globalThis.document.body.appendChild(container1);
+        style.register("file.css", { file: "http://file.css", theme: "CD" });
+        expect((container1.children[0] as HTMLLinkElement).href.startsWith("/xxxx/s/x/da.css?_snv=")).toStrictEqual(true);
+    });
+
 });
 //  隔离性不用测试了，内部代码和version等是一样的逻辑
 
 //  每次执行完后，重置全局配置
 afterEach(() => {
-    style.config({ theme: undefined, container: undefined, origin: undefined, version: undefined });
+    style.config({ theme: undefined, container: undefined, origin: undefined, version: undefined, onRegister: undefined });
     style.theme(new Date().toString());
 });
 //  还原状态

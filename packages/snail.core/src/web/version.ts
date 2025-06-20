@@ -148,10 +148,9 @@ export namespace version {
     function checkVersionOptions(options: Partial<VersionOptions>): VersionOptions {
         //  仅提取指定key数据，避免外部传入object无效key影响
         options = extract<VersionOptions>(Object.keys(CONFIG), options);
-        //  清理空数据
-        options.query = tidyString(options.query);
-        options.version = tidyString(options.version);
-
+        //  清理无效数据：仅传入时才生效
+        hasOwnProperty(options, "query") && (options.query = tidyString(options.query));
+        hasOwnProperty(options, "version") && (options.version = tidyString(options.version));
         return options as VersionOptions;
     }
     //#endregion

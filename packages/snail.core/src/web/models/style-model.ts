@@ -50,6 +50,14 @@ export type StyleOptions = {
      * - 用于注册style时，格式化样式文件url地址
      */
     version: IVersionManager;
+
+    /**
+     * 注册样式文件时执行此方法，外部干预样式文件信息
+     * - 外部可对样式文件信息做一些修改，从而实现拦截替换逻辑
+     * - 配合 IStyleManager.register 使用
+     * @param style 样式文件信息
+     */
+    onRegister(style: StyleFile): void;
 }
 
 /**

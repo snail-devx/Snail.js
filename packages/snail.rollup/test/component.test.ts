@@ -3,8 +3,8 @@ import { describe, expect, test } from 'vitest'
 import { Builder } from "../src/index";
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import { BuilderOptions, CommonLibOptions, IRollupBuilder } from '../src/models/builder';
-import { ComponentOptions } from '../src/models/component';
+import { BuilderOptions, CommonLibOptions, IRollupBuilder } from '../src/models/builder-model';
+import { ComponentOptions } from '../src/models/component-model';
 
 const { getBuilder, getDefaultOptions, getFileOptions } = Builder;
 

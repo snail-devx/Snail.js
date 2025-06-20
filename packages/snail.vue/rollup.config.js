@@ -3,10 +3,20 @@ import { fileURLToPath } from "url";
 import minimist from "minimist";
 
 import { Builder } from "snail.rollup"
-import injectPlugin from "snail.rollup-inject";
+import injectPlugin, { removeDynamicModule, registerDynamicModule } from "snail.rollup-inject";
 import scriptPlugin from "snail.rollup-script";
-import stylePlugin from "snail.rollup-style";
+import stylePlugin, { MODULE_INJECT_LINK } from "snail.rollup-style";
 import vuePlugin from "snail.rollup-vue"
+
+//  动态注入代码注册
+{
+    //      使用snail.core的style模块进行动态css注册，替还 snail.rollup-style默认的addLink方法
+    removeDynamicModule(MODULE_INJECT_LINK);
+    registerDynamicModule(MODULE_INJECT_LINK, `
+        import {style} from "snail.core";
+        export default href => style.register(href);
+    `);
+}
 
 /** 不使用如下方式获取dirName，会在末尾存在 "/"；但resolve等不会存在 "/"；会导致断言出问题
  * const __dirname = fileURLToPath(new URL('.', import.meta.url)); 
@@ -27,7 +37,7 @@ const options = {
     siteRoot: resolve(outDir, "dist"),
     commonLib: [
         { id: 'vue', name: 'Vue', url: 'https://cdn.jsdelivr.net/npm/vue/vue.min.js' },
-        { id: "snail.core", name: "snail", url: "https://unpkg.com/snail.core@1.1.5/dist/snail.core.js" }
+        { id: "snail.core", name: "Snail", url: "https://unpkg.com/snail.core@1.1.5/dist/snail.core.js" }
     ]
 };
 /**

@@ -1,4 +1,4 @@
-import { mustString, extract, isArrayNotEmpty, isObject, isStringNotEmpty, tidyString } from "../base/data";
+import { mustString, extract, isArrayNotEmpty, isObject, isStringNotEmpty, tidyString, hasOwnProperty, tidyFunction } from "../base/data";
 import { event } from "../base/event";
 import { IScope } from "../base/models/scope-model";
 import { IStyleManager, StyleElement, StyleFile, StyleOptions } from "./models/style-model";
@@ -12,7 +12,7 @@ export * from "./models/style-model"
  */
 export namespace style {
     /** 全局默认的版本配置 */
-    const CONFIG: StyleOptions = { theme: undefined, container: undefined, origin: undefined, version: undefined };
+    const CONFIG: StyleOptions = { theme: undefined, container: undefined, origin: undefined, version: undefined, onRegister: undefined };
     /** 事件：改变样式主题 */
     const EVENT_ChangeTheme = "Snail.Style.ChangeTheme";
     /** 全局样式管理 */
@@ -26,7 +26,7 @@ export namespace style {
      */
     export function newScope(options?: Partial<StyleOptions>): IStyleManager {
         /** 脚本配置选项 */
-        options = Object.freeze(checkStyoleOptions(options));
+        options = Object.freeze(checkStyleOptions(options));
         /** 当前样式主题 */
         var scopeTheme: string = undefined;
         /** 管理的样式文件 */
@@ -43,16 +43,22 @@ export namespace style {
             const funcStyles: StyleElement[] = [];
             isArrayNotEmpty(files) && files.forEach((file: string | StyleFile) => {
                 //  1、解析配置；生成文件地址：考虑服务器地址相关配置
-                let href: string = typeof (file) == "string" ? file : file.file;
+                const style: StyleFile = typeof (file) == "string" ? { file: file, theme: undefined } : file;
+                //      解析出href值：存在 onRegister 时需要外部干预
+                let href: string = style.file;
+                if (options.onRegister || CONFIG.onRegister) {
+                    (options.onRegister || CONFIG.onRegister)(style);
+                    href = style.file;
+                }
                 mustString(href, "href");
-                const theme: string = typeof (file) == "string" ? undefined : (file.theme || undefined);
+                //      基于origin组装样式文件全路径
                 let tmpStr: string = options.origin || CONFIG.origin;
                 isStringNotEmpty(tmpStr) && (href = new URL(href, tmpStr).toString());
                 //  2、基于file（不处理query和hash）+theme查重，若已经存在则不用新加入到syleFiles中，此时判断element是否有效
                 tmpStr = href.toLowerCase();
-                let styleEle: StyleElement = scopeStyles.find(s => s.theme == theme && s.file.toLowerCase() == tmpStr);
+                let styleEle: StyleElement = scopeStyles.find(s => s.theme == style.theme && s.file.toLowerCase() == tmpStr);
                 if (!styleEle) {
-                    styleEle = { file: href, theme, ref: 0 };
+                    styleEle = { file: href, theme: style.theme, ref: 0 };
                     scopeStyles.push(styleEle);
                 }
                 styleEle.ref += 1;
@@ -64,10 +70,9 @@ export namespace style {
                     styleEle.element.href = (options.version || CONFIG.version || version).formart(styleEle.file);
                     styleEle.element.rel = "stylesheet";
                     styleEle.element.disabled = true;
-                    theme && styleEle.element.setAttribute("data-theme", theme);
+                    style.theme && styleEle.element.setAttribute("data-theme", style.theme);
                     //  自己的Container-》global-》默认body下创建一个固定的
-                    let container: HTMLElement = options.container || CONFIG.container
-                        || document.getElementById("snail_style_container");
+                    let container: HTMLElement = options.container || CONFIG.container || document.getElementById("snail_style_container");
                     if (!container) {
                         container = document.createElement("div");
                         container.id = "snail_style_container"
@@ -159,7 +164,7 @@ export namespace style {
      * @param options 配置选项
      */
     export function config(options: Partial<StyleOptions>): IStyleManager {
-        options = checkStyoleOptions(options);
+        options = checkStyleOptions(options);
         Object.assign(CONFIG, options);
         return global;
     }
@@ -198,12 +203,13 @@ export namespace style {
      * @param options 
      * @returns
      */
-    function checkStyoleOptions(options: Partial<StyleOptions>): StyleOptions {
+    function checkStyleOptions(options: Partial<StyleOptions>): StyleOptions {
         //  仅提取指定key数据，避免外部传入object无效key影响
         options = extract<StyleOptions>(Object.keys(CONFIG), options);
-        //  清理空数据
-        options.theme = tidyString(options.theme);
-        options.origin = tidyString(options.origin);
+        //  清理无效数据：仅传入时才生效
+        hasOwnProperty(options, "theme") && (options.theme = tidyString(options.theme));
+        hasOwnProperty(options, "origin") && (options.origin = tidyString(options.origin));
+        hasOwnProperty(options, "onRegister") && (options.onRegister = tidyFunction(options.onRegister) as any);
 
         return options as StyleOptions;
     }
