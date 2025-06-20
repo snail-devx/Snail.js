@@ -27,7 +27,7 @@ export function getContext(component: ComponentOptions, options: BuilderOptions)
     /** 组件打包过程中分析出来的依赖资源；如图片，这些自动copy到输出目录 */
     const assets: AssetOptions[] = [];
     /** 组件打包过程中依赖的commonLib字典 */
-    const globals: Map<string, CommonLibOptions> = new Map();
+    const globals: Record<string, CommonLibOptions> = Object.create(null);
     /** 是否生产环境 */
     const isProduction = options.isProduction;
     /** 是否watch模式 */

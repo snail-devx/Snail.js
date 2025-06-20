@@ -107,8 +107,33 @@ export default [
 
 ## 3.2 代码测试
 
-1、默认使用根目录下的`vitest.config.js`配置；若涉及到项目独立配置时，再在`package`下自身目录下构建`vitest.conig.js`文件
+1、默认使用根目录下的 `vitest.config.js`配置；若涉及到项目独立配置时，再在 `package`下自身目录下构建 `vitest.conig.js`文件
 
-2、测试代码放到`package`下项目的 test 目录下，命名规范 `xxx.test.ts`
+2、测试代码放到 `package`下项目的 test 目录下，命名规范 `xxx.test.ts`
 
 ## 3.3 发布 NPM 包
+
+# 4.注意事项
+
+## 4.1 packages 打包时强制版本依赖
+
+- @rollup/plugin-typescript 12.1.2 ；12.1.3 版本在 resolve 时去掉了 filter 过滤
+
+  - 导致一些没有.d.ts 文件的 npm 包会被解析成实际的物理路径
+
+- ```javascript
+  // 12.1.2 import minimist from 'minimist';
+  if (resolved) {
+    if (/\.d\.[cm]?ts/.test(resolved.extension)) return null;
+    if (!filter(resolved.resolvedFileName)) return null;
+    return path.normalize(resolved.resolvedFileName);
+  }
+  ```
+
+  ```javascript
+  // 12.1.3  import minimist from 'E:\\00_Snail\\Snail.js\\node_modules\\.pnpm\\minimist@1.2.8\\node_modules\\minimist\\index.js';
+  if (resolved) {
+    if (/\.d\.[cm]?ts/.test(resolved.extension)) return null;
+    return path.normalize(resolved.resolvedFileName);
+  }
+  ```

@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "snail.core": ">=1.2.8",
-    "snail.rollup": ">=1.2.3",
+    "snail.rollup": ">=1.2.5",
     "snail.rollup-url": ">=1.2.1"
   }
 }

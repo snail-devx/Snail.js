@@ -189,7 +189,7 @@ export interface IComponentContext {
      * - key为模块id；value为对应的commonLib配置
      * - 配合rollup的globals属性使用，方便一键得到全局依赖
      */
-    globals: Map<string, CommonLibOptions>;
+    globals: Record<string, CommonLibOptions>;
     /** 
      * 是否watch模式
      */

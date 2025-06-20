@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "vue-tsc": "^2.2.10",
-    "snail.rollup": ">=1.2.3",
+    "snail.rollup": ">=1.2.5",
     "snail.rollup-asset": ">=1.2.1",
     "snail.rollup-html": ">=1.2.1",
     "snail.rollup-url": ">=1.2.1",
