@@ -35,7 +35,11 @@ export default function scriptPlugin(component: ComponentOptions, context: IComp
     function isCommonLib(module: ModuleOptions, ignoreCase: boolean): CommonLibOptions | undefined {
         const idKey = ignoreCase ? module.id.toLowerCase() : module.id;
         const lib = commonLib.find(lib => ignoreCase ? lib.id.toLowerCase() === idKey : lib.id === idKey);
-        return lib;
+        //  如果是被禁用的commonLib，则仍然忽略掉
+        const isDisable = lib && component.disableCommonLib.includes(idKey)
+            ? component.disableCommonLib.includes(lib.id)
+            : false;
+        return isDisable ? undefined : lib;
     }
 
     //  rollup插件

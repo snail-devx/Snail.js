@@ -10,8 +10,6 @@
  *      2、postcss自身不支持less相关语法，需要进行编译前处理
  */
 
-import Less from "less"
-
 import { dirname, extname } from "path";
 import { existsSync } from "fs";
 import pc from "picocolors";
@@ -183,7 +181,7 @@ export function getStyleProcessor(component: ComponentOptions, context: ICompone
         const preResult: StylePreprocessorResults = processors[extName](style, map, {
             filename: from,
             map,
-            ...{ bpOptions },
+            ...bpOptions,
             //  less分析@import需要，否则会报错
             paths: [dirname(from)],
         });
@@ -221,6 +219,7 @@ export function getStyleProcessor(component: ComponentOptions, context: ICompone
             case "less": {
                 const lessOptions: Less.Options = {
                     syncImport: true,
+
                     /* 重写url地址，避免后续分析url地址不正确 */
                     //@ts-ignore 传递给less内部使用，在Less.Options不存在这些属性
                     rewriteUrls: true,

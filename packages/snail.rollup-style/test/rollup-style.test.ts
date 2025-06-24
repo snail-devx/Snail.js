@@ -4,14 +4,13 @@ import { dirname, resolve } from 'path';
 import { OutputOptions, rollup, RollupOptions } from "rollup";
 import { existsSync, readFileSync, rmSync } from 'fs';
 //  snail.rollup 采用源码引用方式，方便错误调试；整体测试完成后，再换成包形式
-import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../../snail.rollup/src/index"
-import { Builder } from "../../snail.rollup/src/index";
+// import { BuilderOptions, CommonLibOptions, IRollupBuilder } from "../../snail.rollup/src/index"
 
 import stylePlugin, { buildAddLinkCode } from "../src/index"
-import { buildDist, buildNetPath, forceExt } from '../../snail.rollup/src/utils/helper';
 import { version } from 'snail.core';
 import assetPlugin from "../../snail.rollup-asset/src/index";
 import urlPlugin from "../../snail.rollup-url/src/index";
+import { BuilderOptions, Builder } from 'snail.rollup';
 
 //#region 测试前的准备工作
 const options: BuilderOptions = {
@@ -37,10 +36,10 @@ let ruleMessage: string;
 }
 beforeEach(() => {
     ruleMessage = "";
-    existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
+    // existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
 afterEach(() => {
-    existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
+    // existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
 //#endregion
 
@@ -73,11 +72,12 @@ test("default", async () => {
     let styleDist = resolve(options.distRoot!, "./core/styles/c1.css");
     expect(existsSync(styleDist)).toStrictEqual(true);
     content = readFileSync(styleDist, "utf-8").split("\n");
-    expect(content.length).toStrictEqual(10);
-    expect(content[0]).toStrictEqual("body {")
-    expect(content[3]).toStrictEqual("body #id {")
-    expect(content[4]).toContain("  background-image: url(/core/images/asset.png?_snv");
-    expect(content[7]).toContain("background-image: url(/asset.png?_snv=");
+    expect(content.length).toStrictEqual(16);
+    expect(content[0].trim()).toStrictEqual("body {")
+    expect(content[3].trim()).toStrictEqual("body #id {")
+    expect(content[6]).toStrictEqual("#x {")
+    expect(content[7]).toContain("  background-image: url(/asset.png?_snv=");
+    expect(content[10]).toContain(' background-image: url("/core/images/asset2.png?_snv');
     styleDist = resolve(options.distRoot!, "./core/styles/c2.css");
     expect(existsSync(styleDist)).toStrictEqual(true);
     content = readFileSync(styleDist, "utf-8").split("\n");

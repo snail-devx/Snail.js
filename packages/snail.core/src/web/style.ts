@@ -12,11 +12,17 @@ export * from "./models/style-model"
  */
 export namespace style {
     /** 全局默认的版本配置 */
-    const CONFIG: StyleOptions = { theme: undefined, container: undefined, origin: undefined, version: undefined, onRegister: undefined };
+    const CONFIG: StyleOptions = { theme: undefined, container: undefined, origin: undefined, version: undefined };
     /** 事件：改变样式主题 */
     const EVENT_ChangeTheme = "Snail.Style.ChangeTheme";
     /** 全局样式管理 */
     const global: IStyleManager = newScope();
+    /** 全局的样式映射表
+     * - 将指定的样式文件映射为新的样式文件
+     * - key为源样式文件地址，value为新的样式文件地址
+     * - 注意：key区分大小写，外部使用时做好控制
+     */
+    export const styleMap: Map<string, string> = new Map();
 
     //#region ************************************* 公共方法、变量*************************************
     /**
@@ -44,12 +50,10 @@ export namespace style {
             isArrayNotEmpty(files) && files.forEach((file: string | StyleFile) => {
                 //  1、解析配置；生成文件地址：考虑服务器地址相关配置
                 const style: StyleFile = typeof (file) == "string" ? { file: file, theme: undefined } : file;
-                //      解析出href值：存在 onRegister 时需要外部干预
-                let href: string = style.file;
-                if (options.onRegister || CONFIG.onRegister) {
-                    (options.onRegister || CONFIG.onRegister)(style);
-                    href = style.file;
-                }
+                //      解析出href值：进行map映射管理
+                let href: string = styleMap.get(style.file);
+                href && console.log(`map to new style file. style: ${style.file}, new style: ${href}`);
+                href = href || style.file;
                 mustString(href, "href");
                 //      基于origin组装样式文件全路径
                 let tmpStr: string = options.origin || CONFIG.origin;
@@ -209,7 +213,6 @@ export namespace style {
         //  清理无效数据：仅传入时才生效
         hasOwnProperty(options, "theme") && (options.theme = tidyString(options.theme));
         hasOwnProperty(options, "origin") && (options.origin = tidyString(options.origin));
-        hasOwnProperty(options, "onRegister") && (options.onRegister = tidyFunction(options.onRegister) as any);
 
         return options as StyleOptions;
     }

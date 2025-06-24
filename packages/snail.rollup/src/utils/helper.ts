@@ -1,5 +1,5 @@
 import { existsSync, mkdir, mkdirSync, statSync } from "fs";
-import { dirname, extname, relative, resolve } from "path";
+import path, { dirname, extname, relative, resolve } from "path";
 import { fileURLToPath } from "url";
 import { mustString, hasOwnProperty, throwIfFalse, tidyString, url } from "snail.core"
 import pc from "picocolors";
@@ -165,6 +165,7 @@ export function forceExt(file: string, extName: string): string {
  * @returns 输出路径
  */
 export function buildDist(options: BuilderOptions, src: string): string {
+    path.isAbsolute(src) || (src = resolve(options.srcRoot, src));
     src = relative(options.srcRoot, src);
     return resolve(options.distRoot, src);
 }
