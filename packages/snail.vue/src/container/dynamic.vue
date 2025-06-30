@@ -22,7 +22,7 @@
 import { Component, onActivated, onDeactivated, onErrorCaptured, ref, shallowRef, watch } from "vue";
 import { delay, getMessage, isObject, isStringNotEmpty, RunResult, script, throwError, throwIfNullOrUndefined, tidyString } from "snail.core";
 import SnailLoading from "../prompt/loading.vue"
-import { ComponentOptions } from "./models/dynamic-model";
+import { ComponentOptions } from "./models/component-model";
 
 // 👉 组件定义
 //  1、props、data

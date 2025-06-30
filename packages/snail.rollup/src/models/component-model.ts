@@ -176,13 +176,16 @@ export type AssetOptions = {
  */
 export type ViewOptions = AssetOptions & {
     /**
+     * 
      * 句柄：用于外部再次处理视图html文件内容
-     * @param options 打包全局配置
      * @param src 视图源文件地址
      * @param content 视图html文件内容
+     * @param component 视图所属组件对象
+     * @param options 打包全局配置
+     * @param context 组件上下文
      * @returns 处理完的html文件内容
      */
-    handle?: (options: BuilderOptions, src: string, content: string) => string;
+    handle?: (src: string, content: string, component: ComponentOptions, options: BuilderOptions, context: IComponentContext) => string;
 }
 
 /**
