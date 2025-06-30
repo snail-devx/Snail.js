@@ -3,7 +3,7 @@
 //      类型导出
 //      组件导出
 
-import { IScope, isFunction, mustObject } from "snail.core";
+import { IScope, isFunction, mustObject, throwError } from "snail.core";
 
 //      方法导出
 export * from "./base/utils/app-util";
@@ -48,8 +48,15 @@ import { default as SnailDynamic } from "./container/dynamic.vue";
  */
 export function mount(options: ComponentMountOptions, onDestroyed?: (fn: () => void) => void): IScope {
     mustObject(options, "options");
-    mustObject(options.target, "options.target");
-    const app = createApp(SnailDynamic, options.props);
+    (options.target instanceof HTMLElement) || throwError("options.target must be a HTMLElement");
+    const app = createApp(SnailDynamic, {
+        //  挂载组件的具体信息
+        name: options.name,
+        compponent: options.component,
+        url: options.url,
+        //  解构会导致响应式断裂，但这里本来就是给其他环境挂载Vue3环境组件使用，这里暂时可以不用管
+        ...(options.props || {})
+    });
     app.mount(options.target);
     /** 销毁App；取消挂载 */
     function destroy() {
