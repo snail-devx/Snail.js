@@ -18,12 +18,12 @@ export type ComponentOptions = {
      * 【必填】组件打包文件格式
      * - 默认amd模式
      */
-    format?: "amd" | "cjs" | "es" | "iife" | "system" | "umd";
+    format?: ComponentFormatOptions;
     /**
      * 组件打包时的全局变量名
      * - 可通过此名访问组件提供的方法属性等
      * - 仅在打包支持script标签挂载方式时生效，且format为iife/umd
-     * - 组件isCommonLib为true时，强制必须有值
+     * - 若isCommonLib为true时，推荐name设置值，否则入口组件为umd、iife打包格式时会报错
      */
     name?: string;
 
@@ -55,6 +55,12 @@ export type ComponentOptions = {
      * - rollup打包时，会将所有可用的commonLib合并到此属性上。顺序：组件commonLib、全局commonLib
      */
     commonLib?: Array<CommonLibOptions>;
+    /**
+     * 禁用的通用js库
+     * - 传入js库id值；为npm包时传入npm包名，src文件时传入文件绝对路径
+     * - 在此列表中的js公共库，会被禁用，并将其代码合并到组件中
+     */
+    disableCommonLib?: string[];
     /**
      * 组件使用通用js库时强制url地址
      * - rollup打包时，会分析公共库js，重新生成相对于当前组件js的路径
@@ -118,9 +124,11 @@ export type ComponentOptions = {
      * js组件初始化方法
      * - 在rollupbuilder环境初始化加载完成后，调用此方法，完成js组件自身的一些环境依赖信息初始化
      * - 调用前component数据已检测好、并做了默认值构建，请谨慎修改组件值，避免影响功能
+     * @param component 组件对象
      * @param options 构建器全局配置
+     * @param context 组件上下文对象
      */
-    init?: (component: ComponentOptions, options: BuilderOptions) => void;
+    init?: (component: ComponentOptions, options: BuilderOptions, context: IComponentContext) => void;
 
     /**
      * 【忽略】js组件输出路径
@@ -136,6 +144,10 @@ export type ComponentOptions = {
     url?: string;
 }
 /**
+ * 组件打包格式选项
+ */
+export type ComponentFormatOptions = "amd" | "cjs" | "es" | "iife" | "system" | "umd";
+/**
  * 资源配置选项
  */
 export type AssetOptions = {
@@ -149,7 +161,7 @@ export type AssetOptions = {
      * 【选填】资源输出路径；
      * - 无特殊传null即可，内部自动基于src和组件src分析映射
      * - 取值约束：绝对地址，或者相对distRoot的路径；需要在siteRoot目录下
-     * - 填写固定值"\_SITEROOT_"；表示输出到站点根路径下，如做站点首页使用的html文件
+     * - 填写固定值"_SITEROOT_"；表示输出到站点根路径下，如做站点首页使用的html文件
      */
     dist: string;
 
@@ -164,13 +176,16 @@ export type AssetOptions = {
  */
 export type ViewOptions = AssetOptions & {
     /**
+     * 
      * 句柄：用于外部再次处理视图html文件内容
-     * @param options 打包全局配置
      * @param src 视图源文件地址
      * @param content 视图html文件内容
+     * @param component 视图所属组件对象
+     * @param options 打包全局配置
+     * @param context 组件上下文
      * @returns 处理完的html文件内容
      */
-    handle?: (options: BuilderOptions, src: string, content: string) => string;
+    handle?: (src: string, content: string, component: ComponentOptions, options: BuilderOptions, context: IComponentContext) => string;
 }
 
 /**

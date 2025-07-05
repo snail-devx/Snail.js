@@ -8,7 +8,7 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 /**
  * @type {import("rollup").RollupOptions[]}
  */
-export default dealRollupDefault(
+const rollupOptions = dealRollupDefault(
     [
         {
             input: "src/index.ts",
@@ -20,3 +20,5 @@ export default dealRollupDefault(
     __dirname,
     { supportTS: true, needBabel: false, needExternal: true, ignoreWarning: true, }
 );
+
+export default rollupOptions;

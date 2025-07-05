@@ -19,4 +19,4 @@ export { Builder } from "./components/rollup-builder";
 export { AssetManager } from "./components/asset-manager";
 
 //  助手类中部分常量、方法共享
-export { FLAG } from "./utils/helper"
+export { FLAG, buildDist, buildNetPath, forceExt } from "./utils/helper"

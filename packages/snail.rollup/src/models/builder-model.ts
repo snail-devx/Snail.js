@@ -67,18 +67,20 @@ export type CommonLibOptions = {
      */
     id: string;
     /**
-     * 【必填】类库全局变量名
+     * 类库全局变量名
      * - import此类库时的别名；打包时自动分析替换成此名称
      * -  - 如vue可换成Vue2，SVue等等
      * - 仅umd、iife等生效，es等情况无效下无效
+     * - 组件为umd、iife打包时必填，否则报错
      */
-    name: string;
+    name?: string;
     /**
-     * 【必填】类库文件URL地址
+     * 类库文件URL地址
      * - 用于和html做绑定使用
      * - 若组件强制公共库使用url地址，则打包生成的js库依赖，也会使用此url地址
+     * - 若无值，则使用id值
      */
-    url: string;
+    url?: string;
 }
 
 /**

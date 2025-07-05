@@ -119,8 +119,9 @@ export class Builder implements IRollupBuilder {
         //  构建rollup配置选项：为每个组件生成自己的上下文
         return components.map(component => {
             component.commonLib = [].concat(component.commonLib, commonLib);
-            component = Object.freeze(component);
             const context: IComponentContext = getContext(component, this.options);
+            isFunction(component.init) && component.init.call(component, component, this.options, context);
+            component = Object.freeze(component);
             const plugins: InputPluginOption[] = [
                 startPointPlugin(component, context, this.options),
                 ...this.plugin.call(component, component, context, this.options) || [],
@@ -268,14 +269,16 @@ function checkCommonLib(libs: CommonLibOptions[], title: string): CommonLibOptio
         mustString(lib.id, `${errorMessage}: id`);
         idMap.has(lib.id) && throwError(`${errorMessage}: id is duplicated. id:${lib.id}.`);
         idMap.set(lib.id, true);
-        //  name必填
+        //  name选填：后期构建时再做umd和amd时再强制必填
         lib.name = tidyString(lib.name);
-        mustString(lib.name, `${errorMessage}: name`);
-        //  url必填，优先考虑验证必须是网络绝对路径，或者http等协议路径
+        // mustString(lib.name, `${errorMessage}: name`);
+        //  url必填，优先考虑验证必须是网络绝对路径，或者http等协议路径；无值时则使用id赋默认值
         lib.url = tidyString(lib.url);
-        mustString(lib.url, `${errorMessage}: url`);
-        lib.url = url.format(lib.url);
-        isNetPath(lib.url) || throwError(`${errorMessage}: url must be a valid url. url:${lib.url}.`);
+        if (lib.url) {
+            lib.url = url.format(lib.url);
+            isNetPath(lib.url) || throwError(`${errorMessage}: url must be a valid url. url:${lib.url}.`);
+        }
+        lib.url ??= lib.id;
     });
     return libs;
 }
@@ -307,13 +310,21 @@ async function loadProjectDeps(project: string, deps: string[], options: Builder
         depFile = resolve(project, "..", depFile);
         trace(`--load dependency projects[${index}]: ${depFile}`);
         const depsProj: ProjectOptions = await importProject(depFile);
-        depsProj.components = isArrayNotEmpty(depsProj.components)
+        const components: ComponentOptions[] = isArrayNotEmpty(depsProj.components)
             ? checkComponent(depsProj.components, options)
             : [];
-        depsProj.components.forEach(component => {
+        components.forEach(component => {
             const lib = convertToCommonLib(component, options);
             lib && commonLib.push(lib);
         });
+
+        // depsProj.components = isArrayNotEmpty(depsProj.components)
+        //     ? checkComponent(depsProj.components, options)
+        //     : [];
+        // depsProj.components.forEach(component => {
+        //     const lib = convertToCommonLib(component, options);
+        //     lib && commonLib.push(lib);
+        // });
     }
     return commonLib;
 }
@@ -354,11 +365,6 @@ function checkComponent(components: ComponentOptions[], options: BuilderOptions)
             isChild(options.srcRoot, component.root),
             `${errorMessage}: root must be child of srcRoot. srcRoot:${options.srcRoot}, root:${component.root}.`
         );
-        //  dist+url
-        if (component.dist) {
-            debugger;
-            warn(`------components[${index}].url no need assign. url:${component.url}`);
-        }
         component.dist = buildDist(options, component.src);
         component.dist = forceExt(component.dist, ".js");
         component.url = buildNetPath(options, component.dist);
@@ -372,12 +378,13 @@ function checkComponent(components: ComponentOptions[], options: BuilderOptions)
             formats.indexOf(component.format) == -1,
             `${errorMessage}: format must be one of ${formats.join(",")}.`
         );
-        //      name、extend、exports验证：name有值时，若extend无效，则强制默认true
+        //      name：不强制验证必填
         component.name = tidyString(component.name);
-        throwIfTrue(
-            component.isCommonLib == true && component.name == undefined,
-            `${errorMessage}: name must be a non-empty string when component.isCommonLib is true.`
-        );
+        // throwIfTrue(
+        //     component.isCommonLib == true && component.name == undefined,
+        //     `${errorMessage}: name must be a non-empty string when component.isCommonLib is true.`
+        // );
+        //      extend、exports验证：name有值时，若extend无效，则强制默认true
         component.extend = component.name != undefined && isBoolean(component.extend) == false
             ? true
             : component.extend;
@@ -389,12 +396,11 @@ function checkComponent(components: ComponentOptions[], options: BuilderOptions)
         //  组件views、asserts、commonLib处理
         traceIfAny(component.commonLib, `------check component.commonLib`);
         component.commonLib = checkCommonLib(component.commonLib, `components[${index}].commonLib`);
+        component.disableCommonLib = isArrayNotEmpty(component.disableCommonLib) ? component.disableCommonLib : [];
         traceIfAny(component.assets, `------check component.assets`);
         component.assets = checkAssets(component.assets, `components[${index}].assets`, options);
         traceIfAny(component.views, `------check component.views`);
         component.views = checkAssets(component.views, `components[${index}].views`, options);
-        //  执行初始化方法
-        isFunction(component.init) && component.init.call(component, component, options);
 
         return component;
     });
