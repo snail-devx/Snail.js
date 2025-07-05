@@ -3,6 +3,7 @@ import { isFunction, isNullOrUndefined, isObject, isPromise, isRegexp, isStringN
 import { throwIfTrue, throwIfUndefined } from "../base/error";
 import { defer } from "../base/promise";
 import { HttpOptions, HttpInterceptor, IHttpClient, HttpRequest, HttpResponse, HttpError } from "./models/http-model";
+import { server, ServerOptions } from "./server";
 
 /** 把自己的类型共享出去 */
 export * from "./models/http-model"
@@ -54,6 +55,7 @@ export namespace http {
                     : (item.match.lastIndex = 0, item.match.test(request.url))
                 );
             //  1、执行HTTP请求：运行请求拦截器，若拦截成功则不用执行实际的http请求了
+            request.origin = tidyString(request.origin) || options.origin || CONFIG.origin;
             let requestPromise: Promise<HttpResponse<T>> = undefined;
             for (var interceptor of interceptors) {
                 requestPromise = runRequestInterceptor(request, interceptor);
@@ -66,7 +68,6 @@ export namespace http {
                     "accept": options.accept || CONFIG.accept || "application/json, text/plain, */*",
                     "content-type": options.contentType || CONFIG.contentType || "application/json",
                 }
-                request.origin = tidyString(request.origin) || options.origin || CONFIG.origin;
                 requestPromise = runHttpRequest(request, defaultHeaders);
             }
             //  2、分析结果返回；然后分发执行resolve和reject
@@ -105,6 +106,16 @@ export namespace http {
         //  返回构建对象
         const hc: IHttpClient = Object.freeze({ intercept, send, get, post });
         return hc;
+    }
+    /**
+     * 基于服务器配置创建HTTP请求客户端
+     * @param code 服务器编码
+     * @param type 服务器类型
+     * @returns HTTP客户端实例
+     */
+    export function createByServer(code: string, type: keyof ServerOptions = "api"): IHttpClient {
+        const origin = (server.get(code) || {})[type];
+        return create({ origin: origin });
     }
     /**
      * HTTP全局配置

@@ -147,10 +147,8 @@ describe("style-config", () => {
         const container1: HTMLDivElement = globalThis.document.createElement("div");
         style.config({
             container: container1,
-            onRegister(style) {
-                style.file == "file.css" && (style.file = "/xxxx/s/x/da.css");
-            },
         });
+        style.styleMap.set("file.css", "/xxxx/s/x/da.css");
         globalThis.document.body.appendChild(container1);
         style.register("file.css", { file: "http://file.css", theme: "CD" });
         expect((container1.children[0] as HTMLLinkElement).href.startsWith("/xxxx/s/x/da.css?_snv=")).toStrictEqual(true);
@@ -161,7 +159,7 @@ describe("style-config", () => {
 
 //  每次执行完后，重置全局配置
 afterEach(() => {
-    style.config({ theme: undefined, container: undefined, origin: undefined, version: undefined, onRegister: undefined });
+    style.config({ theme: undefined, container: undefined, origin: undefined, version: undefined });
     style.theme(new Date().toString());
 });
 //  还原状态
