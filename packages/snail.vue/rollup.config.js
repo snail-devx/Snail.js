@@ -14,7 +14,7 @@ import vuePlugin from "snail.rollup-vue"
     removeDynamicModule(MODULE_INJECT_LINK);
     registerDynamicModule(MODULE_INJECT_LINK, `
         import {style} from "snail.core";
-        export default href => style.register(href);
+        export default href => setTimeout(style.register, 0, href);
     `);
 }
 
@@ -58,7 +58,7 @@ const builder = Builder.getBuilder(options, (component, context, options) => {
  */
 const components = [
     {
-        src: "snail.vue.ts", format: "amd", name: "SnailVue",
+        src: "snail.vue.ts", format: "es", name: "SnailVue",
     }
 ];
 
@@ -66,4 +66,13 @@ const components = [
  * @type {import("rollup").RollupOptions[]}
  */
 const rollupOptions = await builder.build(components);
+//  构建一个umd格式的组件出来
+const umdOptions = Object.assign({}, rollupOptions[0]);
+umdOptions.output = Object.assign({}, umdOptions.output, {
+    format: "umd",
+    // @ts-ignore
+    file: resolve(umdOptions.output.file, "../snail.vue.umd.js")
+});
+rollupOptions.push(umdOptions);
+
 export default rollupOptions;

@@ -22,3 +22,20 @@ export type ComponentOptions = {
      */
     url?: string;
 }
+
+/**
+ * 
+ */
+export type ComponentMountOptions = ComponentOptions & {
+    /**
+     * 挂载到哪个dom元素下
+     */
+    target: Element,
+
+    /**
+     * 传递给组件的属性值，执行v-bind绑定到要显示的组件
+     * - key为属性名称，遵循vue解析规则
+     * - 若为事件监听，则使用onXXX
+     */
+    props?: Record<string, any>;
+};

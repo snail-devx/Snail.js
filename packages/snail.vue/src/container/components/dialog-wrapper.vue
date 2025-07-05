@@ -7,7 +7,7 @@
         <div v-for="(dialog, $index) in descriptors" :key="dialog.id" class="snail-dialog"
             :class="dialog.options.rootClass" v-bind:class="{ 'unactive': descriptors.length - 1 !== $index }"
             :style="'z-index:' + dialog.options.zIndex" @click.self="onMaskClick(dialog)">
-            <SnailDynamic class="dialog-body" :name="dialog.options.name" :component="dialog.options.component"
+            <Dynamic class="dialog-body" :name="dialog.options.name" :component="dialog.options.component"
                 :url="dialog.options.url" :class="dialog.options.class" :style="dialog.options.style"
                 v-bind="dialog.options.props" :="dialog.handle" />
         </div>
@@ -17,9 +17,9 @@
 <script setup lang="ts">
 import { PropType } from "vue";
 import { Dialog } from "../models/dialog-model";
-import SnailDynamic from "../dynamic.vue";
+import Dynamic from "../dynamic.vue";
 
-// 👉 组件定义
+// *****************************************   👉  组件定义    *****************************************
 //  1、props、data、event
 const { descriptors } = defineProps({
     /** 弹窗描述器 */
@@ -29,9 +29,9 @@ const { descriptors } = defineProps({
     },
 });
 //  2、可选配置选项
-defineOptions({ name: "SnailDialogWrapper", inheritAttrs: true, });
+defineOptions({ name: "DialogWrapper", inheritAttrs: true, });
 
-// 👉 方法+事件
+// *****************************************   👉  方法+事件    ****************************************
 /**
  * 遮罩层点击时：判断是否是最新的弹窗，判断是否需要进行esc关闭事件处理
  * @param dialog 
@@ -41,7 +41,7 @@ function onMaskClick(dialog: Dialog): void {
     last === dialog && dialog.options.closeOnMask && dialog.handle.closeDialog(dialog);
 }
 
-// 👉 组件渲染
+// *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //      全局监听key事件：取到最新的弹窗，判断是否需要进行esc关闭事件处理
 addEventListener("keyup", event => {

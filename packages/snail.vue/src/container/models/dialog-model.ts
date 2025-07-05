@@ -1,5 +1,5 @@
 import { AsyncResult, IScope } from "snail.core";
-import { ComponentOptions } from "./dynamic-model"
+import { ComponentMountOptions, ComponentOptions } from "./component-model"
 import { PropType } from "vue";
 
 /**
@@ -14,17 +14,6 @@ export type DialogOptions = ComponentOptions & {
     props?: Record<string, any>;
 
     /**
-     * 按下esc健时是否关闭弹窗
-     * - 默认值：false
-     */
-    closeOnEscape?: boolean;
-    /**
-     * 点击遮罩层时是否关闭弹窗
-     * - 默认值：false
-     */
-    closeOnMask?: boolean;
-
-    /**
      * 自定义class
      * - 绑定模块弹窗显示的组件根元素上
      */
@@ -34,6 +23,17 @@ export type DialogOptions = ComponentOptions & {
      * - 绑定模块弹窗显示的组件根元素上
      */
     style?: string | string[];
+
+    /**
+     * 按下esc健时是否关闭弹窗
+     * - 默认值：false
+     */
+    closeOnEscape?: boolean;
+    /**
+     * 点击遮罩层时是否关闭弹窗
+     * - 默认值：false
+     */
+    closeOnMask?: boolean;
     /**
      * 弹窗的z-index值
      * - 无特殊情况，建议不粗韩，内部会自动生成，确保弹窗正确性
