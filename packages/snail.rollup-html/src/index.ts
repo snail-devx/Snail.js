@@ -56,7 +56,7 @@ export default function htmlPlugin(component: ComponentOptions, context: ICompon
                     .replace(/\$\{InjectScript\}/i, injectScript)
                     .replace(/\$\{InjectScript\}/gi, "");
                 //  交给外部句柄做自定义处理
-                isFunction(view.handle) && (content = view.handle(options, view.src, content));
+                isFunction(view.handle) && (content = view.handle(view.src, content, component, options, context));
                 //  直接使用writeFile写文件数据，不使用 emitFile。
                 const msg = `\t${relative(options.srcRoot, view.src)}    \t---->    ${relative(options.distRoot, view.dist)}`;
                 console.log(pc.gray(msg));
