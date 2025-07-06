@@ -21,3 +21,12 @@ const rowStyle = computed<Record<string, any>>(() => {
 //  2、可选配置选项
 defineOptions({ name: "TableRow", inheritAttrs: true, });
 </script>
+
+<style lang="less">
+//  行 默认填充满、内部元素垂直居中
+.table-row {
+    min-width: 100%;
+    display: flex;
+    align-items: center;
+}
+</style>

@@ -15,8 +15,6 @@ import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
 import Button from "./button.vue";
 import { FooterOptions, FooterEvents } from "./models/footer-model"
 
-
-
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<FooterOptions>();
@@ -27,6 +25,7 @@ defineOptions({ name: "Footer", inheritAttrs: true, });
 
 <style lang="less">
 .snail-footer {
+    flex-shrink: 0;
     background-color: white;
     width: 100%;
     height: 72px;

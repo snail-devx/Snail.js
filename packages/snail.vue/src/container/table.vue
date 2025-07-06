@@ -21,7 +21,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated, computed } from "vue";
 import Scroll from "./scroll.vue"
 import { TableOptions, TableStyleOptions } from "./models/table-model";
 
@@ -50,16 +49,13 @@ function getStyle(styleOptions: TableStyleOptions): Record<string, any> {
     display: flex;
     flex-direction: column;
 
-    //  表头区域、底部区域：不缩放；宽度100%，内部居中对齐，
     >header.table-header,
-    >header.table-footer {
-        display: flex;
-        align-items: center;
+    >header.table-footer,
+    >main.table-body {
         width: 100%;
-        flex-shrink: 0;
     }
 
-    //  表格钉住位置
+    //  表头钉住位置
     >header.table-header {
         position: sticky !important;
         top: 0;
@@ -68,21 +64,15 @@ function getStyle(styleOptions: TableStyleOptions): Record<string, any> {
     // 实际内容区域
     >main.table-body {
         flex: 1;
-        width: 100%;
-
-        >.table-row {
-            display: flex;
-            align-items: center;
-        }
     }
 
-    //  行列信息，将TablCol和TableRow中的样式合并到这里来
-    >header.table-header>.table-col,
-    >main.table-body>.table-row>.table-col {
-        display: inline-flex;
-        height: 100%;
+
+    //  表头区域、底部区域：不缩放；内部居中对齐，
+    >header.table-header,
+    >header.table-footer {
+        display: flex;
         align-items: center;
-        white-space: nowrap;
+        flex-shrink: 0;
     }
 }
 
@@ -97,7 +87,6 @@ function getStyle(styleOptions: TableStyleOptions): Record<string, any> {
         >.table-col:nth-child(n + 2) {
             border-left: none !important;
         }
-
     }
 
     //  内容区域行下的列，取消上边框

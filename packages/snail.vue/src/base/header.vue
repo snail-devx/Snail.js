@@ -4,14 +4,14 @@
     3、支持外部传入 插槽
 -->
 <template>
-    <div class="snail-header" :class="useTo" v-bind:class="{ 'start-divider': divider }">
+    <header class="snail-header" :class="useTo" v-bind:class="{ 'start-divider': divider }">
         <!-- 标题区域 -->
         <div v-if="title != ''" v-text="title" class="header-title" :class="titleAlign" />
         <!-- 插槽区域，自定义内容 -->
         <slot class="header-slot" />
         <!-- 关闭按钮区域 -->
         <Icon v-if="closeDisable != true" class="close-icon" :="closeIconOptions" @click="emit('close')" />
-    </div>
+    </header>
 </template>
 
 <script setup lang="ts">
@@ -36,12 +36,13 @@ defineOptions({ name: "Header", inheritAttrs: true, });
 
 <style lang="less">
 .snail-header {
+    flex-shrink: 0;
     width: 100%;
+    background-color: white;
     position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
-    background-color: white;
 
     >.header-title {
         white-space: nowrap;

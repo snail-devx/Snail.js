@@ -34,3 +34,13 @@ const colStyle = computed<Record<string, any>>(() => {
 //  2、可选配置选项
 defineOptions({ name: "TableCol", inheritAttrs: true, });
 </script>
+
+<style lang="less">
+//  列 高度100%，内部元素垂直居中，内部文本默认不换行
+.table-col {
+    display: inline-flex;
+    height: 100%;
+    align-items: center;
+    white-space: nowrap;
+}
+</style>
