@@ -17,6 +17,7 @@ import Icon from "./base/icon.vue";
 export * from "./base/utils/app-util";
 export * from "./base/utils/icon-util";
 export * from "./base/utils/observer-util";
+export * from "./base/utils/ref-util";
 //#endregion
 
 //  👉 container 相关导出
