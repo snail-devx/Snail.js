@@ -7,7 +7,7 @@ import { App, createApp, getCurrentScope, ref, shallowRef } from "vue";
 import { Dialog, DialogOpenResult, DialogOptions } from "../models/dialog-model";
 import DialogWrapper from "../components/dialog-wrapper.vue";
 import { triggerAppCreated } from "../../base/utils/app-util";
-import { awaitX, defer, isFunction, isPromise, mustFunction, mustObject, newId } from "snail.core";
+import { defer, isFunction, isPromise, mustFunction, mustObject, newId } from "snail.core";
 import { run, hook } from "snail.core";
 
 /**

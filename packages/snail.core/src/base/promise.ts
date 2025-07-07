@@ -43,7 +43,7 @@ export function delay(timeout?: number): Promise<boolean> {
  * @param task 要等待的任务
  * @returns RunResult<T>执行结果Promise
  */
-export function awaitX<T>(task: Promise<T> | T): Promise<RunResult<T>> {
+export function wait<T>(task: Promise<T> | T): Promise<RunResult<T>> {
     return isPromise(task) == false
         ? Promise.resolve({ success: true, data: task as T })
         : new Promise<RunResult<T>>((resolve, reject) => {
@@ -68,8 +68,8 @@ export function awaitX<T>(task: Promise<T> | T): Promise<RunResult<T>> {
  * @param scope 作用域对象，task执行完成后执行scope.destroy销毁作用域
  * @returns RunResult<T>执行结果Promise
  */
-export async function awaitInScope<T>(task: Promise<T> | T, scope: IScope): Promise<RunResult<T>> {
-    const rt = await awaitX(task);
+export async function waitInScope<T>(task: Promise<T> | T, scope: IScope): Promise<RunResult<T>> {
+    const rt = await wait(task);
     scope && scope.destroy();
     return rt;
 }

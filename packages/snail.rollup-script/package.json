@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "vite": "^6.3.0",
-    "snail.core": ">=1.2.12",
+    "snail.core": ">=1.2.13",
     "snail.rollup": ">=1.2.8"
   },
   "devDependencies": {
