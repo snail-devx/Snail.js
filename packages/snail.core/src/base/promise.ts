@@ -2,6 +2,7 @@
  * 异步模块：Promise相关功能封装
  */
 
+import { IScope } from "./models/scope-model";
 import { isPromise } from "./data";
 import { getMessage } from "./error";
 import { RunResult } from "./function";
@@ -36,17 +37,17 @@ export function delay(timeout?: number): Promise<boolean> {
 }
 
 /**
- * 等待Promise执行结果；
+ * 等待task执行结果；
  * - 外部await此方法返回promise，不用进行try、catch异常处理
  * - 始终成功，不会发生异常；promise成功还是失败，都反映到了RunResult对象上了
- * @param obj 要等待的对象
+ * @param task 要等待的任务
  * @returns RunResult<T>执行结果Promise
  */
-export function awaitX<T>(obj: Promise<T> | T): Promise<RunResult<T>> {
-    return isPromise(obj) == false
-        ? Promise.resolve({ success: true, data: obj as T })
+export function awaitX<T>(task: Promise<T> | T): Promise<RunResult<T>> {
+    return isPromise(task) == false
+        ? Promise.resolve({ success: true, data: task as T })
         : new Promise<RunResult<T>>((resolve, reject) => {
-            (obj as Promise<T>).then(
+            (task as Promise<T>).then(
                 data => resolve({ success: true, data: data }),
                 reason => {
                     const rt: RunResult<T> = {
@@ -58,4 +59,17 @@ export function awaitX<T>(obj: Promise<T> | T): Promise<RunResult<T>> {
                 }
             );
         });
+}
+/**
+ * 等待task执行结果；
+ * - 内部使用 awaitX 等待任务执行结果
+ * - 用于实现任务联动，task执行完成后销毁传入scope作用域
+ * @param task 要等待的任务
+ * @param scope 作用域对象，task执行完成后执行scope.destroy销毁作用域
+ * @returns RunResult<T>执行结果Promise
+ */
+export async function awaitInScope<T>(task: Promise<T> | T, scope: IScope): Promise<RunResult<T>> {
+    const rt = await awaitX(task);
+    scope && scope.destroy();
+    return rt;
 }

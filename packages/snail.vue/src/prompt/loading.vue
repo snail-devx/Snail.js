@@ -14,24 +14,18 @@
 <script setup lang="ts">
 import { LoadingOptions } from './models/loading-model';
 
-const {
-    show = false,
-    disabledMask = false,
-    rootClass = [],
-    transition = "snail-loading",
-} = defineProps<LoadingOptions>();
-defineOptions({ name: "SnailLoading", inheritAttrs: false });
+const { show = false, disabledMask = false, rootClass = [], transition = "snail-loading", } = defineProps<LoadingOptions>();
+defineOptions({ name: "Loading", inheritAttrs: true });
 </script>
 
 <style lang="less">
 .snail-loading {
-    width: 100%;
-    height: 100%;
-    display: block;
     position: absolute;
     z-index: 10000;
-    top: 0;
     left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
 
     &.show-mask {
         background-color: rgba(0, 0, 0, 0.15);

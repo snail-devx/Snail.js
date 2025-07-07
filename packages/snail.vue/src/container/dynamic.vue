@@ -24,7 +24,7 @@ import { delay, getMessage, isObject, isStringNotEmpty, RunResult, script, throw
 import SnailLoading from "../prompt/loading.vue"
 import { ComponentOptions } from "./models/component-model";
 
-// 👉 组件定义
+// *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const { name, component, url } = defineProps<ComponentOptions>();
 /**      动态加载组件的ref实例引用 */
@@ -34,9 +34,9 @@ const dynamicComponent = shallowRef<Component | string>(undefined);
 /**     动态加载时的错误信息：使用浅层相应 */
 const dynamicError = shallowRef<string | undefined>(undefined);
 //  2、可选配置选项
-defineOptions({ name: "SnailDynamic", inheritAttrs: false, });
+defineOptions({ name: "Dynamic", inheritAttrs: false, });
 
-// 👉 方法+事件
+// *****************************************   👉  方法+事件    ****************************************
 /**
  * 构建动态组件
  */
@@ -84,7 +84,7 @@ async function buildDynamicComponent() {
     }
 }
 
-// 👉 组件渲染
+// *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听：构建动态组件，响应外部属性变化（name、component、url）
 {
     watch(() => name, buildDynamicComponent);

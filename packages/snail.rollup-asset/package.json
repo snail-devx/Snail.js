@@ -13,8 +13,8 @@
     "types": "tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
   },
   "dependencies": {
-    "snail.core": ">=1.2.10",
-    "snail.rollup": ">=1.2.7",
+    "snail.core": ">=1.2.12",
+    "snail.rollup": ">=1.2.8",
     "snail.rollup-url": ">=1.2.1"
   }
 }

@@ -1,4 +1,4 @@
-import { InputPluginOption } from "rollup";
+import { InputPluginOption, OutputChunk } from "rollup";
 import { BuilderOptions } from "../models/builder-model";
 import { AssetOptions, ComponentOptions, IComponentContext, ViewOptions } from "../models/component-model";
 import { FLAG } from "../utils/helper";
@@ -17,7 +17,7 @@ import { relative } from "path";
  */
 export function startPointPlugin(component: ComponentOptions, context: IComponentContext, options: BuilderOptions): InputPluginOption {
     return {
-        name: "snaile.rollup-startpoint",
+        name: "snail.rollup-startpoint",
         buildStart() {
             console.log();
             console.log(pc.magentaBright(`👉 compile component: ${component.src}`));
@@ -40,7 +40,7 @@ export function startPointPlugin(component: ComponentOptions, context: IComponen
  */
 export function endpointPlugin(component: ComponentOptions, context: IComponentContext, options: BuilderOptions): InputPluginOption {
     return {
-        name: "snaile.rollup-endpoint",
+        name: "snail.rollup-endpoint",
         resolveId(source, importer) {
             //  1、避免外部直接使用 URL:和URL_VERSION:模块
             if (source.startsWith(FLAG.URLVERSION_MODULE) || source.startsWith(FLAG.URL_MODULE)) {
@@ -85,7 +85,12 @@ export function endpointPlugin(component: ComponentOptions, context: IComponentC
                 return;
             }
         },
-        generateBundle() {
+        /**
+         * 生成文件时：检测生成情况；组装 @ sourceURL标记
+         * @param output js组件输出选项
+         * @param bundle 组件信息
+         */
+        async generateBundle(output, bundle) {
             //  检测使用到的资产文件是否都写入了：判断存在性
             const asset = [...context.assets, ...component.assets as AssetOptions[]].find(asset => existsSync(asset.dist) == false);
             if (asset != undefined) {
@@ -98,8 +103,19 @@ export function endpointPlugin(component: ComponentOptions, context: IComponentC
                 let src = url.format(relative(options.srcRoot, (view as ViewOptions).src));
                 context.triggerRule(`please use "snail.rollup-html" to write view file.`, src, undefined);
             }
-
             console.log(pc.green(`  ----  compile success.`));
+
+            /** 遍历输出的bundle，然后增加@sourceURL，方便chrome浏览器识别“//@ sourceURL={component.url} ”
+             *      1、多个bundle时输出一个SourceUrl会导致一些问题，不过builder一个组件默认仅一个输出，可先忽略
+             *      2、仅处理自身组件 
+             */
+            for (const key in bundle) {
+                if (hasOwnProperty(bundle, key)) {
+                    const module: OutputChunk = bundle[key] as OutputChunk;
+                    const bValue = module.type == "chunk" && module.isEntry == true;
+                    bValue && (module.code = `//@ sourceURL=${component.url}\r\n${module.code}`);
+                }
+            }
         }
     }
 }

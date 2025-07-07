@@ -347,7 +347,8 @@ export namespace script {
             globalArgs.globalThis = globalThis;
             globalArgs.global = globalThis;
             globalArgs.self = globalThis;
-            globalArgs.window = globalThis;
+            //  window对象先不做拦截，不免vue等组件报错
+            // globalArgs.window = globalThis;
             /*  拦截cmd模式js加载，它利用require，是同步加载方式
              *      typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('./Core.ts'))
              */

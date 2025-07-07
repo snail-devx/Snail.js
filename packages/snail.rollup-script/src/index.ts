@@ -157,25 +157,6 @@ export default function scriptPlugin(component: ComponentOptions, context: IComp
                 return await transformScript(code, id, component, options);
             }
             return undefined;
-        },
-        /**
-         * 生成文件时：组装 @ sourceURL标记
-         * @param output js组件输出选项
-         * @param bundle 组件信息
-         */
-        async generateBundle(output, bundle: OutputBundle) {
-            /** 遍历输出的bundle，然后增加@sourceURL，方便chrome浏览器识别“//@ sourceURL={component.url} ”
-             *      1、多个bundle时输出一个SourceUrl会导致一些问题，不过builder一个组件默认仅一个输出，可先忽略
-             *      2、仅处理自身组件 
-             */
-            for (const key in bundle) {
-                if (hasOwnProperty(bundle, key)) {
-                    const module: OutputChunk = bundle[key] as OutputChunk;
-                    const bValue = module.type == "chunk" && module.isEntry == true
-                        && transformMap.has(module.facadeModuleId.toLowerCase()) == true;
-                    bValue && (module.code = `//@ sourceURL=${component.url}\r\n${module.code}`);
-                }
-            }
         }
     }
 }
