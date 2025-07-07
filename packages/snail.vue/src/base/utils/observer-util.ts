@@ -33,9 +33,30 @@ export function useScopes(): IScope & { add: (scope: IScope) => void } {
     const scopes: IScope[] = [];
     const destroy = () => scopes.forEach(scope => scope.destroy());
     tryOnScopeDispose(destroy);
-    return {
-        add: scope => mustFunction((scope || {}).destroy, "add: scope.destroy") && scopes.push(scope),
-        destroy,
+    function add(scope: IScope) {
+        onScope(scope, () => {
+            const index = scopes.indexOf(scope);
+            index >= 0 && scopes.splice(index, 1);
+        });
+        scopes.push(scope);
+    }
+    return { add, destroy };
+}
+/**
+ * 监听scope作用域
+ * - 内部代理 scope.destroy方法，实现拦截监听
+ * - 若为freeze对象，则代理会失败
+ * @param scope 要监听的作用域
+ * @param destroy scope销毁时执行回调
+ */
+function onScope(scope: IScope, destroy: () => void) {
+    //  此方法暂不对外提供
+    mustFunction((scope || {}).destroy, "onScope: scope.destroy");
+    mustFunction(destroy, "onScope: destroy");
+    const origin = scope.destroy;
+    scope.destroy = function () {
+        origin();
+        destroy();
     }
 }
 
