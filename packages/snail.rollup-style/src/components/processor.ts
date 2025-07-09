@@ -26,6 +26,12 @@ import { BuilderOptions, IComponentContext, ComponentOptions, ModuleTransformRes
 import { IStyleProcessor } from "../models/style-model";
 
 /**
+ * style样式的扩展路径
+ * - less进行 @import 文件解析时作为文件查找备选路径使用；如可从 node_modules 下的npm包查找相对路径文件引用
+ */
+export const STYLE_EXTEND_PATHS: string[] = [];
+
+/**
  * 获取样式处理器
  * @param component         要打包的组件配置
  * @param context           组件上下文
@@ -183,7 +189,7 @@ export function getStyleProcessor(component: ComponentOptions, context: ICompone
             map,
             ...bpOptions,
             //  less分析@import需要，否则会报错
-            paths: [dirname(from)],
+            paths: [dirname(from), ...STYLE_EXTEND_PATHS],
         });
         //  判断是否有错误信息，存在则中断执行
         logErrors("preprocess style file failed", from, preResult.errors);

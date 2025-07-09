@@ -8,6 +8,7 @@ import { hasDynamicModule, registerDynamicModule } from "snail.rollup-inject"
 import { BuilderOptions, IComponentContext, ComponentOptions, FLAG } from "snail.rollup"
 
 //#region *************************************        导出接口        *************************************
+export { STYLE_EXTEND_PATHS } from "./components/processor";
 /** 把自己的类型共享出去 */
 export * from "./models/style-model";
 /** 将样式处理器共享出去*/
