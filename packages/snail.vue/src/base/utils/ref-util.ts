@@ -41,7 +41,8 @@ export function scopeRef<T>(rv: Ref<T> | ShallowRef<T>, start: T, end: T, dealy?
  */
 export function animationRef(styleRef: ShallowRef<AnimationRefStyle>, start: AnimationRefStyle, target: AnimationRefStyle, aTime?: number, end?: AnimationRefStyle): IScope {
     styleRef.value = start;
-    const st = setTimeout(() => styleRef.value = target, 0);
+    //  想振兴的增加1ms延迟，避免0的时候，在某些情况下动画效果不生效
+    const st = setTimeout(() => styleRef.value = target, 1);
     const ct = aTime != undefined && end != undefined
         ? setTimeout(() => styleRef.value = end, aTime)
         : undefined;

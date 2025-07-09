@@ -37,6 +37,7 @@ defineOptions({ name: "Table", inheritAttrs: true, });
  * @param styleOptions 样式配置项
  */
 function getStyle(styleOptions: TableStyleOptions): Record<string, any> {
+    styleOptions = styleOptions || {};
     const style: CSSStyleDeclaration = Object.create(null);
     styleOptions.background && (style.background = styleOptions.background);
     styleOptions.height && (style.height = styleOptions.height + (styleOptions.heightUnit || "px"));
@@ -49,10 +50,13 @@ function getStyle(styleOptions: TableStyleOptions): Record<string, any> {
     display: flex;
     flex-direction: column;
 
+    //  表头区域、底部区域：不缩放；内部居中对齐，
     >header.table-header,
-    >header.table-footer,
-    >main.table-body {
+    >footer.table-footer {
         width: 100%;
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
     }
 
     //  表头钉住位置
@@ -63,34 +67,27 @@ function getStyle(styleOptions: TableStyleOptions): Record<string, any> {
 
     // 实际内容区域
     >main.table-body {
+        width: 100%;
         flex: 1;
-    }
-
-
-    //  表头区域、底部区域：不缩放；内部居中对齐，
-    >header.table-header,
-    >header.table-footer {
-        display: flex;
-        align-items: center;
-        flex-shrink: 0;
     }
 }
 
-//  特殊情况适配
-//      启用边框时，进行修饰，避免边框线重叠
+// *****************************************   👉  特殊样式适配    *****************************************
+//  启用边框时，进行修饰，避免边框线重叠（核心规则：body中尽可能全）
 .snail-table.start-border {
 
-    //  所有区域的列：从第二类开始取消左边框
+    //  所有区域的列：从第二列开始取消左边框
     >header.table-header,
     >main.table-body>.table-row,
-    >main.table-footer {
+    >footer.table-footer {
         >.table-col:nth-child(n + 2) {
             border-left: none !important;
         }
     }
 
-    //  内容区域行下的列，取消上边框
-    >main.table-body>.table-row {
+    //  内容区域和尾部区域：取消列的顶部边框
+    >main.table-body>.table-row,
+    >footer.table-footer {
         >.table-col {
             border-top: none !important;
         }

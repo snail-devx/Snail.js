@@ -8,7 +8,7 @@
         <!-- 标题区域 -->
         <div v-if="title != ''" v-text="title" class="header-title" :class="titleAlign" />
         <!-- 插槽区域，自定义内容 -->
-        <slot class="header-slot" />
+        <slot />
         <!-- 关闭按钮区域 -->
         <Icon v-if="closeDisable != true" class="close-icon" :="closeIconOptions" @click="emit('close')" />
     </header>
@@ -28,7 +28,8 @@ const emit = defineEmits<HeaderEvents>();
 const closeIconOptions = computed<IconOptions>(() => ({
     type: "close",
     color: useTo == "page" ? "#2e3033" : "#464953",
-    size: useTo == "page" ? 24 : 20,
+    // size: useTo == "page" ? 22 : 20,
+    size: 22
 }));
 //  2、可选配置选项
 defineOptions({ name: "Header", inheritAttrs: true, });
@@ -60,10 +61,6 @@ defineOptions({ name: "Header", inheritAttrs: true, });
         &.right {
             text-align: right;
         }
-    }
-
-    >.header-slot {
-        flex: 1;
     }
 }
 

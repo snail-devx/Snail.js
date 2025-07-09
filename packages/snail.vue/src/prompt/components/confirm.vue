@@ -4,14 +4,13 @@
     <div class="snail-confirm">
         <Header :use-to="'dialog'" :title="props.title || '提示'" @close="props.closeDialog(false)" />
         <main v-html="props.message || '请确认？'"></main>
-        <Footer align="center" :cancel-name="props.cancelName" :cancel-disable="props.cancelDisable"
+        <Footer align="right" :cancel-name="props.cancelName" :cancel-disable="props.cancelDisable"
             :confirm-name="props.confirmName" :confirm-disable="props.confirmDisable" @cancel="props.closeDialog(false)"
             @confirm="props.closeDialog(true)" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
 import { ConfirmOptions } from "../models/confirm-model"
 import { DialogHandle } from "../../container/models/dialog-model";
 import Header from "../../base/header.vue";
@@ -39,7 +38,7 @@ defineOptions({ name: "Confirm", inheritAttrs: true, });
     >main {
         font-size: 14px;
         flex: 1;
-        margin: 30px 44px;
+        margin: 20px 40px;
         overflow: auto;
         word-wrap: break-word;
         box-sizing: border-box;

@@ -1,31 +1,34 @@
-<!-- 无数据提醒 组件；支持外部自定义图片，自定义提示插槽 -->
+<!-- 空状态提醒 组件；
+ - 用于数据加载时 无数据、搜索无数据时的提醒
+ - 支持外部自定义图片，自定义提示插槽 
+ -->
 <template>
-    <div class="snail-no-data">
-        <!-- 无数据提醒图片 -->
+    <div class="snail-empty">
+        <!-- 提醒图片 -->
         <img :src="props.imageUrl || defaultImageBase64" />
-        <!-- 无数据提醒消息 -->
+        <!-- 提醒消息 -->
         <slot>
-            <div class="hint-message" v-text="props.message || '无数据'" />
+            <div class="message" v-text="props.message || '无数据'" />
         </slot>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { NoDataOptions } from "./models/no-data-model";
+import { EmptyOptions } from "./models/empty-model";
 import { getNoDataBase64Image } from "./utils/prompt-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<NoDataOptions>();
+const props = defineProps<EmptyOptions>();
 /**     默认图片的base64编码值：后期考虑引入图片资源 */
 const defaultImageBase64: string = getNoDataBase64Image();
 //  2、可选配置选项
-defineOptions({ name: "NoData", inheritAttrs: true, });
+defineOptions({ name: "Empty", inheritAttrs: true, });
 </script>
 
 <style lang="less">
-.snail-no-data {
+.snail-empty {
     width: 100%;
     height: 100%;
     display: flex;
@@ -38,7 +41,7 @@ defineOptions({ name: "NoData", inheritAttrs: true, });
         width: 60px;
     }
 
-    >div.hint-message {
+    >div.message {
         color: #babdc2;
         font-size: 14px;
         font-weight: 400;

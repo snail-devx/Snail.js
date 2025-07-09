@@ -5,7 +5,7 @@ export type ButtonOptions = {
     /**
      * 按钮尺寸
      * - max    ： 120 X 40
-     * - middle ： 80 X 32
+     * - middle ： 90 X 32
      * - normal ： 54 X 28
      * - small  ： 30 X 20
      */

@@ -25,7 +25,8 @@
     "snail.rollup-url": ">=1.2.1",
     "snail.rollup-inject": ">=1.2.1",
     "snail.rollup-script": ">=1.2.4",
-    "snail.rollup-style": ">=1.2.3",
-    "snail.rollup-vue": ">=1.2.3"
+    "snail.rollup-style": ">=1.2.5",
+    "snail.style": ">=1.0.0",
+    "snail.rollup-vue": ">=1.2.4"
   }
 }

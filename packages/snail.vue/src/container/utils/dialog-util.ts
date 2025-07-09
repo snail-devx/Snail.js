@@ -3,11 +3,11 @@
  *      1、内部维护一个VueApp实例，专门用于进行模态弹窗操
  *      2、模态弹窗展示效果，通过 @see ../componets/dialog-wrapper.vue 实现
  */
-import { App, createApp, getCurrentScope, ref, shallowRef } from "vue";
+import { App, createApp, getCurrentScope, ref, ShallowRef, shallowRef } from "vue";
 import { Dialog, DialogOpenResult, DialogOptions } from "../models/dialog-model";
 import DialogWrapper from "../components/dialog-wrapper.vue";
 import { triggerAppCreated } from "../../base/utils/app-util";
-import { defer, isFunction, isPromise, mustFunction, mustObject, newId } from "snail.core";
+import { defer, IScope, isFunction, isPromise, mustFunction, mustObject, newId } from "snail.core";
 import { run, hook } from "snail.core";
 
 /**
@@ -60,6 +60,30 @@ export function openDialog<T>(options: DialogOptions, onDestroyed?: (fn: () => v
         deferred.resolve(undefined);
     };
     return dr;
+}
+/**
+ * 作用域弹窗：方法执行逻辑：
+ * - 1、打开弹窗前：若scopeRef有值，则强制执行 scopeRef.value.destroy() 做销毁
+ * - 2、打开弹窗 ：构建IScope赋值给 scopeRef.value ；外部可 scopeRef.value.destroy() 强制关闭弹窗
+ * - 3、等待弹窗关闭 ：得到弹窗返回值，置空scopeRef值，并返回弹窗返回值：scopeRef.value = undefined 
+ * - 备注说明：封装重复性代码，简化外部开发逻辑；无实际业务意义
+ * @param options 弹窗配置选项
+ * @param scopeRef 作用域响应式对象
+ * @returns 弹窗关闭时传递的数据
+ */
+export async function scopeDialog<T>(options: DialogOptions, scopeRef: ShallowRef<IScope | undefined>): Promise<T> {
+    scopeRef.value && scopeRef.value.destroy();
+    scopeRef.value = {
+        destroy() {
+            scopeRef.value = undefined;
+            ret.destroy();
+        }
+    }
+    const ret: DialogOpenResult<T> = openDialog(options);
+    //  等待弹窗关闭并销毁
+    const data: T = await ret;
+    scopeRef.value = undefined;
+    return data;
 }
 
 //#region 👉 内部私有方法逻辑

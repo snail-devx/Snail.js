@@ -11,7 +11,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
 import Button from "./button.vue";
 import { FooterOptions, FooterEvents } from "./models/footer-model"
 
@@ -32,6 +31,10 @@ defineOptions({ name: "Footer", inheritAttrs: true, });
     padding: 0 40px;
     display: flex;
     align-items: center;
+
+    >.snail-button:nth-child(n + 2) {
+        margin-left: 20px;
+    }
 }
 
 // *****************************************   👉  特殊样式适配    *****************************************
@@ -43,27 +46,15 @@ defineOptions({ name: "Footer", inheritAttrs: true, });
 //  2、左对齐时，按钮给左边距
 .snail-footer.left {
     justify-content: left;
-
-    >.snail-button {
-        margin-left: 20px;
-    }
 }
 
 //  3、居中对齐时，按钮（除第一个外）给左边距
 .snail-footer.center {
     justify-content: center;
-
-    >.snail-button:nth-child(n + 2) {
-        margin-left: 20px;
-    }
 }
 
 //  4、对齐时，按钮给右边距
 .snail-footer.right {
     justify-content: right;
-
-    >.snail-button {
-        margin-right: 20px;
-    }
 }
 </style>

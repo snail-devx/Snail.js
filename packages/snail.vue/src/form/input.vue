@@ -1,0 +1,122 @@
+<!-- 输入框
+    1、支持设置标题、提示语、支持标题最大宽度和最小宽度等
+    2、支持指定type值：text、number，password、
+    3、【后续支持】：支持进行数据验证，并支持外部传入自定义验证方法
+    4、【后续支持】：最大最小值，如果是number则范围验证，如果是文本则是长度验证
+ -->
+<template>
+    <div class="snail-input" :class="{ 'readonly': props.readonly }">
+        <!-- 标题区域：有标题时，才展示 -->
+        <div class="input-title" :style="titleStyle" v-if="!!props.title">
+            <span class="text" v-text="props.title" />
+            <span class="required" v-text="'*'" v-if="props.readonly != true && props.required == true" />
+        </div>
+        <!-- 输入框区域：输入不做v-model绑定，只有验证通过后再绑定 -->
+        <div class="input-body">
+            <input ref="inputRef" :type="props.type || 'text'" :value="inputModel" :readonly="props.readonly"
+                :placeholder="props.placeholder" :title="inputModel" @change="onValueChange" @click="emit('click')" />
+            <span class="validate" v-if="!!validateRef" :title="validateRef">
+                <Icon :type="'error'" :size="16" :color="'red'" />
+            </span>
+        </div>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { shallowRef, useTemplateRef } from "vue";
+import { InputEvents, InputOptions } from "./models/input-model";
+import { getTitleStyle } from "./utils/input-util";
+import Icon from "../base/icon.vue";
+
+// *****************************************   👉  组件定义    *****************************************
+//  1、props、data
+const props = defineProps<InputOptions>();
+const emit = defineEmits<InputEvents>();
+/**     输入框引用 */
+const inputRef = useTemplateRef("inputRef");
+/**     输入框内容 */
+const inputModel = defineModel<string>({ default: "" });
+/**     验证结果：非空字符串表示验证失败的提示语 */
+const validateRef = shallowRef<string>();
+/**      标题区域样式 */
+const titleStyle: Record<string, any> = getTitleStyle(props, true);
+//  2、可选配置选项
+defineOptions({ name: "Input", inheritAttrs: true, });
+
+// *****************************************   👉  方法+事件    ****************************************
+/**
+ * 输入框内容发生改变时
+ */
+function onValueChange() {
+    // 验证通过后，设置到value上，并对外发送change事件
+    const text: string = inputRef.value!.value || "";
+    inputModel.value = text;
+    emit("change", text);
+}
+
+// *****************************************   👉  组件渲染    *****************************************
+console.warn("Input:还没实现 验证相关逻辑")
+</script>
+
+<style lang="less">
+@input-border: 1px solid #DDDFED;
+
+.snail-input {
+    display: inline-flex;
+    min-height: 34px;
+
+    >.input-title {
+        flex-shrink: 0;
+        font-size: 14px;
+        padding-top: 6px;
+
+        >span.text {
+            color: #2E3033;
+        }
+
+        >span.required {
+            color: #f74b4b;
+            margin-left: 2px;
+        }
+    }
+
+    >.input-body {
+        height: 32px;
+        align-self: start;
+        flex: 1;
+        display: flex;
+
+        >input {
+            flex: 1;
+            border: @input-border;
+            padding: 0;
+            padding-left: 10px;
+            padding-right: 10px;
+
+            text-overflow: ellipsis;
+            font-weight: 400;
+            font-size: 14px;
+            color: #2E3033;
+
+            &:focus {
+                border: 1px solid #3292ea;
+            }
+        }
+
+        >span {
+            flex-shrink: 0;
+            background-color: red;
+        }
+    }
+}
+
+// *****************************************   👉  特殊样式适配    *****************************************
+//  只读时，文本框干掉焦点样式
+.snail-input.readonly {
+    >div.input-body {
+        >input:focus {
+            border: @input-border;
+        }
+    }
+}
+</style>

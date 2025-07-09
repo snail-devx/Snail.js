@@ -38,7 +38,6 @@ export type TableStyleOptions = {
      * - 默认 px
      */
     heightUnit?: "px" | "rem" | "vw" | "vh";
-
 }
 
 /**

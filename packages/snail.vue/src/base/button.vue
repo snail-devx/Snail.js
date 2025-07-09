@@ -6,7 +6,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
 import { ButtonOptions } from "./models/button-model";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -34,7 +33,7 @@ defineOptions({ name: "Button", inheritAttrs: true, });
 }
 
 .snail-button.middle {
-    width: 80px;
+    width: 90px;
     height: 32px;
 }
 

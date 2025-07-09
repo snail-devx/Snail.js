@@ -1,7 +1,7 @@
 /**
- * 无数据提醒的配置选项
+ * 空状态配置选项
  */
-export type NoDataOptions = {
+export type EmptyOptions = {
     /**
      * 提醒消息
      * - 默认值：无数据
@@ -9,7 +9,7 @@ export type NoDataOptions = {
     message?: string;
 
     /**
-     * 无数据提醒图标Url地址
+     * 提醒图标Url地址
      * - 不传入则使用默认的
      */
     imageUrl?: string;
