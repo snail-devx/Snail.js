@@ -28,7 +28,7 @@ export default function vuePlugin(component: ComponentOptions, context: ICompone
     const styleProcessor: IStyleProcessor = getStyleProcessor(component, context, options);
     /** vue组件注入的css文件源路径，虚拟的 */
     const cssChunksSrc = resolve(
-        dirname(component.src), options.cssChunkFolder || "./css",
+        dirname(component.src), options.cssChunkFolder || "./styles",
         context.forceExt(basename(component.src), ".vue.css")
     );
     /** vue组件注入的css文件输出路径 */
