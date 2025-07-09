@@ -1,4 +1,4 @@
-import { AlignStyle, SizeOptions } from "../../base/models/style-model";
+import { AlignStyle, SizeOptions } from "snail.style";
 
 /**
  * 输入框配置选项
