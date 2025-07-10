@@ -1,6 +1,14 @@
 import { ResolveIdResult } from "rollup";
-import { hasOwnProperty, version } from "snail.core";
+import { hasOwnProperty, isFunction, isStringNotEmpty, version } from "snail.core";
 import { FLAG, BuilderOptions, IComponentContext, ComponentOptions, ModuleOptions } from "snail.rollup"
+
+/**
+ * URL处理句柄
+ * - 对生成的URL地址做二次处理
+ * - 升序执行句柄方法，返回『非空字符串』则中断执行；否则继续执行下一个句柄方法
+ * - 若数组中所有方法未返回『非空字符串』，则使用内置规则处理： context.forceFileExt(url);
+ */
+export const URL_HANDLES: Array<((url: string) => string | undefined)> = [];
 
 /** 插件名称 */
 const PLUGINNAME = "snail.rollup-url";
@@ -36,8 +44,19 @@ export default function urlPlugin(component: ComponentOptions, context: ICompone
             switch (module.type) {
                 case "src": {
                     context.mustInSrcRoot(module, source, importer);
+                    //  对生成的url执行处理句柄：处理失败则执行默认处理逻辑
                     let { url } = context.buildPath(module.id);
-                    url = context.forceFileExt(url);
+                    {
+                        let tmpUrl: string;
+                        for (const handle of URL_HANDLES) {
+                            tmpUrl = isFunction(handle) ? handle(url) : undefined;
+                            if (isStringNotEmpty(tmpUrl) == true) {
+                                break;
+                            }
+                            tmpUrl = undefined;
+                        }
+                        url = tmpUrl ? tmpUrl : context.forceFileExt(url);
+                    }
                     return buildUrlResolve(url, false);
                 }
                 /** net 资源，再分析url地址没有意义，本身就是url路径

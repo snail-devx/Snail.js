@@ -3,7 +3,7 @@
   "description": "配合【snail.rollup】使用的插件，支持使用过程中，将import文件转换成url返回",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",

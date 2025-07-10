@@ -46,7 +46,7 @@ function onSwitchChange() {
 
 .snail-switch {
     width: 36px !important;
-    height: 18px !important;
+    height: 20px !important;
     border-radius: 10px 10px 10px 10px;
     cursor: pointer;
     position: relative;
@@ -68,8 +68,8 @@ function onSwitchChange() {
     }
 
     >div.status {
-        height: 14px;
-        width: 14px;
+        height: 16px;
+        width: 16px;
         border-radius: 10px 10px 10px 10px;
         background: #FFFFFF;
         position: absolute;
@@ -87,7 +87,7 @@ function onSwitchChange() {
     }
 
     >div.status {
-        left: calc(100% - 16px);
+        left: calc(100% - 18px);
     }
 }
 
