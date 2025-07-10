@@ -2,6 +2,7 @@ import { mustFunction } from "./data";
 import { RunResult, run, runAsync } from "./function";
 import { HookFunction, HookRunOptions, IHookManager } from "./models/hook-model";
 import { IScope } from "./models/scope-model";
+import { scope } from "./scope";
 
 /** 把自己的类型共享出去 */
 export * from "./models/hook-model";
@@ -33,7 +34,8 @@ export namespace hook {
             hookMap.has(code) == false && hookMap.set(code, []);
             const hooks: HookFunction[] = hookMap.get(code);
             const index = hooks.push(fn) - 1;
-            return { destroy: () => hooks[index] = undefined };
+
+            return scope.useScope().onDestroy(() => hooks[index] = undefined)
         }
         /**
          * 执行已注册的钩子
@@ -142,6 +144,8 @@ export namespace hook {
         //#region 
 
         //  返回管理器对象
-        return Object.freeze({ register, runHook, runHookAsync, remove, destroy });
+        const hm = { register, runHook, runHookAsync, remove, destroy } as IHookManager<HookCodes>;
+        scope.mountScope(hm).onDestroy(destroy);
+        return Object.freeze(hm as IHookManager<HookCodes>);
     }
 }

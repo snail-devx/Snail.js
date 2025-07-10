@@ -6,8 +6,6 @@
 
 // ******************************      base      ******************************
 //  基础数据类型
-export * from "./base/models/scope-model"
-
 export * from "./base/data"
 export * from "./base/error"
 export * from "./base/event"
@@ -15,6 +13,7 @@ export * from "./base/function"
 export * from "./base/hook"
 export * from "./base/promise"
 // export * from "./base/queue"
+export * from "./base/scope"
 // export * from "./base/storage"
 
 // ******************************      web      ******************************
