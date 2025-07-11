@@ -38,7 +38,7 @@ export namespace server {
         /**
          * 是否存在指定服务器
          * @param code 服务器编码
-         * @returns 服务器配置选项；不存在返回undefined
+         * @returns 存在返回true，否则false
          */
         function has(code: string): boolean {
             return hasOwnProperty(servers, code);

@@ -30,7 +30,7 @@ export interface IServerManager {
     /**
      * 判断全局服务器配置是否存在
      * @param code 服务器编码
-     * @returns 服务器配置选项；不存在返回undefined
+     * @returns 存在返回true，否则false
      */
     has(code: string): boolean;
     /**
