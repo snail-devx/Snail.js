@@ -51,8 +51,8 @@ test("default", async () => {
     await ret.write(components[0].output as OutputOptions);
     expect(existsSync(dist)).toStrictEqual(true);
     let content = readFileSync(dist, "utf-8").split("\n");
-    expect(content[0]).toStrictEqual('var addStyle = 100;');
-    expect(content[2]).toStrictEqual('function addStyle2(){console.log("DMI:AddStyle2");}');
+    expect(content[1]).toStrictEqual('var addStyle = 100;');
+    expect(content[3]).toStrictEqual('function addStyle2(){console.log("DMI:AddStyle2");}');
     //  重复注册
     expect(() => registerDynamicModule("DMI:AddStyle2", 'expect default 111111;'))
         .toThrowError("module[DMI:AddStyle2] has been registered.");
@@ -67,8 +67,8 @@ test("default", async () => {
     await ret.write(components[0].output as OutputOptions);
     expect(existsSync(dist)).toStrictEqual(true);
     content = readFileSync(dist, "utf-8").split("\n");
-    expect(content[0]).toStrictEqual('var addStyle = 100;');
-    expect(content[2]).toStrictEqual('var addStyle2 = "1xssssss";');
+    expect(content[1]).toStrictEqual('var addStyle = 100;');
+    expect(content[3]).toStrictEqual('var addStyle2 = "1xssssss";');
 });
 
 //  测试错误情况

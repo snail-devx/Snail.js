@@ -68,9 +68,9 @@ test("default", async () => {
     let content = readFileSync(dist, 'utf-8');
     expect(content).toContain("const linkMap = Object.create(null);");
     expect(content).toContain("function addLink (href) {");
-    expect(content).toContain('addLink("/css/index.vue.css");');
+    expect(content).toContain('addLink("/styles/index.vue.css");');
     //  验证csschuld文件：不验证内容，依赖snail.rollup-style插件
-    dist = resolve(options.distRoot!, "./css/index.vue.css");
+    dist = resolve(options.distRoot!, "./styles/index.vue.css");
     expect(existsSync(dist)).toStrictEqual(true);
     //  后期再做更细化的验证
 });

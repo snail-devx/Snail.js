@@ -36,10 +36,10 @@ let ruleMessage: string;
 }
 beforeEach(() => {
     ruleMessage = "";
-    // existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
+    existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
 afterEach(() => {
-    // existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
+    existsSync(options.distRoot!) && rmSync(options.distRoot!, { recursive: true });
 });
 //#endregion
 
@@ -54,20 +54,20 @@ test("default", async () => {
     const dist = resolve(options.distRoot!, "./core/core.js")
     expect(existsSync(dist)).toStrictEqual(true);
     let content = readFileSync(dist, "utf-8").split("\n");
-    expect(content.length).toStrictEqual(13);
-    expect(content[0].startsWith('var styleUrl = "/core/styles/c2.css?_snv=')).toStrictEqual(true);
-    expect(content[1]).toStrictEqual("");
-    expect(content[2].startsWith('var netStyle = "/app/styles.less?ADDLINK=&_snv=')).toStrictEqual(true);
-    expect(content[3]).toStrictEqual("");
-    expect(content[4].startsWith('var outStyle1 = "/outer/styles/1.css?_snv=')).toStrictEqual(true);
-    expect(content[5]).toStrictEqual("");
-    expect(content[6].startsWith('var outStyle2 = "/outer/styles/2.css?_snv=')).toStrictEqual(true);
-    expect(content[7]).toStrictEqual("");
-    expect(content[8].trim()).toStrictEqual("console.log(styleUrl);");
-    expect(content[9].trim()).toStrictEqual("console.log(netStyle);");
-    expect(content[10].trim()).toStrictEqual("console.log(outStyle1);");
-    expect(content[11].trim()).toStrictEqual("console.log(outStyle2);");
-    expect(content[12]).toStrictEqual("");
+    expect(content.length).toStrictEqual(14);
+    expect(content[1].startsWith('var styleUrl = "/core/styles/c2.css?_snv=')).toStrictEqual(true);
+    expect(content[2]).toStrictEqual("");
+    expect(content[3].startsWith('var netStyle = "/app/styles.less?ADDLINK=&_snv=')).toStrictEqual(true);
+    expect(content[4]).toStrictEqual("");
+    expect(content[5].startsWith('var outStyle1 = "/outer/styles/1.css?_snv=')).toStrictEqual(true);
+    expect(content[6]).toStrictEqual("");
+    expect(content[7].startsWith('var outStyle2 = "/outer/styles/2.css?_snv=')).toStrictEqual(true);
+    expect(content[8]).toStrictEqual("");
+    expect(content[9].trim()).toStrictEqual("console.log(styleUrl);");
+    expect(content[10].trim()).toStrictEqual("console.log(netStyle);");
+    expect(content[11].trim()).toStrictEqual("console.log(outStyle1);");
+    expect(content[12].trim()).toStrictEqual("console.log(outStyle2);");
+    expect(content[13]).toStrictEqual("");
     //      css编译输出结果验证：验证关键行即可
     let styleDist = resolve(options.distRoot!, "./core/styles/c1.css");
     expect(existsSync(styleDist)).toStrictEqual(true);

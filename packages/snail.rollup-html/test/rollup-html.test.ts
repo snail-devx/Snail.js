@@ -39,7 +39,7 @@ test("default", async () => {
                 {
                     src: "./views/index.html",
                     dist: htmlDist,
-                    handle(options, src, content) {
+                    handle(src: string, content: string, component: ComponentOptions, options: BuilderOptions) {
                         return content;
                     },
                 }

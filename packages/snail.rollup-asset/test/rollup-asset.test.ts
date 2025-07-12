@@ -11,7 +11,7 @@ import { Builder } from "../../snail.rollup/src/index";
 
 import assetPlugin from "../src/index"
 import { buildDist } from '../../snail.rollup/src/utils/helper';
-import { version } from 'snail.core';
+import { configVersion, version } from 'snail.core';
 import urlPlugin from "snail.rollup-url"
 
 //#region 测试前的准备工作
@@ -42,7 +42,7 @@ afterEach(() => {
 //  符合所有规则的引入，正常验证存在性；测试import和显式指定的资源文件
 test("default", async () => {
     //  显式指定版本号，方便后续做等值判断
-    version.config({ version: "xxxxxxxxxxxxxxxx1235" });
+    configVersion({ version: "xxxxxxxxxxxxxxxx1235" });
     //  编译代码输出
     const components: RollupOptions[] = builder.build([
         {
@@ -79,18 +79,19 @@ test("default", async () => {
     dist = resolve(options.distRoot!, "./index.js");
     expect(existsSync(dist)).toStrictEqual(true);
     content = readFileSync(dist, "utf-8").split("\n");
-    expect(content.length).toStrictEqual(21);
-    expect(content[0]).toStrictEqual('var coreHtml = "/core/views/core.html?_snv=xxxxxxxxxxxxxxxx1235";');
-    expect(content[1]).toStrictEqual('');
-    expect(content[2]).toStrictEqual('var coreImages = "/core/images/favicon.png?_snv=xxxxxxxxxxxxxxxx1235";');
-    expect(content[3]).toStrictEqual('');
-    expect(content[4]).toStrictEqual('var serviceHtml = "/service/views/service.html?_snv=xxxxxxxxxxxxxxxx1235";');
-    expect(content[5]).toStrictEqual('');
-    expect(content[6]).toStrictEqual('var serviceImages = "/service/images/favicon.png?_snv=xxxxxxxxxxxxxxxx1235";');
-    expect(content[7]).toStrictEqual('');
-    expect(content[8]).toStrictEqual('var netHtml = "http://www.baidu.com/index.html?_snv=xxxxxxxxxxxxxxxx1235";');
-    expect(content[9]).toStrictEqual('');
-    expect(content[10]).toStrictEqual('var netHtml2 = "/index.html?_snv=xxxxxxxxxxxxxxxx1235";');
+    expect(content.length).toStrictEqual(22);
+    expect(content[0].trim()).toStrictEqual('//@ sourceURL=/index.js');
+    expect(content[1]).toStrictEqual('var coreHtml = "/core/views/core.html?_snv=xxxxxxxxxxxxxxxx1235";');
+    expect(content[2]).toStrictEqual('');
+    expect(content[3]).toStrictEqual('var coreImages = "/core/images/favicon.png?_snv=xxxxxxxxxxxxxxxx1235";');
+    expect(content[4]).toStrictEqual('');
+    expect(content[5]).toStrictEqual('var serviceHtml = "/service/views/service.html?_snv=xxxxxxxxxxxxxxxx1235";');
+    expect(content[6]).toStrictEqual('');
+    expect(content[7]).toStrictEqual('var serviceImages = "/service/images/favicon.png?_snv=xxxxxxxxxxxxxxxx1235";');
+    expect(content[8]).toStrictEqual('');
+    expect(content[9]).toStrictEqual('var netHtml = "http://www.baidu.com/index.html?_snv=xxxxxxxxxxxxxxxx1235";');
+    expect(content[10]).toStrictEqual('');
+    expect(content[11]).toStrictEqual('var netHtml2 = "/index.html?_snv=xxxxxxxxxxxxxxxx1235";');
 });
 
 test("srcRoot-not-in-componentRoot", async () => {
@@ -115,7 +116,7 @@ test("srcRoot-not-in-componentRoot", async () => {
     let distHtml = resolve(options.distRoot!, "./service/views/service.html");
     expect(existsSync(distHtml)).toStrictEqual(false);
     let content = readFileSync(resolve(options.distRoot!, "./core/core.js"), "utf-8").split("\n");
-    expect(content[0].startsWith('var sx = "/service/views/service.html?_snv=')).toStrictEqual(true);
+    expect(content[1].startsWith('var sx = "/service/views/service.html?_snv=')).toStrictEqual(true);
 });
 
 //  错误情况和覆盖率补充测试
