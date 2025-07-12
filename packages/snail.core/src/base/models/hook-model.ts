@@ -4,7 +4,7 @@ import { IScope } from "./scope-model";
 /**
  * 钩子函数管理器
  */
-export interface IHookManager<HookCodes> extends IScope {
+export interface IHookManager<HookCodes> {
     /**
      * 注册钩子处理函数
      * @param code 钩子编码

@@ -1,18 +1,22 @@
 import { isStringNotEmpty } from "../base/data";
-import { UrlParseResult } from "./models/url-model";
+import { IUrlManager, UrlParseResult } from "./models/url-model";
 
-/** 把自己的类型共享出去 */
-export * from "./models/url-model"
+// 把自己的类型共享出去
+export * from "./models/url-model";
 
 /**
- * url模块：支持对URL地址做解析和格式化
+ * 使用【Url管理器】
+ * - 目前是为了和其他模块保持一致，封装了这么个方法，后续考虑可配置实例级的origin地址，从而实现更精细化的url地址格式化、、
+ * @returns 全新的【Url管理器】
  */
-export namespace url {
+function useUrl(): IUrlManager {
+
+    //#region ************************************* 接口方法：IUrlManager具体实现 *************************************
     /**
      * 是否是站点url；如:http://www.baidu.com/xxxxxx
      * @param url url地址
      */
-    export function isSite(url: string): boolean {
+    function isSite(url: string): boolean {
         /* 暂时先使用正则匹配；后续看情况要是不准，直接使用new URL判断 
         try {
             return !!new URL(url);
@@ -31,7 +35,7 @@ export namespace url {
      * @param url url地址
      * @returns 
      */
-    export function isAbsolute(url: string): boolean {
+    function isAbsolute(url: string): boolean {
         return isStringNotEmpty(url)
             ? url.replace(/\\/g, '/')[0] == '/'
             : false;
@@ -45,7 +49,7 @@ export namespace url {
      * @param url 要格式化的url
      * @returns 格式化好的url地址；无效url（空、非string）返回undefined
      */
-    export function format(url: string): string | undefined {
+    function format(url: string): string | undefined {
         if (isStringNotEmpty(url) == false) {
             return undefined;
         }
@@ -64,7 +68,7 @@ export namespace url {
      * @param url 
      * @return 转换结果值，若url无效，则返回undefined
      */
-    export function parse(url: string): UrlParseResult | undefined {
+    function parse(url: string): UrlParseResult | undefined {
         if (isStringNotEmpty(url)) {
             var hash = undefined;
             var [file, query] = url.split('?', 2);
@@ -82,7 +86,7 @@ export namespace url {
      * @param server 要格式化的服务器地址
      * @returns 格式化好的服务器地址：无效则返回undefined
      */
-    export function getOrigin(server: string): string | undefined {
+    function getOrigin(server: string): string | undefined {
         try {
             const url = new URL(server);
             // return `${url.protocol}//${url.host}`;
@@ -93,4 +97,13 @@ export namespace url {
             return undefined;
         }
     }
+    //#endregion
+
+    //  构建管理器实例
+    return Object.freeze({ isSite, isAbsolute, format, parse, getOrigin });
 }
+
+/**
+ * url模块：支持对URL地址做解析和格式化
+ */
+export const url: IUrlManager = useUrl();

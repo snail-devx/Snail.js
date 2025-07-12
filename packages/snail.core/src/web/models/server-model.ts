@@ -1,22 +1,4 @@
 /**
- * 服务器配置选项；先固化几个，后面再加
- */
-export type ServerOptions = {
-    /**
-     * web服务器地址；用于进行html、js、css文件加载
-     */
-    web?: string,
-    /**
-     * api请求地址：用于进行api请求，完成api逻辑
-     */
-    api?: string,
-    /**
-     * socket通信地址
-     */
-    socket?: string,
-}
-
-/**
  * 接口：服务器地址管理器
  */
 export interface IServerManager {
@@ -52,4 +34,21 @@ export interface IServerManager {
      * @returns 管理器自身，方便链式调用
      */
     remove(code: string): IServerManager;
+}
+/**
+ * 服务器配置选项；先固化几个，后面再加
+ */
+export type ServerOptions = {
+    /**
+     * web服务器地址；用于进行html、js、css文件加载
+     */
+    web?: string,
+    /**
+     * api请求地址：用于进行api请求，完成api逻辑
+     */
+    api?: string,
+    /**
+     * socket通信地址
+     */
+    socket?: string,
 }

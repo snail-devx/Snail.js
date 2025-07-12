@@ -1,5 +1,5 @@
 import { assert, describe, expect, test } from 'vitest'
-import { server } from "../../src/web/server"
+import { server, useServer } from "../../src/web/server"
 import { IServerManager } from '../../src/web/models/server-model'
 
 /**
@@ -35,15 +35,15 @@ function testFunc(sr: IServerManager): void {
 
 //  测试示例
 test("global", () => testFunc(server));
-test("newScope", () => testFunc(server.newScope()));
+test("newScope", () => testFunc(useServer()));
 
 
 //  测试作用域隔离
 test("test-private", () => {
 
     const s1: IServerManager = server.register("s", { api: "s1" }),
-        s2: IServerManager = server.newScope().register("s", { api: "s2" }),
-        s3: IServerManager = server.newScope().register("s", { api: "s3" });
+        s2: IServerManager = useServer().register("s", { api: "s2" }),
+        s3: IServerManager = useServer().register("s", { api: "s3" });
 
     expect(s1.getUrl("s", "api")).toStrictEqual("s1");
     expect(s2.getUrl("s", "api")).toStrictEqual("s2");

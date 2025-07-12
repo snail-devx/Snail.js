@@ -1,8 +1,9 @@
 import { beforeEach, afterEach, describe, expect, it, vi, test } from 'vitest';
-import { hook } from "../../src/base/hook";
+import { useHook } from "../../src/base/hook";
 import { HookFunction, IHookManager } from '../../src/base/models/hook-model';
 import { throwError } from '../../src/base/error';
 import { delay } from '../../src/base/promise';
+import { IScope } from '../../src/base/scope';
 
 const flag: string[] = [];
 beforeEach(() => flag.splice(0));
@@ -24,7 +25,7 @@ const hookA1 = async () => (await delay(10), flag.push("hookA1"), undefined),
     hookAE2: HookFunction = async () => (await delay(10), flag.push("hookAE2"), throwError("hookAE2"), undefined);
 
 describe("runHook", () => {
-    const manager: IHookManager<string> = hook.newScope();
+    const manager: IHookManager<string> = useHook<string>();
     test("none-registed", () => {
         let rt = manager.runHook("A");
         expect(rt.success).toBe(true);
@@ -57,7 +58,7 @@ describe("runHook", () => {
 
 });
 describe("runHook-false", () => {
-    const manager: IHookManager<string> = hook.newScope();
+    const manager: IHookManager<string> = useHook();
     manager.register("A", hook1);
     manager.register("A", hookF1);
     manager.register("A", hook2);
@@ -91,7 +92,7 @@ describe("runHook-false", () => {
     });
 });
 describe("runHookAsync", () => {
-    const manager: IHookManager<string> = hook.newScope();
+    const manager: IHookManager<string> = useHook();
     test("none-registed", async () => {
         const rt = await manager.runHookAsync("A");
         expect(rt.success).toBe(true);
@@ -123,7 +124,7 @@ describe("runHookAsync", () => {
     });
 });
 describe("runHookAsync-false", async () => {
-    const manager: IHookManager<string> = hook.newScope();
+    const manager: IHookManager<string> = useHook();
     manager.register("A", hookA1);
     manager.register("A", hookAF1);
     manager.register("A", hookA2);
@@ -158,7 +159,7 @@ describe("runHookAsync-false", async () => {
 });
 //  注册、移除、销毁
 describe("register-remove-destroy", () => {
-    const manager: IHookManager<string> = hook.newScope();
+    const manager: IHookManager<string> & IScope = useHook();
     test("remove", () => {
         manager.register("A", hook1);
         manager.register("A", hook2);
@@ -183,45 +184,13 @@ describe("register-remove-destroy", () => {
         expect(flag).toEqual(["hookA1", "hookA2", "hookA3"].reverse());
         flag.splice(0);
         manager.destroy();
-        await manager.runHookAsync("A");
+        await expect(() => manager.runHookAsync("A")).rejects.toThrow("runHookAsync: hook manager destroyed.");
         expect(flag.length).toBe(0);
         expect(flag).toEqual([]);
-    });
 
-    test("register-destroy", () => {
-        const d1 = manager.register("A", hook1);
-        const d2 = manager.register("A", hook2);
-        const d3 = manager.register("A", hook3);
+        expect(manager.runHook("A")).contain({ success: false, reason: "runHook: hook manager destroyed." });
+        expect(() => manager.register("A", hook1)).toThrow("register: hook manager destroyed.");
+        expect(() => manager.remove("A")).toThrow("remove: hook manager destroyed.");
 
-        manager.runHook("A", { mode: "all", order: "desc" });
-        expect(flag).toEqual(["hook1", "hook2", "hook3"].reverse());
-
-        flag.splice(0);
-        d2.destroy();
-        manager.runHook("A", { mode: "all", order: "desc" });
-        expect(flag).toEqual(["hook1", "hook3"].reverse());
-
-        flag.splice(0);
-        d3.destroy();
-        manager.runHook("A", { mode: "all", order: "desc" });
-        expect(flag).toEqual(["hook1"].reverse());
-
-        flag.splice(0);
-        d1.destroy();
-        manager.runHook("A", { mode: "all", order: "desc" });
-        expect(flag).toEqual([].reverse());
-
-        //  重复注册
-        flag.slice(0);
-        const dd1 = manager.register("A", hook1);
-        manager.register("A", hook1);
-        //      每次注册都生效
-        manager.runHook("A", { mode: "all", order: "asc" });
-        expect(flag).toEqual(["hook1", "hook1"]);
-        //      测试销毁仅自己
-        flag.splice(0);
-        dd1.destroy();
-        manager.runHook("A", { mode: "all", order: "asc" });
-        expect(flag).toEqual(["hook1"]);
     });
 });

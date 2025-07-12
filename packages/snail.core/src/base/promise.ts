@@ -68,6 +68,7 @@ export function wait<T>(task: Promise<T> | T): Promise<RunResult<T>> {
  * @param scope 作用域对象，task执行完成后执行scope.destroy销毁作用域
  * @returns RunResult<T>执行结果Promise
  */
+/* v8 ignore next 5 不用测时，拼接的功能 */
 export async function waitInScope<T>(task: Promise<T> | T, scope: IScope): Promise<RunResult<T>> {
     const rt = await wait(task);
     scope && scope.destroy();

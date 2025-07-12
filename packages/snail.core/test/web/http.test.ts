@@ -1,10 +1,10 @@
 import { assert, describe, expect, test } from 'vitest'
-import { http } from "../../src/web/http"
+import { useHttp, useHttpByServer, configHttp, configHttpIntercept } from "../../src/web/http"
 import { IHttpClient } from '../../src/web/models/http-model';
 import { delay } from '../../src/base/promise';
 import { server } from '../../src/web/server';
 
-const hc: IHttpClient = http.create({ origin: "https://fanyi.baidu.com/" });
+const hc: IHttpClient = useHttp({ origin: "https://fanyi.baidu.com/" });
 //  默认配置：百度接口，没做其他配置，虽然后返回值，状态码200，
 test("default", async () => {
     var data = await hc.send({
@@ -77,10 +77,10 @@ test("throwError", async () => {
     await expect(() => hc.send({ url: "/mtpe-individual/multimodal?11", timeout: 1, method: "GET" }))
         .rejects.toThrow("request is timeout");
     //  @ts-ignore
-    await expect(() => http.create().send({ url: "/mtpe-individual/multimodal" }))
+    await expect(() => useHttp().send({ url: "/mtpe-individual/multimodal" }))
         .rejects.toThrow("invalid.url:/mtpe-individual/multimodal,orign:undefined");
     //  @ts-ignore
-    await expect(() => http.create("").send({ url: "https://mp.weixin.qq.com/1" }))
+    await expect(() => useHttp("").send({ url: "https://mp.weixin.qq.com/1" }))
         .rejects.toThrow("response status is not ok:404 Not Found");
     //  测试status 非ok
     await expect(() => hc.get("https://mp.weixin.qq.com/1"))
@@ -90,23 +90,22 @@ test("throwError", async () => {
         .rejects.toThrow(/^fetch error\./);
 });
 
-
 //  配置后的http请求
 test("config", async () => {
-    http.config({ accept: "application/json", contentType: "application/json;charset=utf-8" });
+    configHttp({ accept: "application/json", contentType: "application/json;charset=utf-8" });
     var data = await hc.get("/mtpe-individual/multimodal");
     expect(data).toMatch(/<title>百度翻译-您的超级翻译伙伴（文本、文档翻译）<\/title>/);
     var data = await hc.get("/mtpe-individual/multimodal");
     expect(data).toMatch(/<title>百度翻译-您的超级翻译伙伴（文本、文档翻译）<\/title>/);
-    http.config({ accept: "application/json", contentType: undefined! });
+    configHttp({ accept: "application/json", contentType: undefined! });
 });
 
 //  执行http拦截
 test("interceptor", async () => {
     //  无效情况测试
-    expect(() => http.intercept(undefined!)).toThrow("interceptor must be an Object,like {match,request,resolve,reject}");
-    expect(() => http.intercept({ match: undefined! })).toThrow("interceptor.match must be a RegExp or not empty string");
-    expect(http.intercept({ match: "/" }));
+    expect(() => configHttpIntercept(undefined!)).toThrow("interceptor must be an Object,like {match,request,resolve,reject}");
+    expect(() => configHttpIntercept({ match: undefined! })).toThrow("interceptor.match must be a RegExp or not empty string");
+    expect(configHttpIntercept({ match: "/" }));
     let gReq = 0, gRes = 0, gRej = 0;
     let hcReq = 0, hcRes = 0, hcRej = 0;
     const clear = function () {
@@ -114,7 +113,7 @@ test("interceptor", async () => {
         hcReq = 0, hcRes = 0, hcRej = 0;
     }
     //  request拦截：两层(全局、自己)
-    var ihandle = http.intercept({
+    var ihandle = configHttpIntercept({
         match: /\/.*/gi,
         request(request) {
             gReq += 1;
@@ -129,7 +128,7 @@ test("interceptor", async () => {
             return reason;
         },
     });
-    http.intercept({
+    configHttpIntercept({
         match: "/TestHttp",
         request(request) {
             gReq += 1;
@@ -187,3 +186,5 @@ test("interceptor", async () => {
     await expect(hc.post("/TestHttp1", 1)).rejects.toThrow("request intercepted with false");
     await expect(hc.post("/TestHttp1", 100)).rejects.toThrow("response intercepted with error.haha:haha");
 });
+
+

@@ -1,5 +1,5 @@
 import { assert, describe, expect, test, it, afterEach } from 'vitest'
-import { version } from "../../src/web/version"
+import { configVersion, useVersion, version } from "../../src/web/version"
 import { IVersionManager } from '../../src/web/models/version-model'
 
 function tmpFunc(vm: IVersionManager): void {
@@ -37,15 +37,15 @@ describe("global-scope", () => {
         expect(defaultQueryVersion).toStrictEqual(`_snv=${defaultVersion}`);
     });
 
-    version.config({ version: "1x3", query: "_snvxx" });
+    configVersion({ version: "1x3", query: "_snvxx" });
     test("global", () => tmpFunc(version));
-    test("newScope", () => tmpFunc(version.newScope({ version: "1x3", query: "_snvxx" })));
-    test("newScope1", () => tmpFunc(version.newScope({ version: "1x3", query: "_snvxx" })));
+    test("newScope", () => tmpFunc(useVersion({ version: "1x3", query: "_snvxx" })));
+    test("newScope1", () => tmpFunc(useVersion({ version: "1x3", query: "_snvxx" })));
 })
 
 //  测试隔离性
 test("private", () => {
-    let vm1 = version.config({ version: "0" }), vm2 = version.newScope({ version: "1" }), vm3 = version.newScope({ version: "2" });
+    let vm1 = configVersion({ version: "0" }), vm2 = useVersion({ version: "1" }), vm3 = useVersion({ version: "2" });
     [vm1, vm2, vm3].forEach((vm, index) => {
         vm.addFile("/test?x", "/test?x=" + index)
     });

@@ -42,6 +42,12 @@ export interface IScopes extends IScope {
      * @param child 子作用域对象
      */
     remove(child: IScope): void;
+    /**
+     * 获取【子作用域】
+     * - 内部执行add加入当前【作用域组】
+     * @returns 全新的【子作用域】
+     */
+    get(): IScope;
 }
 
 /**
@@ -52,33 +58,18 @@ export interface IScopes extends IScope {
 export interface IAsyncScope<T> extends Promise<T>, IScope { }
 
 /**
- * 接口：作用域管理器
+ * 【唯一作用域】use结果
  */
-export interface IScopeManager {
+export type KeyScopeUseResult = {
     /**
-     * 给指定对象挂载【作用域】
-     * - 将IScope的相关属性、方法挂载到target对象上
-     * - 这里一个助手类方法，方便基于继承IScope构建新对象，如Http请求、Hook管理等
-     * @param target 要挂载【作用域】的实例
-     * @returns target，方便链式调用
+     * 作用域对象
      */
-    mountScope<T>(target: T): T;
+    scope: IScope;
 
     /**
-     * 使用新的【作用域】
-     * @returns 【作用域】对象
+     * scope是复用的吗
+     * - true 复用已存在的
+     * - false 新创建的
      */
-    useScope(): IScope;
-    /**
-     * 使用新的【作用域组】
-     * @returns 【作用域组】对象
-     */
-    useScopes(): IScopes;
-    /**
-     * 使用【异步作用域】
-     * - 等待task执行完成后，自动销毁作用域
-     * @param task 异步任务对象
-     * @returns 【异步作用域】对象
-     */
-    useAsyncScope<T>(task: Promise<T>): IAsyncScope<T>;
+    reuse: boolean;
 }

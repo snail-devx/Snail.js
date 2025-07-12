@@ -1,6 +1,6 @@
 import { afterAll, assert, describe, expect, test } from 'vitest'
-import { script } from "../../src/web/script"
-import { http } from '../../src/web/http';
+import { script, useScript, IScriptManager, configScript } from "../../src/web/script"
+import { useHttp, configHttpIntercept } from '../../src/web/http';
 import { HttpRequest } from '../../src/web/models/http-model';
 import { version } from '../../src/web/version';
 
@@ -8,7 +8,7 @@ import { version } from '../../src/web/version';
 let counterAMD = 0, counterIIFE = 0, counterUMD = 0;
 {
     //  amd脚本拦截
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/amd\.js/i,
         request(request: HttpRequest) {
             console.log("-----------------------", request.url);
@@ -27,7 +27,7 @@ let counterAMD = 0, counterIIFE = 0, counterUMD = 0;
         },
     });
     //  cmd脚本拦截
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/cmd\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(`
@@ -40,7 +40,7 @@ let counterAMD = 0, counterIIFE = 0, counterUMD = 0;
         },
     });
     //  iife脚本拦截
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/iife\.js/i,
         request(request: HttpRequest) {
             counterIIFE += 1;
@@ -55,7 +55,7 @@ let counterAMD = 0, counterIIFE = 0, counterUMD = 0;
         },
     });
     //  umd脚本拦截
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/umd\.js/i,
         request(request: HttpRequest) {
             counterUMD += 1;
@@ -74,7 +74,7 @@ let counterAMD = 0, counterIIFE = 0, counterUMD = 0;
         },
     });
     //  复杂脚本拦截：测试依赖
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/complex\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(`
@@ -89,7 +89,7 @@ let counterAMD = 0, counterIIFE = 0, counterUMD = 0;
         },
     });
     //  复杂脚本拦截：测试死循环
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/complex2\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(`
@@ -103,7 +103,7 @@ let counterAMD = 0, counterIIFE = 0, counterUMD = 0;
         `);
         },
     });
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/complex3\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(`
@@ -183,7 +183,7 @@ test("default-global", async () => {
 });
 //  默认的覆盖性测试
 test("default-coverage", async () => {
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/amd2\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(`
@@ -193,7 +193,7 @@ test("default-coverage", async () => {
         `);
         },
     });
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/amd3\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(`
@@ -203,7 +203,7 @@ test("default-coverage", async () => {
         `);
         },
     });
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/amd4\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(`
@@ -213,7 +213,7 @@ test("default-coverage", async () => {
         `);
         },
     });
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/amd5\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(`
@@ -221,7 +221,7 @@ test("default-coverage", async () => {
         `);
         },
     });
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/amd6\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(`
@@ -232,7 +232,7 @@ test("default-coverage", async () => {
         `);
         },
     });
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/amd7\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(`
@@ -257,7 +257,7 @@ test("default-coverage", async () => {
     expect(data.name).toStrictEqual("amd7");
 
     //  测试空代码
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/iife2\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(``);
@@ -266,7 +266,7 @@ test("default-coverage", async () => {
     data = await script.load<any>("scripts/iife2.js");
     expect(data === undefined).toStrictEqual(true);
     //  测试iife的return结果作为exports
-    http.intercept({
+    configHttpIntercept({
         match: /scripts\/iife3\.js/i,
         request(request: HttpRequest) {
             return Promise.resolve(`
@@ -294,7 +294,7 @@ test("dependencies", async () => {
 });
 //  测试配置
 test("config", async () => {
-    script.config({
+    configScript({
         origin: "http://localhost:3000",
     });
     let data = await script.load<any>("scripts/amd.js");
@@ -321,7 +321,7 @@ test("scope", async () => {
     expect(script.has("/scripts/amd-scope.js")).toStrictEqual(true);
 
     //  scope加载
-    const sm = script.newScope({ origin: "http://localhost:4000", version: version });
+    const sm = useScript({ origin: "http://localhost:4000", version: version });
     var sHandle = sm.register("http://localhost:4000/amd.js", "http://localhost:5000/xxxamd.js");
     expect(sm.has("snail-amd1")).toStrictEqual(false);
     expect(sm.has("/scripts/amd-scope.js")).toStrictEqual(false);
@@ -352,8 +352,12 @@ test("scope", async () => {
     expect(sm.has("/amd.js")).toStrictEqual(false);
     sm.register("http://localhost:4000/amd.js");
     expect(sm.has("/amd.js")).toStrictEqual(true);
+
     sm.destroy();
-    expect(sm.has("/amd.js")).toStrictEqual(false);
+    expect(() => sm.has("/amd.js")).toThrow("has: script manager destroyed.");
+    expect(() => sm.register("/amd.js")).toThrow("register: script manager destroyed.");
+    await expect(() => sm.load("/amd.js")).rejects.toThrow("load: script manager destroyed.");
+    await expect(() => sm.loads(["/amd.js"])).rejects.toThrow("loads: script manager destroyed.");
 
     //  最后断言拦截次数：确保资源复用
     assertCounter();

@@ -1,5 +1,5 @@
 import { assert, describe, expect, test } from 'vitest'
-import { event } from "../../src/base/event"
+import { event, useEvent } from "../../src/base/event"
 import { EventHandle, IEventManager } from '../../src/base/models/event-model';
 import { delay } from '../../src/base/promise';
 
@@ -55,16 +55,16 @@ async function testFunc(em: IEventManager) {
 
 //  测试全局的
 test("global", async () => testFunc(event));
-test("newScope", async () => testFunc(event.newScope()));
-test("mountScope", async () => testFunc(event.newScope()));
+test("newScope", async () => testFunc(useEvent()));
+test("mountScope", async () => testFunc(useEvent()));
 
 //  测试各个事件对象的隔离性；
 test("test-private", async () => {
     let global_number = 0, scope1_number = 0, scope2_number = 0;
 
     event.on<number>("private", number => global_number = number!);
-    const event1 = event.newScope().on<number>("private", number => scope1_number = number!);
-    const event2 = event.newScope().on<number>("private", number => scope2_number = number!);
+    const event1 = useEvent().on<number>("private", number => scope1_number = number!);
+    const event2 = useEvent().on<number>("private", number => scope2_number = number!);
 
     event.trigger<number>("private", 100);
     event1.trigger<number>("private", 200);

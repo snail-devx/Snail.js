@@ -4,7 +4,7 @@ import { IVersionManager } from "./version-model";
 /**
  * 接口：脚本管理器
  */
-export interface IScriptManager extends IScope {
+export interface IScriptManager {
     /**
      * 注册脚本
      * - 重复注册同一脚本，报错
