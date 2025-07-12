@@ -3,7 +3,7 @@
  */
 
 import { InputOptions } from "../models/input-model";
-import { getAlignStyle, getSizeStyle } from "snail.style";
+import { style } from "snail.view";
 
 /**
  * 获取输入框标题区域样式
@@ -12,10 +12,7 @@ import { getAlignStyle, getSizeStyle } from "snail.style";
  * @returns 样式对象
  */
 export function getTitleStyle(options: InputOptions, isFlex: boolean): Partial<CSSStyleDeclaration> {
-    const style: Record<string, any> = Object.create(null);
-    if (options.titleStyle) {
-        getSizeStyle(style, options.titleStyle, "width", isFlex);
-        getAlignStyle(style, options.titleStyle, isFlex);
-    }
-    return style;
+    return options && options.titleStyle
+        ? style.build({ ...options.titleStyle, width: options.titleStyle }, isFlex)
+        : Object.create(null);
 }

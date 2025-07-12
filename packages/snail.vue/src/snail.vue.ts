@@ -1,6 +1,6 @@
 
 import { createApp } from "vue";
-import { IScope, isFunction, mustObject, throwError } from "snail.core";
+import { IScope, isFunction, mustObject, throwError, useScope } from "snail.core";
 
 //  👉 base 相关导出
 //      类型导出
@@ -18,7 +18,6 @@ import Switch from "./base/switch.vue";
 //      方法导出
 export * from "./base/utils/app-util";
 export * from "./base/utils/icon-util";
-export * from "./base/utils/observer-util";
 export * from "./base/utils/ref-util";
 //#endregion
 
@@ -99,10 +98,8 @@ export function mount(options: ComponentMountOptions, onDestroyed?: (fn: () => v
     });
     triggerAppCreated(app);
     app.mount(options.target);
-    /** 销毁App；取消挂载 */
-    function destroy() {
-        app.unmount();
-    }
-    isFunction(onDestroyed) && onDestroyed(destroy);
-    return { destroy }
+    //  构建作用域，监听作用域销毁，并销毁app
+    const scope = useScope().onDestroy(() => app.unmount());
+    isFunction(onDestroyed) && onDestroyed(scope.destroy);
+    return scope;
 }

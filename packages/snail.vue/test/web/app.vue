@@ -2,7 +2,8 @@
     <div style="width: 100%;height: 100%;position: relative;">
         <!-- <LoadingTest /> -->
         <!-- <DynamicTest /> -->
-        <DialogTest />
+        <!-- <DialogTest /> -->
+        <FoldTest />
     </div>
 </template>
 <script setup lang="ts">
@@ -12,6 +13,7 @@ import { Component, getCurrentScope, shallowRef } from "vue";
 import DynamicTest from "./container/dynamic-test.vue";
 import DialogTest from "./container/dialog-test.vue";
 import LoadingTest from "./prompt/loading-test.vue";
+import FoldTest from "./container/fold-test.vue";
 
 defineProps(["testNumber"]);
 

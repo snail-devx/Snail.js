@@ -1,4 +1,4 @@
-import { AlignStyle, SizeOptions } from "snail.style";
+import { AlignStyle, SizeOptions } from "snail.view";
 
 /**
  * 输入框配置选项

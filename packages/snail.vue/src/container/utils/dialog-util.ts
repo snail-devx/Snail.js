@@ -7,8 +7,8 @@ import { App, createApp, getCurrentScope, ref, ShallowRef, shallowRef } from "vu
 import { Dialog, DialogOpenResult, DialogOptions } from "../models/dialog-model";
 import DialogWrapper from "../components/dialog-wrapper.vue";
 import { triggerAppCreated } from "../../base/utils/app-util";
-import { defer, IScope, isFunction, isPromise, mustFunction, mustObject, newId } from "snail.core";
-import { run, hook } from "snail.core";
+import { defer, IScope, isFunction, isPromise, mustFunction, mustObject, newId, useScope } from "snail.core";
+import { run, useHook } from "snail.core";
 
 /**
  * 打开模态弹窗
@@ -73,12 +73,10 @@ export function openDialog<T>(options: DialogOptions, onDestroyed?: (fn: () => v
  */
 export async function scopeDialog<T>(options: DialogOptions, scopeRef: ShallowRef<IScope | undefined>): Promise<T> {
     scopeRef.value && scopeRef.value.destroy();
-    scopeRef.value = {
-        destroy() {
-            scopeRef.value = undefined;
-            ret.destroy();
-        }
-    }
+    scopeRef.value = useScope().onDestroy(() => {
+        scopeRef.value = undefined;
+        ret.destroy();
+    });
     const ret: DialogOpenResult<T> = openDialog(options);
     //  等待弹窗关闭并销毁
     const data: T = await ret;
@@ -90,7 +88,7 @@ export async function scopeDialog<T>(options: DialogOptions, scopeRef: ShallowRe
 /** 打开的弹窗实例 */
 const descriptors = ref<Dialog[]>([]);
 /** 弹窗钩子函数 */
-const dialogHook = hook.newScope<string>();
+const dialogHook = useHook<string>();
 
 /**
  * 创建指定对话框的dialogHook

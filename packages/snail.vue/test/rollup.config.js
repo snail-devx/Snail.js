@@ -4,9 +4,9 @@ import { fileURLToPath } from "url";
 
 import htmlPlugin from "snail.rollup-html";
 import scriptPlugin from "snail.rollup-script";
-import stylePlugin from "snail.rollup-style";
+import stylePlugin, { MODULE_INJECT_LINK, STYLE_EXTEND_PATHS } from "snail.rollup-style";
 import vuePlugin from "snail.rollup-vue"
-import injectPlugin from "snail.rollup-inject";
+import injectPlugin, { registerDynamicModule, removeDynamicModule } from "snail.rollup-inject";
 import urlPlugin from "snail.rollup-url";
 import assetPlugin from "snail.rollup-asset";
 
@@ -16,6 +16,18 @@ import assetPlugin from "snail.rollup-asset";
 const __filename = fileURLToPath(import.meta.url);
 /** 文件所处目录路径  */
 const __dirname = dirname(__filename);
+
+//  动态注入代码注册
+{
+    //  使用snail.core的style模块进行动态css注册，替还 snail.rollup-style默认的addLink方法
+    removeDynamicModule(MODULE_INJECT_LINK);
+    registerDynamicModule(MODULE_INJECT_LINK, `
+        import { link } from "snail.view";
+        export default href => setTimeout(link.register, 0, href);
+    `);
+    //  增加 less 动态引入时的相对路径查找
+    STYLE_EXTEND_PATHS.push(resolve(__dirname, "node_modules"))
+}
 
 /**
  * 构建选项
@@ -28,6 +40,7 @@ const options = {
     distRoot: resolve(__dirname, 'dist'),
     commonLib: [
         { id: "snail.core", name: "Snail", url: "/library/snail.core.umd.js" },
+        { id: "snail.view", name: "SnailView", url: "/library/snail.view.umd.js" },
         { id: 'vue', name: 'Vue', url: '/library/vue.global.js' },
     ]
 }
@@ -43,6 +56,7 @@ const builder = Builder.getBuilder(options, (component, context, options) => {
         htmlPlugin(component, context, options,
             `<!-- 加载依赖脚本 -->
     <script src="/library/snail.core.umd.js"></script>
+    <script src="/library/snail.view.umd.js"></script>
     <script src="/library/vue.global.js"></script>
     <script src="${component.url}?${new Date().getTime()}"></script>
             `
@@ -63,6 +77,7 @@ const components = builder.build([
         views: ["index.html"],
         assets: [
             "library/snail.core.umd.js",
+            "library/snail.view.umd.js",
             "library/vue.global.js"
         ]
     },

@@ -20,7 +20,8 @@
 import { ref, onMounted, onUnmounted, useTemplateRef, computed } from "vue";
 import { ToastHandle, ToastOptions } from "../models/toast-model";
 import Icon from "../../base/icon.vue"
-import { onResize, useScopes } from "../../base/utils/observer-util";
+import { useScopes } from "snail.core";
+import { useObserver } from "snail.view";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -33,10 +34,10 @@ const showToast = ref(false);
 const closeFill = ref("#707070");
 /** toast弹窗大小 */
 const toastSize = ref({ width: 0, height: 0 });
-/** 使用IScope管理器，监听一些事件 */
-const scopes = useScopes();
 /** 自动销毁时的定时器 */
 var destroyTimer: NodeJS.Timeout;
+/** 元素观察者作用域 */
+const observer = useObserver();
 //  2、可选配置选项
 defineOptions({ name: "Toast", inheritAttrs: true });
 
@@ -62,12 +63,12 @@ function onToastClose() {
 // *****************************************   👉  组件渲染    *****************************************
 // 监听大小变化，进行水平、垂直居中处理
 onMounted(() => {
-    scopes.add(onResize(toastRef.value, size => toastSize.value = size));
+    observer.onSize(toastRef.value, size => toastSize.value = size);
     destroyTimer = setTimeout(onToastClose, 2000);
     showToast.value = true;
 });
 onUnmounted(() => {
-    scopes.destroy();
+    observer.destroy();
     destroyTimer && clearTimeout(destroyTimer);
 });
 </script>
