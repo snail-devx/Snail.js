@@ -2,9 +2,9 @@
 <template>
     <footer class="snail-footer" :class="{ 'start-divider': props.divider }" v-bind:class="props.align || 'right'">
         <slot>
-            <Button v-if="props.cancelDisable != true" :size="'max'" :type="'default'" @click="emit('cancel')"
+            <Button v-if="props.cancelDisabled != true" :size="'max'" :type="'default'" @click="emit('cancel')"
                 v-text="props.cancelName || '取消'" />
-            <Button v-if="props.confirmDisable != true" :size="'max'" :type="'primary'" @click="emit('confirm')"
+            <Button v-if="props.confirmDisabled != true" :size="'max'" :type="'primary'" @click="emit('confirm')"
                 v-text="props.confirmName || '确定'" />
         </slot>
     </footer>

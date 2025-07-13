@@ -23,7 +23,7 @@ export interface ICSSManager {
      * @param isFlex 是否是flex布局
      * @returns 计算出来的组件样式信息
      */
-    buildStyle(options: AllStyle | undefined, isFlex?: boolean): Partial<CSSStyleDeclaration>;
+    buildStyle(options: AllStyle | undefined, isFlex?: boolean): Record<string, string>;
 }
 
 /**

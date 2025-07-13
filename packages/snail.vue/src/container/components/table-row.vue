@@ -8,16 +8,13 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { TableRowOptions } from "../models/table-model"
+import { css } from "snail.view";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<TableRowOptions>();
-/**     行样式*/
-const rowStyle = computed<Record<string, any>>(() => {
-    const style: CSSStyleDeclaration = Object.create(null);
-    props.height > 0 && (style.height = props.height + (props.unit || "px"));
-    return style;
-});
+/**     行样式：使用css样式*/
+const rowStyle = computed(() => css.buildStyle(props));
 //  2、可选配置选项
 defineOptions({ name: "TableRow", inheritAttrs: true, });
 </script>

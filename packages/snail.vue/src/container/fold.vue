@@ -10,7 +10,7 @@
             <slot name="header">
                 <div class="title" v-text="props.title" />
                 <div class="subtitle" v-if="!!props.subtitle" v-text="props.subtitle" />
-                <div class="status" v-if="props.disable != true">
+                <div class="status" v-if="props.disabled != true">
                     <span :title="status == 'expand' ? '收起' : '展开'" ref="foldStatusSpan">
                         <Icon :type="'custom'" :draw="statusIcon" @click="onStatusClick" />
                     </span>
@@ -28,8 +28,8 @@
 import { onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from "vue";
 import { FoldEvents, FoldOptions, FoldStatus } from "./models/fold-model";
 import { getFoldStatusDraw } from "./utils/fold-util";
-import { TransitionCSS, useAnimation } from "snail.view";
-import { throwError } from "snail.core";
+import { useAnimation } from "snail.view";
+import { throwError, useScopes } from "snail.core";
 import Icon from "../base/icon.vue";
 
 // *****************************************   👉  组件定义    *****************************************

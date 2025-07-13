@@ -1,6 +1,6 @@
 /**
  * 视图观察者
- *  1、观察元素尺寸、位置变化
+ *  
  * 注意事项：
  *  1、不提供全局【观察者】对象；这个涉到不少子scope的销毁，在全局挂着始终不好
  */
@@ -12,6 +12,8 @@ export * from "../models/observer-model";
 
 /**
  * 使用【观察者】
+ * - 观察元素尺寸、位置变化
+ * - 观察事件，scope销毁时自动清理事件监听
  * @returns 全新的【观察者】+作用域
  */
 export function useObserver(): IObserver & IScope {
@@ -28,7 +30,7 @@ export function useObserver(): IObserver & IScope {
      * @param fn 事件处理方法
      * @returns 作用域，可销毁监听
      */
-    function onEvent(target: Element | Window, name: string, fn: EventListenerOrEventListenerObject): IScope {
+    function onEvent(target: Element | Window, name: string, fn: (...args: any[]) => void): IScope {
         checkScope(manager, "onEvent: observer destroyed.");
         throwIfFalse(target instanceof Element || target === window, "onEvent: target must be a Element or Window")
         mustString(name, "onEvent: name");

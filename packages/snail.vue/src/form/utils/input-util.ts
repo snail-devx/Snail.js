@@ -3,7 +3,7 @@
  */
 
 import { InputOptions } from "../models/input-model";
-import { style } from "snail.view";
+import { css } from "snail.view";
 
 /**
  * 获取输入框标题区域样式
@@ -13,6 +13,6 @@ import { style } from "snail.view";
  */
 export function getTitleStyle(options: InputOptions, isFlex: boolean): Partial<CSSStyleDeclaration> {
     return options && options.titleStyle
-        ? style.build({ ...options.titleStyle, width: options.titleStyle }, isFlex)
+        ? css.buildStyle(options.titleStyle, isFlex)
         : Object.create(null);
 }

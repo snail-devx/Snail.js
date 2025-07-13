@@ -9,10 +9,11 @@ export type LoadingOptions = {
     show: boolean;
 
     /**
-     * 展示遮罩层
-     * - 默认值：false，显示遮罩层
+     * 禁用【遮罩层】
+     * - false  显示遮罩层
+     * - true   不显示遮罩层
      */
-    disabledMask?: boolean;
+    maskDisabled?: boolean;
     /**
      * loading的根样式
      * - 外部传入后，可进行自由定制loading样式

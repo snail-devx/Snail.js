@@ -1,6 +1,5 @@
-import { AsyncResult, IScope } from "snail.core";
-import { ComponentMountOptions, ComponentOptions } from "./component-model"
-import { PropType } from "vue";
+import { IScope } from "snail.core";
+import { ComponentOptions } from "./component-model"
 
 /**
  * 模态弹窗显示的组件配置选项

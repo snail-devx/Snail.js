@@ -1,4 +1,4 @@
-import { AlignStyle, SizeOptions } from "snail.view";
+import { AlignStyle, FlexStyle, WidthStyle } from "snail.view"
 
 /**
  * 输入框配置选项
@@ -44,7 +44,7 @@ export type InputOptions = {
      * - 对齐方式
      * - 标题区域宽度
      */
-    titleStyle?: AlignStyle & SizeOptions;
+    titleStyle?: AlignStyle & WidthStyle & FlexStyle;
     /**
      * 输入框自定义验证方法
      * @param value 输入框文本值

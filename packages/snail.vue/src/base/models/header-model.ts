@@ -1,5 +1,3 @@
-
-
 /**
  * 头部配置选项
  */
@@ -27,7 +25,7 @@ export type HeaderOptions = {
     /** 禁用【关闭】按钮
      * - 默认值false 
      */
-    closeDisable?: boolean;
+    closeDisabled?: boolean;
 }
 
 /**

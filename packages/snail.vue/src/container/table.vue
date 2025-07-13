@@ -6,17 +6,17 @@
     <Scroll class="snail-table" :scroll-x="props.scrollX" :scroll-y="props.scrollY"
         :class="{ 'start-border': props.border == true }">
         <!-- 头部区域 -->
-        <header class="table-header" :style="getStyle(props.headerStyle)">
+        <div class="table-header" :style="getStyle(props.headerStyle)">
             <slot name="header" />
-        </header>
+        </div>
         <!-- 内容区域：滚动 -->
-        <main class="table-body">
+        <div class="table-body">
             <slot />
-        </main>
+        </div>
         <!-- 尾部区域 -->
-        <footer class="table-footer" :style="getStyle(props.footerStyle)">
+        <div class="table-footer" :style="getStyle(props.footerStyle)">
             <slot name="footer" />
-        </footer>
+        </div>
     </Scroll>
 </template>
 
@@ -37,10 +37,11 @@ defineOptions({ name: "Table", inheritAttrs: true, });
  * @param styleOptions 样式配置项
  */
 function getStyle(styleOptions: TableStyleOptions): Record<string, any> {
+    //  snail.view中还没封装 background属性，暂时先这样
     styleOptions = styleOptions || {};
     const style: CSSStyleDeclaration = Object.create(null);
     styleOptions.background && (style.background = styleOptions.background);
-    styleOptions.height && (style.height = styleOptions.height + (styleOptions.heightUnit || "px"));
+    styleOptions.height && (style.height = styleOptions.height);
     return style;
 }
 </script>
@@ -51,8 +52,8 @@ function getStyle(styleOptions: TableStyleOptions): Record<string, any> {
     flex-direction: column;
 
     //  表头区域、底部区域：不缩放；内部居中对齐，
-    >header.table-header,
-    >footer.table-footer {
+    >div.table-header,
+    >div.table-footer {
         width: 100%;
         display: flex;
         align-items: center;
@@ -60,13 +61,13 @@ function getStyle(styleOptions: TableStyleOptions): Record<string, any> {
     }
 
     //  表头钉住位置
-    >header.table-header {
+    >div.table-header {
         position: sticky !important;
         top: 0;
     }
 
     // 实际内容区域
-    >main.table-body {
+    >div.table-body {
         width: 100%;
         flex: 1;
     }
@@ -77,17 +78,17 @@ function getStyle(styleOptions: TableStyleOptions): Record<string, any> {
 .snail-table.start-border {
 
     //  所有区域的列：从第二列开始取消左边框
-    >header.table-header,
-    >main.table-body>.table-row,
-    >footer.table-footer {
+    >div.table-header,
+    >div.table-body>.table-row,
+    >div.table-footer {
         >.table-col:nth-child(n + 2) {
             border-left: none !important;
         }
     }
 
     //  内容区域和尾部区域：取消列的顶部边框
-    >main.table-body>.table-row,
-    >footer.table-footer {
+    >div.table-body>.table-row,
+    >div.table-footer {
         >.table-col {
             border-top: none !important;
         }

@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
 import { EmptyOptions } from "./models/empty-model";
 import { getNoDataBase64Image } from "./utils/prompt-util";
 

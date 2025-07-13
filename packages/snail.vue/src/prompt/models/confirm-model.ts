@@ -25,7 +25,7 @@ export type ConfirmOptions = {
      * 禁用【取消】按钮
      * - 为true时，不显示【取消】按钮
      */
-    cancelDisable?: boolean;
+    cancelDisabled?: boolean;
 
     /**
      * 【确定】按钮名称
@@ -36,7 +36,7 @@ export type ConfirmOptions = {
      * 禁用【确定】按钮
      * - 为true时，不显示【确定】按钮
      */
-    confirmDisable?: boolean;
+    confirmDisabled?: boolean;
 }
 
 

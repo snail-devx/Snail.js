@@ -5,7 +5,7 @@
  -->
 <template>
     <Transition :name="transition">
-        <div class="snail-loading" :class="{ 'show-mask': disabledMask != true }" v-bind:class="rootClass" v-if="show">
+        <div class="snail-loading" :class="{ 'show-mask': maskDisabled != true }" v-bind:class="rootClass" v-if="show">
             <slot v-bind="$attrs"></slot>
         </div>
     </Transition>
@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { LoadingOptions } from './models/loading-model';
 
-const { show = false, disabledMask = false, rootClass = [], transition = "snail-loading", } = defineProps<LoadingOptions>();
+const { show = false, maskDisabled = false, rootClass = [], transition = "snail-loading", } = defineProps<LoadingOptions>();
 defineOptions({ name: "Loading", inheritAttrs: true });
 </script>
 

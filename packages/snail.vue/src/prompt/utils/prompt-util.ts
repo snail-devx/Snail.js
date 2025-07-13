@@ -1,11 +1,9 @@
 import { Component, createApp } from "vue";
-import { ToastOptions } from "../models/toast-model";
 import Toast from "../components/toast.vue";
 import { IconType } from "../../base/models/icon-model";
 import { DialogOpenResult } from "../../container/models/dialog-model";
 import { defer } from "snail.core";
 import Confirm from "../components/confirm.vue";
-import { ConfirmOptions } from "../models/confirm-model";
 import { openDialog } from "../../container/utils/dialog-util";
 
 //#region *****************************************   👉  内部使用的常量，使用到时才返回，不直接定义为常亮    ****************************************

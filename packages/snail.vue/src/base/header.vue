@@ -10,7 +10,7 @@
         <!-- 插槽区域，自定义内容 -->
         <slot />
         <!-- 关闭按钮区域 -->
-        <Icon v-if="closeDisable != true" class="close-icon" :="closeIconOptions" @click="emit('close')" />
+        <Icon v-if="closeDisabled != true" class="close-icon" :="closeIconOptions" @click="emit('close')" />
     </header>
 </template>
 
@@ -22,7 +22,7 @@ import { computed } from "vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data、event
-const { useTo = 'page', divider, title = "", titleAlign = "center", closeDisable = false } = defineProps<HeaderOptions>();
+const { useTo = 'page', divider, title = "", titleAlign = "center", closeDisabled = false } = defineProps<HeaderOptions>();
 const emit = defineEmits<HeaderEvents>();
 /**     关闭按钮配置选项 */
 const closeIconOptions = computed<IconOptions>(() => ({

@@ -337,16 +337,16 @@
             }
           }
         },
-        create: {
+        get: {
           enumerable: false,
           writable: false,
           value: function () {
-            checkScope(scopes, "useScopes.create: scopes destroyed.");
+            checkScope(scopes, "useScopes.get: scopes destroyed.");
             return scopes.add(useScope());
           }
         }
       });
-      mountScope(scopes).onDestroy(() => children.forEach(sc => run(sc.destroy)));
+      mountScope(scopes).onDestroy(() => [...children].forEach(sc => run(sc.destroy)));
       return scopes;
     }
     function useAsyncScope(task) {
@@ -542,6 +542,39 @@
       });
       manager.onDestroy(() => hookMap.clear());
       return Object.freeze(manager);
+    }
+
+    function useTimer() {
+      const scopes = useScopes();
+      function onTimeout(fn, timeout) {
+        for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+          args[_key - 2] = arguments[_key];
+        }
+        mustFunction(fn, 'onTimeout: fn');
+        const scope = scopes.get();
+        const id = setTimeout(() => {
+          if (scope.destroyed == false) {
+            run(fn, ...args);
+            scope.destroy();
+          }
+        }, timeout);
+        return scope.onDestroy(() => clearTimeout(id));
+      }
+      function onInterval(fn, timeout) {
+        for (var _len2 = arguments.length, args = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+          args[_key2 - 2] = arguments[_key2];
+        }
+        mustFunction(fn, 'onInterval: fn');
+        const scope = scopes.get();
+        const id = setInterval(() => scope.destroyed || fn.apply(this, args), timeout);
+        return scope.onDestroy(() => clearInterval(id));
+      }
+      const manger = mountScope({
+        onTimeout,
+        onInterval
+      });
+      manger.onDestroy(scopes.destroy);
+      return Object.freeze(manger);
     }
 
     const DEFAULT_ServerType = "api";
@@ -1284,6 +1317,7 @@
     exports.useScopes = useScopes;
     exports.useScript = useScript;
     exports.useServer = useServer;
+    exports.useTimer = useTimer;
     exports.useVersion = useVersion;
     exports.version = version;
     exports.wait = wait;

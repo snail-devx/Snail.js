@@ -1,12 +1,14 @@
 <!-- 确认 弹窗组件
+    1、支持定制确认消息、按钮信息
+    2、这里的header、main、footer 保持不变，弹窗算一个独立页面
 -->
 <template>
     <div class="snail-confirm">
         <Header :use-to="'dialog'" :title="props.title || '提示'" @close="props.closeDialog(false)" />
         <main v-html="props.message || '请确认？'"></main>
-        <Footer align="right" :cancel-name="props.cancelName" :cancel-disable="props.cancelDisable"
-            :confirm-name="props.confirmName" :confirm-disable="props.confirmDisable" @cancel="props.closeDialog(false)"
-            @confirm="props.closeDialog(true)" />
+        <Footer align="right" :cancel-name="props.cancelName" :cancel-disable="props.cancelDisabled"
+            :confirm-name="props.confirmName" :confirm-disable="props.confirmDisabled"
+            @cancel="props.closeDialog(false)" @confirm="props.closeDialog(true)" />
     </div>
 </template>
 

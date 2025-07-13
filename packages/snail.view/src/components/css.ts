@@ -8,6 +8,9 @@ import { isArrayNotEmpty, isObject, isStringNotEmpty } from "snail.core";
 import { AllStyle, CSS, CSSDescriptor, ICSSManager } from "../models/css-model";
 import { buildAlign, buildBorder, buildFlex, buildHeight, buildMargin, buildPadding, buildTransition, buildWidth } from "../utils/css-util";
 
+// 把自己的类型共享出去
+export * from "../models/css-model";
+
 /**
  * 使用【CSS管理器】
  * @returns 全新【CSS管理器】
@@ -63,8 +66,8 @@ function useCSS(): ICSSManager {
      * @param isFlex 是否是flex布局
      * @returns 计算出来的组件样式信息
      */
-    function buildStyle(options: AllStyle | undefined, isFlex?: boolean): Partial<CSSStyleDeclaration> {
-        const style: CSSStyleDeclaration = Object.create(null);
+    function buildStyle(options: AllStyle | undefined, isFlex?: boolean): Record<string, string> {
+        const style: Record<string, string> = Object.create(null);
         if (options) {
             //  对齐方式、布局
             buildAlign(style, options, isFlex);

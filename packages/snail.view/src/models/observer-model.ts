@@ -13,7 +13,7 @@ export interface IObserver {
      * @param fn 事件处理方法
      * @returns 作用域，可销毁监听
      */
-    onEvent(target: Element | Window, name: string, fn: EventListenerOrEventListenerObject): IScope;
+    onEvent(target: Element | Window, name: string, fn: (...args: any[]) => void): IScope;
 
     /**
      * 监听元素尺寸变化

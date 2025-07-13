@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { onActivated, onDeactivated } from "vue";
 import { SwitchEvents, SwitchOptions } from "./models/switch-model";
 
 // *****************************************   👉  组件定义    *****************************************

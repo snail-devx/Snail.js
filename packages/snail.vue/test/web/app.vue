@@ -3,7 +3,8 @@
         <!-- <LoadingTest /> -->
         <!-- <DynamicTest /> -->
         <!-- <DialogTest /> -->
-        <FoldTest />
+        <!-- <FoldTest /> -->
+        <DragVerifyTest />
     </div>
 </template>
 <script setup lang="ts">
@@ -14,6 +15,7 @@ import DynamicTest from "./container/dynamic-test.vue";
 import DialogTest from "./container/dialog-test.vue";
 import LoadingTest from "./prompt/loading-test.vue";
 import FoldTest from "./container/fold-test.vue";
+import DragVerifyTest from "./prompt/drag-verify-test.vue";
 
 defineProps(["testNumber"]);
 

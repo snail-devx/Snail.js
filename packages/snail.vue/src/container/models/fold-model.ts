@@ -13,10 +13,10 @@ export type FoldOptions = {
     subtitle?: string;
 
     /**
-     * 使用禁用【折叠】功能
+     * 禁用【折叠】功能
      * - true 则禁用折叠，始终展开内容区域
      */
-    disable?: boolean;
+    disabled?: boolean;
 }
 
 /**

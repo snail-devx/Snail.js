@@ -12,15 +12,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onActivated, onDeactivated, onMounted, onUnmounted, useTemplateRef } from "vue";
+import { ref, onMounted, onUnmounted, useTemplateRef } from "vue";
 import { DragVerifyOptions, DragVerifyInfo } from "./models/drag-verify-model";
 import Icon from "../base/icon.vue";
 import { getTwoArrowIconDraw } from "./utils/prompt-util";
+import { useObserver } from "snail.view";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const { message = "拖动滑块以完成验证" } = defineProps<DragVerifyOptions>();
 const emit = defineEmits<{ (e: "success") }>();
+/** 组件观察者 */
+const observer = useObserver();
 /** 是否是触摸设备 */
 const isTouch = 'ontouchstart' in window;
 /** 拖拽元素 */
@@ -81,10 +84,11 @@ function onDragEnd() {
 }
 
 // *****************************************   👉  组件渲染    *****************************************
-isTouch || onMounted(() => {
-    addEventListener("mousemove", onDragMove);
-    addEventListener("mouseup", onDragEnd);
+isTouch || onMounted(function () {
+    observer.onEvent(window, "mousemove", onDragMove);
+    observer.onEvent(window, "mouseup", onDragEnd);
 });
+onUnmounted(observer.destroy);
 </script>
 
 <style lang="less">
