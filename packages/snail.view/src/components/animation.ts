@@ -8,7 +8,8 @@
  */
 import { IScope, IScopes, isObject, mountScope, throwIfFalse, useScopes } from "snail.core";
 import { TransitionEffectOptions, IAnimationManager } from "../models/animation-model";
-import { getAnimationScope, operateCSS, parseTransitionCSS } from "../utils/animation-util";
+import { getAnimationScope } from "../utils/animation-util";
+import { css } from "./css";
 
 // 把自己的类型共享出去
 export * from "../models/animation-model";
@@ -41,20 +42,20 @@ export function useAnimation(): IAnimationManager & IScope {
     function transition(el: HTMLElement, effect: TransitionEffectOptions, time?: number): IScope {
         throwIfFalse(isObject(effect), "transition: effect must be an object.");
         const scope = scopes.add(getAnimationScope(manager, el));
-        const fromCss = parseTransitionCSS(effect.from);
-        const toCss = parseTransitionCSS(effect.to);
-        const endCss = parseTransitionCSS(effect.end);
+        const fromCss = css.parse(effect.from);
+        const toCss = css.parse(effect.to);
+        const endCss = css.parse(effect.end);
         //  启动动画：先 清理 to end ；设置 from ，然后异步设置 to
-        operateCSS(el, "clear", toCss);
-        operateCSS(el, "clear", endCss);
-        operateCSS(el, "add", fromCss);
-        setTimeout(operateCSS, 1, el, "add", toCss);
+        css.operate(el, "clear", toCss);
+        css.operate(el, "clear", endCss);
+        css.operate(el, "add", fromCss);
+        setTimeout(css.operate, 1, el, "add", toCss);
         //  返回动画作用域：scope销毁时：执行样式清理；动画结束后，强制销毁scope
         setTimeout(scope.destroy, time > 0 ? time : 200);
         return scope.onDestroy(function () {
-            operateCSS(el, "clear", fromCss);
-            operateCSS(el, "clear", toCss);
-            operateCSS(el, "add", endCss);
+            css.operate(el, "clear", fromCss);
+            css.operate(el, "clear", toCss);
+            css.operate(el, "add", endCss);
         });
     }
     //#endregion

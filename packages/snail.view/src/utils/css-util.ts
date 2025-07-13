@@ -1,6 +1,10 @@
-import { AlignStyle, BorderStyle, MarginStyle, PaddingStyle, SizeOptions, TransitionStyle } from "../models/style-model";
+import {
+    AlignStyle, FlexStyle,
+    WidthStyle, HeightStyle, BorderStyle, MarginStyle, PaddingStyle,
+    TransitionStyle,
+} from "../models/css-model";
 
-//#region ************************************* 样式构建助手类 *************************************
+//#region ************************************* style 样式构建助手类 *************************************
 /**
  * 构建尺寸样式
  * @param style 样式对象
@@ -29,30 +33,42 @@ export function buildAlign(style: Partial<CSSStyleDeclaration>, align: AlignStyl
         align.valign && (style.verticalAlign = align.valign);
     }
 }
+/**
+ * 构建弹性布局
+ * @param style 样式对象
+ * @param flex 弹性布局配置
+ */
+export function buildFlex(style: Partial<CSSStyleDeclaration>, flex: FlexStyle) {
+    if (flex) {
+        flex.flex && (style.flex = flex.flex);
+        flex.flexBasis && (style.flexBasis = flex.flexBasis);
+        flex.flexGrow && (style.flexGrow = String(flex.flexGrow));
+        flex.flexShrink && (style.flexShrink = String(flex.flexShrink));
+    }
+}
 
 /**
- * 构建尺寸样式
- * @param style 样式对象
- * @param size 尺寸配置
- * @param styleName 尺寸样式名：高度、宽度
- * @param isFlex 是否是flex布局
+ * 构建宽度
+ * @param style 
+ * @param width 
  */
-export function buildSize(style: Partial<CSSStyleDeclaration>, size: SizeOptions, styleName: "width" | "height", isFlex: boolean): void {
-    if (size) {
-        var fixed = size.size;
-        //  是flex布局时，优先使用flex值，且强制fixed无效
-        if (isFlex && size.flex != undefined) {
-            fixed = undefined;
-            style.flex = String(size.flex);
-        }
-        //  固定值；最大最小值：fixed无效时生效
-        if (fixed != undefined) {
-            style[styleName] = fixed;
-        }
-        else {
-            size.min != undefined && (style[`min-${styleName}`] = size.min);
-            size.max != undefined && (style[`max-${styleName}`] = size.max);
-        }
+export function buildWidth(style: Partial<CSSStyleDeclaration>, width: WidthStyle) {
+    if (width) {
+        width.width && (style.width = width.width);
+        width.minWidth && (style.minWidth = width.minWidth);
+        width.maxWidth && (style.maxWidth = width.maxWidth);
+    }
+}
+/**
+ * 构建高度样式
+ * @param style 
+ * @param height 
+ */
+export function buildHeight(style: Partial<CSSStyleDeclaration>, height: HeightStyle) {
+    if (height) {
+        height.height && (style.height = height.height);
+        height.minHeight && (style.minHeight = height.minHeight);
+        height.maxHeight && (style.maxHeight = height.maxHeight);
     }
 }
 /**

@@ -3,7 +3,7 @@
     "description": "对视图界面做的一些封装。如样式计算助手方法，常用样式less混入、变量等；dom相关助手类",
     "author": "snail_dev@163.com",
     "license": "MIT",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "type": "module",
     "main": "dist/snail.view.js",
     "module": "dist/snail.view.js",
@@ -14,7 +14,7 @@
         "types": "tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
     },
     "dependencies": {
-        "snail.core": ">=2.0.4"
+        "snail.core": ">=2.0.5"
     },
     "devDependencies": {
         "rollup": ">=4.39.0",

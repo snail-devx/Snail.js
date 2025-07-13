@@ -1,4 +1,5 @@
 import { IScope } from "snail.core";
+import { CSS } from "./css-model";
 
 /**
  * 动画管理器
@@ -24,13 +25,6 @@ export interface IAnimationManager {
 }
 
 /**
- * 过渡动画样式信息，支持class和style
- * - string、string[] 时为 class 类样式名称
- * - Object时为 style 样式对象：key为样式名称（height、width、scale)，value为样式值
- * - - { height:"100px" }
- */
-export type TransitionCSS = string | string[] | Partial<CSSStyleDeclaration>;
-/**
  * 过渡动画效果配置信息
  * - 执行顺序 from - to - end
  */
@@ -40,16 +34,16 @@ export type TransitionEffectOptions = {
      * - 支持 class 、style 样式属性
      * - 如 高度 从 100 到 200；100 则为动画开始样式
      */
-    from: TransitionCSS;
+    from: CSS;
     /**
      * 过渡动画目标样式
      * - 支持 class 、style 样式属性
      * - 如 高度 从 100 到 200；200 则为动画目标样式
      */
-    to: TransitionCSS;
+    to: CSS;
     /**
      * 动画结束样式
      * - 支持 class 、style 样式属性
      */
-    end?: TransitionCSS;
+    end?: CSS;
 }
