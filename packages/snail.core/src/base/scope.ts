@@ -102,7 +102,6 @@ export function useScopes(): IScopes {
             }
         }
     });
-    mountScope(scopes);
     //  监听【作用域】销毁事件，执行子作用域的销毁逻辑。需要先做一下缓存，子scope销毁时会执行remove逻辑，导致children索引变化
     mountScope(scopes).onDestroy(() => [...children].forEach(sc => run(sc.destroy)));
     return scopes;
