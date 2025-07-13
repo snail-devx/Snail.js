@@ -35,7 +35,7 @@ export interface IScopes extends IScope {
      * @param child 【子作用域】对象 
      * @returns 传入的child对象，方便链式调用
      */
-    add(child: IScope): IScope;
+    add<T extends IScope>(child: T): T;
     /**
      * 移除【子作用域】
      * - 不再由 当前作用域 管理

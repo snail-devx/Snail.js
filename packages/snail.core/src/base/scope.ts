@@ -65,14 +65,14 @@ export function useScope(): IScope {
  * @returns 全新的IScopes实例
  */
 export function useScopes(): IScopes {
-    //  管理子作用域、挂载scope属性，监听【作用域】销毁事件
+    //  管理子作用域、挂载scope属性
     const children: IScope[] = [];
     const scopes: IScopes = Object.defineProperties(Object.create(null), {
         //  添加【子作用域】
         add: {
             enumerable: false,
             writable: false,
-            value: function (child: IScope): IScope {
+            value: function <T extends IScope>(child: T): T {
                 throwIfTrue(scopes.destroyed, "scopes destroyed.");
                 mustFunction((child || {}).destroy, "useScopes.add: child must be an instance of IScope.");
                 children.push(child);
@@ -93,16 +93,18 @@ export function useScopes(): IScopes {
         },
         //  构建【子作用域】
         /* v8 ignore next 8 不用测试，拼接的功能 */
-        create: {
+        get: {
             enumerable: false,
             writable: false,
             value: function (): IScope {
-                checkScope(scopes, "useScopes.create: scopes destroyed.");
+                checkScope(scopes, "useScopes.get: scopes destroyed.");
                 return scopes.add(useScope());
             }
         }
     });
-    mountScope(scopes).onDestroy(() => children.forEach(sc => run(sc.destroy)));
+    mountScope(scopes);
+    //  监听【作用域】销毁事件，执行子作用域的销毁逻辑。需要先做一下缓存，子scope销毁时会执行remove逻辑，导致children索引变化
+    mountScope(scopes).onDestroy(() => [...children].forEach(sc => run(sc.destroy)));
     return scopes;
 }
 

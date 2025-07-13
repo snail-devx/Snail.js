@@ -15,6 +15,7 @@ export * from "./base/promise"
 // export * from "./base/queue"
 export * from "./base/scope"
 // export * from "./base/storage"
+export * from "./base/timer"
 
 // ******************************      web      ******************************
 export * from "./web/http";

@@ -65,9 +65,17 @@ describe("useScopes", () => {
     test("remove", () => scopes.remove(removeScope));
 
     test("destroy", () => {
+        var x = 1;
+        const newScope = scopes.get();
+        newScope.onDestroy(() => {
+            debugger
+            x = 2;
+        });
+
         scopes.destroy();
         expect(childScopeDestroyed).toStrictEqual(2);
         expect(scopes.destroyed).toStrictEqual(true);
+        expect(x).toStrictEqual(2);
     });
 
     test("after-destroy", () => {
