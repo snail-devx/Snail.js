@@ -106,12 +106,14 @@
         css.operate(el, "clear", toCss);
         css.operate(el, "clear", endCss);
         css.operate(el, "add", fromCss);
-        setTimeout(css.operate, 1, el, "add", toCss);
-        setTimeout(scope.destroy, time > 0 ? time : 200);
+        const toId = setTimeout(css.operate, 1, el, "add", toCss);
+        const endId = setTimeout(scope.destroy, time > 0 ? time : 200);
         return scope.onDestroy(function () {
           css.operate(el, "clear", fromCss);
           css.operate(el, "clear", toCss);
           css.operate(el, "add", endCss);
+          clearTimeout(toId);
+          clearTimeout(endId);
         });
       }
       const manager = snail_core.mountScope({

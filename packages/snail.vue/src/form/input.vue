@@ -59,6 +59,9 @@ console.warn("Input:还没实现 验证相关逻辑")
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+
 @input-border: 1px solid #DDDFED;
 
 .snail-input {
@@ -81,9 +84,9 @@ console.warn("Input:还没实现 验证相关逻辑")
     }
 
     >.input-body {
+        flex: 1;
         height: 32px;
         align-self: start;
-        flex: 1;
         display: flex;
 
         >input {

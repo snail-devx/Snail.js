@@ -10,49 +10,42 @@
         <!-- 插槽区域，自定义内容 -->
         <slot />
         <!-- 关闭按钮区域 -->
-        <Icon v-if="closeDisabled != true" class="close-icon" :="closeIconOptions" @click="emit('close')" />
+        <Icon :type="'close'" :size="22" :color="useTo == 'page' ? '#2e3033' : '#464953'" class="close-icon"
+            v-if="closeDisabled != true" @click="emit('close')" />
     </header>
 </template>
 
 <script setup lang="ts">
 import { HeaderOptions, HeaderEvents } from "./models/header-model";
 import Icon from "./icon.vue";
-import { IconOptions } from "./models/icon-model";
-import { computed } from "vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data、event
 const { useTo = 'page', divider, title = "", titleAlign = "center", closeDisabled = false } = defineProps<HeaderOptions>();
 const emit = defineEmits<HeaderEvents>();
-/**     关闭按钮配置选项 */
-const closeIconOptions = computed<IconOptions>(() => ({
-    type: "close",
-    color: useTo == "page" ? "#2e3033" : "#464953",
-    // size: useTo == "page" ? 22 : 20,
-    size: 22
-}));
 //  2、可选配置选项
 defineOptions({ name: "Header", inheritAttrs: true, });
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+
 .snail-header {
     flex-shrink: 0;
     width: 100%;
     background-color: white;
     position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    // flex 布局：display: flex，align-items 为center
+    .flex-cross-center();
 
     >.header-title {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
         color: #2e3033;
         line-height: 48px;
         padding-left: 24px;
         flex: 1;
+        // 文本溢出时出省略号
+        .text-ellipsis();
 
         &.center {
             text-align: center;

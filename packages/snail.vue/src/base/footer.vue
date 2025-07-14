@@ -23,14 +23,17 @@ defineOptions({ name: "Footer", inheritAttrs: true, });
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+
 .snail-footer {
+    width: 100%;
     flex-shrink: 0;
     background-color: white;
-    width: 100%;
     height: 72px;
     padding: 0 40px;
-    display: flex;
-    align-items: center;
+    // flex 布局：display: flex，align-items 为center
+    .flex-cross-center();
 
     >.snail-button:nth-child(n + 2) {
         margin-left: 20px;

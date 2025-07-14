@@ -44,15 +44,15 @@ function onSwitchChange() {
 @left-transition: left 0.2s ease;
 
 .snail-switch {
+    position: relative;
     width: 36px !important;
     height: 20px !important;
+    overflow: hidden;
     border-radius: 10px 10px 10px 10px;
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
 
     >div {
-        // 高度、宽度填充100%
+        // width:100%；height:100%
         .wh-fill();
     }
 
@@ -61,18 +61,18 @@ function onSwitchChange() {
     }
 
     >div.off {
-        background-color: #C4C8CC;
         position: absolute;
+        background-color: #C4C8CC;
         transition: @left-transition;
     }
 
     >div.status {
+        position: absolute;
         height: 16px;
         width: 16px;
-        border-radius: 10px 10px 10px 10px;
-        background: #FFFFFF;
-        position: absolute;
         top: 2px;
+        border-radius: 10px 10px 10px 10px;
+        background: white;
         transition: @left-transition;
     }
 }
@@ -92,8 +92,8 @@ function onSwitchChange() {
 
 .snail-switch.off {
     >div.off {
-        top: 0;
-        left: 0
+        // x、y起始位置：left:0,top:0
+        .zero-position();
     }
 
     >div.status {

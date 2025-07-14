@@ -25,19 +25,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from "vue";
+import { onUnmounted, useTemplateRef, watch } from "vue";
 import { FoldEvents, FoldOptions, FoldStatus } from "./models/fold-model";
 import { getFoldStatusDraw } from "./utils/fold-util";
 import { useAnimation } from "snail.view";
-import { throwError, useScopes } from "snail.core";
+import { throwError } from "snail.core";
 import Icon from "../base/icon.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<FoldOptions>();
 const emit = defineEmits<FoldEvents>();
-/**     动画作用域：执行展开，折叠动画 */
-const animationScope = useAnimation();
+/**     动画管理器：执行展开，折叠动画 */
+const animation = useAnimation();
 /**     折叠状态：默认展开 */
 const status = defineModel<FoldStatus>("status", { default: "expand" });
 /**     监听折叠状态，进行样式计算*/
@@ -60,7 +60,7 @@ function updateFoldStyle() {
     const isExpand = status.value == "expand";
     //  折叠图标样式：这个可以用vue的响应式，配合class样式，这里纯粹是为了验证transition动画
     if (foldStatusSpanRef.value) {
-        animationScope.transition(foldStatusSpanRef.value, {
+        animation.transition(foldStatusSpanRef.value, {
             from: {
                 transition: "transform 0.2s ease",
                 transform: isExpand ? "rotateZ(180deg)" : "rotate(0)"
@@ -73,7 +73,7 @@ function updateFoldStyle() {
     if (foldBodyRef.value) {
         const minHeight = 32;
         const maxHeight = minHeight + foldBodyRef.value.getBoundingClientRect().height;
-        animationScope.transition(foldBodyRef.value.parentElement, {
+        animation.transition(foldBodyRef.value.parentElement, {
             from: {
                 transition: "height 0.2s ease",
                 overflow: "hidden",
@@ -107,46 +107,46 @@ function onStatusClick() {
 
 // *****************************************   👉  组件渲染    *****************************************
 //  生命周期响应
-onUnmounted(() => {
-    animationScope.destroy();
-    statusWatch.stop();
-});
+onUnmounted(() => { statusWatch.stop(); });
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+
 .snail-fold {
     flex-shrink: 0;
 
     >div.fold-header {
-        height: 32px;
         position: relative;
-        display: flex;
-        align-items: center;
+        height: 32px;
         user-select: none;
+        // flex 布局：display: flex，align-items 为center
+        .flex-cross-center();
 
         //  标题前的 标记
         &::before {
             position: absolute;
-            content: "";
-            height: 18px;
+            left: 0;
             top: 7px;
             width: 4px;
-            left: 0;
+            height: 18px;
+            content: "";
             background-color: rgb(44, 151, 251);
         }
 
-        //  标题、副标题，不换行，移除隐藏
+        //  标题、副标题
         >.title,
         >.subtitle {
-            white-space: nowrap;
-            overflow: hidden;
+            // 文本溢出时出省略号
+            .text-ellipsis();
         }
 
         >.title {
+            padding-left: 20px;
             font-size: 14px;
             font-weight: bold;
             color: #2e3033;
-            padding-left: 20px;
         }
 
         >.subtitle {
@@ -157,9 +157,8 @@ onUnmounted(() => {
         //  状态图标：默认【收起】指示，增加动画效果
         >div.status {
             flex: 1;
-            display: flex;
-            justify-content: right;
-            justify-self: right;
+            // flex 布局：display: flex，align-items、justify-content 都为right
+            .flex-right();
         }
     }
 

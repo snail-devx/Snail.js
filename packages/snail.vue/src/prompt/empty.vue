@@ -27,13 +27,15 @@ defineOptions({ name: "Empty", inheritAttrs: true, });
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+
 .snail-empty {
-    width: 100%;
-    height: 100%;
-    display: flex;
+    // width:100%；height:100%
+    .wh-fill();
+    // flex 布局：display: flex，align-items、justify-content 都为center
+    .flex-center();
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
 
     >img {
         height: 60px;

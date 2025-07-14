@@ -3,8 +3,8 @@
         <!-- <LoadingTest /> -->
         <!-- <DynamicTest /> -->
         <!-- <DialogTest /> -->
-        <!-- <FoldTest /> -->
-        <DragVerifyTest />
+        <FoldTest />
+        <!-- <DragVerifyTest /> -->
     </div>
 </template>
 <script setup lang="ts">

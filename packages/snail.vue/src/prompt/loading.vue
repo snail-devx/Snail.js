@@ -19,13 +19,16 @@ defineOptions({ name: "Loading", inheritAttrs: true });
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+
 .snail-loading {
     position: absolute;
     z-index: 10000;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
+    // x、y起始位置：left:0,top:0
+    .zero-position();
+    // width:100%；height:100%
+    .wh-fill();
 
     &.show-mask {
         background-color: rgba(0, 0, 0, 0.15);

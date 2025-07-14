@@ -6,8 +6,8 @@
     <div class="snail-confirm">
         <Header :use-to="'dialog'" :title="props.title || '提示'" @close="props.closeDialog(false)" />
         <div class="confirm-body" v-html="props.message || '请确认？'" />
-        <Footer align="right" :cancel-name="props.cancelName" :cancel-disable="props.cancelDisabled"
-            :confirm-name="props.confirmName" :confirm-disable="props.confirmDisabled"
+        <Footer align="right" :cancel-name="props.cancelName" :cancel-disabled="props.cancelDisabled"
+            :confirm-name="props.confirmName" :confirm-disabled="props.confirmDisabled"
             @cancel="props.closeDialog(false)" @confirm="props.closeDialog(true)" />
     </div>
 </template>
@@ -28,22 +28,20 @@ defineOptions({ name: "Confirm", inheritAttrs: true, });
 <style lang="less">
 .snail-confirm {
     min-width: 348px;
-    background-color: #ffffff;
+    max-width: 548px;
+    max-height: 350px;
     border-radius: 4px;
+    background-color: white;
     color: #2e2f33;
     display: flex;
     flex-direction: column;
-    max-width: 548px;
-    box-sizing: border-box;
-    max-height: 350px;
 
     >div.confirm-body {
-        font-size: 14px;
         flex: 1;
         margin: 20px 40px;
         overflow: auto;
+        font-size: 14px;
         word-wrap: break-word;
-        box-sizing: border-box;
     }
 }
 </style>

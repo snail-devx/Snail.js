@@ -16,14 +16,18 @@ defineOptions({ name: "Button", inheritAttrs: true, });
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+
 .snail-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     cursor: pointer;
     border-radius: 2px;
     font-size: 14px;
     white-space: nowrap;
+    user-select: none;
+    // flex 布局：display: flex，align-items、justify-content 都为center
+    .flex-center();
+    display: inline-flex;
 }
 
 // *****************************************   👉  特殊样式适配    *****************************************
@@ -47,16 +51,15 @@ defineOptions({ name: "Button", inheritAttrs: true, });
     height: 20px;
 }
 
-
 .snail-button.primary {
     background-color: #5ca3ff;
     color: white;
 }
 
 .snail-button.default {
+    background-color: white;
     border: 1px solid #dddfed;
     color: #2e2f33;
-    background-color: #ffffff;
 }
 
 .snail-button.link {

@@ -205,6 +205,7 @@
         ret.data = func.apply(this, args);
         ret.success = true;
       } catch (ex) {
+        console.error("run func failed:", ex);
         ret.success = false;
         ret.ex = ex;
         ret.reason = getMessage(ex);
@@ -221,6 +222,7 @@
         ret.data = await func.apply(this, args);
         ret.success = true;
       } catch (ex) {
+        console.error("async run func failed:", ex);
         ret.success = false;
         ret.ex = ex;
         ret.reason = getMessage(ex);
@@ -279,11 +281,12 @@
       return deferred.promise;
     }
 
+    const mountHandles = [];
     function mountScope(target) {
       throwIfFalse(typeof target === "object", "mountScope: target must be an Object.");
       var destroyed = false;
       const handles = [];
-      return Object.defineProperties(target, {
+      const scope = Object.defineProperties(target, {
         destroyed: {
           enumerable: false,
           get: () => destroyed
@@ -309,21 +312,30 @@
           }
         }
       });
+      mountHandles.forEach(fn => run(fn, scope));
+      return scope;
+    }
+    function onMountScope(fn) {
+      mustFunction(fn, 'onMountScope: fn');
+      mountHandles.push(fn);
     }
     function useScope() {
       return mountScope(Object.create(null));
     }
     function useScopes() {
-      const children = [];
+      const children = new Map();
       const scopes = Object.defineProperties(Object.create(null), {
         add: {
           enumerable: false,
           writable: false,
           value: function (child) {
-            throwIfTrue(scopes.destroyed, "scopes destroyed.");
+            checkScope(scopes, "useScopes.add: scopes destroyed.");
             mustFunction((child || {}).destroy, "useScopes.add: child must be an instance of IScope.");
-            children.push(child);
-            child.onDestroy(() => scopes.remove(child));
+            checkScope(child, "useScopes.add: child destroyed.");
+            if (children.has(child) == false) {
+              children.set(child, true);
+              child.onDestroy(() => scopes.remove(child));
+            }
             return child;
           }
         },
@@ -331,10 +343,7 @@
           enumerable: false,
           writable: false,
           value: function (child) {
-            if (scopes.destroyed == false) {
-              const index = children.indexOf(child);
-              index >= 0 && children.splice(index, 1);
-            }
+            scopes.destroyed || children.delete(child);
           }
         },
         get: {
@@ -346,7 +355,10 @@
           }
         }
       });
-      mountScope(scopes).onDestroy(() => [...children].forEach(sc => run(sc.destroy)));
+      mountScope(scopes).onDestroy(function () {
+        [...children.keys()].forEach(child => run(child.destroy));
+        children.clear();
+      });
       return scopes;
     }
     function useAsyncScope(task) {
@@ -1292,6 +1304,7 @@
     exports.mustObject = mustObject;
     exports.mustString = mustString;
     exports.newId = newId;
+    exports.onMountScope = onMountScope;
     exports.polling = polling;
     exports.run = run;
     exports.runAsync = runAsync;

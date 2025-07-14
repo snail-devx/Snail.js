@@ -54,24 +54,25 @@ addEventListener("keyup", event => {
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+
 .snail-dialog {
     position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    overflow: hidden;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    // x、y起始位置：left:0,top:0
+    .zero-position();
+    // width:100%；height:100%
+    .wh-fill();
+    // flex 布局：display: flex，align-items、justify-content 都为center
+    .flex-center();
 
     &::before {
         content: "";
         background-color: rgba(24, 27, 33, 0.45);
         position: absolute;
-        width: 100%;
-        height: 100%;
+
+        // width:100%；height:100%
+        .wh-fill();
     }
 
     //  弹窗展示组件：给个背景色，避免透明

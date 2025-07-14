@@ -20,7 +20,6 @@
 import { ref, onMounted, onUnmounted, useTemplateRef, computed } from "vue";
 import { ToastHandle, ToastOptions } from "../models/toast-model";
 import Icon from "../../base/icon.vue"
-import { useScopes } from "snail.core";
 import { useObserver } from "snail.view";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -68,12 +67,14 @@ onMounted(() => {
     showToast.value = true;
 });
 onUnmounted(() => {
-    observer.destroy();
     destroyTimer && clearTimeout(destroyTimer);
 });
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+
 .snail-toast {
     display: flex;
     position: fixed;
@@ -85,7 +86,7 @@ onUnmounted(() => {
     padding: 20px 30px 20px 20px;
     overflow: hidden;
     opacity: 0.2;
-    color: #fff;
+    color: white;
     background: rgba(0, 0, 0, 0.7);
     transition: opacity 0.2s ease;
 
@@ -101,14 +102,13 @@ onUnmounted(() => {
 
     >div.icon {
         align-self: center;
-        border-radius: 50%;
         height: 26px;
         width: 26px;
-        background: rgba(255, 255, 255, 0.15);
-        display: flex;
-        justify-content: center;
-        align-items: center;
         margin-right: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.15);
+        // flex 布局：display: flex，align-items、justify-content 都为center
+        .flex-center();
 
         >svg {
             cursor: none !important;
@@ -118,10 +118,10 @@ onUnmounted(() => {
     }
 
     >div.message {
-        word-break: break-all;
-        line-height: 24px;
         flex: 1;
         overflow: hidden;
+        line-height: 24px;
+        word-break: break-all;
     }
 }
 </style>

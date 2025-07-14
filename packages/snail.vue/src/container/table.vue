@@ -41,6 +41,9 @@ defineOptions({ name: "Table", inheritAttrs: true, });
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+
 .snail-table {
     display: flex;
     flex-direction: column;
@@ -49,9 +52,9 @@ defineOptions({ name: "Table", inheritAttrs: true, });
     >div.table-header,
     >div.table-footer {
         width: 100%;
-        display: flex;
-        align-items: center;
         flex-shrink: 0;
+        // flex 布局：display: flex，align-items 为center
+        .flex-cross-center();
     }
 
     //  表头钉住位置

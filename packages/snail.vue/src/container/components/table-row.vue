@@ -20,10 +20,13 @@ defineOptions({ name: "TableRow", inheritAttrs: true, });
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+
 //  行 默认填充满、内部元素垂直居中
 .table-row {
     min-width: 100%;
-    display: flex;
-    align-items: center;
+    // flex 布局：display: flex，align-items 为center
+    .flex-cross-center();
 }
 </style>

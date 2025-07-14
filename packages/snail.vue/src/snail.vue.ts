@@ -1,6 +1,6 @@
 
-import { createApp } from "vue";
-import { IScope, isFunction, mustObject, throwError, useScope } from "snail.core";
+import { createApp, getCurrentScope, onScopeDispose } from "vue";
+import { IScope, isFunction, mustObject, onMountScope, throwError, useScope } from "snail.core";
 
 //  👉 base 相关导出
 //      类型导出
@@ -16,9 +16,9 @@ import Header from "./base/header.vue";
 import Icon from "./base/icon.vue";
 import Switch from "./base/switch.vue";
 //      方法导出
+export * from "./base/components/reactive";
 export * from "./base/utils/app-util";
 export * from "./base/utils/icon-util";
-export * from "./base/utils/ref-util";
 //#endregion
 
 //  👉 container 相关导出
@@ -103,3 +103,6 @@ export function mount(options: ComponentMountOptions, onDestroyed?: (fn: () => v
     isFunction(onDestroyed) && onDestroyed(scope.destroy);
     return scope;
 }
+
+//  挂载Scope时，若在Vue的setup中，则自动销毁
+onMountScope(scope => getCurrentScope() && onScopeDispose(scope.destroy));
