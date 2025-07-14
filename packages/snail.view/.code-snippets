@@ -1,0 +1,88 @@
+//	配合snail库进行less混合代码提示使用的代码片段
+{
+	//	引入基础Mixins样式
+	"@import-mixins-base": {
+		"prefix": "@import-base-mixins",
+		"scope": "less",
+		"description": "引入基础Mixins样式",
+		"body": [
+			"// 引入基础Mixins样式",
+			"@import \"snail.view/dist/styles/base-mixins.less\";"
+		]
+	},
+	// *****************************************   👉  文本样式    *****************************************
+	"text-ellipsis": {
+		"prefix": ".text-ellipsis",
+		"scope": "less",
+		"description": "文本溢出时出省略号",
+		"body": [
+			"// 文本溢出时出省略号",
+			".text-ellipsis();",
+		]
+	},
+	// *****************************************   👉  高宽定位    *****************************************
+	"wh-fill": {
+		"prefix": ".wh-fill",
+		"scope": "less",
+		"description": "高度、宽度100%填充满",
+		"body": [
+			"// width:100%；height:100%",
+			".wh-fill();"
+		]
+	},
+	"wh-fill-hidden": {
+		"prefix": ".wh-fill-hidden",
+		"scope": "less",
+		"description": "高度、宽度100%填充满，隐藏溢出的内容",
+		"body": [
+			"// width:100%；height:100%；overflow: hidden",
+			".wh-fill-hidden();"
+		]
+	},
+	"zero-position": {
+		"prefix": ".zero-position",
+		"scope": "less",
+		"description": "left:0,top:0；辅助 fixed、absolute定位使用",
+		"body": [
+			"// x、y起始位置：left:0,top:0",
+			".zero-position();"
+		]
+	},
+	// *****************************************   👉  弹性盒子    *****************************************"
+	"flex-main-center": {
+		"prefix": ".flex-main-center",
+		"scope": "less",
+		"description": "flex 布局，主轴居中",
+		"body": [
+			"// flex 布局：display: flex，justify-content 为center",
+			".flex-main-center();"
+		]
+	},
+	"flex-cross-center": {
+		"prefix": ".flex-cross-center",
+		"scope": "less",
+		"description": "flex 布局，交叉轴居中",
+		"body": [
+			"// flex 布局：display: flex，align-items 为center",
+			".flex-cross-center();"
+		]
+	},
+	"flex-center": {
+		"prefix": ".flex-center",
+		"scope": "less",
+		"description": "flex 布局，主轴和交叉轴居中",
+		"body": [
+			"// flex 布局：display: flex，align-items、justify-content 都为center",
+			".flex-center();"
+		]
+	},
+	"flex-right": {
+		"prefix": ".flex-right",
+		"scope": "less",
+		"description": "flex 布局，主轴和交叉轴居右",
+		"body": [
+			"// flex 布局：display: flex，align-items、justify-content 都为right",
+			".flex-right();"
+		]
+	}
+}
