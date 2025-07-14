@@ -19,13 +19,13 @@ import { argMap, buildPackage } from "./build.js"
 /** 文件所处目录路径  */
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 /** 默认copy的文件 */
-const DEFAULT_FILES = ["index.js", "package.json", "LICENSE", "README.md"];
+const DEFAULT_FILES = ["index.js", "package.json", "LICENSE", "README.md", ".code-snippets"];
 /** 默认共享的文件 */
 const DEFAULT_SHARED = ["LICENSE"];
 /** 是否需要发布 */
 // const needPublish = existsSync(resolve(__dirname, "../.snail.publish"));
-const needPublish = true;
-// const needPublish = false;
+var needPublish = true;
+// needPublish = false;
 
 /**
  * 发布指定包；构建npm项目，自动版本号、自动publish
