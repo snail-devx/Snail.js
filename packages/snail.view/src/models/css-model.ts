@@ -1,4 +1,10 @@
 /**
+ * CSS 样式相关属性
+ *  1、支持class样式和style样式
+ *  2、针对常用style样式做结构封装，值仅封装常用的，若不满足则自己写样式控制
+ */
+
+/**
  * CSS管理器
  */
 export interface ICSSManager {
@@ -20,10 +26,9 @@ export interface ICSSManager {
     /**
      * 构建样式
      * @param options 样式配置
-     * @param isFlex 是否是flex布局
      * @returns 计算出来的组件样式信息
      */
-    buildStyle(options: AllStyle | undefined, isFlex?: boolean): Record<string, string>;
+    buildStyle(options: AllStyle): Record<string, string>;
 }
 
 /**
@@ -54,57 +59,89 @@ export type CSSDescriptor = {
  * - 高度、宽度、对齐、边框、内边距等合集
  * - 对齐方式、、、
  */
-export type AllStyle = AlignStyle
-    & FlexStyle & HeightStyle & WidthStyle & MarginStyle & BorderStyle & PaddingStyle
+export type AllStyle = BaseStyle & FlexBoxStyle
+    & WidthStyle & HeightStyle & MarginStyle & BorderStyle & PaddingStyle
     & TransitionStyle;
 
-// *****************************************   👉  对齐方式：文本、布局  ****************************************
+// *****************************************   👉  基础样式：文本、布局  ****************************************
 /**
- * 组件对齐样式
- * - flex布局时约束 align-items和 justify-content
- * - 非flex布局时约束 text-align和 vertical-align
+ * 基础样式：对齐方式、颜色属性
  */
-export type AlignStyle = {
+export type BaseStyle = {
     /**
-     * 对齐方式
+     * 文本颜色
+     */
+    color?: string;
+    /**
+     * 背景颜色
+     */
+    backgroundColor?: string;
+
+    /**
+     * 文本对齐方式
      * - left: 左对齐
      * - center: 居中对齐
      * - right: 右对齐
      */
-    align?: "left" | "center" | "right";
+    textAlign?: "left" | "center" | "right";
     /**
      * 垂直对齐方式
      * - top: 顶部对齐
      * - middle: 居中对齐
      * - bottom: 底部对齐
      */
-    valign?: "top" | "middle" | "bottom";
+    verticalAlign?: "top" | "middle" | "bottom";
 }
-
 /**
- * 主轴弹性样式
+ * 弹性盒子样式
+ * - Flex Container
+ * - Flex Item 
  */
-export type FlexStyle = {
+export type FlexBoxStyle = {
+
+    //#region ************************************* Container *************************************************
+    /**
+     * 项目主轴方向对齐方式
+     * - 取值较多，先列举常用的
+     */
+    justifyContent?: "start" | "center" | "end" | "space-between" | "space-around" | "space-evenly" | "stretch";
+    /**
+     * 项目交叉轴方向对齐方式
+     * - 取值较多，先列举常用的
+     */
+    alignItems?: "start" | "center" | "end";
+    //#endregion
+
+    //#region ************************************* Item *******************************************************
     /**
      * 弹性置
-     * @see https://developer.mozilla.org/zh-CN/docs/Web/CSS/flex
      */
     flex?: string;
     /**
      * 主轴初始大小
-     * @see https://developer.mozilla.org/zh-CN/docs/Web/CSS/flex-basis
      */
     flexBasis?: string;
     /**
      * 主轴放大系数
-     * @see https://developer.mozilla.org/zh-CN/docs/Web/CSS/flex-grow
      */
-    flexGrow?: number | "inherit" | "initial" | "revert" | "unset";
+    flexGrow?: number;
     /**
      * 主轴收缩规则
-     * @see https://developer.mozilla.org/zh-CN/docs/Web/CSS/flex-shrink
      */
-    flexShrink?: number | "inherit" | "initial" | "unset";
+    flexShrink?: number;
+
+    /**
+     * 项目的排列顺序。数值越小，排列越靠前
+     */
+    order?: number;
+
+    /**
+     * 项目在交叉轴方向的对齐方式
+     * - 自定义，独立与容器指定的 alignItems
+     * - 取值较多，先列举常用的
+     */
+    alignSelf?: "start" | "center" | "end";
+    //#endregion
 
 }
 

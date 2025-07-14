@@ -23,10 +23,10 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef, useTemplateRef } from "vue";
+import { computed, shallowRef, useTemplateRef } from "vue";
 import { InputEvents, InputOptions } from "./models/input-model";
-import { getTitleStyle } from "./utils/input-util";
 import Icon from "../base/icon.vue";
+import { css } from "snail.view";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -39,7 +39,7 @@ const inputModel = defineModel<string>({ default: "" });
 /**     验证结果：非空字符串表示验证失败的提示语 */
 const validateRef = shallowRef<string>();
 /**      标题区域样式 */
-const titleStyle: Record<string, any> = getTitleStyle(props, true);
+const titleStyle: Record<string, any> = computed(() => css.buildStyle(props.titleStyle));
 //  2、可选配置选项
 defineOptions({ name: "Input", inheritAttrs: true, });
 

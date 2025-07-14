@@ -1,6 +1,6 @@
 <!-- 表格列组件；作为Table、TableRow的配套组件，根class不用加 snail 前缀-->
 <template>
-    <div class="table-col" :style="colStyle" :class="props.align">
+    <div class="table-col" :style="colStyle" :class="props.textAlign">
         <slot />
     </div>
 </template>

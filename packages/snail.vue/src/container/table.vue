@@ -6,7 +6,7 @@
     <Scroll class="snail-table" :scroll-x="props.scrollX" :scroll-y="props.scrollY"
         :class="{ 'start-border': props.border == true }">
         <!-- 头部区域 -->
-        <div class="table-header" :style="getStyle(props.headerStyle)">
+        <div class="table-header" :style="headerStyle">
             <slot name="header" />
         </div>
         <!-- 内容区域：滚动 -->
@@ -14,7 +14,7 @@
             <slot />
         </div>
         <!-- 尾部区域 -->
-        <div class="table-footer" :style="getStyle(props.footerStyle)">
+        <div class="table-footer" :style="footerStyle">
             <slot name="footer" />
         </div>
     </Scroll>
@@ -22,28 +22,22 @@
 
 <script setup lang="ts">
 import Scroll from "./scroll.vue"
-import { TableOptions, TableStyleOptions } from "./models/table-model";
+import { TableOptions } from "./models/table-model";
+import { computed } from "vue";
+import { css } from "snail.view";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<TableOptions>();
+/** 表头样式 */
+const headerStyle = computed(() => css.buildStyle(props.headerStyle));
+/** 表尾样式 */
+const footerStyle = computed(() => css.buildStyle(props.footerStyle));
 //  2、可选配置选项
 defineOptions({ name: "Table", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
-/**
- * 获取样式信息
- * - 用于计算表格头部、尾部样式
- * @param styleOptions 样式配置项
- */
-function getStyle(styleOptions: TableStyleOptions): Record<string, any> {
-    //  snail.view中还没封装 background属性，暂时先这样
-    styleOptions = styleOptions || {};
-    const style: CSSStyleDeclaration = Object.create(null);
-    styleOptions.background && (style.background = styleOptions.background);
-    styleOptions.height && (style.height = styleOptions.height);
-    return style;
-}
+
 </script>
 
 <style lang="less">

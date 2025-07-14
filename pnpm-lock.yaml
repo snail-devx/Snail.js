@@ -239,8 +239,8 @@ importers:
         specifier: '>=2.0.6'
         version: 2.0.6(typescript@5.8.3)
       snail.view:
-        specifier: '>=1.0.10'
-        version: 1.0.10(typescript@5.8.3)
+        specifier: '>=1.0.11'
+        version: 1.0.11(typescript@5.8.3)
       vue:
         specifier: ^3.5.14
         version: 3.5.17(typescript@5.8.3)
@@ -3737,8 +3737,8 @@ packages:
     transitivePeerDependencies:
       - typescript
 
-  /snail.view@1.0.10(typescript@5.8.3):
-    resolution: {integrity: sha512-XlIsC9P8Z9w9R67wdy2EGDYEsHLqBw/o8eqHwK8NMLaVQipnQPP4B9sXwTk6vcktwCy0jlwMwp4aoDviqdcmcA==}
+  /snail.view@1.0.11(typescript@5.8.3):
+    resolution: {integrity: sha512-qaq2IH3PcTyZSQUeXf16hcLtiA5ifKiMX+/NtJZDLsNPxaJse4mun5agwFj5VOpzaOhwkNC/Cs8yOpAhzZHzSw==}
     dependencies:
       snail.core: 2.0.6(typescript@5.8.3)
     transitivePeerDependencies:

@@ -111,7 +111,7 @@ export function useHttp(options?: Partial<HttpOptions>): IHttpClient & IScope {
  * @returns 全新的【HTTP客户端】+作用域
  */
 /* v8 ignore next 4 不用测试，拼接的功能 */
-export function useHttpByServer(code: string, type: keyof ServerOptions = "api", options?: Omit<Partial<ServerOptions>, "origin">): IHttpClient & IScope {
+export function useHttpByServer(code: string, type: keyof ServerOptions = "api", options?: Omit<Partial<HttpOptions>, "origin">): IHttpClient & IScope {
     const origin = (server.get(code) || {})[type];
     return useHttp({ ...options, origin });
 }

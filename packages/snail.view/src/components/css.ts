@@ -6,7 +6,6 @@
  */
 import { isArrayNotEmpty, isObject, isStringNotEmpty } from "snail.core";
 import { AllStyle, CSS, CSSDescriptor, ICSSManager } from "../models/css-model";
-import { buildAlign, buildBorder, buildFlex, buildHeight, buildMargin, buildPadding, buildTransition, buildWidth } from "../utils/css-util";
 
 // 把自己的类型共享出去
 export * from "../models/css-model";
@@ -66,23 +65,67 @@ function useCSS(): ICSSManager {
      * @param isFlex 是否是flex布局
      * @returns 计算出来的组件样式信息
      */
-    function buildStyle(options: AllStyle | undefined, isFlex?: boolean): Record<string, string> {
-        const style: Record<string, string> = Object.create(null);
-        if (options) {
-            //  对齐方式、布局
-            buildAlign(style, options, isFlex);
-            //  flex布局：仅指定isFlex时才生效
-            isFlex && buildFlex(style, options);
-            //  盒子模型
-            buildWidth(style, options);
-            buildHeight(style, options);
-            buildMargin(style, options);
-            buildBorder(style, options);
-            buildPadding(style, options);
-            //  动画
-            buildTransition(style, options);
+    function buildStyle(options: AllStyle): Record<string, string> {
+        const style: CSSStyleDeclaration = Object.create(null);
+        if (!!!options) {
+            return style as any;
         }
-        return style;
+        //  1、基础样式：颜色、对齐、布局（弹性盒子）
+        {
+            //  BaseStyle
+            options.color && (style.color = options.color);
+            options.backgroundColor && (style.backgroundColor = options.backgroundColor);
+            options.textAlign && (style.textAlign = options.textAlign);
+            options.verticalAlign && (style.verticalAlign = options.verticalAlign);
+            //  FlextBox
+            options.justifyContent && (style.justifyContent = options.justifyContent);
+            options.alignItems && (style.alignItems = options.alignItems);
+            options.flex && (style.flex = options.flex);
+            options.flexBasis && (style.flexBasis = options.flexBasis);
+            options.flexGrow > 0 && (style.flexGrow = String(options.flexGrow));
+            options.flexShrink > 0 && (style.flexShrink = String(options.flexShrink));
+            options.order > 0 && (style.order = String(options.order));
+            options.alignSelf && (style.alignSelf = options.alignSelf);
+        }
+        //  2、高、宽、边框、边距
+        {
+            //  width、height
+            options.width && (style.width = options.width);
+            options.minWidth && (style.minWidth = options.minWidth);
+            options.maxWidth && (style.maxWidth = options.maxWidth);
+            options.height && (style.height = options.height);
+            options.minHeight && (style.minHeight = options.minHeight);
+            options.maxHeight && (style.maxHeight = options.maxHeight);
+            //  外边距
+            options.margin && (style.margin = options.margin);
+            options.marginTop && (style.marginTop = options.marginTop);
+            options.marginRight && (style.marginRight = options.marginRight);
+            options.marginBottom && (style.marginBottom = options.marginBottom);
+            options.marginLeft && (style.marginLeft = options.marginLeft);
+            //  边框
+            options.borderRadius && (style.borderRadius = options.borderRadius);
+            options.border && (style.border = options.border);
+            options.borderTop && (style.borderTop = options.borderTop);
+            options.borderRight && (style.borderRight = options.borderRight);
+            options.borderBottom && (style.borderBottom = options.borderBottom);
+            options.borderLeft && (style.borderLeft = options.borderLeft);
+            //  内边距
+            options.padding && (style.padding = options.padding);
+            options.paddingTop && (style.paddingTop = options.paddingTop);
+            options.paddingRight && (style.paddingRight = options.paddingRight);
+            options.paddingBottom && (style.paddingBottom = options.paddingBottom);
+            options.paddingLeft && (style.paddingLeft = options.paddingLeft);
+        }
+        //  动画样式
+        {
+            //  过渡动画：transition
+            options.transition && (style.transition = options.transition);
+            options.transitionProperty && (style.transitionProperty = options.transitionProperty);
+            options.transitionDuration && (style.transitionDuration = options.transitionDuration);
+            options.transitionDelay && (style.transitionDelay = options.transitionDelay);
+            options.transitionTimingFunction && (style.transitionTimingFunction = options.transitionTimingFunction);
+        }
+        return style as any;
     }
 
     //#endregion

@@ -1,5 +1,3 @@
-import { IScope } from "snail.core";
-
 /**
  * 确认弹窗配置选项
  */

@@ -25,6 +25,7 @@ const DEFAULT_SHARED = ["LICENSE"];
 /** 是否需要发布 */
 // const needPublish = existsSync(resolve(__dirname, "../.snail.publish"));
 const needPublish = true;
+// const needPublish = false;
 
 /**
  * 发布指定包；构建npm项目，自动版本号、自动publish

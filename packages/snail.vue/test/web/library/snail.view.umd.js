@@ -11,85 +11,6 @@
       return snail_core.useKeyScope(el, false).scope;
     }
 
-    function buildAlign(style, align, isFlex) {
-      if (isFlex == true) {
-        const map = {
-          "left": "start",
-          "center": "center",
-          "right": "end",
-          "top": "start",
-          "middle": "center",
-          "bottom": "end"
-        };
-        const aV = map[align.align],
-          vaV = map[align.valign];
-        aV && (style.justifyContent = aV);
-        vaV && (style.alignItems = vaV);
-      } else {
-        align.align && (style.textAlign = align.align);
-        align.valign && (style.verticalAlign = align.valign);
-      }
-    }
-    function buildFlex(style, flex) {
-      if (flex) {
-        flex.flex && (style.flex = flex.flex);
-        flex.flexBasis && (style.flexBasis = flex.flexBasis);
-        flex.flexGrow && (style.flexGrow = String(flex.flexGrow));
-        flex.flexShrink && (style.flexShrink = String(flex.flexShrink));
-      }
-    }
-    function buildWidth(style, width) {
-      if (width) {
-        width.width && (style.width = width.width);
-        width.minWidth && (style.minWidth = width.minWidth);
-        width.maxWidth && (style.maxWidth = width.maxWidth);
-      }
-    }
-    function buildHeight(style, height) {
-      if (height) {
-        height.height && (style.height = height.height);
-        height.minHeight && (style.minHeight = height.minHeight);
-        height.maxHeight && (style.maxHeight = height.maxHeight);
-      }
-    }
-    function buildMargin(style, margin) {
-      if (margin) {
-        margin.margin && (style.margin = margin.margin);
-        margin.marginTop && (style.marginTop = margin.marginTop);
-        margin.marginRight && (style.marginRight = margin.marginRight);
-        margin.marginBottom && (style.marginBottom = margin.marginBottom);
-        margin.marginLeft && (style.marginLeft = margin.marginLeft);
-      }
-    }
-    function buildBorder(style, border) {
-      if (border) {
-        border.borderRadius && (style.borderRadius = border.borderRadius);
-        border.border && (style.border = border.border);
-        border.borderTop && (style.borderTop = border.borderTop);
-        border.borderRight && (style.borderRight = border.borderRight);
-        border.borderBottom && (style.borderBottom = border.borderBottom);
-        border.borderLeft && (style.borderLeft = border.borderLeft);
-      }
-    }
-    function buildPadding(style, padding) {
-      if (padding) {
-        padding.padding && (style.padding = padding.padding);
-        padding.paddingTop && (style.paddingTop = padding.paddingTop);
-        padding.paddingRight && (style.paddingRight = padding.paddingRight);
-        padding.paddingBottom && (style.paddingBottom = padding.paddingBottom);
-        padding.paddingLeft && (style.paddingLeft = padding.paddingLeft);
-      }
-    }
-    function buildTransition(style, transition) {
-      if (transition) {
-        transition.transition && (style.transition = transition.transition);
-        transition.transitionProperty && (style.transitionProperty = transition.transitionProperty);
-        transition.transitionDuration && (style.transitionDuration = transition.transitionDuration);
-        transition.transitionDelay && (style.transitionDelay = transition.transitionDelay);
-        transition.transitionTimingFunction && (style.transitionTimingFunction = transition.transitionTimingFunction);
-      }
-    }
-
     function useCSS() {
       function parse(css2) {
         if (snail_core.isStringNotEmpty(css2) == true) {
@@ -114,17 +35,55 @@
         css2 && snail_core.isArrayNotEmpty(css2.class) && css2.class.forEach(name => type == "add" ? el.classList.add(name) : el.classList.remove(name));
         css2 && css2.style && Object.keys(css2.style).forEach(key => type == "add" ? el.style.setProperty(key, css2.style[key]) : el.style.removeProperty(key));
       }
-      function buildStyle(options, isFlex) {
+      function buildStyle(options) {
         const style = Object.create(null);
-        if (options) {
-          buildAlign(style, options, isFlex);
-          isFlex && buildFlex(style, options);
-          buildWidth(style, options);
-          buildHeight(style, options);
-          buildMargin(style, options);
-          buildBorder(style, options);
-          buildPadding(style, options);
-          buildTransition(style, options);
+        if (!!!options) {
+          return style;
+        }
+        {
+          options.color && (style.color = options.color);
+          options.backgroundColor && (style.backgroundColor = options.backgroundColor);
+          options.textAlign && (style.textAlign = options.textAlign);
+          options.verticalAlign && (style.verticalAlign = options.verticalAlign);
+          options.justifyContent && (style.justifyContent = options.justifyContent);
+          options.alignItems && (style.alignItems = options.alignItems);
+          options.flex && (style.flex = options.flex);
+          options.flexBasis && (style.flexBasis = options.flexBasis);
+          options.flexGrow > 0 && (style.flexGrow = String(options.flexGrow));
+          options.flexShrink > 0 && (style.flexShrink = String(options.flexShrink));
+          options.order > 0 && (style.order = String(options.order));
+          options.alignSelf && (style.alignSelf = options.alignSelf);
+        }
+        {
+          options.width && (style.width = options.width);
+          options.minWidth && (style.minWidth = options.minWidth);
+          options.maxWidth && (style.maxWidth = options.maxWidth);
+          options.height && (style.height = options.height);
+          options.minHeight && (style.minHeight = options.minHeight);
+          options.maxHeight && (style.maxHeight = options.maxHeight);
+          options.margin && (style.margin = options.margin);
+          options.marginTop && (style.marginTop = options.marginTop);
+          options.marginRight && (style.marginRight = options.marginRight);
+          options.marginBottom && (style.marginBottom = options.marginBottom);
+          options.marginLeft && (style.marginLeft = options.marginLeft);
+          options.borderRadius && (style.borderRadius = options.borderRadius);
+          options.border && (style.border = options.border);
+          options.borderTop && (style.borderTop = options.borderTop);
+          options.borderRight && (style.borderRight = options.borderRight);
+          options.borderBottom && (style.borderBottom = options.borderBottom);
+          options.borderLeft && (style.borderLeft = options.borderLeft);
+          options.padding && (style.padding = options.padding);
+          options.paddingTop && (style.paddingTop = options.paddingTop);
+          options.paddingRight && (style.paddingRight = options.paddingRight);
+          options.paddingBottom && (style.paddingBottom = options.paddingBottom);
+          options.paddingLeft && (style.paddingLeft = options.paddingLeft);
+        }
+        {
+          options.transition && (style.transition = options.transition);
+          options.transitionProperty && (style.transitionProperty = options.transitionProperty);
+          options.transitionDuration && (style.transitionDuration = options.transitionDuration);
+          options.transitionDelay && (style.transitionDelay = options.transitionDelay);
+          options.transitionTimingFunction && (style.transitionTimingFunction = options.transitionTimingFunction);
         }
         return style;
       }
