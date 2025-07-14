@@ -21,6 +21,7 @@ export function run<T>(func: (...args: any[]) => T, ...args: any[]): RunResult<T
         ret.success = true;
     }
     catch (ex: any) {
+        console.error("run func failed:", ex);
         ret.success = false;
         ret.ex = ex;
         ret.reason = getMessage(ex);
@@ -43,6 +44,7 @@ export async function runAsync<T>(func: (...args: any[]) => Promise<T> | T, ...a
         ret.success = true;
     }
     catch (ex: any) {
+        console.error("async run func failed:", ex);
         ret.success = false;
         ret.ex = ex;
         ret.reason = getMessage(ex);

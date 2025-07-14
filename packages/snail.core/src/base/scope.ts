@@ -6,6 +6,8 @@ import { IScope, IAsyncScope, IScopes, KeyScopeUseResult } from "./models/scope-
 // 把自己的类型共享出去
 export * from "./models/scope-model";
 
+/** 挂载【作用域】的回调函数列表 */
+const mountHandles: Array<(scope: IScope) => void> = [];
 /**
  * 挂载【作用域】
  * - 通过 Object.defineProperties 将IScope相关属性、方法挂载给target
@@ -19,7 +21,7 @@ export function mountScope<T>(target: T): T & IScope {
     var destroyed: boolean = false;
     const handles: Array<() => void> = [];
     /** 使用  defineProperties 进行只读赋值，避免外部改变，且destroyed为属性，通过 defineProperties get 方法实现 */
-    return Object.defineProperties(target, {
+    const scope = Object.defineProperties(target, {
         //  【作用域】是否销毁了：通过get属性实现外部只读，内部修改可直接反应出来
         destroyed: {
             enumerable: false,
@@ -48,6 +50,18 @@ export function mountScope<T>(target: T): T & IScope {
             }
         }
     }) as T & IScope;
+    //  返回挂载【作用域】；触发【onMountScope】句柄方法
+    mountHandles.forEach(fn => run(fn, scope));
+    return scope;
+}
+/**
+ * 监听 挂载【作用域】 操作
+ * - 外部可通过此方法，监听新挂载的【作用域】，如Vue中实现组件销毁时自动销毁此【作用域】
+ * @param fn 挂载【作用域】 后执行方法，执行时传入当前挂载的scope实例
+ */
+export function onMountScope(fn: (scope: IScope) => void): void {
+    mustFunction(fn, 'onMountScope: fn');
+    mountHandles.push(fn);
 }
 
 /**
@@ -65,18 +79,23 @@ export function useScope(): IScope {
  * @returns 全新的IScopes实例
  */
 export function useScopes(): IScopes {
-    //  管理子作用域、挂载scope属性
-    const children: IScope[] = [];
+    //  管理子作用域、挂载scope属性；使用map管理，方便remove时操作
+    const children: Map<IScope, boolean> = new Map();
     const scopes: IScopes = Object.defineProperties(Object.create(null), {
         //  添加【子作用域】
         add: {
             enumerable: false,
             writable: false,
             value: function <T extends IScope>(child: T): T {
-                throwIfTrue(scopes.destroyed, "scopes destroyed.");
+                //  作用域销毁，添加无意义
+                checkScope(scopes, "useScopes.add: scopes destroyed.");
                 mustFunction((child || {}).destroy, "useScopes.add: child must be an instance of IScope.");
-                children.push(child);
-                child.onDestroy(() => scopes.remove(child));
+                checkScope(child, "useScopes.add: child destroyed.");
+                //  添加后返回子自身：避免重复添加，监听子的【销毁】事件，从scopes中移除掉
+                if (children.has(child) == false) {
+                    children.set(child, true);
+                    child.onDestroy(() => scopes.remove(child));
+                }
                 return child;
             }
         },
@@ -85,10 +104,7 @@ export function useScopes(): IScopes {
             enumerable: false,
             writable: false,
             value: function (child: IScope): void {
-                if (scopes.destroyed == false) {
-                    const index = children.indexOf(child);
-                    index >= 0 && children.splice(index, 1);
-                }
+                scopes.destroyed || children.delete(child);
             }
         },
         //  构建【子作用域】
@@ -102,8 +118,12 @@ export function useScopes(): IScopes {
             }
         }
     });
-    //  监听【作用域】销毁事件，执行子作用域的销毁逻辑。需要先做一下缓存，子scope销毁时会执行remove逻辑，导致children索引变化
-    mountScope(scopes).onDestroy(() => [...children].forEach(sc => run(sc.destroy)));
+    //  监听【作用域】销毁事件，执行子作用域的销毁逻辑
+    mountScope(scopes).onDestroy(function () {
+        /*  需要先做一下缓存，子scope销毁时会执行remove逻辑，导致children索引变化 */
+        [...children.keys()].forEach(child => run(child.destroy));
+        children.clear();
+    });
     return scopes;
 }
 

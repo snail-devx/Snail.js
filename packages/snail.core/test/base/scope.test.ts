@@ -1,9 +1,17 @@
 import { assert, describe, expect, it, test } from 'vitest'
 import { wait, defer, delay } from "../../src/base/promise"
 import { getMessage, throwError } from '../../src/base/error';
-import { IScope, useScope, useScopes, useAsyncScope, checkScope, useKeyScope } from '../../src/base/scope';
+import { IScope, useScope, useScopes, useAsyncScope, checkScope, useKeyScope, onMountScope, mountScope } from '../../src/base/scope';
 
 //  不用测试【mountScope】，在useScope等方法内部就是使用【mountScope】方法实现，附带就测试了
+
+test("onMountScope", () => {
+    var mountCount = 0;
+    onMountScope(sope => mountCount++);
+    useScope();
+    mountScope({});
+    expect(mountCount).toBe(2);
+});
 
 describe("useScope", () => {
     const sc = useScope();
@@ -68,7 +76,6 @@ describe("useScopes", () => {
         var x = 1;
         const newScope = scopes.get();
         newScope.onDestroy(() => {
-            debugger
             x = 2;
         });
 
