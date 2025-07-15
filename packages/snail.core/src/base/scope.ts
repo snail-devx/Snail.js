@@ -37,15 +37,14 @@ export function mountScope<T>(target: T): T & IScope {
                 return target as IScope;
             }
         },
-        //  销毁【作用域】
+        //  销毁【作用域】：销毁时，先将句柄全部清空在遍历运行，否则可能出现死循环逻辑
         destroy: {
             enumerable: false,
             writable: false,
             value: function (): void {
                 if (destroyed == false) {
-                    handles.forEach(run);
                     destroyed = true;
-                    handles.splice(0);
+                    handles.splice(0).forEach(run);
                 }
             }
         }
@@ -120,9 +119,10 @@ export function useScopes(): IScopes {
     });
     //  监听【作用域】销毁事件，执行子作用域的销毁逻辑
     mountScope(scopes).onDestroy(function () {
-        /*  需要先做一下缓存，子scope销毁时会执行remove逻辑，导致children索引变化 */
-        [...children.keys()].forEach(child => run(child.destroy));
+        /*  先备份子作用域，清理后再执行destroy方法；避免remove过程中影响map的keys索引 */
+        const tmpScopes = [...children.keys()];
         children.clear();
+        tmpScopes.forEach(scope => scope.destroy());
     });
     return scopes;
 }
@@ -137,7 +137,7 @@ export function useScopes(): IScopes {
 export function useAsyncScope<T>(task: Promise<T>): IAsyncScope<T> {
     throwIfFalse(isPromise(task), "task must be a Promise.");
     const scope = mountScope<Promise<T>>(task) as IAsyncScope<T>
-    task.then(scope.destroy, scope.destroy);
+    task.finally(scope.destroy);
     return scope;
 }
 
