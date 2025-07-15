@@ -93,7 +93,7 @@ function onSwitchChange() {
 .snail-switch.off {
     >div.off {
         // x、y起始位置：left:0,top:0
-        .zero-position();
+        .left-right-start();
     }
 
     >div.status {

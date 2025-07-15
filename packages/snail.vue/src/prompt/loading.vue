@@ -26,7 +26,7 @@ defineOptions({ name: "Loading", inheritAttrs: true });
     position: absolute;
     z-index: 10000;
     // x、y起始位置：left:0,top:0
-    .zero-position();
+    .left-right-start();
     // width:100%；height:100%
     .wh-fill();
 

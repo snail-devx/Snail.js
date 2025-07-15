@@ -3,9 +3,8 @@
     不直接对外提供，外部使用toast方法使用
 -->
 <template>
-    <div ref="toastRef" class="snail-toast" :class="{ 'show-toast': showToast }"
-        :style="{ left: `calc(50% - ${toastSize.width / 2}px)`, top: `calc(50% - ${toastSize.height / 2}px)` }"
-        @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
+    <div ref="toast" class="snail-toast" :class="{ 'show-toast': showToast }" @mouseenter="onMouseEvent(false)"
+        @mouseleave="onMouseEvent(true)">
         <!-- 关闭按钮 -->
         <Icon type="close" class="close-icon" :fill="closeFill" :size="20" @mouseenter="closeFill = 'red'"
             @mouseleave="closeFill = '#707070'" @click="onToastClose" />
@@ -17,36 +16,30 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, useTemplateRef, computed } from "vue";
-import { ToastHandle, ToastOptions } from "../models/toast-model";
+import { ref, onMounted, onUnmounted } from "vue";
+import { ToastOptions } from "../models/toast-model";
 import Icon from "../../base/icon.vue"
-import { useObserver } from "snail.view";
+import { PopupExtend, PopupFlagOptions, PopupHandle } from "../manager";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<ToastOptions & ToastHandle>();
-/** toast弹窗根元素，用于计算元素大小，计算显示位置 */
-const toastRef = useTemplateRef("toastRef");
+const props = defineProps<ToastOptions & PopupFlagOptions & PopupHandle<any> & PopupExtend>();
 /** 是否显示toast弹窗 */
 const showToast = ref(false);
 /** 计算出来的填充颜色 */
 const closeFill = ref("#707070");
-/** toast弹窗大小 */
-const toastSize = ref({ width: 0, height: 0 });
 /** 自动销毁时的定时器 */
 var destroyTimer: NodeJS.Timeout;
-/** 元素观察者作用域 */
-const observer = useObserver();
 //  2、可选配置选项
-defineOptions({ name: "Toast", inheritAttrs: true });
+defineOptions({ name: "ToastContainer", inheritAttrs: true });
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
  * 鼠标移入移出事件
+ * - 清理掉自动关闭的定时器，鼠标移除时再定时关闭
  * @param isLeave 是鼠标离开还是进入
  */
 function onMouseEvent(isLeave: boolean) {
-    //  清理掉自动关闭的定时器，鼠标移除时再定时关闭
     destroyTimer && clearTimeout(destroyTimer);
     destroyTimer = undefined;
     isLeave && (destroyTimer = setTimeout(onToastClose, 2000));
@@ -56,15 +49,14 @@ function onMouseEvent(isLeave: boolean) {
  */
 function onToastClose() {
     showToast.value = false;
-    setTimeout(props.close, 200);
+    setTimeout(props.closePopup, 200);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
 // 监听大小变化，进行水平、垂直居中处理
 onMounted(() => {
-    observer.onSize(toastRef.value, size => toastSize.value = size);
     destroyTimer = setTimeout(onToastClose, 2000);
-    showToast.value = true;
+    setTimeout(() => showToast.value = true, 1);
 });
 onUnmounted(() => {
     destroyTimer && clearTimeout(destroyTimer);
@@ -76,19 +68,22 @@ onUnmounted(() => {
 @import "snail.view/dist/styles/base-mixins.less";
 
 .snail-toast {
-    display: flex;
     position: fixed;
-    z-index: 99999;
     min-width: 200px;
-    max-width: 500px;
+    max-width: 400px;
     max-height: 200px;
-    border-radius: 5px;
-    padding: 20px 30px 20px 20px;
+    border-radius: 10px;
+    padding: 20px 35px 20px 15px;
+    //  通过left、rigth进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)
+    .left-right-center();
+    //  动画展示
+    transition: opacity .5s ease;
+    opacity: 0;
+    //  内容展示
+    display: flex;
     overflow: hidden;
-    opacity: 0.2;
     color: white;
     background: rgba(0, 0, 0, 0.7);
-    transition: opacity 0.2s ease;
 
     &.show-toast {
         opacity: 1;

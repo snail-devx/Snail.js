@@ -1,15 +1,17 @@
 <!-- 模态弹窗测试组件 -->
 <template>
     <button @click="onOpenClick">打开弹窗</button>
+    <button @click="onConfirm">确认弹窗</button>
 </template>
 
 <script setup lang="ts">
 import { shallowRef, onActivated, onDeactivated, } from "vue";
-import { openDialog } from "../../../src/snail.vue";
-import DialogContent from "./dialog-child-content.vue"
+import { usePopup } from "../../../src/snail.vue";
+import DialogContent from "./child-content.vue"
 
 // 👉 组件定义
 //  1、props、data
+const popup = usePopup();
 
 //  2、可选配置选项
 defineOptions({ name: "DialogTest", inheritAttrs: false, });
@@ -19,7 +21,7 @@ defineOptions({ name: "DialogTest", inheritAttrs: false, });
  * 打开弹窗
  */
 function onOpenClick() {
-    const dialog = openDialog({
+    const dialog = popup.dialog({
         component: shallowRef(DialogContent),
         closeOnEscape: true,
         closeOnMask: true,
@@ -32,6 +34,13 @@ function onOpenClick() {
     dialog.then(data => console.log(data));
     // 测试弹窗自动关闭
     // setTimeout(() => dialog.close(), 4000);
+}
+/**
+ * 确认弹窗
+ */
+async function onConfirm() {
+    const data = await popup.confirm("顶顶顶顶顶顶顶顶", "确定要删除【xxxxd的】吗?");
+    console.log(data);
 }
 
 // 👉 组件渲染

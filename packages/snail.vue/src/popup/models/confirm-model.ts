@@ -36,15 +36,3 @@ export type ConfirmOptions = {
      */
     confirmDisabled?: boolean;
 }
-
-
-/**
- * 确认弹窗句柄
- */
-export type ConfirmHandle = {
-    /**
-     * 关闭弹窗
-     * @param confirm 是否是点击【确认】按钮触发的关闭
-     */
-    close: (confirm: boolean) => void
-}

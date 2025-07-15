@@ -15,13 +15,3 @@ export type ToastOptions = {
 
     //  后期支持配置自动消失时间等
 }
-
-/**
- * Toast弹窗句柄
- */
-export type ToastHandle = {
-    /**
-     * 关闭toast弹窗
-     */
-    close: () => void
-}

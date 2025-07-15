@@ -118,7 +118,7 @@ isTouch || onMounted(function () {
         position: absolute;
         transition: left 0.5s ease-in-out;
         // x、y起始位置：left:0,top:0
-        .zero-position();
+        .left-right-start();
     }
 
     >.verify-message {

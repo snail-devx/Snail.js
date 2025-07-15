@@ -3,7 +3,7 @@
  *  1、针对Vue的响应式相关功能，做一些便捷封装
  *  2、方便使用，减少重复性代码量
  */
-import { IReactiveManager } from "../models/reactive-model";
+import { IReactiveManager } from "./models/reactive-model";
 import { IScope, IScopes, isObject, mountScope, throwIfFalse, useScopes } from "snail.core";
 
 /**
