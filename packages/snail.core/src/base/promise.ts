@@ -46,19 +46,14 @@ export function delay(timeout?: number): Promise<boolean> {
 export function wait<T>(task: Promise<T> | T): Promise<RunResult<T>> {
     return isPromise(task) == false
         ? Promise.resolve({ success: true, data: task as T })
-        : new Promise<RunResult<T>>((resolve, reject) => {
-            (task as Promise<T>).then(
-                data => resolve({ success: true, data: data }),
-                reason => {
-                    const rt: RunResult<T> = {
-                        success: false,
-                        ex: reason instanceof Error ? reason : undefined,
-                        reason: getMessage(reason),
-                    };
-                    resolve(rt);
-                }
-            );
-        });
+        : (task as Promise<T>).then(
+            data => Promise.resolve<RunResult<T>>({ success: true, data }),
+            reason => Promise.resolve<RunResult<T>>({
+                success: false,
+                ex: reason instanceof Error ? reason : undefined,
+                reason: getMessage(reason),
+            })
+        );
 }
 /**
  * 等待task执行结果；

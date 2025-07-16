@@ -135,7 +135,7 @@ export function useScopes(): IScopes {
  * @returns 【异步作用域】对象
  */
 export function useAsyncScope<T>(task: Promise<T>): IAsyncScope<T> {
-    throwIfFalse(isPromise(task), "task must be a Promise.");
+    throwIfFalse(isPromise(task), "useAsyncScope: task must be a Promise.");
     const scope = mountScope<Promise<T>>(task) as IAsyncScope<T>
     task.finally(scope.destroy);
     return scope;
