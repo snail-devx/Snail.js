@@ -37,14 +37,14 @@ import Icon from "../base/icon.vue";
 const props = defineProps<FoldOptions>();
 const emit = defineEmits<FoldEvents>();
 /**     动画管理器：执行展开，折叠动画 */
-const animation = useAnimation();
+const { transition } = useAnimation();
 /**     折叠状态：默认展开 */
 const status = defineModel<FoldStatus>("status", { default: "expand" });
 /**     监听折叠状态，进行样式计算*/
 const statusWatch = watch(status, updateFoldStyle);
 /**     展开、收起图标绘制路径 */
 const statusIcon: string = getFoldStatusDraw();
-/**      折叠状态区域引用 */
+/**     折叠状态区域引用 */
 const foldStatusSpanRef = useTemplateRef("foldStatusSpan");
 /**     折叠面板内容区域引用 */
 const foldBodyRef = useTemplateRef("foldBody");
@@ -60,7 +60,7 @@ function updateFoldStyle() {
     const isExpand = status.value == "expand";
     //  折叠图标样式：这个可以用vue的响应式，配合class样式，这里纯粹是为了验证transition动画
     if (foldStatusSpanRef.value) {
-        animation.transition(foldStatusSpanRef.value, {
+        transition(foldStatusSpanRef.value, {
             from: {
                 transition: "transform 0.2s ease",
                 transform: isExpand ? "rotateZ(180deg)" : "rotate(0)"
@@ -73,7 +73,7 @@ function updateFoldStyle() {
     if (foldBodyRef.value) {
         const minHeight = 32;
         const maxHeight = minHeight + foldBodyRef.value.getBoundingClientRect().height;
-        animation.transition(foldBodyRef.value.parentElement, {
+        transition(foldBodyRef.value.parentElement, {
             from: {
                 transition: "height 0.2s ease",
                 overflow: "hidden",

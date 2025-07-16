@@ -1,15 +1,15 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <components.Fold :title="'测试Fold'" style="margin:10px">
+    <Fold :title="'测试Fold'" style="margin:10px">
         <template #>
             <div style="height:200px;background: red;" />
         </template>
-    </components.Fold>
+    </Fold>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components } from "../../../src/snail.vue";
+import Fold from "../../../src/container/fold.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data

@@ -1,21 +1,22 @@
 <!-- dynamic 动态加载组件测试 -->
 <template>
     <div style="width:100%;height:100%;position: relative;">
-        <components.Dynamic :name="dynamicName" :component="dynamicComponent!" :url="dynamicUrl" :show="showLoading"
+        <Dynamic :name="dynamicName" :component="dynamicComponent!" :url="dynamicUrl" :show="showLoading"
             :title="'dhad西溪新的'">
             <template #="data">
                 海鲜好想好想 {{ data }}
             </template>
-        </components.Dynamic>
+        </Dynamic>
     </div>
 </template>
 <script setup lang="ts">
 import { Component, shallowRef } from "vue"
-import { components } from "../../../src/snail.vue";
+import Dynamic from "../../../src/container/dynamic.vue";
+import Loading from "../../../src/prompt/loading.vue";
 
 const showLoading = true;
 const dynamicName = shallowRef<string | undefined>("DialogContent");
-const dynamicComponent = shallowRef<Component | undefined>(components.Loading);
+const dynamicComponent = shallowRef<Component | undefined>(Loading);
 const dynamicUrl = shallowRef<string | undefined>("/components/dynamic-test.js#default");
 setTimeout(() => {
     dynamicName.value = undefined;

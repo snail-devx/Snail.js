@@ -21,7 +21,7 @@ import { useObserver } from "snail.view";
 //  1、props、data
 const props = defineProps<DialogOptions & DialogHandle<any> & DailogExtend & PopupFlagOptions>();
 /** 监听器 */
-const observer = useObserver();
+const { onEvent } = useObserver();
 /** 是否进行组件加载：为了让 Transition 生效，在 onMounted 设置为 true */
 const loading = shallowRef<boolean>(false);
 //  2、可选配置选项
@@ -30,7 +30,7 @@ defineOptions({ name: "DialogContainer", inheritAttrs: true, });
 // *****************************************   👉  组件渲染    *****************************************
 onMounted(() => {
     loading.value = true;
-    observer.onEvent(window, "keyup", (event: KeyboardEvent) => {
+    onEvent(window, "keyup", (event: KeyboardEvent) => {
         event.key === "Escape" && props.dialogStatus.value == "active"
             && props.closeOnEscape && props.closeDialog();
     });
@@ -64,7 +64,6 @@ onMounted(() => {
         background-color: white;
         position: relative;
         border-radius: 4px;
-        box-sizing: border-box;
         //  私有添加阴影，增强显示效果
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     }

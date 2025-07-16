@@ -5,12 +5,11 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components } from "../../../src/snail.vue";
+import Loading from "../../../src/prompt/loading.vue";
 
 // 👉 组件定义
 //  1、props、data
 const showLoading = shallowRef(true);
-const { Loading } = components;
 //  2、可选配置选项
 defineOptions({ inheritAttrs: false, });
 

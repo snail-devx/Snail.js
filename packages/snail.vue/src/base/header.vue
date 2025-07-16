@@ -42,22 +42,29 @@ defineOptions({ name: "Header", inheritAttrs: true, });
     >.header-title {
         color: #2e3033;
         line-height: 48px;
-        padding-left: 24px;
         flex: 1;
+        padding: 0 30px;
         // 文本溢出时出省略号
         .text-ellipsis();
-
-        &.center {
-            text-align: center;
-        }
-
-        &.right {
-            text-align: right;
-        }
     }
 }
 
 // *****************************************   👉  特殊样式适配    *****************************************
+//  标题文本对齐方式
+.snail-header>.header-title {
+    &.left {
+        text-align: left;
+    }
+
+    &.center {
+        text-align: center;
+    }
+
+    &.right {
+        text-align: right;
+    }
+}
+
 //  启用分隔符
 .snail-header.start-divider {
     border-bottom: 1px solid #dddfed;

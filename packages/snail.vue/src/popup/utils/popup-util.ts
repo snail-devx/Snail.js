@@ -85,7 +85,7 @@ const initPopupApp: () => void = (function () {
     return function () {
         if (popupApp == undefined) {
             const container = document.createElement("div");
-            container.classList.add("snail-popup-app");
+            container.classList.add("snail-app", "snail-popup-app");
             container.style = "height:0 !important; width:0 !important;";
             document.body.appendChild(container);
             /** 这里传入props时，需要先.value后再传递

@@ -23,3 +23,7 @@ app.mount("#app");
 // setInterval(function () {
 //     testNumber.value += 1;
 // }, 1000);
+// @ts-ignore
+import lessUrl from "./styles/index.less";
+import { link } from "snail.view"
+link.register(lessUrl);

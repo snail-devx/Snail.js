@@ -13,7 +13,7 @@
         </div>
         <!-- 输入框区域：输入不做v-model绑定，只有验证通过后再绑定 -->
         <div class="input-body">
-            <input ref="inputRef" :type="props.type || 'text'" :value="inputModel" :readonly="props.readonly"
+            <input ref="input-el" :type="props.type || 'text'" :value="inputModel" :readonly="props.readonly"
                 :placeholder="props.placeholder" :title="inputModel" @change="onValueChange" @click="emit('click')" />
             <span class="validate" v-if="!!validateRef" :title="validateRef">
                 <Icon :type="'error'" :size="16" :color="'red'" />
@@ -33,7 +33,7 @@ import { css } from "snail.view";
 const props = defineProps<InputOptions>();
 const emit = defineEmits<InputEvents>();
 /**     输入框引用 */
-const inputRef = useTemplateRef("inputRef");
+const inputRef = useTemplateRef("input-el");
 /**     输入框内容 */
 const inputModel = defineModel<string>({ default: "" });
 /**     验证结果：非空字符串表示验证失败的提示语 */

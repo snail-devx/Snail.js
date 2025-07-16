@@ -15,6 +15,7 @@ import { triggerAppCreated } from "../../base/utils/app-util";
 export function mount(options: ComponentMountOptions, onDestroyed?: (fn: () => void) => void): IScope {
     mustObject(options, "options");
     (options.target instanceof HTMLElement) || throwError("options.target must be a HTMLElement");
+    options.target.classList.add("snail-app");
     const app = createApp(Dynamic, {
         //  挂载组件的具体信息
         name: options.name,

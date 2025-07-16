@@ -23,7 +23,7 @@ import { PopupExtend, PopupFlagOptions, PopupHandle } from "../manager";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<ToastOptions & PopupFlagOptions & PopupHandle<any> & PopupExtend>();
+const props = defineProps<ToastOptions & PopupHandle<any>>();
 /** 是否显示toast弹窗 */
 const showToast = ref(false);
 /** 计算出来的填充颜色 */

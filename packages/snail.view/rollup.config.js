@@ -49,14 +49,14 @@ const rollupOptions = await builder.build([{
         "styles/base-mixins.less",
     ]
 }]);
-
-//  构建一个umd格式的组件出来
-const umdOptions = Object.assign({}, rollupOptions[0]);
-umdOptions.output = Object.assign({}, umdOptions.output, {
-    format: "umd",
+//  增加 umd 格式输出文件
+rollupOptions[0].output = [
     // @ts-ignore
-    file: resolve(umdOptions.output.file, "../snail.view.umd.js")
-});
-rollupOptions.push(umdOptions);
+    rollupOptions[0].output, Object.assign({}, rollupOptions[0].output, {
+        format: "umd",
+        // @ts-ignore
+        file: resolve(rollupOptions[0].output.file, "../snail.view.umd.js")
+    }),
+]
 
 export default rollupOptions;

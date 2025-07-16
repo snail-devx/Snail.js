@@ -1,14 +1,16 @@
-import { dirname, resolve } from "path"
+import path, { dirname, resolve } from "path"
 import { fileURLToPath } from "url";
 import minimist from "minimist";
 
 import { Builder } from "snail.rollup"
 import injectPlugin, { removeDynamicModule, registerDynamicModule } from "snail.rollup-inject";
+import urlPlugin from "snail.rollup-url";
 import assetPlugin from "snail.rollup-asset"
 import scriptPlugin from "snail.rollup-script";
 import stylePlugin, { MODULE_INJECT_LINK } from "snail.rollup-style";
 import vuePlugin from "snail.rollup-vue"
 import { STYLE_EXTEND_PATHS } from "snail.rollup-style";
+import { renameSync, rmdir, rmdirSync, rmSync } from "fs";
 
 /** 不使用如下方式获取dirName，会在末尾存在 "/"；但resolve等不会存在 "/"；会导致断言出问题
  * const __dirname = fileURLToPath(new URL('.', import.meta.url)); 
@@ -50,12 +52,25 @@ const options = {
  */
 const builder = Builder.getBuilder(options, (component, context, options) => {
     return [
+        urlPlugin(component, context, options),
         assetPlugin(component, context, options),
         injectPlugin(component, context, options),
         //  支持脚本、style、vue
         scriptPlugin(component, context, options),
         stylePlugin(component, context, options),
         vuePlugin(component, context, options),
+        //  构建完成后的处理
+        {
+            name: "snail.vue-build",
+            buildEnd() {
+                const root = options.distRoot;
+                //  将输出到 其他目录下的 css文件，合并到根目录下的 styles 目录下
+                renameSync(resolve(root, "./base/styles/app.css"), resolve(root, "./styles/app.css"));
+                //  移除目录，逐步异步，非空报错，避免上述处理遗留文件
+                rmdirSync(resolve(root, "./base/styles"));
+                rmdirSync(resolve(root, "./base"));
+            }
+        }
     ];
 });
 
@@ -74,13 +89,13 @@ const components = [
  * @type {import("rollup").RollupOptions[]}
  */
 const rollupOptions = await builder.build(components);
-//  构建一个umd格式的组件出来
-const umdOptions = Object.assign({}, rollupOptions[0]);
-umdOptions.output = Object.assign({}, umdOptions.output, {
-    format: "umd",
+//  增加 umd 格式输出文件
+rollupOptions[0].output = [
     // @ts-ignore
-    file: resolve(umdOptions.output.file, "../snail.vue.umd.js")
-});
-rollupOptions.push(umdOptions);
-
+    rollupOptions[0].output, Object.assign({}, rollupOptions[0].output, {
+        format: "umd",
+        // @ts-ignore
+        file: resolve(rollupOptions[0].output.file, "../snail.vue.umd.js")
+    }),
+]
 export default rollupOptions;

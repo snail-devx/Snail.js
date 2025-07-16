@@ -45,8 +45,10 @@ const dtsFiles = [];
                         buildEnd: () => rmSync(typesRoot, { recursive: true }),
                     }
                 ],
+                //  合并.d.ts文件时，忽略掉node_modules和.less文件；后续补充看配置只包含 .d.ts 行不行
                 external: [
                     /node_modules/gi,
+                    /\.less/gi
                 ],
                 //  忽略【依赖包加载失败】的警告，合并.d.ts文件在最外层目录下，packages下项目依赖的特定包会不存在
                 onwarn(warning, warn) {

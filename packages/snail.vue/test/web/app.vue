@@ -1,5 +1,6 @@
 <template>
-    <div style="width: 100%;height: 100%;position: relative;">
+    <div style="width: 100%;height: 100%;position: relative; padding: 20px;">
+        <Input /> <br />
         <!-- <LoadingTest /> -->
         <!-- <DynamicTest /> -->
         <DialogTest /> -----------
@@ -19,6 +20,9 @@ import PopupTest from "./popup/popup-test.vue";
 import LoadingTest from "./prompt/loading-test.vue";
 import FoldTest from "./container/fold-test.vue";
 import DragVerifyTest from "./prompt/drag-verify-test.vue";
+import Input from "../../src/form/input.vue";
+
+
 
 defineProps(["testNumber"]);
 

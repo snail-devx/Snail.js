@@ -1,0 +1,21 @@
+// Vue实例级别相关css，用于约束全局样式
+
+.snail-app {
+    //  指定默认字体
+    font-family: "Microsoft YaHei", "微软雅黑", "Hiragino Sans GB", "tahoma", "arial", "simsun", " 宋体", "sans-serif";
+
+    //  强制元素 box-sizing: border-box
+    &,
+    * {
+        box-sizing: border-box;
+    }
+
+    //  input 输入框等，去掉默认的外边框
+    input {
+        outline: 0 !important;
+        font: inherit;
+        margin: 0;
+        border-radius: 4px;
+    }
+
+}

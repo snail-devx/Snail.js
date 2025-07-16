@@ -36,10 +36,6 @@ defineOptions({ name: "ConfirmContainer", inheritAttrs: true, });
     display: flex;
     flex-direction: column;
 
-    >* {
-        box-sizing: border-box;
-    }
-
     >div.confirm-body {
         flex: 1;
         margin: 20px 40px;

@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { shallowRef, onActivated, onDeactivated, } from "vue";
-import { usePopup } from "../../../src/snail.vue";
+import { usePopup } from "../../../src/popup/manager";
 import DialogContent from "./child-content.vue"
 
 // 👉 组件定义

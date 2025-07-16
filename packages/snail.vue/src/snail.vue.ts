@@ -9,6 +9,8 @@ export * from "./base/models/header-model";
 export * from "./base/models/icon-model";
 export * from "./base/models/reactive-model";
 export * from "./base/models/switch-model";
+//      样式导出
+import "./base/styles/app.less"
 //      组件导出
 import Button from "./base/button.vue";
 import Footer from "./base/footer.vue";
