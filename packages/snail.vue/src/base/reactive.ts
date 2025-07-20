@@ -4,8 +4,8 @@
  *  2、方便使用，减少重复性代码量
  */
 import { Ref, ShallowRef } from "vue";
-import { IReactiveManager } from "./models/reactive-model";
-import { IAsyncScope, IScope, IScopes, isObject, isPromise, mountScope, RunResult, throwIfFalse, useAsyncScope, useScopes } from "snail.core";
+import { IReactiveManager, ReactiveVar } from "./models/reactive-model";
+import { IAsyncScope, IScope, IScopes, isObject, isPromise, mountScope, RunResult, throwIfFalse, useAsyncScope, useScopes, wait } from "snail.core";
 
 /**
  * 使用【响应式管理器】
@@ -28,7 +28,7 @@ export function useReactive(): IReactiveManager & IScope {
      * @param time 过渡持续时间，到时间后销毁作用域
      * @returns 作用域对象，可销毁【值过渡】效果
      */
-    function transition<T>(rv: ShallowRef<T> | Ref<T>, effect: { from: T, to: T }, time: number): IScope {
+    function transition<T>(rv: ReactiveVar<T>, effect: { from: T, to: T }, time: number): IScope {
         throwIfFalse(isObject(effect), "transition: effect must be an object.");
         const scope: IScope = scopes.get();
         //  设置初始值，并延迟销毁作用域
@@ -41,36 +41,36 @@ export function useReactive(): IReactiveManager & IScope {
         });
     }
     /**
-     * 【任务】响应式
-     * - 任务运行时，设置loading.value=true
-     * - 任务完成后，设置loading.value=false
-     * - 可通过delay值，延迟执行 loading.value=false 操作
+     * 响应式【加载】任务
+     * - 任务运行时，设置 status.value=true
+     * - 任务完成后，设置 status.value=false
+     * - 可通过delay值，延迟执行 status.value=false 操作
      * - 可在api请求等耗时操作任务过程中，实现响应式显隐Loading组件
      * @param task 要运行的任务
-     * @param loading 正在加载的响应式变量
+     * @param status 加载状态的响应式变量
      * @param delay 延迟时间，单位ms；不传则不延迟
      * @returns 任务自身
      */
-    function task<T, E>(task: Promise<T>, loading: ShallowRef<boolean> | Ref<boolean>, delay: number)
-        : Promise<{ success: boolean, data?: T, error?: E }> {
+    function load<T>(task: Promise<T>, status: ReactiveVar<boolean>, delay: number): Promise<RunResult<T>> {
         throwIfFalse(isPromise(task), "task: task must be a Promise.");
         //  维护loading状态值
-        loading.value = true;
+        status.value = true;
         task.finally(function () {
             delay > 0
-                ? setTimeout(() => loading.value = false, delay)
-                : loading.value = false;
+                ? setTimeout(() => status.value = false, delay)
+                : status.value = false;
         });
         //  等待任务执行完成，返回具体结果
-        return task.then(
-            data => ({ success: true, data }),
-            error => ({ success: false, error })
-        )
+        return wait<T>(task);
+        // return task.then(
+        //     data => ({ success: true, data }),
+        //     error => ({ success: false, error })
+        // )
     }
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IReactiveManager>({ transition, task });
+    const manager = mountScope<IReactiveManager>({ transition, load });
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
 }

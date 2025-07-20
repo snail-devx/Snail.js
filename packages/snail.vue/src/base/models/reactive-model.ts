@@ -7,7 +7,7 @@ import { Ref, ShallowRef } from "vue";
  */
 export interface IReactiveManager {
     /**
-     * 【过渡】变量值
+     * 响应式【过渡】变量值
      * - 通过设置 rv.value 的值来实现.value值过渡
      * - 执行顺序 from、to
      * - 开始时，设置 rv.value 值为 from；延迟time时间后，强制销毁scope
@@ -20,7 +20,7 @@ export interface IReactiveManager {
     transition<T>(rv: ShallowRef<T> | Ref<T>, effect: { from: T, to: T }, time: number): IScope;
 
     /**
-     * 【任务】响应式
+     * 响应式【加载】任务
      * - 任务运行时，设置loading.value=true
      * - 任务完成后，设置loading.value=false
      * - 可通过delay值，延迟执行 loading.value=false 操作
@@ -30,6 +30,11 @@ export interface IReactiveManager {
      * @param delay 延迟时间，单位ms；不传则不延迟
      * @returns 任务自身
      */
-    task<T, E>(task: Promise<T>, loading: ShallowRef<boolean> | Ref<boolean>, delay: number)
+    load<T, E>(task: Promise<T>, loading: ShallowRef<boolean> | Ref<boolean>, delay: number)
         : Promise<{ success: boolean, data?: T, error?: E }>;
 }
+
+/**
+ * 响应式变量
+ */
+export type ReactiveVar<T> = ShallowRef<T> | Ref<T>;

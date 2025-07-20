@@ -8,7 +8,7 @@ import { PopupDescriptor } from "../models/manager-model";
 import { triggerAppCreated } from "../../base/utils/app-util"
 import { createApp, ref, App, Component, shallowRef } from "vue";
 import PopupApp from "../components/popup-app.vue";
-import { FlatPromise, getMessage, isObject, isStringNotEmpty, mustObject, throwIfFalse } from "snail.core";
+import { FlatPromise, isObject, isStringNotEmpty, mustObject, throwIfFalse } from "snail.core";
 
 /** 默认的Z-index值 */
 const DEFAULT_ZINDEX: number = 2000;
@@ -27,7 +27,7 @@ export function checkPopup(options: PopupOptions): string | undefined {
         options.zIndex > 0 || (options.zIndex = DEFAULT_ZINDEX);
     }
     catch (ex: any) {
-        return getMessage(ex)
+        return ex.message;
     }
 }
 

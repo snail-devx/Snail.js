@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { Component, onActivated, onDeactivated, onErrorCaptured, ref, shallowRef, watch } from "vue";
-import { delay, getMessage, isObject, isStringNotEmpty, RunResult, script, throwError, throwIfNullOrUndefined, tidyString } from "snail.core";
+import { delay, isObject, isStringNotEmpty, RunResult, script, throwError, throwIfNullOrUndefined, tidyString } from "snail.core";
 import SnailLoading from "../prompt/loading.vue"
 import { ComponentOptions } from "./models/component-model";
 
@@ -74,9 +74,9 @@ async function buildDynamicComponent() {
                 ? (dynamicComponent.value = comp)
                 : (dynamicError.value = `load component failed:return nulll or undefined. url:${url}.`)
         }
-        catch (ex) {
+        catch (ex: any) {
             dynamicComponent.value = undefined;
-            dynamicError.value = getMessage(ex);
+            dynamicError.value = ex.message;
         }
     }
     else {
