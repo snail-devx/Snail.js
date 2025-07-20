@@ -2,6 +2,7 @@ import { mustFunction, isFunction, isPromise } from "./data";
 import { getMessage } from "./error";
 import { RunResult } from "./models/function-model";
 import { AsyncResult, defer } from "./promise";
+import { buildResultByError } from "./utils/function-util";
 
 /** 把自己的类型共享出去 */
 export * from "./models/function-model"
@@ -13,22 +14,16 @@ export * from "./models/function-model"
  * @returns 运行结果
  */
 export function run<T>(func: (...args: any[]) => T, ...args: any[]): RunResult<T> {
-    const ret: RunResult<T> = Object.create(null);
     try {
         mustFunction(func, "func");
         // @ts-ignore
-        ret.data = func.apply(this, args);
-        ret.success = true;
+        const data = func.apply(this, args);
+        return { success: true, data };
     }
     catch (ex: any) {
-        console.error("run func failed:", ex);
-        ret.success = false;
-        ret.ex = ex;
-        ret.reason = getMessage(ex);
+        return buildResultByError(ex, "run func failed:");
     }
-    return ret;
 }
-
 /**
  * 运行异步方法
  * @param func 要运行的异步方法
@@ -36,46 +31,15 @@ export function run<T>(func: (...args: any[]) => T, ...args: any[]): RunResult<T
  * @returns 运行结果
  */
 export async function runAsync<T>(func: (...args: any[]) => Promise<T> | T, ...args: any[]): Promise<RunResult<T>> {
-    const ret: RunResult<T> = Object.create(null);
     try {
         mustFunction(func, "func");
         // @ts-ignore
-        ret.data = await func.apply(this, args);
-        ret.success = true;
+        const data = await func.apply(this, args);
+        return { success: true, data };
     }
     catch (ex: any) {
-        console.error("async run func failed:", ex);
-        ret.success = false;
-        ret.ex = ex;
-        ret.reason = getMessage(ex);
+        return buildResultByError<T>(ex, "async run func failed:");
     }
-    return ret;
-
-    /** 改版前的旧代码
-    function runAsync1<T>(func: (...args: any[]) => Promise<T> | T, ...args: any[]): Promise<RunResult<T>> {
-        const ret: RunResult<T | Promise<T>> = run(func, ...args);
-        const deferred = defer<RunResult<T>>();
-        if (isPromise(ret.data) == true) {
-            (ret.data as Promise<T>).then(
-                function (data) {
-                    ret.success = true;
-                    ret.data = data;
-                    deferred.resolve(ret as RunResult<T>);
-                },
-                function (reason) {
-                    delete ret.data;
-                    ret.success = false;
-                    ret.reason = reason;
-                    deferred.resolve(ret as RunResult<T>);
-                }
-            );
-        }
-        else {
-            deferred.resolve(ret as RunResult<T>);
-        }
-        return deferred.promise;
-    };    
-     */
 }
 
 /**

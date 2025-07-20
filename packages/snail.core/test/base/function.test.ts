@@ -42,7 +42,7 @@ test("runAsync", async () => {
     rt = await runAsync(testFunc, 0);
     expect(rt.success).toStrictEqual(false);
     expect(rt.data).toStrictEqual(undefined);
-    expect(rt.reason).toStrictEqual("0");
+    expect(rt.reason).toStrictEqual(0);
     rt = await runAsync(testFunc, -1);
     expect(rt.success).toStrictEqual(false);
     expect(rt.reason).toStrictEqual("测试Error");

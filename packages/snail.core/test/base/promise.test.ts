@@ -18,7 +18,7 @@ test("delay", async () => {
 });
 
 //  使用通义灵码生成的单元测试
-describe('awaitX', async () => {
+describe('wait', async () => {
     it('should resolve with success: true when given a non-Promise value', async () => {
         const result = await wait(42);
         expect(result).toEqual({ success: true, data: 42 } as RunResult<number>);
@@ -35,7 +35,7 @@ describe('awaitX', async () => {
         expect(result).toEqual({
             success: false,
             ex: error,
-            reason: 'Test error'
+            reason: "Test error"
         } as RunResult<never>);
     });
 
@@ -54,7 +54,7 @@ describe('awaitX', async () => {
         expect(result).toEqual({
             success: false,
             ex: undefined,
-            reason: '{"code":500,"message":"Internal Server Error"}'
+            reason: errorObject
         } as RunResult<never>);
     });
 
@@ -63,7 +63,7 @@ describe('awaitX', async () => {
         expect(result).toEqual({
             success: false,
             ex: undefined,
-            reason: '404'
+            reason: 404
         } as RunResult<never>);
     });
 });

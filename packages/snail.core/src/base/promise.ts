@@ -2,11 +2,10 @@
  * 异步模块：Promise相关功能封装
  */
 
-import { IScope } from "./models/scope-model";
 import { isPromise } from "./data";
-import { getMessage } from "./error";
 import { RunResult } from "./function";
 import { FlatPromise } from "./models/promise-model";
+import { buildResultByError } from "./utils/function-util";
 
 /** 把自己的类型共享出去 */
 export * from "./models/promise-model"
@@ -21,7 +20,6 @@ export function defer<T>(): FlatPromise<T> {
         onResolve = resolve;
         onReject = reject;
     });
-
     return Object.freeze({ promise, resolve: onResolve, reject: onReject });
 }
 
@@ -31,9 +29,7 @@ export function defer<T>(): FlatPromise<T> {
  * @returns Promise，使用await等待Promise的Resolve完成
  */
 export function delay(timeout?: number): Promise<boolean> {
-    return new Promise(resolve => {
-        setTimeout(resolve, timeout, true);
-    });
+    return new Promise(resolve => setTimeout(resolve, timeout, true));
 }
 
 /**
@@ -47,25 +43,7 @@ export function wait<T>(task: Promise<T> | T): Promise<RunResult<T>> {
     return isPromise(task) == false
         ? Promise.resolve({ success: true, data: task as T })
         : (task as Promise<T>).then(
-            data => Promise.resolve<RunResult<T>>({ success: true, data }),
-            reason => Promise.resolve<RunResult<T>>({
-                success: false,
-                ex: reason instanceof Error ? reason : undefined,
-                reason: getMessage(reason),
-            })
+            data => ({ success: true, data }),
+            reason => buildResultByError<T>(reason, "wait task error.")
         );
-}
-/**
- * 等待task执行结果；
- * - 内部使用 awaitX 等待任务执行结果
- * - 用于实现任务联动，task执行完成后销毁传入scope作用域
- * @param task 要等待的任务
- * @param scope 作用域对象，task执行完成后执行scope.destroy销毁作用域
- * @returns RunResult<T>执行结果Promise
- */
-/* v8 ignore next 5 不用测时，拼接的功能 */
-export async function waitInScope<T>(task: Promise<T> | T, scope: IScope): Promise<RunResult<T>> {
-    const rt = await wait(task);
-    scope && scope.destroy();
-    return rt;
 }
