@@ -7,7 +7,7 @@
 <template>
     <div class="snail-input" :class="{ 'readonly': props.readonly }">
         <!-- 标题区域：有标题时，才展示 -->
-        <div class="input-title" :style="titleStyle" v-if="!!props.title">
+        <div class="input-title" :style="titleStyleRef" v-if="!!props.title">
             <span class="text" v-text="props.title" />
             <span class="required" v-text="'*'" v-if="props.readonly != true && props.required == true" />
         </div>
@@ -33,13 +33,13 @@ import { css } from "snail.view";
 const props = defineProps<InputOptions>();
 const emit = defineEmits<InputEvents>();
 /**     输入框引用 */
-const inputRef = useTemplateRef("input-el");
+const inputDom = useTemplateRef("input-el");
 /**     输入框内容 */
 const inputModel = defineModel<string>({ default: "" });
 /**     验证结果：非空字符串表示验证失败的提示语 */
 const validateRef = shallowRef<string>();
 /**      标题区域样式 */
-const titleStyle: Record<string, any> = computed(() => css.buildStyle(props.titleStyle));
+const titleStyleRef: Record<string, any> = computed(() => css.buildStyle(props.titleStyle));
 //  2、可选配置选项
 defineOptions({ name: "Input", inheritAttrs: true, });
 
@@ -49,7 +49,7 @@ defineOptions({ name: "Input", inheritAttrs: true, });
  */
 function onValueChange() {
     // 验证通过后，设置到value上，并对外发送change事件
-    const text: string = inputRef.value!.value || "";
+    const text: string = inputDom.value!.value || "";
     inputModel.value = text;
     emit("change", text);
 }

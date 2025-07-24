@@ -1,6 +1,6 @@
 import { IScope, RunResult } from "snail.core";
 import { TransitionEffect } from "snail.view";
-import { Ref, ShallowRef } from "vue";
+import { Ref, ShallowRef, WatchSource } from "vue";
 
 /**
  * 接口：响应式管理器
@@ -37,11 +37,11 @@ export interface IReactiveManager {
      * - 内部利用vue的watch逻辑实现
      * - 自动进行生命周期管理，作用域销毁时自动清理watch监听
      * - 仅实现简化版本watch监听；复杂的监听逻辑，自行使用watch方法
-     * @param getter 监听值的get方法，返回要监听的值
+     * @param source 监听源
      * @param callback 回调方法：可接收新旧值变化
      * @returns 监听作用域，destroy可销毁监听
      */
-    watcher<T>(getter: () => T, callback: (newValue: T, oldValue: T) => void): IScope;
+    watcher<T>(source: WatchSource<T>, callback: (newValue: T, oldValue: T) => void): IScope;
 }
 
 /**

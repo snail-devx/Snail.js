@@ -5,7 +5,7 @@
 -->
 <template>
     <div class="snail-choose" :class="props.readonly ? 'readonly' : ''">
-        <div v-for="(item, index) in chooseItems" :key="newId()" class="choose-item"
+        <div v-for="(item, index) in chooseItemsRef" :key="newId()" class="choose-item"
             :class="item.checked ? 'checked' : ''" :style="css.buildStyle(props.itemStyle)"
             @click="onItemClick(item, index)">
             <input :type="props.type" :checked="item.checked" />
@@ -37,15 +37,15 @@ type ChooseItemDetail = ChooseItem<any> & {
 const props = defineProps<ChooseOptions<any>>();
 const emit = defineEmits<ChooseEvents<any>>();
 /**     双向绑定数据值：多选时，若传入的非数组，则强制转为空数组 */
-const values = defineModel<any | any[]>({});
-props.multi && isArray(values.value) == false && (values.value = []);
+const valuesModel = defineModel<any | any[]>({});
+props.multi && isArray(valuesModel.value) == false && (valuesModel.value = []);
 /**     待选项目：进行响应式计算，model值改变时，同步更新选项状态*/
-const chooseItems: ComputedRef<ChooseItemDetail[]> = computed(() => props.items.map(item => {
+const chooseItemsRef: ComputedRef<ChooseItemDetail[]> = computed(() => props.items.map(item => {
     return {
         ...item,
         checked: props.multi == true
-            ? (values.value as any[]).includes(item.value)
-            : values.value == item.value
+            ? (valuesModel.value as any[]).includes(item.value)
+            : valuesModel.value == item.value
     }
 }));
 //  2、可选配置选项
@@ -63,16 +63,16 @@ function onItemClick(item: ChooseItemDetail, index: number) {
     //      多选模式
     if (props.multi == true) {
         item.checked = !item.checked;
-        values.value = chooseItems.value.filter(item => item.checked).map(item => item.value);
+        valuesModel.value = chooseItemsRef.value.filter(item => item.checked).map(item => item.value);
     }
     //      单选模式
     else {
-        chooseItems.value.forEach(item => item.checked = false);
+        chooseItemsRef.value.forEach(item => item.checked = false);
         item.checked = true;
-        values.value = item.value;
+        valuesModel.value = item.value;
     }
     //  发送事件做通知
-    emit("change", values.value);
+    emit("change", valuesModel.value);
 }
 </script>
 

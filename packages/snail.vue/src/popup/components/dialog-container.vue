@@ -1,7 +1,7 @@
 <!-- 对话框弹窗容器：支持外部传入动画，不转则使用默认的 -->
 <template>
     <Transition :name="props.transition || 'snail-dialog'">
-        <div class="snail-dialog" v-if="loading && props.dialogStatus.value != 'close'" :class="props.rootClass"
+        <div class="snail-dialog" v-if="loadingRef && props.dialogStatus.value != 'close'" :class="props.rootClass"
             v-bind:class="props.dialogStatus.value" @click.self="props.closeOnMask && props.closeDialog();">
             <Dynamic class="dialog-body" :name="props.name" :component="props.component" :url="props.url"
                 :in-dialog="props.inDialog" :close-dialog="props.closeDialog" :on-dialog-close="props.onDialogClose"
@@ -23,13 +23,13 @@ const props = defineProps<DialogOptions & DialogHandle<any> & DailogExtend & Pop
 /** 监听器 */
 const { onEvent } = useObserver();
 /** 是否进行组件加载：为了让 Transition 生效，在 onMounted 设置为 true */
-const loading = shallowRef<boolean>(false);
+const loadingRef = shallowRef<boolean>(false);
 //  2、可选配置选项
 defineOptions({ name: "DialogContainer", inheritAttrs: true, });
 
 // *****************************************   👉  组件渲染    *****************************************
 onMounted(() => {
-    loading.value = true;
+    loadingRef.value = true;
     onEvent(window, "keyup", (event: KeyboardEvent) => {
         event.key === "Escape" && props.dialogStatus.value == "active"
             && props.closeOnEscape && props.closeDialog();

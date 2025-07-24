@@ -14,7 +14,10 @@
 <script setup lang="ts">
 import { LoadingOptions } from './models/loading-model';
 
-const { show = false, maskDisabled = false, rootClass = [], transition = "snail-loading", } = defineProps<LoadingOptions>();
+// *****************************************   👉  组件定义    *****************************************
+//  1、props、data
+const { show = false, maskDisabled = false, rootClass = [], transition = "snail-loading" } = defineProps<LoadingOptions>();
+//  2、可选配置选项
 defineOptions({ name: "Loading", inheritAttrs: true });
 </script>
 

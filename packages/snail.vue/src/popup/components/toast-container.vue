@@ -3,11 +3,11 @@
     不直接对外提供，外部使用toast方法使用
 -->
 <template>
-    <div ref="toast" class="snail-toast" :class="{ 'show-toast': showToast }" @mouseenter="onMouseEvent(false)"
+    <div ref="toast" class="snail-toast" :class="{ 'show-toast': showToastRef }" @mouseenter="onMouseEvent(false)"
         @mouseleave="onMouseEvent(true)">
         <!-- 关闭按钮 -->
-        <Icon type="close" class="close-icon" :fill="closeFill" :size="20" @mouseenter="closeFill = 'red'"
-            @mouseleave="closeFill = '#707070'" @click="onToastClose" />
+        <Icon type="close" class="close-icon" :fill="closeFillRef" :size="20" @mouseenter="closeFillRef = 'red'"
+            @mouseleave="closeFillRef = '#707070'" @click="onToastClose" />
         <!-- 图标和文本 -->
         <div class="icon" v-if="props.type">
             <Icon :type="props.type" fill="black" :size="18" />
@@ -25,9 +25,9 @@ import { PopupExtend, PopupFlagOptions, PopupHandle } from "../manager";
 //  1、props、data
 const props = defineProps<ToastOptions & PopupHandle<any>>();
 /** 是否显示toast弹窗 */
-const showToast = ref(false);
+const showToastRef = ref(false);
 /** 计算出来的填充颜色 */
-const closeFill = ref("#707070");
+const closeFillRef = ref("#707070");
 /** 自动销毁时的定时器 */
 var destroyTimer: NodeJS.Timeout;
 //  2、可选配置选项
@@ -48,7 +48,7 @@ function onMouseEvent(isLeave: boolean) {
  * 关闭toast
  */
 function onToastClose() {
-    showToast.value = false;
+    showToastRef.value = false;
     setTimeout(props.closePopup, 200);
 }
 
@@ -56,7 +56,7 @@ function onToastClose() {
 // 监听大小变化，进行水平、垂直居中处理
 onMounted(() => {
     destroyTimer = setTimeout(onToastClose, 2000);
-    setTimeout(() => showToast.value = true, 1);
+    setTimeout(() => showToastRef.value = true, 1);
 });
 onUnmounted(() => {
     destroyTimer && clearTimeout(destroyTimer);

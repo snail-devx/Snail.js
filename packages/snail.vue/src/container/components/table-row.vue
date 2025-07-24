@@ -1,6 +1,6 @@
 <!-- 表格行组件：配合Table组件使用，作为内容行组件 -->
 <template>
-    <div class="table-row" :style="rowStyle">
+    <div class="table-row" :style="styleRef">
         <slot />
     </div>
 </template>
@@ -14,7 +14,7 @@ import { css } from "snail.view";
 //  1、props、data
 const props = defineProps<TableRowOptions>();
 /**     行样式：使用css样式*/
-const rowStyle = computed(() => css.buildStyle(props));
+const styleRef = computed(() => css.buildStyle(props));
 //  2、可选配置选项
 defineOptions({ name: "TableRow", inheritAttrs: true, });
 </script>

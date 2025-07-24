@@ -5,34 +5,36 @@
 -->
 <template>
     <!-- 加载组件区域 -->
-    <component :is="dynamicComponent" v-bind="$attrs" ref="componentRef">
+    <component :is="dynamicComponentRef" v-bind="$attrs" ref="componentRef">
         <template v-for="(_, name) in $slots" v-slot:[name]="slotData" :key="name">
             <slot :name="name" v-bind="slotData" />
         </template>
     </component>
     <!-- 加载错误时的展示区域 -->
-    <div class="snail-dynamic-error" v-if="dynamicError != undefined" v-bind="$attrs">
-        load component error：<span>{{ dynamicError }}</span>
+    <div class="snail-dynamic-error" v-if="dynamicErrorRef != undefined" v-bind="$attrs">
+        load component error：<span>{{ dynamicErrorRef }}</span>
     </div>
     <!-- 组件加载过程中的等待提示 -->
-    <SnailLoading v-else-if="dynamicComponent == undefined" :show="true" :disabled-mask="true" />
+    <SnailLoading v-else-if="dynamicComponentRef == undefined" :show="true" :disabled-mask="true" />
 </template>
 
 <script setup lang="ts">
-import { Component, onActivated, onDeactivated, onErrorCaptured, ref, shallowRef, watch } from "vue";
-import { delay, isObject, isStringNotEmpty, RunResult, script, throwError, throwIfNullOrUndefined, tidyString } from "snail.core";
+import { Component, onErrorCaptured, ref, shallowRef } from "vue";
+import { delay, isObject, isStringNotEmpty, script, } from "snail.core";
 import SnailLoading from "../prompt/loading.vue"
 import { ComponentOptions } from "./models/component-model";
+import { useReactive } from "../base/reactive";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const { name, component, url } = defineProps<ComponentOptions>();
+const { watcher } = useReactive();
 /**      动态加载组件的ref实例引用 */
 const componentRef = ref(null);
 /**     动态加载出来的组件：使用浅层相应 */
-const dynamicComponent = shallowRef<Component | string>(undefined);
+const dynamicComponentRef = shallowRef<Component | string>(undefined);
 /**     动态加载时的错误信息：使用浅层相应 */
-const dynamicError = shallowRef<string | undefined>(undefined);
+const dynamicErrorRef = shallowRef<string | undefined>(undefined);
 //  2、可选配置选项
 defineOptions({ name: "Dynamic", inheritAttrs: false, });
 
@@ -41,15 +43,15 @@ defineOptions({ name: "Dynamic", inheritAttrs: false, });
  * 构建动态组件
  */
 async function buildDynamicComponent() {
-    dynamicComponent.value = undefined;
-    dynamicError.value = undefined;
+    dynamicComponentRef.value = undefined;
+    dynamicErrorRef.value = undefined;
     /* 根据优先级加载组件：name > component > url */
     if (isStringNotEmpty(name) == true) {
-        dynamicComponent.value = name;
+        dynamicComponentRef.value = name;
         return;
     }
     if (isObject(component) == true) {
-        dynamicComponent.value = component;
+        dynamicComponentRef.value = component;
         return;
     }
     //  动态Url地址：先执行loading加载，启动script做程序加载
@@ -71,25 +73,25 @@ async function buildDynamicComponent() {
         try {
             const comp = await task;
             isObject(comp) || isStringNotEmpty(comp)
-                ? (dynamicComponent.value = comp)
-                : (dynamicError.value = `load component failed:return nulll or undefined. url:${url}.`)
+                ? (dynamicComponentRef.value = comp)
+                : (dynamicErrorRef.value = `load component failed:return nulll or undefined. url:${url}.`)
         }
         catch (ex: any) {
-            dynamicComponent.value = undefined;
-            dynamicError.value = ex.message;
+            dynamicComponentRef.value = undefined;
+            dynamicErrorRef.value = ex.message;
         }
     }
     else {
-        dynamicError.value = "load error: name component、url are all empty.";
+        dynamicErrorRef.value = "load error: name component、url are all empty.";
     }
 }
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听：构建动态组件，响应外部属性变化（name、component、url）
 {
-    watch(() => name, buildDynamicComponent);
-    watch(() => component, buildDynamicComponent);
-    watch(() => url, buildDynamicComponent);
+    watcher(() => name, buildDynamicComponent);
+    watcher(() => component, buildDynamicComponent);
+    watcher(() => url, buildDynamicComponent);
     buildDynamicComponent();
 }
 //  2、生命周期响应
@@ -100,9 +102,6 @@ onErrorCaptured((error, vm, info) => {
         return false;
     }
 });
-//      监听组件激活和卸载，适配KeepAlive组件内使用
-onActivated(() => console.log("onActivated"));
-onDeactivated(() => console.log("onDeactivated"));
 </script>
 
 <style lang="less">

@@ -4,14 +4,14 @@
     3、后续支持内容区域最大高度，从而支持滚动条
 -->
 <template>
-    <div class="snail-fold" :class="status">
+    <div class="snail-fold" :class="statusModel">
         <!-- 折叠面板头部：支持插槽，并做默认实现 -->
         <div class="fold-header">
             <slot name="header">
                 <div class="title" v-text="props.title" />
                 <div class="subtitle" v-if="!!props.subtitle" v-text="props.subtitle" />
                 <div class="status" v-if="props.disabled != true">
-                    <span :title="status == 'expand' ? '收起' : '展开'" ref="foldStatusSpan">
+                    <span :title="statusModel == 'expand' ? '收起' : '展开'" ref="foldStatusSpan">
                         <Icon :type="'custom'" :draw="statusIcon" @click="onStatusClick" />
                     </span>
                 </div>
@@ -25,29 +25,30 @@
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, useTemplateRef, watch } from "vue";
+import { throwError } from "snail.core";
+import { useAnimation } from "snail.view";
+import { useTemplateRef } from "vue";
+import Icon from "../base/icon.vue";
 import { FoldEvents, FoldOptions, FoldStatus } from "./models/fold-model";
 import { getFoldStatusDraw } from "./utils/fold-util";
-import { useAnimation } from "snail.view";
-import { throwError } from "snail.core";
-import Icon from "../base/icon.vue";
+import { useReactive } from "../base/reactive";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<FoldOptions>();
 const emit = defineEmits<FoldEvents>();
-/**     动画管理器：执行展开，折叠动画 */
 const { transition } = useAnimation();
+const { watcher } = useReactive();
 /**     折叠状态：默认展开 */
-const status = defineModel<FoldStatus>("status", { default: "expand" });
-/**     监听折叠状态，进行样式计算*/
-const statusWatch = watch(status, updateFoldStyle);
+const statusModel = defineModel<FoldStatus>("status", { default: "expand" });
+//      监听折叠状态，进行样式计算
+watcher(statusModel, updateFoldStyle);
 /**     展开、收起图标绘制路径 */
 const statusIcon: string = getFoldStatusDraw();
 /**     折叠状态区域引用 */
-const foldStatusSpanRef = useTemplateRef("foldStatusSpan");
+const statusDom = useTemplateRef("foldStatusSpan");
 /**     折叠面板内容区域引用 */
-const foldBodyRef = useTemplateRef("foldBody");
+const foldBodyDom = useTemplateRef("foldBody");
 //  2、可选配置选项
 defineOptions({ name: "Fold", inheritAttrs: true, });
 
@@ -57,10 +58,10 @@ defineOptions({ name: "Fold", inheritAttrs: true, });
  */
 function updateFoldStyle() {
     /** 是否是展开状态 */
-    const isExpand = status.value == "expand";
+    const isExpand = statusModel.value == "expand";
     //  折叠图标样式：这个可以用vue的响应式，配合class样式，这里纯粹是为了验证transition动画
-    if (foldStatusSpanRef.value) {
-        transition(foldStatusSpanRef.value, {
+    if (statusDom.value) {
+        transition(statusDom.value, {
             from: {
                 transition: "transform 0.2s ease",
                 transform: isExpand ? "rotateZ(180deg)" : "rotate(0)"
@@ -70,10 +71,10 @@ function updateFoldStyle() {
         });
     }
     //  折叠内容样式：折叠时，动画完成后保留target样式，且此时overflow:hidden，否则折叠将失效
-    if (foldBodyRef.value) {
+    if (foldBodyDom.value) {
         const minHeight = 32;
-        const maxHeight = minHeight + foldBodyRef.value.getBoundingClientRect().height;
-        transition(foldBodyRef.value.parentElement, {
+        const maxHeight = minHeight + foldBodyDom.value.getBoundingClientRect().height;
+        transition(foldBodyDom.value.parentElement, {
             from: {
                 transition: "height 0.2s ease",
                 overflow: "hidden",
@@ -89,25 +90,21 @@ function updateFoldStyle() {
 }
 /** 状态图标点击事件：切换展开、收起状态 */
 function onStatusClick() {
-    switch (status.value) {
+    switch (statusModel.value) {
         //  展开时，折叠
         case "expand":
-            status.value = "fold";
+            statusModel.value = "fold";
             break;
         //  折叠时，展开
         case "fold":
-            status.value = "expand";
+            statusModel.value = "expand";
             break;
         //  不支持的状态，强制报错
         default:
-            throwError(`Fold not support status value: ${status.value}`);
+            throwError(`Fold not support status value: ${statusModel.value}`);
     }
-    emit("change", status.value);
+    emit("change", statusModel.value);
 }
-
-// *****************************************   👉  组件渲染    *****************************************
-//  生命周期响应
-onUnmounted(() => { statusWatch.stop(); });
 </script>
 
 <style lang="less">

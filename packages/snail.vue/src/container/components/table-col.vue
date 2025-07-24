@@ -1,6 +1,6 @@
 <!-- 表格列组件；作为Table、TableRow的配套组件，根class不用加 snail 前缀-->
 <template>
-    <div class="table-col" :style="colStyle" :class="props.textAlign">
+    <div class="table-col" :style="styleRef" :class="props.textAlign">
         <slot />
     </div>
 </template>
@@ -14,7 +14,7 @@ import { css } from "snail.view";
 //  1、props、data
 const props = defineProps<TableColOptions>();
 /**     行样式*/
-const colStyle = computed<Record<string, any>>(() => css.buildStyle(props));
+const styleRef = computed<Record<string, any>>(() => css.buildStyle(props));
 //  2、可选配置选项
 defineOptions({ name: "TableCol", inheritAttrs: true, });
 </script>

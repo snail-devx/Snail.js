@@ -6,7 +6,7 @@
     <Scroll class="snail-table" :scroll-x="props.scrollX" :scroll-y="props.scrollY"
         :class="{ 'start-border': props.border == true }">
         <!-- 头部区域 -->
-        <div class="table-header" :style="headerStyle">
+        <div class="table-header" :style="hStyleRef">
             <slot name="header" />
         </div>
         <!-- 内容区域：滚动 -->
@@ -14,7 +14,7 @@
             <slot />
         </div>
         <!-- 尾部区域 -->
-        <div class="table-footer" :style="footerStyle">
+        <div class="table-footer" :style="fStyleRef">
             <slot name="footer" />
         </div>
     </Scroll>
@@ -30,9 +30,9 @@ import { css } from "snail.view";
 //  1、props、data
 const props = defineProps<TableOptions>();
 /** 表头样式 */
-const headerStyle = computed(() => css.buildStyle(props.headerStyle));
+const hStyleRef = computed(() => css.buildStyle(props.headerStyle));
 /** 表尾样式 */
-const footerStyle = computed(() => css.buildStyle(props.footerStyle));
+const fStyleRef = computed(() => css.buildStyle(props.footerStyle));
 //  2、可选配置选项
 defineOptions({ name: "Table", inheritAttrs: true, });
 

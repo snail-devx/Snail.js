@@ -4,7 +4,7 @@
     3、每个弹窗容器就是一个app实例，实现互不干扰
 -->
 <template>
-    <Dynamic class="snail-popup" v-if="loading && props.popupStatus.value != 'close'" :name="props.name"
+    <Dynamic class="snail-popup" v-if="loadingRef && props.popupStatus.value != 'close'" :name="props.name"
         :component="props.component" :url="props.url" :in-popup="props.inPopup" :close-popup="props.closePopup"
         v-bind="props.props" />
 </template>
@@ -18,7 +18,7 @@ import { PopupExtend, PopupFlagOptions, PopupHandle, PopupOptions } from "../mod
 //  1、props、data
 const props = defineProps<PopupOptions & PopupHandle<any> & PopupExtend & PopupFlagOptions>();
 /** 是否加载组件：模拟出动画效果 */
-const loading = shallowRef<boolean>(false);
+const loadingRef = shallowRef<boolean>(false);
 //  2、可选配置选项
 defineOptions({ name: "PopupContainer", inheritAttrs: true, });
 
@@ -26,7 +26,7 @@ defineOptions({ name: "PopupContainer", inheritAttrs: true, });
 
 // *****************************************   👉  组件渲染    *****************************************
 onMounted(() => {
-    loading.value = true;
+    loadingRef.value = true;
     //  监听点击和keyup事件，进行弹窗关闭
 });
 </script>

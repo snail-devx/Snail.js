@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { onActivated, onDeactivated } from "vue";
 import { ScrollOptions, ScrollEvents } from "./models/scroll-model"
 
 // *****************************************   👉  组件定义    *****************************************

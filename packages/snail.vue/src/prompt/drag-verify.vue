@@ -1,11 +1,11 @@
 <!-- 拖拽验证组件：支持PC、移动端 -->
 <template>
-    <div class="snail-drag-verify" :class="{ 'touch-mode': isTouch }" v-bind:class="dragInfo.status">
-        <div class="drag-progress" :style="{ width: `${dragInfo.distance}px` }" />
-        <div class="verify-message" v-text="dragInfo.status == 'success' ? '验证成功' : message" />
-        <div class="drag-handle" ref="dragHandle" :style="{ left: `${dragInfo.distance}px` }" @mousedown="onStartDrag"
-            @touchstart="onStartDrag" @touchmove="onDragMove" @touchend="onDragEnd">
-            <Icon type="success" :size="20" color="white" v-if="dragInfo.status == 'success'" />
+    <div class="snail-drag-verify" :class="{ 'touch-mode': isTouch }" v-bind:class="dragInfoRef.status">
+        <div class="drag-progress" :style="{ width: `${dragInfoRef.distance}px` }" />
+        <div class="verify-message" v-text="dragInfoRef.status == 'success' ? '验证成功' : message" />
+        <div class="drag-handle" ref="dragHandle" :style="{ left: `${dragInfoRef.distance}px` }"
+            @mousedown="onStartDrag" @touchstart="onStartDrag" @touchmove="onDragMove" @touchend="onDragEnd">
+            <Icon type="success" :size="20" color="white" v-if="dragInfoRef.status == 'success'" />
             <Icon type="custom" :size="20" color="#948D8D" :draw="towArrowIcon" v-else />
         </div>
     </div>
@@ -27,9 +27,9 @@ const { onEvent } = useObserver();
 /** 是否是触摸设备 */
 const isTouch = 'ontouchstart' in window;
 /** 拖拽元素 */
-const dragHandle = useTemplateRef("dragHandle");
+const dragHandleDom = useTemplateRef("dragHandle");
 /** 拖拽信息 */
-const dragInfo = ref<DragVerifyInfo>({ status: "none", startX: 0, endX: 0, distance: 0 });
+const dragInfoRef = ref<DragVerifyInfo>({ status: "none", startX: 0, endX: 0, distance: 0 });
 /** 双箭头图标绘制路径 */
 const towArrowIcon: string = getTwoArrowIconDraw();
 //  2、可选配置选项
@@ -40,17 +40,17 @@ defineOptions({ name: "DragVerify", inheritAttrs: true, });
  * 计算最大的拖拽距离
  */
 function getMaxDistance(): number {
-    return dragHandle.value.parentElement.getBoundingClientRect().width - dragHandle.value.getBoundingClientRect().width;
+    return dragHandleDom.value.parentElement.getBoundingClientRect().width - dragHandleDom.value.getBoundingClientRect().width;
 }
 /**
  * 开始拖拽
  */
 function onStartDrag(e: TouchEvent | MouseEvent) {
-    if (dragInfo.value.status == "none") {
-        dragInfo.value.status = "dragging";
-        dragInfo.value.endX = 0;
-        dragInfo.value.distance = 0;
-        dragInfo.value.startX = isTouch
+    if (dragInfoRef.value.status == "none") {
+        dragInfoRef.value.status = "dragging";
+        dragInfoRef.value.endX = 0;
+        dragInfoRef.value.distance = 0;
+        dragInfoRef.value.startX = isTouch
             ? (e as TouchEvent).touches[0].clientX
             : (e as MouseEvent).clientX;
     }
@@ -59,26 +59,26 @@ function onStartDrag(e: TouchEvent | MouseEvent) {
  * 拖拽移动时
  */
 function onDragMove(e: TouchEvent | MouseEvent) {
-    if (dragInfo.value.status == "dragging") {
-        dragInfo.value.endX = isTouch
+    if (dragInfoRef.value.status == "dragging") {
+        dragInfoRef.value.endX = isTouch
             ? (e as TouchEvent).touches[0].clientX
             : (e as MouseEvent).clientX;
-        dragInfo.value.distance = Math.min(Math.max(dragInfo.value.endX - dragInfo.value.startX, 0), getMaxDistance());
+        dragInfoRef.value.distance = Math.min(Math.max(dragInfoRef.value.endX - dragInfoRef.value.startX, 0), getMaxDistance());
     }
 }
 /**
  * 拖拽结束
  */
 function onDragEnd() {
-    if (dragInfo.value.status == "dragging") {
+    if (dragInfoRef.value.status == "dragging") {
         //  判断是否拖拽验证成功
-        if (dragInfo.value.distance == getMaxDistance()) {
-            dragInfo.value.status = "success";
+        if (dragInfoRef.value.distance == getMaxDistance()) {
+            dragInfoRef.value.status = "success";
             emit("success");
         }
         else {
-            dragInfo.value.status = "none";
-            dragInfo.value.distance = 0;
+            dragInfoRef.value.status = "none";
+            dragInfoRef.value.distance = 0;
         }
     }
 }

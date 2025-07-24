@@ -6,7 +6,7 @@
     <svg viewBox="0 0 1024 1024" :width="props.size || 24" :height="props.size || 24" :class="type" class="snail-icon"
         @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
         <title v-text="props.title || ''" />
-        <path v-for="draw in paths" :d="draw" :fill="color" />
+        <path v-for="draw in paths" :d="draw" :fill="colorRef" />
     </svg>
 </template>
 
@@ -21,7 +21,7 @@ const props = defineProps<IconOptions>();
 /** 图片路径信息 */
 const paths = getSvgDraw(props || {} as any);
 /** 图标颜色 */
-const color = shallowRef<string>(props.color);
+const colorRef = shallowRef<string>(props.color);
 //  2、可选配置选项
 defineOptions({ name: "Icon", inheritAttrs: true, });
 
@@ -30,13 +30,13 @@ defineOptions({ name: "Icon", inheritAttrs: true, });
  * 鼠标移入时
  */
 function onMouseEnter() {
-    color.value = props.hoverColor || props.color;
+    colorRef.value = props.hoverColor || props.color;
 }
 /**
  * 鼠标移出时
  */
 function onMouseLeave() {
-    color.value = props.color;
+    colorRef.value = props.color;
 }
 </script>
 <style lang="less">

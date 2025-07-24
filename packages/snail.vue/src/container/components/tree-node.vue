@@ -13,7 +13,7 @@
             <template v-else>
                 <div class="indent" />
                 <div class="node-fold" v-if="extend.foldDisabled != true">
-                    <Icon v-if="hasChildren" :class="foldStatus" :type="'custom'" :size="24" :color="'#8a8099'"
+                    <Icon v-if="hasChildrenRef" :class="statusRef" :type="'custom'" :size="24" :color="'#8a8099'"
                         :draw="'M 298.667 426.667 l 213.333 256 l 213.333 -256 Z'" @click="toggleFold" />
                 </div>
                 <span class="node-text" :title="node.text" v-text="node.text" @click="onNodeClick(node, parent)" />
@@ -23,7 +23,7 @@
             </template>
         </div>
         <!-- 子节点区域：遍历子，插槽绑定时，将插槽绑定属性同步向外传递 -->
-        <div class="children" v-if="hasChildren" ref="children">
+        <div class="children" v-if="hasChildrenRef" ref="children">
             <TreeNode v-for="child in node.children" :key="newId()" :node="child" :parent="node" :level="nextLevel"
                 :extend="extend" @click="onNodeClick">
                 <template #="slotProps">
@@ -48,13 +48,13 @@ throwIfTrue(level > 10, "tree node level cannot exceed 10.");
 const emit = defineEmits<TreeNodeEvents<any>>();
 const { transition } = useAnimation();
 /**     折叠状态，默认展开 */
-const foldStatus = shallowRef<"expand" | "fold">("expand");
+const statusRef = shallowRef<"expand" | "fold">("expand");
 /**     是否有子节点 */
-const hasChildren = computed(() => isArrayNotEmpty(node.children));
+const hasChildrenRef = computed(() => isArrayNotEmpty(node.children));
 /**     下一个层级： */
 const nextLevel: number = level + 1;
 /**     子节点区域Dom元素引用 */
-const childrenRef = useTemplateRef("children");
+const childrenDom = useTemplateRef("children");
 //  2、可选配置选项
 defineOptions({ name: "TreeNode", inheritAttrs: true, });
 
@@ -63,22 +63,22 @@ defineOptions({ name: "TreeNode", inheritAttrs: true, });
  * 折叠状态点击时
  */
 function toggleFold() {
-    switch (foldStatus.value) {
+    switch (statusRef.value) {
         case "expand":
-            foldStatus.value = "fold";
+            statusRef.value = "fold";
             break;
         case "fold":
-            foldStatus.value = "expand";
+            statusRef.value = "expand";
             break;
     }
     //  有子节点时，计算位置动画效果
-    if (childrenRef.value) {
-        const minHeight = childrenRef.value.previousElementSibling.getBoundingClientRect().height;
-        const maxHeight = minHeight + childrenRef.value.getBoundingClientRect().height;
-        transition(childrenRef.value.parentElement, {
-            from: { transition: "height 0.2s ease", overflow: "hidden", height: `${foldStatus.value == 'fold' ? maxHeight : minHeight}px` },
-            to: { height: `${foldStatus.value == 'fold' ? minHeight : maxHeight}px` },
-            end: foldStatus.value == 'fold' ? { height: `${minHeight}px`, overflow: 'hidden' } : {}
+    if (childrenDom.value) {
+        const minHeight = childrenDom.value.previousElementSibling.getBoundingClientRect().height;
+        const maxHeight = minHeight + childrenDom.value.getBoundingClientRect().height;
+        transition(childrenDom.value.parentElement, {
+            from: { transition: "height 0.2s ease", overflow: "hidden", height: `${statusRef.value == 'fold' ? maxHeight : minHeight}px` },
+            to: { height: `${statusRef.value == 'fold' ? minHeight : maxHeight}px` },
+            end: statusRef.value == 'fold' ? { height: `${minHeight}px`, overflow: 'hidden' } : {}
         }, 200);
     }
 }

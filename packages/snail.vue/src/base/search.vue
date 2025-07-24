@@ -1,8 +1,8 @@
 <!-- 搜索组件-->
 <template>
     <div class="snail-search" :class="props.readonly ? 'readonly' : ''">
-        <input type="search" :placeholder="props.placeholder" :readonly="props.readonly == true" v-model.trim="text"
-            @keyup.enter="onSearch" />
+        <input type="search" :placeholder="props.placeholder" :readonly="props.readonly == true"
+            v-model.trim="textModel" @keyup.enter="onSearch" />
         <div>
             <Icon class="search-button" :type="'custom'" :draw="searchIon" :size="24" :color="'#707070'"
                 @click="onSearch" />
@@ -11,7 +11,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated, useModel } from "vue";
 import { SearchEvents, SearchOptions } from "./models/search-model";
 import Icon from "./icon.vue";
 
@@ -20,7 +19,7 @@ import Icon from "./icon.vue";
 const props = defineProps<SearchOptions>();
 const emit = defineEmits<SearchEvents>();
 /**     搜索文本 */
-const text = defineModel<string>({ default: "" });
+const textModel = defineModel<string>({ default: "" });
 /**     搜索图标 */
 const searchIon: string = "M 860.16 824.32 l -163.84 -163.84 c 102.4 -120.32 97.28 -302.08 -17.92 -414.72 c -120.32 -120.32 -314.88 -120.32 -435.2 0 c -120.32 120.32 -120.32 314.88 0 435.2 c 112.64 112.64 294.4 120.32 414.72 17.92 l 163.84 163.84 c 10.24 10.24 25.6 10.24 35.84 0 c 12.8 -12.8 12.8 -28.16 2.56 -38.4 Z M 281.6 642.56 C 181.76 542.72 181.76 381.44 281.6 281.6 c 99.84 -99.84 261.12 -99.84 360.96 0 c 99.84 99.84 99.84 261.12 0 360.96 c -99.84 102.4 -261.12 102.4 -360.96 0 Z";
 //      三方组件
@@ -33,7 +32,7 @@ defineOptions({ name: "Search", inheritAttrs: true, });
  */
 function onSearch() {
     //  后期做一些验证，将旧值存储起来，没变化时不做触发
-    props.readonly || emit("search", text.value);
+    props.readonly || emit("search", textModel.value);
 }
 
 </script>
