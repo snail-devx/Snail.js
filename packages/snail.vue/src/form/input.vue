@@ -13,7 +13,7 @@
         </div>
         <!-- 输入框区域：输入不做v-model绑定，只有验证通过后再绑定 -->
         <div class="input-body">
-            <input ref="input-el" :type="props.type || 'text'" :value="inputModel" :readonly="props.readonly"
+            <input ref="input-el" :type="props.type || 'text'" :value="inputModel" :readonly="props.readonly == true"
                 :placeholder="props.placeholder" :title="inputModel" @change="onValueChange" @click="emit('click')" />
             <span class="validate" v-if="!!validateRef" :title="validateRef">
                 <Icon :type="'error'" :size="16" :color="'red'" />
@@ -62,8 +62,6 @@ console.warn("Input:还没实现 验证相关逻辑")
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/base-mixins.less";
 
-@input-border: 1px solid #DDDFED;
-
 .snail-input {
     display: inline-flex;
     min-height: 34px;
@@ -91,34 +89,11 @@ console.warn("Input:还没实现 验证相关逻辑")
 
         >input {
             flex: 1;
-            border: @input-border;
-            padding: 0;
-            padding-left: 10px;
-            padding-right: 10px;
-
-            text-overflow: ellipsis;
-            font-weight: 400;
-            font-size: 14px;
-            color: #2E3033;
-
-            &:focus {
-                border: 1px solid #3292ea;
-            }
         }
 
         >span {
             flex-shrink: 0;
             background-color: red;
-        }
-    }
-}
-
-// *****************************************   👉  特殊样式适配    *****************************************
-//  只读时，文本框干掉焦点样式
-.snail-input.readonly {
-    >div.input-body {
-        >input:focus {
-            border: @input-border;
         }
     }
 }

@@ -25,7 +25,6 @@ defineOptions({ name: "TableRow", inheritAttrs: true, });
 
 //  行 默认填充满、内部元素垂直居中
 .table-row {
-    min-width: 100%;
     // flex 布局：display: flex，align-items 为center
     .flex-cross-center();
 }

@@ -31,6 +31,8 @@ defineOptions({ name: "Empty", inheritAttrs: true, });
 @import "snail.view/dist/styles/base-mixins.less";
 
 .snail-empty {
+    //  给个最小高度
+    min-height: 150px;
     // width:100%；height:100%
     .wh-fill();
     // flex 布局：display: flex，align-items、justify-content 都为center

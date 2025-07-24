@@ -4,18 +4,22 @@ import { IScope, isFunction, mustObject, onMountScope, throwError, useScope } fr
 //  👉 base 相关导出
 //      类型导出
 export * from "./base/models/button-model";
+export * from "./base/models/choose-model";
 export * from "./base/models/footer-model";
 export * from "./base/models/header-model";
 export * from "./base/models/icon-model";
 export * from "./base/models/reactive-model";
+export * from "./base/models/search-model";
 export * from "./base/models/switch-model";
 //      样式导出
 import "./base/styles/app.less"
 //      组件导出
 import Button from "./base/button.vue";
+import Choose from "./base/choose.vue";
 import Footer from "./base/footer.vue";
 import Header from "./base/header.vue";
 import Icon from "./base/icon.vue";
+import Search from "./base/search.vue";
 import Switch from "./base/switch.vue";
 //      方法导出
 export * from "./base/reactive";
@@ -27,14 +31,19 @@ export * from "./base/utils/icon-util";
 export * from "./container/models/component-model";
 export * from "./container/models/fold-model";
 export * from "./container/models/scroll-model";
+export * from "./container/models/sort-model";
 export * from "./container/models/table-model";
+export * from "./container/models/tree-model";
+
 //      组件导出：赋值给 components
 import Dynamic from "./container/dynamic.vue";
 import Fold from "./container/fold.vue";
 import Scroll from "./container/scroll.vue";
+import Sort from "./container/sort.vue";
 import Table from "./container/table.vue";
 import TableRow from "./container/components/table-row.vue";
 import TableCol from "./container/components/table-col.vue";
+import Tree from "./container/tree.vue";
 //      方法导出
 export * from "./container/utils/component-util";
 
@@ -64,9 +73,9 @@ import Loading from "./prompt/loading.vue";
 //  👉 组件导出
 export const components = {
     //  base下的组件
-    Button, Footer, Header, Icon, Switch,
+    Button, Choose, Footer, Header, Icon, Search, Switch,
     //  container 下的组件
-    Dynamic, Fold, Scroll, Table, TableRow, TableCol,
+    Dynamic, Fold, Scroll, Sort, Table, TableRow, TableCol, Tree,
     //  form 下的组件
     Input,
     //  prompt 下的组件

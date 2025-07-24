@@ -57,10 +57,12 @@ defineOptions({ name: "Table", inheritAttrs: true, });
         .flex-cross-center();
     }
 
-    //  表头钉住位置
+    //  表头钉住位置；给个默认背景色，避免滑动时盖不住数据行
     >div.table-header {
         position: sticky !important;
         top: 0;
+        z-index: 1;
+        background-color: white;
     }
 
     // 实际内容区域
