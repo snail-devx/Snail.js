@@ -11,8 +11,8 @@
 </template>
 <script setup lang="ts">
 import { Component, shallowRef } from "vue"
-import Dynamic from "../../../src/container/dynamic.vue";
-import Loading from "../../../src/prompt/loading.vue";
+import { components } from "snail.vue"
+const { Dynamic, Loading } = components;
 
 const showLoading = true;
 const dynamicName = shallowRef<string | undefined>("DialogContent");
@@ -29,19 +29,19 @@ setTimeout(() => {
 }, 3000);
 //  组件内部错误，不会处理
 setTimeout(() => {
-    dynamicUrl.value = "/container/dynamic-url-test.js#error";
+    dynamicUrl.value = "/components/container/dynamic-url-test.js#error";
 }, 4000);
 setTimeout(() => {
-    dynamicUrl.value = "/container/dynamic-url-test.js#errorSetup";
+    dynamicUrl.value = "/components/container/dynamic-url-test.js#errorSetup";
 }, 6000);
 setTimeout(() => {
-    dynamicUrl.value = "/container/dynamic-url-test.js#errorMounted";
+    dynamicUrl.value = "/components/container/dynamic-url-test.js#errorMounted";
 }, 8000);
 //  url地址错误
 setTimeout(() => {
     dynamicUrl.value = "sxxxx";
 }, 10000);
 setTimeout(() => {
-    dynamicUrl.value = "/container/dynamic-url-test.js#default";
+    dynamicUrl.value = "/components/container/dynamic-url-test.js#default";
 }, 12000);
 </script>

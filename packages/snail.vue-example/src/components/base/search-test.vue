@@ -1,18 +1,20 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <div style="margin: 100px;">
-        <DragVerify :message="'测试哈哈哈'" />
-    </div>
+    <Search v-model="text" @search="console.log" />
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import DragVerify from "../../../src/prompt/drag-verify.vue";
+import { ref, shallowRef, watch, onActivated, onDeactivated, useModel } from "vue";
+
+import { components } from "snail.vue"
+const { Search } = components;
+
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
+const text = shallowRef<string>();
 //  2、可选配置选项
-defineOptions({ name: "DragVerifyTest.vue", inheritAttrs: true, });
+defineOptions({ name: "SearchTest", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
 
@@ -25,4 +27,7 @@ onActivated(() => console.log("onActivated"));
 onDeactivated(() => console.log("onDeactivated"));
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/base-mixins.less";
+</style>

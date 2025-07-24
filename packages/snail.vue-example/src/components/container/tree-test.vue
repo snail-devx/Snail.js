@@ -9,8 +9,8 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import Tree from "../../../src/container/tree.vue";
-import { TreeOptions } from "../../../src/container/models/tree-model";
+import { components, TreeOptions } from "snail.vue"
+const { Tree } = components;
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data

@@ -1,0 +1,46 @@
+{
+  "name": "snail.vue-example",
+  "version": "1.0.0",
+  "keywords": [],
+  "description": "snail.vue 库的示例测试代码",
+  "author": "snail_dev@163.com",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c ./rollup.config.js",
+    "dev": "rollup --watch  -c ./rollup.config.js"
+  },
+  "dependencies": {
+    "snail.core": ">=2.0.11",
+    "snail.view": ">=1.0.11",
+    "snail.vue": ">=1.0.35",
+    "sortablejs": ">=1.15.6",
+    "vue": "^3.5.14"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.27.1",
+    "@babel/preset-env": "^7.27.2",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^22.15.21",
+    "@vitest/coverage-v8": "^3.1.4",
+    "minimist": "^1.2.8",
+    "rollup": "^4.41.0",
+    "rollup-plugin-dts": "^6.2.1",
+    "snail.rollup": ">=1.2.8",
+    "snail.rollup-asset": ">=1.2.1",
+    "snail.rollup-html": ">=1.2.3",
+    "snail.rollup-inject": ">=1.2.1",
+    "snail.rollup-script": ">=1.2.4",
+    "snail.rollup-style": ">=1.2.8",
+    "snail.rollup-url": ">=1.2.2",
+    "snail.rollup-vue": ">=1.2.4",
+    "vitest": "^3.1.4",
+    "vue-tsc": "^2.2.10"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.8.2"
+  }
+}

@@ -1,17 +1,19 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <Empty :message="'无数据提醒'" />
+    <div style="margin: 100px;">
+        <DragVerify :message="'测试哈哈哈'" />
+    </div>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import Empty from "../../../src/prompt/empty.vue";
-
+import { components } from "snail.vue"
+const { DragVerify } = components;
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 //  2、可选配置选项
-defineOptions({ name: "EmptyTest", inheritAttrs: true, });
+defineOptions({ name: "DragVerifyTest.vue", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
 
@@ -24,7 +26,4 @@ onActivated(() => console.log("onActivated"));
 onDeactivated(() => console.log("onDeactivated"));
 </script>
 
-<style lang="less">
-// 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
-</style>
+<style lang="less"></style>

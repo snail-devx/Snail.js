@@ -1,34 +1,20 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <button @click="onPopupClick">popup</button>
-    <button @click="onToastClick">toast</button>
+    <Empty :message="'无数据提醒'" />
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { IPopupManager, usePopup } from "../../../src/popup/manager";
-import DialogChildContent from "./child-content.vue";
+import { components } from "snail.vue"
+const { Empty } = components;
 
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const popup: IPopupManager = usePopup();
 //  2、可选配置选项
-defineOptions({ name: "PopupText", inheritAttrs: true, });
+defineOptions({ name: "EmptyTest", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
-function onPopupClick() {
-    popup.popup({
-        component: shallowRef(DialogChildContent),
-        props: {
-
-        },
-        zIndex: 4000,
-    });
-}
-function onToastClick() {
-    popup.toast("close", "对对对对对对的点点滴滴哒哒哒哒哒哒哒哒哒哒哒哒哒哒哒");
-}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听

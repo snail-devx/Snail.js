@@ -8,18 +8,16 @@
 </template>
 <script setup lang="ts">
 import { Component, shallowRef } from "vue";
-import { useReactive } from "../../src/base/reactive";
-import Tree from "../../src/container/tree.vue";
-import { TreeNode, TreeOptions } from "../../src/container/models/tree-model";
+import { useReactive, TreeNode, TreeOptions, components } from "snail.vue";
 
 //#region *******************************   👉  组件定义    *****************************************
 //  👉 基础组件：
-import ButtonTest from "./common/button-test.vue";
-import ChooseTest from "./common/choose-test.vue";
-import HeaderFooterTest from "./common/header-footer-test.vue";
-import IconTest from "./common/icon-test.vue";
-import SearchTest from "./common/search-test.vue";
-import SwitchTest from "./common/switch-test.vue";
+import ButtonTest from "./base/button-test.vue";
+import ChooseTest from "./base/choose-test.vue";
+import HeaderFooterTest from "./base/header-footer-test.vue";
+import IconTest from "./base/icon-test.vue";
+import SearchTest from "./base/search-test.vue";
+import SwitchTest from "./base/switch-test.vue";
 //  👉 容器组件
 import DynamicTest from "./container/dynamic-test.vue";
 import FoldTest from "./container/fold-test.vue";
@@ -39,6 +37,7 @@ import EmptyTest from "./prompt/empty-test.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 const { transition } = useReactive();
+const { Tree } = components;
 /** 当前展示组件*/
 var curComponent: Component = undefined;
 /** 是否显示组件 */

@@ -38,7 +38,8 @@
 			"release": true,
 			"release/**/package.json": true,
 		},
-		"svn.ignoreMissingSvnWarning": true
+		"svn.ignoreMissingSvnWarning": true,
+		"liveServer.settings.root": "./packages/snail.vue-example/dist",
 	},
 	"extensions": {
 		"recommendations": [

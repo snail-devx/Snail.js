@@ -24,8 +24,9 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { components } from "snail.vue"
+const { Choose } = components;
 //  选项组件
-import Choose from "../../../src/base/choose.vue";
 const chooseItems: { text: string, value: boolean }[] = [
     { text: "升序", value: true },
     { text: "降序", value: false }

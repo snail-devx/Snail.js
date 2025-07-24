@@ -6,7 +6,8 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import Loading from "../../../src/prompt/loading.vue";
+import { components } from "snail.vue"
+const { Loading } = components;
 import { useTimer } from "snail.core";
 
 // 👉 组件定义

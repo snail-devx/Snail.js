@@ -12,9 +12,9 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { DialogHandle } from "../../../src/popup/models/dialog-model";
+import { components, DialogHandle, PopupHandle, usePopup } from "snail.vue"
+const { } = components;
 import DialogContentTest from "./child-content.vue";
-import { PopupHandle, usePopup } from "../../../src/popup/manager";
 
 // 👉 组件定义
 //  1、props、data

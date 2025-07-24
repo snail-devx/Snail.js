@@ -1,18 +1,21 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <Search v-model="text" @search="console.log" />
+    <Fold :title="'测试Fold'" style="margin:10px">
+        <template #>
+            <div style="height:200px;background: red;" />
+        </template>
+    </Fold>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated, useModel } from "vue";
-import Search from "../../../src/base/search.vue";
-
+import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { components } from "snail.vue"
+const { Fold } = components;
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const text = shallowRef<string>();
 //  2、可选配置选项
-defineOptions({ name: "SearchTest", inheritAttrs: true, });
+defineOptions({ name: "FoldTest", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
 
@@ -25,7 +28,4 @@ onActivated(() => console.log("onActivated"));
 onDeactivated(() => console.log("onDeactivated"));
 </script>
 
-<style lang="less">
-// 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
-</style>
+<style lang="less"></style>
