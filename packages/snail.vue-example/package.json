@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "build": "rollup -c ./rollup.config.js",
-    "dev": "rollup --watch  -c ./rollup.config.js"
+    "dev": "rollup --watch -c ./rollup.config.js"
   },
   "dependencies": {
     "snail.core": ">=2.0.11",
