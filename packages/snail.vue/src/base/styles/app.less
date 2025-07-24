@@ -2,20 +2,54 @@
 
 .snail-app {
     //  指定默认字体
-    font-family: "Microsoft YaHei", "微软雅黑", "Hiragino Sans GB", "tahoma", "arial", "simsun", " 宋体", "sans-serif";
+    font-family: "Microsoft YaHei", "微软雅黑", "Hiragino Sans GB", "tahoma", "arial", "simsun", "宋体", "sans-serif";
 
     //  强制元素 box-sizing: border-box
     &,
     * {
-        box-sizing: border-box;
+        box-sizing: border-box !important;
     }
 
-    //  input 输入框等，去掉默认的外边框
-    input {
+    //  input 输入框等，去掉默认的外边框；仅针对输入类型的，后续逐步扩充。checkbox、radio等先忽略
+    input[type="search"],
+    input[type="text"],
+    input[type="url"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"] {
         outline: 0 !important;
-        font: inherit;
+        appearance: none !important;
+
         margin: 0;
+        border: 1px solid #DDDFED;
         border-radius: 4px;
+        padding: 0 10px;
+
+        font: inherit;
+        font-weight: 400;
+        font-size: 14px;
+        color: #2E3033;
+        text-overflow: ellipsis;
+
+        //  搜索模式时的【清除】按钮
+        &::-webkit-search-cancel-button {
+            display: none;
+        }
+
+        &:focus {
+            border: 1px solid #3292ea;
+        }
+
+        //  只读时的边框样式
+        &:read-only:focus {
+            border: 1px solid #DDDFED;
+        }
     }
 
+    //  input 选项类：取消边距等
+    input[type="radio"],
+    input[type="checkbox"] {
+        margin: 0;
+        padding: 0;
+    }
 }

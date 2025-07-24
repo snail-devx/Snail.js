@@ -3,23 +3,41 @@
     2、采用svg方式实现，不使用字体图片，按需引入
 -->
 <template>
-    <svg viewBox="0 0 1024 1024" :width="props.size || 24" :height="props.size || 24" :class="type" class="snail-icon">
-        <path :="icon">
-        </path>
+    <svg viewBox="0 0 1024 1024" :width="props.size || 24" :height="props.size || 24" :class="type" class="snail-icon"
+        @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+        <title v-text="props.title || ''" />
+        <path v-for="draw in paths" :d="draw" :fill="color" />
     </svg>
 </template>
 
 <script setup lang="ts">
+import { ref, shallowRef } from "vue";
 import { IconOptions } from "./models/icon-model";
-import { getSvgIcon } from "./utils/icon-util";
+import { getSvgDraw } from "./utils/icon-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data、event
 const props = defineProps<IconOptions>();
 /** 图片路径信息 */
-const icon = getSvgIcon(props);
+const paths = getSvgDraw(props || {} as any);
+/** 图标颜色 */
+const color = shallowRef<string>(props.color);
 //  2、可选配置选项
 defineOptions({ name: "Icon", inheritAttrs: true, });
+
+// *****************************************   👉  方法事件    *****************************************
+/**
+ * 鼠标移入时
+ */
+function onMouseEnter() {
+    color.value = props.hoverColor || props.color;
+}
+/**
+ * 鼠标移出时
+ */
+function onMouseLeave() {
+    color.value = props.color;
+}
 </script>
 <style lang="less">
 .snail-icon {

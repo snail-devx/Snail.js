@@ -3,7 +3,7 @@
  *  1、针对Vue的响应式相关功能，做一些便捷封装
  *  2、方便使用，减少重复性代码量
  */
-import { Ref, ShallowRef } from "vue";
+import { Ref, ShallowRef, watch } from "vue";
 import { IReactiveManager, ReactiveVar } from "./models/reactive-model";
 import { IAsyncScope, IScope, IScopes, isObject, isPromise, mountScope, RunResult, throwIfFalse, useAsyncScope, useScopes, wait } from "snail.core";
 
@@ -67,10 +67,24 @@ export function useReactive(): IReactiveManager & IScope {
         //     error => ({ success: false, error })
         // )
     }
+
+    /**
+     * 监听器：监听单个值变化
+     * - 内部利用vue的watch逻辑实现
+     * - 自动进行生命周期管理，作用域销毁时自动清理watch监听
+     * - 仅实现简化版本watch监听；复杂的监听逻辑，自行使用watch方法
+     * @param getter 监听值的get方法，返回要监听的值
+     * @param callback 回调方法：可接收新旧值变化
+     * @returns 监听作用域，destroy可销毁监听
+     */
+    function watcher<T>(getter: () => T, callback: (newValue: T, oldValue: T) => void): IScope {
+        const { stop } = watch(getter, callback);
+        return scopes.get().onDestroy(stop);
+    }
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IReactiveManager>({ transition, load });
+    const manager = mountScope<IReactiveManager>({ transition, load, watcher });
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
 }

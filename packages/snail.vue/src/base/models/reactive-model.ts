@@ -1,4 +1,4 @@
-import { IScope } from "snail.core";
+import { IScope, RunResult } from "snail.core";
 import { TransitionEffect } from "snail.view";
 import { Ref, ShallowRef } from "vue";
 
@@ -17,7 +17,7 @@ export interface IReactiveManager {
      * @param time 过渡持续时间，到时间后销毁作用域
      * @returns 作用域对象，可销毁【值过渡】效果
      */
-    transition<T>(rv: ShallowRef<T> | Ref<T>, effect: { from: T, to: T }, time: number): IScope;
+    transition<T>(rv: ReactiveVar<T>, effect: { from: T, to: T }, time: number): IScope;
 
     /**
      * 响应式【加载】任务
@@ -30,8 +30,18 @@ export interface IReactiveManager {
      * @param delay 延迟时间，单位ms；不传则不延迟
      * @returns 任务自身
      */
-    load<T, E>(task: Promise<T>, loading: ShallowRef<boolean> | Ref<boolean>, delay: number)
-        : Promise<{ success: boolean, data?: T, error?: E }>;
+    load<T>(task: Promise<T>, loading: ReactiveVar<boolean>, delay: number): Promise<RunResult<T>>;
+
+    /**
+     * 监听器：监听单个值变化
+     * - 内部利用vue的watch逻辑实现
+     * - 自动进行生命周期管理，作用域销毁时自动清理watch监听
+     * - 仅实现简化版本watch监听；复杂的监听逻辑，自行使用watch方法
+     * @param getter 监听值的get方法，返回要监听的值
+     * @param callback 回调方法：可接收新旧值变化
+     * @returns 监听作用域，destroy可销毁监听
+     */
+    watcher<T>(getter: () => T, callback: (newValue: T, oldValue: T) => void): IScope;
 }
 
 /**
