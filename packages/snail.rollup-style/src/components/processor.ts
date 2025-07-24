@@ -47,7 +47,15 @@ export function getStyleProcessor(component: ComponentOptions, context: ICompone
         nested(),
         autoprefixer(),
         //  生产环境，做压缩处理
-        ...(options.isProduction ? [cssnano()] : [])
+        ...(options.isProduction ? [
+            cssnano({
+                preset: ['default', {
+                    // normalizeWhitespace: false, // 关闭空白字符规范化
+                    minifyFontValues: false, // 关闭字体值最小化，这可能会去除引号
+                }],
+            })]
+            : []
+        )
     ];
 
     //#region ************************************* IStyleProcessor *************************************

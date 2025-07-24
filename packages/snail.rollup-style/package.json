@@ -3,7 +3,7 @@
   "description": "配合【snail.rollup】使用的插件，支持less、css、scss、sass等样式文件打包编译",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.2.6",
+  "version": "1.2.8",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
