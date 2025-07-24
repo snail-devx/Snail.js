@@ -11,6 +11,7 @@
   "private": true,
   "scripts": {
     "init": "pnpm install --no-link",
+    "dev vue-example": "rollup                          --watch               -c ./packages/snail.vue-example/rollup.config.js",
     "build core": "node scripts/build.js                snail.core",
     "build view": "node scripts/build.js                snail.view",
     "build vue": "node scripts/build.js                 snail.vue",

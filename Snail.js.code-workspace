@@ -37,6 +37,8 @@
 			//	纯粹生成的npm包目录，忽略package.json文件，避免干扰VSCode的【NPN脚本】栏目
 			"release": true,
 			"release/**/package.json": true,
+			//	先把packages项目下的 packages.json 忽略掉，后期看情况放开
+			"packages/**/package.json": true,
 		},
 		"svn.ignoreMissingSvnWarning": true,
 		"liveServer.settings.root": "./packages/snail.vue-example/dist",

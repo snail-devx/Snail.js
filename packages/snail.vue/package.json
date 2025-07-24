@@ -10,8 +10,7 @@
   "types": "dist/snail.vue.d.ts",
   "scripts": {
     "build": "rollup -c ./rollup.config.js",
-    "types": "vue-tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types",
-    "dev:test": "rollup --watch  -c ./test/rollup.config.js"
+    "types": "vue-tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
   },
   "dependencies": {
     "vue": "^3.5.14",
