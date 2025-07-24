@@ -319,4 +319,35 @@ export function extract<T>(keys: any[], ...sources: any[]): T {
     });
     return ret;
 }
+
+/**
+ * 从数组中移除指定元素
+ * @param array 数组对象
+ * @param item 要移除的元素
+ * @returns 元素之前在数组中的索引位置；数组无此元素则返回-1
+ */
+export function removeFromArray<T>(array: T[], item: T): number {
+    if (isArrayNotEmpty(array) == true) {
+        const index = array.indexOf(item);
+        index != -1 && array.splice(index, 1);
+        return index;
+    }
+    return -1;
+}
+/**
+ * 从数组中移动元素
+ * - 可用于排序时等操作数组元素位置
+ * - 内部使用 splice 实现移动； from 和 to索引需有效，否则可能操作失败
+ * @param array 数组对象
+ * @param from 元数旧位置
+ * @param to 元素新位置
+ * @returns 数组对象
+ */
+export function moveFromArray<T>(array: T[], from: number, to: number): T[] {
+    if (isArrayNotEmpty(array) == true) {
+        const items = array.splice(from, 1);
+        items.length == 1 && array.splice(to, 0, items[0]);
+    }
+    return array;
+}
 //#endregion

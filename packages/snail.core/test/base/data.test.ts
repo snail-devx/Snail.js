@@ -4,7 +4,9 @@ import {
     getType, isString, isStringNotEmpty, isArray, isArrayNotEmpty, isBoolean, isDate, isFalsey, isFunction, isNumber, isNumberNotNaN,
     isUndefined, isNull, isNullOrUndefined, isObject, isPromise, isRegexp, isWindow,
     newId, tidyFunction, tidyString,
-    mustArray, mustFunction, mustString, mustObject
+    mustArray, mustFunction, mustString, mustObject,
+    moveFromArray,
+    removeFromArray
 } from "../../src/base/data"
 
 //  getType、isXX测试
@@ -212,4 +214,80 @@ test("extract", () => {
     expect(extract(["1", "2"], {})).toMatchObject({});
     expect(extract(["1", "2"], {})).toMatchObject({});
     expect(extract(["1", "2"], { 1: "123" })).toMatchObject({ 1: "123" });
+});
+
+test("removeFromArray", () => {
+    // 测试从数组中成功移除元素
+    const array1 = [1, 2, 3, 4, 5];
+    const result1 = removeFromArray(array1, 3);
+    expect(result1).toBe(2);
+    expect(array1).toEqual([1, 2, 4, 5]);
+
+    // 测试移除不存在的元素
+    const array2 = [1, 2, 3, 4, 5];
+    const result2 = removeFromArray(array2, 6);
+    expect(result2).toBe(-1);
+    expect(array2).toEqual([1, 2, 3, 4, 5]);
+
+    // 测试移除数组中的第一个元素
+    const array3 = ['a', 'b', 'c', 'd'];
+    const result3 = removeFromArray(array3, 'a');
+    expect(result3).toBe(0);
+    expect(array3).toEqual(['b', 'c', 'd']);
+
+    // 测试移除数组中的最后一个元素
+    const array4 = ['a', 'b', 'c', 'd'];
+    const result4 = removeFromArray(array4, 'd');
+    expect(result4).toBe(3);
+    expect(array4).toEqual(['a', 'b', 'c']);
+
+    // 测试在空数组中移除元素
+    const array5: any[] = [];
+    const result5 = removeFromArray(array5, 'a');
+    expect(result5).toBe(-1);
+    expect(array5).toEqual([]);
+
+    // 测试移除重复元素（只移除第一个匹配的元素）
+    const array6 = [1, 2, 2, 3, 2, 4];
+    const result6 = removeFromArray(array6, 2);
+    expect(result6).toBe(1);
+    expect(array6).toEqual([1, 2, 3, 2, 4]);
+});
+
+describe("moveFromArray", () => {
+    test("should move element from one position to another", () => {
+        const array = [1, 2, 3, 4, 5];
+        const result = moveFromArray(array, 1, 3);
+        expect(result).toEqual([1, 3, 4, 2, 5]);
+    });
+
+    test("should handle moving to the beginning", () => {
+        const array = [1, 2, 3, 4, 5];
+        const result = moveFromArray(array, 4, 0);
+        expect(result).toEqual([5, 1, 2, 3, 4]);
+    });
+
+    test("should handle moving to the end", () => {
+        const array = [1, 2, 3, 4, 5];
+        const result = moveFromArray(array, 0, 4);
+        expect(result).toEqual([2, 3, 4, 5, 1]);
+    });
+
+    test("should return same array when moving element to same position", () => {
+        const array = [1, 2, 3, 4, 5];
+        const result = moveFromArray(array, 2, 2);
+        expect(result).toEqual([1, 2, 3, 4, 5]);
+    });
+
+    test("should handle empty array", () => {
+        const array: number[] = [];
+        const result = moveFromArray(array, 0, 1);
+        expect(result).toEqual([]);
+    });
+
+    test("should handle single element array", () => {
+        const array = [1];
+        const result = moveFromArray(array, 0, 0);
+        expect(result).toEqual([1]);
+    });
 });

@@ -1,4 +1,4 @@
-import { tidyString } from "../base/data";
+import { removeFromArray, tidyString } from "../base/data";
 import { checkScope, IScope, mountScope, useScope } from "../base/scope";
 import { HttpOptions, HttpInterceptor, IHttpClient, HttpRequest, HttpResponse } from "./models/http-model";
 import { server, ServerOptions } from "./server";
@@ -131,8 +131,5 @@ export function configHttp(options: Partial<HttpOptions>): void {
 export function configHttpIntercept(interceptor: HttpInterceptor): IScope {
     interceptor = checkInterceptor(interceptor);
     HTTP_INTERCEPTORS.push(interceptor);
-    return useScope().onDestroy(() => {
-        const index = HTTP_INTERCEPTORS.indexOf(interceptor);
-        index !== -1 && HTTP_INTERCEPTORS.splice(index, 1);
-    });
+    return useScope().onDestroy(() => removeFromArray(HTTP_INTERCEPTORS, interceptor));
 }
