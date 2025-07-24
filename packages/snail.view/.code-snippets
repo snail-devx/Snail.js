@@ -6,8 +6,18 @@
 		"scope": "less",
 		"description": "引入基础Mixins样式",
 		"body": [
-			"// 引入基础Mixins样式",
+			"//  引入基础Mixins样式",
 			"@import \"snail.view/dist/styles/base-mixins.less\";"
+		]
+	},
+	// *****************************************   👉  所有元素    *****************************************
+	".*-box-sizing": {
+		"prefix": ".*-box-sizing",
+		"scope": "less",
+		"description": "所有元素的box-sizing属性设置为border-box",
+		"body": [
+			"//  所有元素的box-sizing属性设置为border-box",
+			".\\*-box-sizing();",
 		]
 	},
 	// *****************************************   👉  文本样式    *****************************************
@@ -16,8 +26,17 @@
 		"scope": "less",
 		"description": "文本溢出时出省略号",
 		"body": [
-			"// 文本溢出时出省略号",
+			"//  文本溢出时出省略号",
 			".text-ellipsis();",
+		]
+	},
+	"tip-text": {
+		"prefix": ".tip-text",
+		"scope": "less",
+		"description": "提示文本样式",
+		"body": [
+			"//  提示文本样式：400 weight，14px size，#8A9099 color",
+			".tip-text();",
 		]
 	},
 	// *****************************************   👉  高宽定位    *****************************************
@@ -26,7 +45,7 @@
 		"scope": "less",
 		"description": "高度、宽度100%填充满",
 		"body": [
-			"// width:100%；height:100%",
+			"//  width:100%；height:100%",
 			".wh-fill();"
 		]
 	},
@@ -35,7 +54,7 @@
 		"scope": "less",
 		"description": "高度、宽度100%填充满，隐藏溢出的内容",
 		"body": [
-			"// width:100%；height:100%；overflow: hidden",
+			"//  width:100%；height:100%；overflow: hidden",
 			".wh-fill-hidden();"
 		]
 	},
@@ -44,7 +63,7 @@
 		"scope": "less",
 		"description": "left:0,top:0；辅助 fixed、absolute定位使用",
 		"body": [
-			"// left、right起始位置：left: 0; top: 0",
+			"//  left、right起始位置：left: 0; top: 0",
 			".left-right-start();"
 		]
 	},
@@ -53,7 +72,7 @@
 		"scope": "less",
 		"description": "通过left、rigth进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)",
 		"body": [
-			"// 通过left、rigth进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)",
+			"//  通过left、rigth进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)",
 			".left-right-center();"
 		]
 	},
@@ -63,7 +82,7 @@
 		"scope": "less",
 		"description": "flex 布局，主轴居中",
 		"body": [
-			"// flex 布局：display: flex，justify-content 为center",
+			"//  flex 布局：display: flex，justify-content 为center",
 			".flex-main-center();"
 		]
 	},
@@ -72,7 +91,7 @@
 		"scope": "less",
 		"description": "flex 布局，交叉轴居中",
 		"body": [
-			"// flex 布局：display: flex，align-items 为center",
+			"//  flex 布局：display: flex，align-items 为center",
 			".flex-cross-center();"
 		]
 	},
@@ -81,7 +100,7 @@
 		"scope": "less",
 		"description": "flex 布局，主轴和交叉轴居中",
 		"body": [
-			"// flex 布局：display: flex，align-items、justify-content 都为center",
+			"//  flex 布局：display: flex，align-items、justify-content 都为center",
 			".flex-center();"
 		]
 	},
@@ -90,8 +109,17 @@
 		"scope": "less",
 		"description": "flex 布局，主轴和交叉轴居右",
 		"body": [
-			"// flex 布局：display: flex，align-items、justify-content 都为right",
+			"//  flex 布局：display: flex，align-items、justify-content 都为right",
 			".flex-right();"
+		]
+	},
+	"flex-column": {
+		"prefix": ".flex-column",
+		"scope": "less",
+		"description": "flex布局，列 为主轴",
+		"body": [
+			"//  flex布局，列 为主轴：display: flex，flex-direction: column;",
+			".flex-column();"
 		]
 	}
 }
