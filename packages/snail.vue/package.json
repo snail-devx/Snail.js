@@ -3,7 +3,7 @@
   "description": "依赖【snail】，基于vue封装常用UI组件",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.0.32",
+  "version": "1.0.33",
   "type": "module",
   "main": "dist/snail.vue.js",
   "module": "dist/snail.vue.js",
@@ -16,7 +16,8 @@
   "dependencies": {
     "vue": "^3.5.14",
     "snail.core": ">=2.0.10",
-    "snail.view": ">=1.0.13"
+    "snail.view": ">=1.0.14",
+    "sortablejs": ">=1.15.6"
   },
   "devDependencies": {
     "vue-tsc": "^2.2.10",
@@ -26,7 +27,7 @@
     "snail.rollup-url": ">=1.2.2",
     "snail.rollup-inject": ">=1.2.1",
     "snail.rollup-script": ">=1.2.4",
-    "snail.rollup-style": ">=1.2.5",
+    "snail.rollup-style": ">=1.2.7",
     "snail.rollup-vue": ">=1.2.4"
   }
 }

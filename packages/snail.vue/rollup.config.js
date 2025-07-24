@@ -42,9 +42,11 @@ const options = {
     distRoot: resolve(outDir, "dist"),
     siteRoot: resolve(outDir, "dist"),
     commonLib: [
-        { id: 'vue', name: 'Vue', url: 'https://cdn.jsdelivr.net/npm/vue/vue.min.js' },
-        { id: "snail.core", name: "Snail", url: "https://unpkg.com/snail.core@1.1.5/dist/snail.core.js" },
-        { id: "snail.view", name: "SnailView", url: "https://unpkg.com/snail.view@1.0.0/dist/snail.view.js" },
+        { id: 'vue', name: "Vue" },
+        { id: "sortablejs", name: "Sortable" },
+
+        { id: "snail.core", name: "Snail" },
+        { id: "snail.view", name: "SnailView" },
     ]
 };
 /**
