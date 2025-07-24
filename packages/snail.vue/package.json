@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "vue": "^3.5.14",
-    "snail.core": ">=2.0.10",
+    "snail.core": ">=2.0.11",
     "snail.view": ">=1.0.14",
     "sortablejs": ">=1.15.6"
   },
@@ -27,7 +27,7 @@
     "snail.rollup-url": ">=1.2.2",
     "snail.rollup-inject": ">=1.2.1",
     "snail.rollup-script": ">=1.2.4",
-    "snail.rollup-style": ">=1.2.7",
+    "snail.rollup-style": ">=1.2.8",
     "snail.rollup-vue": ">=1.2.4"
   }
 }
