@@ -198,8 +198,8 @@ importers:
         specifier: '>=1.2.4'
         version: 1.2.4(@types/node@22.16.2)(typescript@5.8.3)
       snail.rollup-style:
-        specifier: '>=1.2.5'
-        version: 1.2.5(typescript@5.8.3)
+        specifier: '>=1.2.7'
+        version: 1.2.7(typescript@5.8.3)
     devDependencies:
       snail.rollup-asset:
         specifier: '>=1.2.1'
@@ -239,8 +239,11 @@ importers:
         specifier: '>=2.0.10'
         version: 2.0.10(typescript@5.8.3)
       snail.view:
-        specifier: '>=1.0.13'
-        version: 1.0.13(typescript@5.8.3)
+        specifier: '>=1.0.14'
+        version: 1.0.14(typescript@5.8.3)
+      sortablejs:
+        specifier: '>=1.15.6'
+        version: 1.15.6
       vue:
         specifier: ^3.5.14
         version: 3.5.17(typescript@5.8.3)
@@ -261,8 +264,8 @@ importers:
         specifier: '>=1.2.4'
         version: 1.2.4(@types/node@22.16.2)(typescript@5.8.3)
       snail.rollup-style:
-        specifier: '>=1.2.5'
-        version: 1.2.5(typescript@5.8.3)
+        specifier: '>=1.2.7'
+        version: 1.2.7(typescript@5.8.3)
       snail.rollup-url:
         specifier: '>=1.2.2'
         version: 1.2.2(typescript@5.8.3)
@@ -3676,8 +3679,8 @@ packages:
       - typescript
       - yaml
 
-  /snail.rollup-style@1.2.5(typescript@5.8.3):
-    resolution: {integrity: sha512-SDBPMt3zkovEJPH139HSNN1ZLS79qKp+jFJ1LVTexYPZq56FQK6HH6/8EXXNYnw4k4qoPzk5AvS7GWQj9kUBcg==}
+  /snail.rollup-style@1.2.7(typescript@5.8.3):
+    resolution: {integrity: sha512-Ijl01ltAEIXCHj7svyaIxQrt+O06gvXl5HuWYeHRoyp8Dc0voVv9NV/5Pc4YoOBpO9AfmaC8FcdsqlcFAo5qOQ==}
     dependencies:
       '@vue/compiler-sfc': 3.5.17
       autoprefixer: 10.4.21(postcss@8.5.6)
@@ -3712,7 +3715,7 @@ packages:
       snail.core: 2.0.10(typescript@5.8.3)
       snail.rollup: 1.2.8(typescript@5.8.3)
       snail.rollup-script: 1.2.4(@types/node@22.16.2)(typescript@5.8.3)
-      snail.rollup-style: 1.2.5(typescript@5.8.3)
+      snail.rollup-style: 1.2.7(typescript@5.8.3)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -3737,12 +3740,16 @@ packages:
     transitivePeerDependencies:
       - typescript
 
-  /snail.view@1.0.13(typescript@5.8.3):
-    resolution: {integrity: sha512-hgGilPj1ExU39JKkbpMjL/4RJJ505d4Oue6Ig0ET0ZKjq7hsKwFPVKdtXcXsCoc5PSd+ifOtifESqFoCQwW2pQ==}
+  /snail.view@1.0.14(typescript@5.8.3):
+    resolution: {integrity: sha512-NKUI3/apCfnbgLQ3QOzmPf9u4cvwQ2HaSCpM7MY/O9Em7HEf0eu5DmhZW4EQcJ8fwkieHMsrPu2fuRxZAE9/1Q==}
     dependencies:
       snail.core: 2.0.10(typescript@5.8.3)
     transitivePeerDependencies:
       - typescript
+    dev: false
+
+  /sortablejs@1.15.6:
+    resolution: {integrity: sha512-aNfiuwMEpfBM/CN6LY0ibyhxPfPbyFeBTYJKCvzkJ2GkUpazIt3H+QIPAMHwqQ7tMKaHz1Qj+rJJCqljnf4p3A==}
     dev: false
 
   /source-map-js@1.2.1:
