@@ -7,6 +7,7 @@ import { Component } from "vue";
 import { ConfirmOptions } from "./confirm-model";
 import { IconType } from "../../base/models/icon-model";
 import { ToastOptions } from "./toast-model";
+import { FollowOptions } from "./follow-model";
 
 /**
  * 弹窗管理器
@@ -27,8 +28,13 @@ export interface IPopupManager {
      * @returns 弹窗打开结果，外部可手动关闭弹窗
      */
     dialog<T>(options: DialogOptions): IAsyncScope<T>;
-
-    //  follow弹窗：跟随效果
+    /**
+     * 跟随弹窗
+     * - 跟随指定的target对象，可跟随位置、大小
+     * @param options 跟随配置选项
+     * @returns 弹窗异步作用域，外部可手动关闭弹窗
+     */
+    follow<T>(options: FollowOptions): IAsyncScope<T>;
 
     // *****************************************   👉  弹窗的扩充方法：方便调用    **********************************
     /**
