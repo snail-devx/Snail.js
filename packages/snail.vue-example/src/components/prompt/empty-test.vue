@@ -5,7 +5,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components } from "snail.vue"
+import { components } from "../../core"
 const { Empty } = components;
 
 

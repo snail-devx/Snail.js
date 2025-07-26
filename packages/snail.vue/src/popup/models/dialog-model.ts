@@ -4,7 +4,7 @@
 import { PopupOptions, PopupStatus } from "./popup-model";
 
 /**
- * 模态弹窗配置选项
+ * 模态弹窗 配置选项
  * - 继承 ComponentOptions ，动态加载组件
  */
 export type DialogOptions = PopupOptions & {

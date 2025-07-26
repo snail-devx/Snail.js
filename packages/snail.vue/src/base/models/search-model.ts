@@ -1,15 +1,10 @@
+import { PlaceholderOptions, ReadonlyOptions } from "./base-mode";
+
 /**
  * 搜索组件配置选项
  */
-export type SearchOptions = {
-    /**
-     * 是否为只读模式
-     */
-    readonly?: boolean;
-    /**
-     * 搜索提示语
-     */
-    placeholder?: string;
+export type SearchOptions = ReadonlyOptions & PlaceholderOptions & {
+
 }
 /**
  * 搜索组件事件

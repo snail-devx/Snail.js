@@ -12,10 +12,10 @@
   "scripts": {
     "init": "pnpm install --no-link",
     "dev vue-example": "rollup                          --watch               -c ./packages/snail.vue-example/rollup.config.js",
+    "build vue-example": "node scripts/build.js         snail.vue-example",
     "build core": "node scripts/build.js                snail.core",
     "build view": "node scripts/build.js                snail.view",
     "build vue": "node scripts/build.js                 snail.vue",
-    "build vue-example": "node scripts/build.js         snail.vue-example",
     "build rollup": "node scripts/build.js              snail.rollup",
     "build rollup-*": "node scripts/build.js            snail.rollup--*",
     "release core": "node scripts/release.js            snail.core            --typings   --environment NODE_ENV:production",

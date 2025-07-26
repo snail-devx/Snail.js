@@ -1,7 +1,10 @@
+import { TitleOptions } from "./base-mode";
+
 /**
  * 头部配置选项
+ * - title          将作为头部标题，无则不展示标题区域
  */
-export type HeaderOptions = {
+export type HeaderOptions = TitleOptions & {
     /**
      * 使用到哪里
      * - page   ：页面头部：默认类型；标题、关闭按钮等对齐一行；
@@ -13,11 +16,7 @@ export type HeaderOptions = {
      * 启用后，则组件顶部设置边框 border-bottom: 1px solid #dddfed;;
      */
     divider?: boolean;
-    /** 
-     * 弹窗标题
-     * - 无则不展示标题区域 
-     */
-    title?: string;
+
     /** 弹窗标题对齐方式
      * - 默认值：center
      */

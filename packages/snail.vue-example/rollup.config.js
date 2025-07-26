@@ -33,20 +33,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     //  style：使用snail.core的style模块进行动态css注册，替还 snail.rollup-style默认的addLink方法
     removeDynamicModule(MODULE_INJECT_LINK);
     registerDynamicModule(MODULE_INJECT_LINK, `
-        import { link } from "snail.view";
-        export default href => link.register(href);
+        // import { link } from "snail.view";
+        //  example 示例项目下，dev 模式时 snail.view会被识别为公共库，这里不做import，强制写死Snail.link
+        export default href =>setTimeout(function(){
+            Snail.link.register(href);
+        });;
     `);
-}
-//  动态注入代码注册
-{
-    //  使用snail.core的style模块进行动态css注册，替还 snail.rollup-style默认的addLink方法
-    removeDynamicModule(MODULE_INJECT_LINK);
-    registerDynamicModule(MODULE_INJECT_LINK, `
-        import { link } from "snail.view";
-        export default href => setTimeout(link.register, 0, href);
-    `);
-    //  增加 less 动态引入时的相对路径查找
-    STYLE_EXTEND_PATHS.push(resolve(__dirname, "node_modules"))
 }
 
 /**
@@ -63,6 +55,8 @@ const options = {
         { id: "snail.core", name: "Snail" },
         { id: "snail.view", name: "Snail" },
         { id: "snail.vue", name: "Snail" },
+        //  sortablejs
+        { id: "sortablejs", },
         //  vue
         { id: "vue", name: "Vue" }
     ]
@@ -73,7 +67,7 @@ const _sv = new Date().getTime();
 /** Vue */
 const vueUrl = forceExt(buildNetPath(options, buildDist(options, "libraries/vue.global.js")), ".js");
 /** snail.js文件url地址，作为html的默认依赖js引入 */
-const snailUrl = forceExt(buildNetPath(options, buildDist(options, "libraries/snail.ts")), ".js");
+const coreUrl = forceExt(buildNetPath(options, buildDist(options, "core.ts")), ".js");
 
 /**
  * @type {import("snail.rollup").IRollupBuilder}
@@ -86,10 +80,10 @@ const builder = Builder.getBuilder(options, (component, context, options) => {
         //  支持html页面代码注入
         htmlPlugin(component, context, options, [
             `<script src="${vueUrl}?_sv=${_sv}"></script>`,
-            `<script src="${snailUrl}?_sv=${_sv}"></script>`,
+            `<script src="${coreUrl}?_sv=${_sv}"></script>`,
             `<script type="text/javascript">`,
             `   //  加载脚本，取出【initFunc】方法，若存在则调用，进行模块初始化`,
-            `   Snail.script.load("${component.url}").then(`,
+            `  Snail.script.load("${component.url}").then(`,
             `       function (exports){`,
             `           var initFunc = (exports||{}).initFunc;`,
             `           typeof (initFunc) === "function" && initFunc();`,
@@ -125,7 +119,7 @@ const components = builder.build([
         src: "index.ts", isCommonLib: false, views: ["index.html"],
     },
     {
-        src: "libraries/snail.ts",
+        src: "core.ts",
         isCommonLib: true,
         format: "iife",
         name: "Snail",
@@ -133,12 +127,15 @@ const components = builder.build([
         disableCommonLib: ["snail.core", "snail.view", "snail.vue"],
         //  将三方库同步输出
         assets: [
-            "libraries/vue.global.js"
+            "libraries/vue.global.js",
+            "libraries/sortable.js",
         ]
+    },
+    {
+        src: "components/container/dynamic-url-test.ts",
+        isCommonLib: false,
+        format: "amd",
     }
-    // {
-    //     src: "container/dynamic-url-test.ts", isCommonLib: false, format: "amd",
-    // }
 ]);
 
 export default components;

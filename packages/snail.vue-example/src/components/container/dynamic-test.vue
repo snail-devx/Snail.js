@@ -11,7 +11,7 @@
 </template>
 <script setup lang="ts">
 import { Component, shallowRef } from "vue"
-import { components } from "snail.vue"
+import { components } from "../../core"
 const { Dynamic, Loading } = components;
 
 const showLoading = true;
@@ -25,7 +25,7 @@ setTimeout(() => {
     dynamicComponent.value = undefined;
 }, 2000);
 setTimeout(() => {
-    dynamicUrl.value = "/container/dynamic-url-test.js#comp";
+    dynamicUrl.value = "/components/container/dynamic-url-test.js#comp";
 }, 3000);
 //  组件内部错误，不会处理
 setTimeout(() => {

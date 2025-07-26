@@ -284,9 +284,6 @@ importers:
       snail.view:
         specifier: '>=1.0.11'
         version: 1.0.14(typescript@5.8.3)
-      snail.vue:
-        specifier: '>=1.0.35'
-        version: 1.0.35(typescript@5.8.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -3927,17 +3924,6 @@ packages:
     resolution: {integrity: sha512-NKUI3/apCfnbgLQ3QOzmPf9u4cvwQ2HaSCpM7MY/O9Em7HEf0eu5DmhZW4EQcJ8fwkieHMsrPu2fuRxZAE9/1Q==}
     dependencies:
       snail.core: 2.0.11(typescript@5.8.3)
-    transitivePeerDependencies:
-      - typescript
-    dev: false
-
-  /snail.vue@1.0.35(typescript@5.8.3):
-    resolution: {integrity: sha512-DV/ITTE2A4d4qwlEQ9O/oFI1EmoJYCo18LRLm8EWkXWmm+vU8H+bVXbIwHGIq8915zrTGUjRMRcOr422Tn5OiQ==}
-    dependencies:
-      snail.core: 2.0.11(typescript@5.8.3)
-      snail.view: 1.0.14(typescript@5.8.3)
-      sortablejs: 1.15.6
-      vue: 3.5.17(typescript@5.8.3)
     transitivePeerDependencies:
       - typescript
     dev: false

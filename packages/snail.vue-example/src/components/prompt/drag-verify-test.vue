@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components } from "snail.vue"
+import { components } from "../../core"
 const { DragVerify } = components;
 
 // *****************************************   👉  组件定义    *****************************************

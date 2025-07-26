@@ -3,11 +3,12 @@
  */
 
 import { HeightStyle, MarginStyle, WidthStyle } from "snail.view";
+import { ReadonlyOptions } from "./base-mode";
 
 /**
  * 选择 组件配置选项
  */
-export type ChooseOptions<T> = {
+export type ChooseOptions<T> = ReadonlyOptions & {
     /**
      * 是否为多选模式
      * - true 多选模式，可以选中items中多个选项
@@ -20,11 +21,6 @@ export type ChooseOptions<T> = {
      * - checkbox:  多选框样式
      */
     type: "checkbox" | "radio";
-
-    /**
-     * 是否是只读模式
-     */
-    readonly?: boolean;
 
     /**
      * 待选项目

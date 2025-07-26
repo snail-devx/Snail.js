@@ -1,22 +1,16 @@
+import { DisabledOptions, TitleOptions } from "../../base/models/base-mode";
+
 /**
  * 折叠面板配置选项
+ * - title          折叠面板标题
+ * - disabled       禁用折叠效果，始终展开
  */
-export type FoldOptions = {
-    /**
-     * 折叠面板标题
-     */
-    title?: string;
+export type FoldOptions = DisabledOptions & TitleOptions & {
     /**
      * 副标题
      * - 跟随在title后
      */
     subtitle?: string;
-
-    /**
-     * 禁用【折叠】功能
-     * - true 则禁用折叠，始终展开内容区域
-     */
-    disabled?: boolean;
 }
 
 /**

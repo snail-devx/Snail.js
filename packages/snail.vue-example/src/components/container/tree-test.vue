@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components, TreeOptions } from "snail.vue"
+import { components, TreeOptions } from "../../core"
 const { Tree } = components;
 
 // *****************************************   👉  组件定义    *****************************************

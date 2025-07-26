@@ -1,16 +1,14 @@
+import { TitleOptions } from "./base-mode";
+
 /**
  * 图标配置选项
- * - 后续支持外部直接传入svg路径，这样实现更细粒度的控制
+ * - title          作为鼠标移入图标时的提示
  */
-export type IconOptions = {
+export type IconOptions = TitleOptions & {
     /** 
      * 图标类型
      */
     type: IconType;
-    /**
-     * 标题，鼠标移上去时的提示
-     */
-    title?: string;
 
     /** 
      * 图标颜色 

@@ -1,11 +1,9 @@
+import { ReadonlyOptions } from "./base-mode";
+
 /**
  * 开关 配置选项
  */
-export type SwitchOptions = {
-    /**
-     * 是否只读
-     */
-    readonly?: boolean;
+export type SwitchOptions = ReadonlyOptions & {
 }
 
 /**

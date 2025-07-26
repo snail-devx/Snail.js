@@ -1,19 +1,17 @@
+import { DisabledOptions } from "../../base/models/base-mode";
+
 /**
  * 排序组件 配置选项
+ * - disabled       禁用排序效果，不能再拖拽元素排序
  * - 整理部分SortableJs中的配置，不分逻辑不开放
  */
-export type SortOptions<T> = {
+export type SortOptions<T> = DisabledOptions & {
     /**
      * 变化器
      * - 在此元素值发生变化时，重新刷新排序面板
      * - 如在增加元素时，改变此值实现 新元素 可拖拽排序
      */
     changer: T;
-    /**
-     * 是否禁用排序
-     * - true 不支持排序
-     */
-    disabled?: boolean;
 
     /**
      * 拖动哪个元素

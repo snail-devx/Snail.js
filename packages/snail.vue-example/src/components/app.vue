@@ -8,7 +8,7 @@
 </template>
 <script setup lang="ts">
 import { Component, shallowRef } from "vue";
-import { useReactive, TreeNode, TreeOptions, components } from "snail.vue";
+import { useReactive, TreeNode, TreeOptions, components } from "../core";
 
 //#region *******************************   👉  组件定义    *****************************************
 //  👉 基础组件：

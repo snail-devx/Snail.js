@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components } from "snail.vue"
+import { components } from "../../core"
 const { Loading } = components;
 import { useTimer } from "snail.core";
 

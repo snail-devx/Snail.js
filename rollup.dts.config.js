@@ -30,6 +30,10 @@ const dtsFiles = [];
     readdirSync(typesRoot).forEach(item => {
         const dtsFile = resolve(typesRoot, item);
         if (statSync(dtsFile).isFile() && dtsFile.endsWith(".d.ts")) {
+            //  忽略 exporter.d.ts，无需合并导出为模块的.d.ts
+            if (item == "exporter.d.ts") {
+                return;
+            }
             //  合并输出文件，和【typesRoot】同级文件
             const target = resolve(typesRoot, "../", item);
             trace(`--build file \t${dtsFile} \t➡️\t ${target}`);

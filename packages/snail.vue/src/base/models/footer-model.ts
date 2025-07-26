@@ -1,7 +1,9 @@
+import { ConfirmAreaOptions } from "./base-mode";
+
 /**
  * 底部组件配置选项
  */
-export type FooterOptions = {
+export type FooterOptions = ConfirmAreaOptions & {
     /**
      * 内部的按钮等对齐方式：
      * - 默认 right
@@ -12,28 +14,6 @@ export type FooterOptions = {
      * 启用后，则组件顶部设置边框 border-top: 1px solid #dddfed;
      */
     divider?: boolean;
-
-    /**
-     * 【取消】按钮名称
-     * - 默认【取消】
-     */
-    cancelName?: string;
-    /**
-     * 禁用【取消】按钮
-     * - 为true时，不显示【取消】按钮
-     */
-    cancelDisabled?: boolean;
-
-    /**
-     * 【确定】按钮名称
-     * - 默认【确定】
-     */
-    confirmName?: string;
-    /**
-     * 禁用【确定】按钮
-     * - 为true时，不显示【确定】按钮
-     */
-    confirmDisabled?: boolean;
 }
 /**
  * 底部组件事件

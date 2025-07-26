@@ -11,6 +11,7 @@
     "exclude": [
         "node_modules",
         "packages/*/test/**/*.js",
+        "packages/snail.vue-example/src/libraries/*.js"
     ],
     //  包含所需的所有ts文件
     "include": [

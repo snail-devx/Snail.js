@@ -1,9 +1,12 @@
 import { BaseStyle, FlexBoxStyle, WidthStyle } from "snail.view"
+import { DisabledOptions, PlaceholderOptions, ReadonlyOptions, TitleOptions } from "../../base/models/base-mode";
 
 /**
  * 输入框配置选项
+ * - title          将作为 输入框标题区域文本；不传入则不展示 标题区域，仅展示输入框
+ * - 暂不提供 disabled 逻辑
  */
-export type InputOptions = {
+export type InputOptions = ReadonlyOptions & /*DisabledOptions & */PlaceholderOptions & TitleOptions & {
     /**
      * 输入框类型
      * - text: 文本输入框
@@ -13,31 +16,11 @@ export type InputOptions = {
     type?: "text" | "number" | "password";
 
     /**
-     * 输入框标题
-     * - 不传入则不展示 标题区域
-     */
-    title?: string;
-
-    /**
      * 输入框是否必填
      * - 必填，则验证不通过时，显示错误信息
      * - 必填时，显示必填标记，红色 * 号
      */
     required?: boolean;
-    /**
-     * 输入框提示语
-     */
-    placeholder?: string;
-
-    /**
-     * 是否为只读状态
-     */
-    readonly?: boolean;
-    /**
-     * 是否为禁用状态
-     * - 暂时不对外开放
-    disabled?: boolean;
-     */
 
     /**
      * 标题区域样式

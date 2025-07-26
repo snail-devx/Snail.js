@@ -1,3 +1,5 @@
+import { DisabledOptions } from "../../base/models/base-mode";
+
 /**
  * 树组件配置选项
  */
@@ -21,8 +23,9 @@ export type TreeEvents<T> = {
 
 /**
  * 树节点
+ * - disabled       不展示节点和子节点
  */
-export type TreeNode<T> = {
+export type TreeNode<T> = DisabledOptions & {
     /**
      * 树节点 文本
      */
@@ -43,11 +46,6 @@ export type TreeNode<T> = {
      * - false 此节点不可点击
      */
     clickable?: boolean;
-    /**
-     * 是否禁用
-     * - true：禁用此节点 禁用时不显示此节点及其子节点
-     */
-    disabled?: boolean;
 
     /**
      * 子节点 数据

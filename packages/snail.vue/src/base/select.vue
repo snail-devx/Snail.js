@@ -1,34 +1,20 @@
-<!-- 组件介绍写到这里 -->
+<!-- 下拉选择 组件：
+    1、支持基础的html select ，支持多级选择，支持搜索功能 
+    2、考虑把这个封装为方法，方便外部直接openSelect使用
+-->
 <template>
-    <button @click="onPopupClick">popup</button>
-    <button @click="onToastClick">toast</button>
+
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { IPopupManager, usePopup } from "../../core"
-import DialogChildContent from "./child-content.vue";
-
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const popup: IPopupManager = usePopup();
 //  2、可选配置选项
-defineOptions({ name: "PopupText", inheritAttrs: true, });
+defineOptions({ name: "Select", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
-function onPopupClick() {
-    popup.popup({
-        component: shallowRef(DialogChildContent),
-        props: {
-
-        },
-        zIndex: 4000,
-    });
-}
-function onToastClick() {
-    popup.toast("close", "对对对对对对的点点滴滴哒哒哒哒哒哒哒哒哒哒哒哒哒哒哒");
-}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听

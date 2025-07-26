@@ -40,16 +40,4 @@ onMounted(() => {
     // x、y起始位置：left:0,top:0
     .left-right-start();
 }
-
-// *****************************************   👉  组件动画    *****************************************
-.snail-popup-enter-active,
-.snail-popup-leave-active {
-    // transition: opacity 0.5s ease-in-out;
-    transition: opacity 0.1s ease;
-}
-
-.snail-popup-enter-from,
-.snail-popup-leave-to {
-    opacity: 0;
-}
 </style>

@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, getCurrentInstance, onUnmounted } from "vue";
+import { onMounted, getCurrentInstance, onUnmounted, onBeforeUnmount, nextTick } from "vue";
 import { SortEvents, SortOptions } from "./models/sort-model";
 import { newId, script } from "snail.core";
 import { useReactive } from "../base/reactive";
@@ -14,9 +14,6 @@ import { useReactive } from "../base/reactive";
 const props = defineProps<SortOptions<any>>();
 const emit = defineEmits<SortEvents>();
 const { watcher } = useReactive();
-/**     观察者，执行响应式 */
-watcher(() => props.disabled, buildSortable);
-watcher(() => props.changer, buildSortable);
 /**      排序面板：组件父级元素*/
 var sortPanel: HTMLElement = undefined;
 /**     Sortable对象实例 */
@@ -29,11 +26,15 @@ defineOptions({ name: "Sort", inheritAttrs: true, });
  * 构建【可拖拽排序】对象
  */
 async function buildSortable() {
-    sortInstance && sortInstance.destroy();
-    sortInstance = undefined;
+    //  先销毁掉
+    {
+        sortInstance && sortInstance.destroy();
+        sortInstance = undefined;
+    }
+    //  可用时，才构建
     if (props.disabled != true) {
-        console.log("sort.vue: buildSortable...");
         const Sortable = await script.load<any>("sortablejs");
+        console.log("sort.vue: buildSortable...");
         sortInstance = new Sortable(sortPanel, {
             group: props.group || newId(),
             draggable: props.draggable,
@@ -58,8 +59,14 @@ async function buildSortable() {
 onMounted(() => {
     const instance = getCurrentInstance();
     sortPanel = instance.vnode.el.parentElement;
+    //  挂载完成后，先构建一次；避免外部一开始有数据，则不会触发changer监听
+    nextTick(() => {
+        buildSortable();
+        watcher(() => props.disabled, buildSortable);
+        watcher(() => props.changer, buildSortable);
+    })
 })
-onUnmounted(() => sortInstance && sortInstance.destroy());
+onBeforeUnmount(() => sortInstance && sortInstance.destroy());
 </script>
 
 <style lang="less">
@@ -71,6 +78,7 @@ onUnmounted(() => sortInstance && sortInstance.destroy());
     cursor: move;
     border-radius: 4px;
     border: solid 1px #4c9aff;
+    background: white;
 }
 
 //  幽灵元素：推动元素 在排序面板中的占位元素
