@@ -73,62 +73,67 @@ function useCSS(): ICSSManager {
         //  1、基础样式：颜色、对齐、布局（弹性盒子）
         {
             //  BaseStyle
-            options.color && (style.color = options.color);
-            options.backgroundColor && (style.backgroundColor = options.backgroundColor);
-            options.textAlign && (style.textAlign = options.textAlign);
-            options.verticalAlign && (style.verticalAlign = options.verticalAlign);
+            options.color != undefined && (style.color = options.color);
+            options.backgroundColor != undefined && (style.backgroundColor = options.backgroundColor);
+            options.textAlign != undefined && (style.textAlign = options.textAlign);
+            options.verticalAlign != undefined && (style.verticalAlign = options.verticalAlign);
             //  FlextBox
-            options.justifyContent && (style.justifyContent = options.justifyContent);
-            options.alignItems && (style.alignItems = options.alignItems);
-            options.flex && (style.flex = options.flex);
-            options.flexBasis && (style.flexBasis = options.flexBasis);
-            options.flexGrow > 0 && (style.flexGrow = String(options.flexGrow));
-            options.flexShrink > 0 && (style.flexShrink = String(options.flexShrink));
-            options.order > 0 && (style.order = String(options.order));
-            options.alignSelf && (style.alignSelf = options.alignSelf);
+            options.justifyContent != undefined && (style.justifyContent = options.justifyContent);
+            options.alignItems != undefined && (style.alignItems = options.alignItems);
+            options.flex != undefined && (style.flex = options.flex);
+            options.flexBasis != undefined && (style.flexBasis = options.flexBasis);
+            options.flexGrow > 0 != undefined && (style.flexGrow = String(options.flexGrow));
+            options.flexShrink > 0 != undefined && (style.flexShrink = String(options.flexShrink));
+            options.order > 0 != undefined && (style.order = String(options.order));
+            options.alignSelf != undefined && (style.alignSelf = options.alignSelf);
         }
         //  2、高、宽、边框、边距
         {
             //  width、height
-            options.width && (style.width = options.width);
-            options.minWidth && (style.minWidth = options.minWidth);
-            options.maxWidth && (style.maxWidth = options.maxWidth);
-            options.height && (style.height = options.height);
-            options.minHeight && (style.minHeight = options.minHeight);
-            options.maxHeight && (style.maxHeight = options.maxHeight);
+            options.width != undefined && (style.width = options.width);
+            options.minWidth != undefined && (style.minWidth = options.minWidth);
+            options.maxWidth != undefined && (style.maxWidth = options.maxWidth);
+            options.height != undefined && (style.height = options.height);
+            options.minHeight != undefined && (style.minHeight = options.minHeight);
+            options.maxHeight != undefined && (style.maxHeight = options.maxHeight);
             //  外边距
-            options.margin && (style.margin = options.margin);
-            options.marginTop && (style.marginTop = options.marginTop);
-            options.marginRight && (style.marginRight = options.marginRight);
-            options.marginBottom && (style.marginBottom = options.marginBottom);
-            options.marginLeft && (style.marginLeft = options.marginLeft);
+            options.margin != undefined && (style.margin = options.margin);
+            options.marginTop != undefined && (style.marginTop = options.marginTop);
+            options.marginRight != undefined && (style.marginRight = options.marginRight);
+            options.marginBottom != undefined && (style.marginBottom = options.marginBottom);
+            options.marginLeft != undefined && (style.marginLeft = options.marginLeft);
             //  边框
-            options.borderRadius && (style.borderRadius = options.borderRadius);
-            options.border && (style.border = options.border);
-            options.borderTop && (style.borderTop = options.borderTop);
-            options.borderRight && (style.borderRight = options.borderRight);
-            options.borderBottom && (style.borderBottom = options.borderBottom);
-            options.borderLeft && (style.borderLeft = options.borderLeft);
+            options.borderRadius != undefined && (style.borderRadius = options.borderRadius);
+            options.border != undefined && (style.border = options.border);
+            options.borderTop != undefined && (style.borderTop = options.borderTop);
+            options.borderRight != undefined && (style.borderRight = options.borderRight);
+            options.borderBottom != undefined && (style.borderBottom = options.borderBottom);
+            options.borderLeft != undefined && (style.borderLeft = options.borderLeft);
             //  内边距
-            options.padding && (style.padding = options.padding);
-            options.paddingTop && (style.paddingTop = options.paddingTop);
-            options.paddingRight && (style.paddingRight = options.paddingRight);
-            options.paddingBottom && (style.paddingBottom = options.paddingBottom);
-            options.paddingLeft && (style.paddingLeft = options.paddingLeft);
+            options.padding != undefined && (style.padding = options.padding);
+            options.paddingTop != undefined && (style.paddingTop = options.paddingTop);
+            options.paddingRight != undefined && (style.paddingRight = options.paddingRight);
+            options.paddingBottom != undefined && (style.paddingBottom = options.paddingBottom);
+            options.paddingLeft != undefined && (style.paddingLeft = options.paddingLeft);
+            //  位置信息
+            options.left != undefined && (style.left = options.left);
+            options.right != undefined && (style.right = options.right);
+            options.top != undefined && (style.top = options.top);
+            options.bottom != undefined && (style.bottom = options.bottom);
         }
-        //  动画样式
+        //  3、动画样式
         {
             //  过渡动画：transition
-            options.transition && (style.transition = options.transition);
-            options.transitionProperty && (style.transitionProperty = options.transitionProperty);
-            options.transitionDuration && (style.transitionDuration = options.transitionDuration);
-            options.transitionDelay && (style.transitionDelay = options.transitionDelay);
-            options.transitionTimingFunction && (style.transitionTimingFunction = options.transitionTimingFunction);
+            options.transition != undefined && (style.transition = options.transition);
+            options.transitionProperty != undefined && (style.transitionProperty = options.transitionProperty);
+            options.transitionDuration != undefined && (style.transitionDuration = options.transitionDuration);
+            options.transitionDelay != undefined && (style.transitionDelay = options.transitionDelay);
+            options.transitionTimingFunction != undefined && (style.transitionTimingFunction = options.transitionTimingFunction);
         }
         return style as any;
     }
-
     //#endregion
+
     //  构建管理器实例，挂载scope作用域
     return Object.freeze({ parse, operate, buildStyle });
 }

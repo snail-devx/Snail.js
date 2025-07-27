@@ -60,7 +60,7 @@ export type CSSDescriptor = {
  * - 对齐方式、、、
  */
 export type AllStyle = BaseStyle & FlexBoxStyle
-    & WidthStyle & HeightStyle & MarginStyle & BorderStyle & PaddingStyle
+    & WidthStyle & HeightStyle & MarginStyle & BorderStyle & PaddingStyle & PositionStyle
     & TransitionStyle;
 
 // *****************************************   👉  基础样式：文本、布局  ****************************************
@@ -262,6 +262,27 @@ export type PaddingStyle = {
      * 左内边距
      */
     paddingLeft?: string;
+}
+/**
+ * 位置样式
+ */
+export type PositionStyle = {
+    /**
+     * x轴 左侧 值
+     */
+    left?: string,
+    /**
+     * x轴 右侧 值
+     */
+    right?: string,
+    /**
+     * y轴 顶部 值
+     */
+    top?: string,
+    /**
+     * y轴 底部 值
+     */
+    bottom?: string,
 }
 
 // *****************************************   👉  动画样式：transition、animation  ****************************************
