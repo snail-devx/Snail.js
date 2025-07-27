@@ -70,6 +70,8 @@ function useCSS(): ICSSManager {
         if (!!!options) {
             return style as any;
         }
+        //  后续考虑直接遍历Key，然后做setProperty赋值
+
         //  1、基础样式：颜色、对齐、布局（弹性盒子）
         {
             //  BaseStyle
@@ -86,6 +88,15 @@ function useCSS(): ICSSManager {
             options.flexShrink > 0 != undefined && (style.flexShrink = String(options.flexShrink));
             options.order > 0 != undefined && (style.order = String(options.order));
             options.alignSelf != undefined && (style.alignSelf = options.alignSelf);
+            //  PositionStyle
+            options.left != undefined && (style.left = options.left);
+            options.right != undefined && (style.right = options.right);
+            options.top != undefined && (style.top = options.top);
+            options.bottom != undefined && (style.bottom = options.bottom);
+            //  OverflowStyle
+            options.overflow != undefined && (style.overflow = options.overflow);
+            options.overflowX != undefined && (style.overflowX = options.overflowX);
+            options.overflowY != undefined && (style.overflowY = options.overflowY);
         }
         //  2、高、宽、边框、边距
         {
@@ -115,11 +126,6 @@ function useCSS(): ICSSManager {
             options.paddingRight != undefined && (style.paddingRight = options.paddingRight);
             options.paddingBottom != undefined && (style.paddingBottom = options.paddingBottom);
             options.paddingLeft != undefined && (style.paddingLeft = options.paddingLeft);
-            //  位置信息
-            options.left != undefined && (style.left = options.left);
-            options.right != undefined && (style.right = options.right);
-            options.top != undefined && (style.top = options.top);
-            options.bottom != undefined && (style.bottom = options.bottom);
         }
         //  3、动画样式
         {

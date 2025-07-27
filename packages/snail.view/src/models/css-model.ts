@@ -59,8 +59,8 @@ export type CSSDescriptor = {
  * - 高度、宽度、对齐、边框、内边距等合集
  * - 对齐方式、、、
  */
-export type AllStyle = BaseStyle & FlexBoxStyle
-    & WidthStyle & HeightStyle & MarginStyle & BorderStyle & PaddingStyle & PositionStyle
+export type AllStyle = BaseStyle & FlexBoxStyle & PositionStyle & OverflowStyle
+    & WidthStyle & HeightStyle & MarginStyle & BorderStyle & PaddingStyle
     & TransitionStyle;
 
 // *****************************************   👉  基础样式：文本、布局  ****************************************
@@ -143,6 +143,44 @@ export type FlexBoxStyle = {
     alignSelf?: "start" | "center" | "end";
     //#endregion
 
+}
+/**
+ * 位置样式
+ */
+export type PositionStyle = {
+    /**
+     * x轴 左侧 值
+     */
+    left?: string,
+    /**
+     * x轴 右侧 值
+     */
+    right?: string,
+    /**
+     * y轴 顶部 值
+     */
+    top?: string,
+    /**
+     * y轴 底部 值
+     */
+    bottom?: string,
+}
+/**
+ * 溢出样式
+ */
+export type OverflowStyle = {
+    /**
+     * 溢出 样式
+     */
+    overflow?: string;
+    /**
+     * x轴溢出 样式
+     */
+    overflowX?: string;
+    /**
+     * y轴溢出 样式
+     */
+    overflowY?: string;
 }
 
 // *****************************************   👉  高、宽、边框、边距    ****************************************
@@ -262,27 +300,6 @@ export type PaddingStyle = {
      * 左内边距
      */
     paddingLeft?: string;
-}
-/**
- * 位置样式
- */
-export type PositionStyle = {
-    /**
-     * x轴 左侧 值
-     */
-    left?: string,
-    /**
-     * x轴 右侧 值
-     */
-    right?: string,
-    /**
-     * y轴 顶部 值
-     */
-    top?: string,
-    /**
-     * y轴 底部 值
-     */
-    bottom?: string,
 }
 
 // *****************************************   👉  动画样式：transition、animation  ****************************************
