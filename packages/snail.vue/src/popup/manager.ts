@@ -7,7 +7,7 @@
  * 5、【后续支持】全局配置z-index起始值，容器组件、、、
  */
 import { shallowRef } from "vue";
-import { defer, FlatPromise, IAsyncScope, IScope, IScopes, isStringNotEmpty, mountScope, useAsyncScope, useScopes } from "snail.core";
+import { defer, FlatPromise, IAsyncScope, IScope, IScopes, isStringNotEmpty, mountScope, throwIfFalse, useAsyncScope, useScopes } from "snail.core";
 import { buildDialogExtOptions, checkDialog, monitorDialog } from "./utils/dialog-util";
 import { checkFollow } from "./utils/follow-util";
 import { checkPopup, destroyPopup, openPopup } from "./utils/popup-util";
@@ -15,7 +15,7 @@ import { checkPopup, destroyPopup, openPopup } from "./utils/popup-util";
 import { ToastOptions } from "./models/toast-model";
 import { IconType } from "../base/models/icon-model";
 import { DialogOptions } from "./models/dialog-model";
-import { FollowHandle, FollowOptions } from "./models/follow-model";
+import { FollowExtend, FollowHandle, FollowOptions } from "./models/follow-model";
 import { IPopupManager } from "./models/manager-model";
 import { ConfirmOptions } from "./models/confirm-model";
 import { PopupExtend, PopupHandle, PopupOptions } from "./models/popup-model";
@@ -29,6 +29,7 @@ import ToastContainer from "./components/toast-container.vue";
 /** 把自己的类型共享出去 */
 export * from "./models/confirm-model"
 export * from "./models/dialog-model"
+export * from "./models/follow-model"
 export * from "./models/manager-model"
 export * from "./models/popup-model"
 export * from "./models/toast-model"
@@ -88,30 +89,39 @@ export function usePopup(): IPopupManager & IScope {
         return scope.destroyed ? scope : scopes.add(scope);
     }
     /**
-     * 跟随弹窗
-     * - 跟随指定的target对象，可跟随位置、大小
-     * @param options 跟随配置选项
-     * @returns 弹窗异步作用域，外部可手动关闭弹窗
-     */
-    function follow<T>(options: FollowOptions): IAsyncScope<T> {
+    * 跟随弹窗
+    * - 跟随指定的target对象，可跟随位置、大小
+    * @param target 跟随的目标元素
+    * @param options 跟随配置选项
+    * @returns 弹窗异步作用域，外部可手动关闭弹窗
+    */
+    function follow<T>(target: HTMLElement, options: FollowOptions): IAsyncScope<T> {
+        //  基础配置选项验证、target必须为html元素
         var scope = checkOptions<FollowOptions, T>(options, checkFollow);
-        //  和popup很想，后续考虑和popup做一下优化
+        if (scope == undefined && target instanceof HTMLElement == false) {
+            const deferred = defer<T>();
+            deferred.reject("follow: target must be an HTMLElement.");
+            scope = useAsyncScope(deferred.promise);
+        }
+        //  准备弹窗，启动【跟随】效果：和popup很像，后续考虑和popup做一下优化
         if (scope == undefined) {
             const deferred = defer<T>();
-            const handle: FollowHandle<T> & PopupExtend = {
-                popupStatus: shallowRef("open"),
+            const extOptions: FollowHandle<T> & FollowExtend = {
                 inFollow: true,
                 closeFollow(data?: T) {
                     if (scope.destroyed == false) {
-                        handle.popupStatus.value = "close";
+                        extOptions.followStatus.value = "close";
                         deferred.resolve(data);
                     }
                     scope.destroyed || deferred.resolve(data);
                 },
+
+                followStatus: shallowRef("open"),
+                target: target,
             }
-            const popupId = openPopup(FollowContainer, options, handle);
+            const popupId = openPopup(FollowContainer, options, extOptions);
             scope = useAsyncScope<T>(deferred.promise);
-            scope.onDestroy(() => destroyPopup(popupId, handle.popupStatus, deferred));
+            scope.onDestroy(() => destroyPopup(popupId, extOptions.followStatus, deferred));
         }
         return scope.destroyed ? scope : scopes.add(scope);
     }

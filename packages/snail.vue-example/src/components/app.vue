@@ -28,6 +28,7 @@ import TreeTest from "./container/tree-test.vue";
 import InputTest from "./form/input-test.vue";
 //  👉 弹窗组件
 import DialogTest from "./popup/dialog-test.vue";
+import FollowTest from "./popup/follow-test.vue";
 import PopupTest from "./popup/popup-test.vue";
 //  👉 提示组件
 import LoadingTest from "./prompt/loading-test.vue";
@@ -79,6 +80,7 @@ const treeOptions: TreeOptions<Component> = {
             text: "弹窗管理",
             children: [
                 { text: "Dialog 模态弹窗", data: DialogTest, clickable: true },
+                { text: "Follow 跟随弹窗", data: FollowTest, clickable: true },
                 { text: "Popup 弹出", data: PopupTest, clickable: true },
             ]
         },

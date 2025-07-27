@@ -31,10 +31,11 @@ export interface IPopupManager {
     /**
      * 跟随弹窗
      * - 跟随指定的target对象，可跟随位置、大小
+     * @param target 跟随的目标元素
      * @param options 跟随配置选项
      * @returns 弹窗异步作用域，外部可手动关闭弹窗
      */
-    follow<T>(options: FollowOptions): IAsyncScope<T>;
+    follow<T>(target: HTMLElement, options: FollowOptions): IAsyncScope<T>;
 
     // *****************************************   👉  弹窗的扩充方法：方便调用    **********************************
     /**

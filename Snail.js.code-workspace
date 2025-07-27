@@ -38,10 +38,11 @@
 			"release": true,
 			"release/**/package.json": true,
 			//	先把packages项目下的 packages.json 忽略掉，后期看情况放开
-			"packages/**/package.json": true,
+			// "packages/**/package.json": true,
 		},
 		"svn.ignoreMissingSvnWarning": true,
 		"liveServer.settings.root": "./packages/snail.vue-example/dist",
+		"liveServer.settings.port": 40000,
 	},
 	"extensions": {
 		"recommendations": [
