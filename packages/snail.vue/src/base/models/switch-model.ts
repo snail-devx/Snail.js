@@ -1,7 +1,7 @@
 import { ReadonlyOptions } from "./base-mode";
 
 /**
- * 开关 配置选项
+ * 开关组件 配置选项
  */
 export type SwitchOptions = ReadonlyOptions & {
 }

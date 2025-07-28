@@ -21,7 +21,7 @@ import { useObserver } from "snail.view";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const { message = "拖动滑块以完成验证" } = defineProps<DragVerifyOptions>();
-const emit = defineEmits<{ (e: "success") }>();
+const emits = defineEmits<{ (e: "success") }>();
 /** 组件观察者 */
 const { onEvent } = useObserver();
 /** 是否是触摸设备 */
@@ -74,7 +74,7 @@ function onDragEnd() {
         //  判断是否拖拽验证成功
         if (dragInfoRef.value.distance == getMaxDistance()) {
             dragInfoRef.value.status = "success";
-            emit("success");
+            emits("success");
         }
         else {
             dragInfoRef.value.status = "none";

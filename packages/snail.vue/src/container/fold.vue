@@ -36,7 +36,7 @@ import { useReactive } from "../base/reactive";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<FoldOptions>();
-const emit = defineEmits<FoldEvents>();
+const emits = defineEmits<FoldEvents>();
 const { transition } = useAnimation();
 const { watcher } = useReactive();
 /**     折叠状态：默认展开 */
@@ -103,7 +103,7 @@ function onStatusClick() {
         default:
             throwError(`Fold not support status value: ${statusModel.value}`);
     }
-    emit("change", statusModel.value);
+    emits("change", statusModel.value);
 }
 </script>
 

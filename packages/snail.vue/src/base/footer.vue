@@ -2,9 +2,9 @@
 <template>
     <footer class="snail-footer" :class="{ 'start-divider': props.divider }" v-bind:class="props.align || 'right'">
         <slot>
-            <Button v-if="props.cancelDisabled != true" :size="'max'" :type="'default'" @click="emit('cancel')"
+            <Button v-if="props.cancelDisabled != true" :size="'max'" :type="'default'" @click="emits('cancel')"
                 v-text="props.cancelName || '取消'" />
-            <Button v-if="props.confirmDisabled != true" :size="'max'" :type="'primary'" @click="emit('confirm')"
+            <Button v-if="props.confirmDisabled != true" :size="'max'" :type="'primary'" @click="emits('confirm')"
                 v-text="props.confirmName || '确定'" />
         </slot>
     </footer>
@@ -17,7 +17,7 @@ import { FooterOptions, FooterEvents } from "./models/footer-model"
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<FooterOptions>();
-const emit = defineEmits<FooterEvents>();
+const emits = defineEmits<FooterEvents>();
 //  2、可选配置选项
 defineOptions({ name: "Footer", inheritAttrs: true, });
 </script>

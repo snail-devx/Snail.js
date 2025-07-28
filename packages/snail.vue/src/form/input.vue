@@ -14,7 +14,7 @@
         <!-- 输入框区域：输入不做v-model绑定，只有验证通过后再绑定 -->
         <div class="input-body">
             <input ref="input-el" :type="props.type || 'text'" :value="inputModel" :readonly="props.readonly == true"
-                :placeholder="props.placeholder" :title="inputModel" @change="onValueChange" @click="emit('click')" />
+                :placeholder="props.placeholder" :title="inputModel" @change="onValueChange" @click="emits('click')" />
             <span class="validate" v-if="!!validateRef" :title="validateRef">
                 <Icon :type="'error'" :size="16" :color="'red'" />
             </span>
@@ -31,7 +31,7 @@ import { css } from "snail.view";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<InputOptions>();
-const emit = defineEmits<InputEvents>();
+const emits = defineEmits<InputEvents>();
 /**     输入框引用 */
 const inputDom = useTemplateRef("input-el");
 /**     输入框内容 */
@@ -51,7 +51,7 @@ function onValueChange() {
     // 验证通过后，设置到value上，并对外发送change事件
     const text: string = inputDom.value!.value || "";
     inputModel.value = text;
-    emit("change", text);
+    emits("change", text);
 }
 
 // *****************************************   👉  组件渲染    *****************************************

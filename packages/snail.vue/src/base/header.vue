@@ -11,7 +11,7 @@
         <slot />
         <!-- 关闭按钮区域 -->
         <Icon :type="'close'" :size="22" :color="useTo == 'page' ? '#2e3033' : '#464953'" class="close-icon"
-            v-if="closeDisabled != true" @click="emit('close')" />
+            v-if="closeDisabled != true" @click="emits('close')" />
     </header>
 </template>
 
@@ -22,7 +22,7 @@ import Icon from "./icon.vue";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data、event
 const { useTo = 'page', divider, title = "", titleAlign = "center", closeDisabled = false } = defineProps<HeaderOptions>();
-const emit = defineEmits<HeaderEvents>();
+const emits = defineEmits<HeaderEvents>();
 //  2、可选配置选项
 defineOptions({ name: "Header", inheritAttrs: true, });
 </script>

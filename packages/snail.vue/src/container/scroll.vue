@@ -16,7 +16,7 @@ import { ScrollOptions, ScrollEvents } from "./models/scroll-model"
 //  1、props、data
 const props = defineProps<ScrollOptions>();
 console.warn("scroll 的事件还没实现");
-// const emit = defineEmits<ScrollEvents>();
+// const emits = defineEmits<ScrollEvents>();
 //  2、可选配置选项
 defineOptions({ name: "Scroll", inheritAttrs: true, });
 

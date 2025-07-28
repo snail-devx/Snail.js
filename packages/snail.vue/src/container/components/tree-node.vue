@@ -45,7 +45,7 @@ import { useAnimation } from "snail.view";
 //  1、props、data
 const { node, parent, level, extend = {} } = defineProps<TreeNodeOptions<any>>();
 throwIfTrue(level > 10, "tree node level cannot exceed 10.");
-const emit = defineEmits<TreeNodeEvents<any>>();
+const emits = defineEmits<TreeNodeEvents<any>>();
 const { transition } = useAnimation();
 /**     折叠状态，默认展开 */
 const statusRef = shallowRef<"expand" | "fold">("expand");
@@ -91,7 +91,7 @@ function toggleFold() {
  * @param parent 
  */
 function onNodeClick(node, parent?) {
-    node.clickable == true && emit("click", node, parent);
+    node.clickable == true && emits("click", node, parent);
 }
 </script>
 

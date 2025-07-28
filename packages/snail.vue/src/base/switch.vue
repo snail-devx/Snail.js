@@ -19,7 +19,7 @@ import { SwitchEvents, SwitchOptions } from "./models/switch-model";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<SwitchOptions>();
-const emit = defineEmits<SwitchEvents>();
+const emits = defineEmits<SwitchEvents>();
 /**     开关值：开启还是关闭 */
 const switchModel = defineModel<boolean>({ default: false });
 //  2、可选配置选项
@@ -32,7 +32,7 @@ defineOptions({ name: "Switch", inheritAttrs: true, });
 function onSwitchChange() {
     if (props.readonly != true) {
         switchModel.value = !switchModel.value;
-        emit("change", switchModel.value);
+        emits("change", switchModel.value);
     }
 }
 </script>

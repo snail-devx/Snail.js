@@ -12,7 +12,7 @@ import { useReactive } from "../base/reactive";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<SortOptions<any>>();
-const emit = defineEmits<SortEvents>();
+const emits = defineEmits<SortEvents>();
 const { watcher } = useReactive();
 /**      排序面板：组件父级元素*/
 var sortPanel: HTMLElement = undefined;
@@ -49,7 +49,7 @@ async function buildSortable() {
             //  事件监听
             //      顺序发生变化时，通知外面
             onUpdate(evt) {
-                emit("update", evt.oldIndex, evt.newIndex);
+                emits("update", evt.oldIndex, evt.newIndex);
             }
         });
     }

@@ -17,7 +17,7 @@ import Icon from "./icon.vue";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<SearchOptions>();
-const emit = defineEmits<SearchEvents>();
+const emits = defineEmits<SearchEvents>();
 /**     搜索文本 */
 const textModel = defineModel<string>({ default: "" });
 /**     搜索图标 */
@@ -32,7 +32,7 @@ defineOptions({ name: "Search", inheritAttrs: true, });
  */
 function onSearch() {
     //  后期做一些验证，将旧值存储起来，没变化时不做触发
-    props.readonly || emit("search", textModel.value);
+    props.readonly || emits("search", textModel.value);
 }
 
 </script>

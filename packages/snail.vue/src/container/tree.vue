@@ -25,7 +25,7 @@ import { newId } from "snail.core";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<TreeOptions<any>>();
-const emit = defineEmits<TreeEvents<any> & TreeNodeEvents<any>>();
+const emits = defineEmits<TreeEvents<any> & TreeNodeEvents<any>>();
 //  2、可选配置选项
 defineOptions({ name: "Tree", inheritAttrs: true, });
 
@@ -36,7 +36,7 @@ defineOptions({ name: "Tree", inheritAttrs: true, });
  * @param parent 
  */
 function onTreeNodeClick(node, parent) {
-    emit("click", node, parent);
+    emits("click", node, parent);
 }
 
 // *****************************************   👉  组件渲染    *****************************************

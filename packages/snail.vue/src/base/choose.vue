@@ -35,7 +35,7 @@ type ChooseItemDetail = ChooseItem<any> & {
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<ChooseOptions<any>>();
-const emit = defineEmits<ChooseEvents<any>>();
+const emits = defineEmits<ChooseEvents<any>>();
 /**     双向绑定数据值：多选时，若传入的非数组，则强制转为空数组 */
 const valuesModel = defineModel<any | any[]>({});
 props.multi && isArray(valuesModel.value) == false && (valuesModel.value = []);
@@ -72,7 +72,7 @@ function onItemClick(item: ChooseItemDetail, index: number) {
         valuesModel.value = item.value;
     }
     //  发送事件做通知
-    emit("change", valuesModel.value);
+    emits("change", valuesModel.value);
 }
 </script>
 
