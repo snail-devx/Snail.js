@@ -38,8 +38,9 @@ export type IconOptions = TitleOptions & {
  * - close 关闭 用作数据删除，弹窗关闭
  * - error 错误 
  * - warn 警告图标
+ * - arrow 向右箭头
  * - trash 垃圾桶图标，常用于【删除】操作
  * - grip   紧握图标，垂直方向，一般用于拖动句柄
  * - custom 自定义图标：此时IconOptions.draw属性传入绘制路径
  */
-export type IconType = "success" | "close" | "error" | "warn" | "trash" | "grip" | "custom";
+export type IconType = "success" | "close" | "error" | "warn" | "arrow" | "trash" | "grip" | "custom";

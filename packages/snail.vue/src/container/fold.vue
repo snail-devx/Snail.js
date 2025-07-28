@@ -11,9 +11,8 @@
                 <div class="title" v-text="props.title" />
                 <div class="subtitle" v-if="!!props.subtitle" v-text="props.subtitle" />
                 <div class="status" v-if="props.disabled != true">
-                    <span :title="statusModel == 'expand' ? '收起' : '展开'" ref="foldStatusSpan">
-                        <Icon :type="'custom'" :draw="statusIcon" @click="onStatusClick" />
-                    </span>
+                    <Icon :type="'arrow'" :draw="statusIcon" :title="statusModel == 'expand' ? '收起' : '展开'"
+                        @click="onStatusClick" />
                 </div>
             </slot>
         </div>
@@ -45,8 +44,6 @@ const statusModel = defineModel<FoldStatus>("status", { default: "expand" });
 watcher(statusModel, updateFoldStyle);
 /**     展开、收起图标绘制路径 */
 const statusIcon: string = getFoldStatusDraw();
-/**     折叠状态区域引用 */
-const statusDom = useTemplateRef("foldStatusSpan");
 /**     折叠面板内容区域引用 */
 const foldBodyDom = useTemplateRef("foldBody");
 //  2、可选配置选项
@@ -59,17 +56,6 @@ defineOptions({ name: "Fold", inheritAttrs: true, });
 function updateFoldStyle() {
     /** 是否是展开状态 */
     const isExpand = statusModel.value == "expand";
-    //  折叠图标样式：这个可以用vue的响应式，配合class样式，这里纯粹是为了验证transition动画
-    if (statusDom.value) {
-        transition(statusDom.value, {
-            from: {
-                transition: "transform 0.2s ease",
-                transform: isExpand ? "rotateZ(180deg)" : "rotate(0)"
-            },
-            to: { transform: isExpand ? "rotate(0)" : "rotateZ(180deg)" },
-            end: { transform: isExpand ? "" : "rotateZ(180deg)" }
-        });
-    }
     //  折叠内容样式：折叠时，动画完成后保留target样式，且此时overflow:hidden，否则折叠将失效
     if (foldBodyDom.value) {
         const minHeight = 32;
@@ -156,11 +142,30 @@ function onStatusClick() {
             flex: 1;
             // flex 布局：display: flex，align-items、justify-content 都为right
             .flex-right();
+
+            //  展开、收起状态图标
+            >svg.snail-icon {
+                transition: transform 0.2s ease;
+            }
         }
     }
 
     >div.fold-body {
         padding-left: 20px;
+    }
+}
+
+// *****************************************   👉  特殊样式适配    *****************************************
+//  展开、收起状态适配
+.snail-fold.expand {
+    >div.fold-header>div.status>svg.snail-icon {
+        transform: rotate(-90deg);
+    }
+}
+
+.snail-fold.fold {
+    >div.fold-header>div.status>svg.snail-icon {
+        transform: rotate(90deg);
     }
 }
 </style>
