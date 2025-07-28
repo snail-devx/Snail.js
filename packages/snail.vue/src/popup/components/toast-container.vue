@@ -19,7 +19,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { ToastOptions } from "../models/toast-model";
 import Icon from "../../base/icon.vue"
-import { PopupExtend, PopupFlagOptions, PopupHandle } from "../manager";
+import { PopupHandle } from "../manager";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data

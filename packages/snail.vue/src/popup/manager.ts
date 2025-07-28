@@ -106,19 +106,18 @@ export function usePopup(): IPopupManager & IScope {
         //  准备弹窗，启动【跟随】效果：和popup很像，后续考虑和popup做一下优化
         if (scope == undefined) {
             const deferred = defer<T>();
-            const extOptions: FollowHandle<T> & FollowExtend = {
+            //  强制加上freeze，否则修改 followStatus时，内部组件.value不会响应式，比较诡异
+            const extOptions = Object.freeze<FollowHandle<T> & FollowExtend>({
                 inFollow: true,
                 closeFollow(data?: T) {
                     if (scope.destroyed == false) {
                         extOptions.followStatus.value = "close";
                         deferred.resolve(data);
                     }
-                    scope.destroyed || deferred.resolve(data);
                 },
-
                 followStatus: shallowRef("open"),
                 target: target,
-            }
+            });
             const popupId = openPopup(FollowContainer, options, extOptions);
             scope = useAsyncScope<T>(deferred.promise);
             scope.onDestroy(() => destroyPopup(popupId, extOptions.followStatus, deferred));

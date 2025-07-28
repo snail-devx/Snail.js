@@ -1,6 +1,7 @@
 <!-- 跟随效果测试组件 -->
 <template>
     <div class="follow-test">
+        <!-- followX -->
         <button @click="onFollow($event, { followX: 'start' })"
             style="position: absolute;left: 0;top: 0;">FollowX：start</button>
         <button @click="onFollow($event, { followX: 'end' })"
@@ -9,6 +10,10 @@
             style="position: absolute;right: 150px;top: 10px;">FollowX：center</button>
         <button @click="onFollow($event, { followX: 'center' })"
             style="position: absolute;right: 50%;top: 50%;transform: translate(-50%,-50%);">FollowX：center</button>
+        <!-- followWidth -->
+        <div style="width: 1000px;height: 200px;line-height: 200px;border: 1px solid red;"
+            @click="onFollow($event, { followWidth: true })">
+            followWidth</div>
     </div>
 </template>
 
@@ -21,6 +26,10 @@ import ChildContent from "./child-content.vue";
 //  1、props、data
 const followOpitions: FollowOptions = Object.freeze<FollowOptions>({
     component: shallowRef(ChildContent),
+    closeOnEscape: true,
+    closeOnMask: true,
+    closeOnResize: true,
+    closeOnTarget: true,
 });
 const { follow } = usePopup();
 //  2、可选配置选项

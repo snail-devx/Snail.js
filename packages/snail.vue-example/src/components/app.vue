@@ -50,6 +50,14 @@ const treeOptions: TreeOptions<Component> = {
     },
     nodes: [
         {
+            text: "弹窗管理",
+            children: [
+                { text: "Dialog 模态弹窗", data: DialogTest, clickable: true },
+                { text: "Follow 跟随弹窗", data: FollowTest, clickable: true },
+                { text: "Popup 弹出", data: PopupTest, clickable: true },
+            ]
+        },
+        {
             text: "基础组件",
             children: [
                 { text: "Button 按钮组件", data: ButtonTest, clickable: true },
@@ -74,14 +82,6 @@ const treeOptions: TreeOptions<Component> = {
             text: "表单组件",
             children: [
                 { text: "Input 输入框组件", data: InputTest, clickable: true },
-            ]
-        },
-        {
-            text: "弹窗管理",
-            children: [
-                { text: "Dialog 模态弹窗", data: DialogTest, clickable: true },
-                { text: "Follow 跟随弹窗", data: FollowTest, clickable: true },
-                { text: "Popup 弹出", data: PopupTest, clickable: true },
             ]
         },
         {
