@@ -16,6 +16,7 @@ export * from "./base/models/header-model";
 export * from "./base/models/icon-model";
 export * from "./base/models/reactive-model";
 export * from "./base/models/search-model";
+export * from "./base/models/select-model";
 export * from "./base/models/switch-model";
 //  组件导出
 import Button from "./base/button.vue";
@@ -24,6 +25,7 @@ import Footer from "./base/footer.vue";
 import Header from "./base/header.vue";
 import Icon from "./base/icon.vue";
 import Search from "./base/search.vue";
+import Select from "./base/select.vue";
 import Switch from "./base/switch.vue";
 //  方法导出
 export * from "./base/reactive";
@@ -77,7 +79,7 @@ import Loading from "./prompt/loading.vue";
 // *****************************************   👉  组件合并导出    ****************************************
 export const components = {
     //  base下的组件
-    Button, Choose, Footer, Header, Icon, Search, Switch,
+    Button, Choose, Footer, Header, Icon, Search, Select, Switch,
     //  container 下的组件
     Dynamic, Fold, Scroll, Sort, Table, TableRow, TableCol, Tree,
     //  form 下的组件

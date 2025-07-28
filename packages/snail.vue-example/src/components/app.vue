@@ -17,6 +17,7 @@ import ChooseTest from "./base/choose-test.vue";
 import HeaderFooterTest from "./base/header-footer-test.vue";
 import IconTest from "./base/icon-test.vue";
 import SearchTest from "./base/search-test.vue";
+import SelectTest from "./base/select-test.vue";
 import SwitchTest from "./base/switch-test.vue";
 //  👉 容器组件
 import DynamicTest from "./container/dynamic-test.vue";
@@ -50,14 +51,6 @@ const treeOptions: TreeOptions<Component> = {
     },
     nodes: [
         {
-            text: "弹窗管理",
-            children: [
-                { text: "Dialog 模态弹窗", data: DialogTest, clickable: true },
-                { text: "Follow 跟随弹窗", data: FollowTest, clickable: true },
-                { text: "Popup 弹出", data: PopupTest, clickable: true },
-            ]
-        },
-        {
             text: "基础组件",
             children: [
                 { text: "Button 按钮组件", data: ButtonTest, clickable: true },
@@ -65,6 +58,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, },
                 { text: "Icon 图标组件", data: IconTest, clickable: true },
                 { text: "Search 搜索组件", data: SearchTest, clickable: true },
+                { text: "Select 选项菜单组件", data: SelectTest, clickable: true },
                 { text: "Switch 开关组件", data: SwitchTest, clickable: true },
             ],
         },
@@ -82,6 +76,14 @@ const treeOptions: TreeOptions<Component> = {
             text: "表单组件",
             children: [
                 { text: "Input 输入框组件", data: InputTest, clickable: true },
+            ]
+        },
+        {
+            text: "弹窗管理",
+            children: [
+                { text: "Dialog 模态弹窗", data: DialogTest, clickable: true },
+                { text: "Follow 跟随弹窗", data: FollowTest, clickable: true },
+                { text: "Popup 弹出", data: PopupTest, clickable: true },
             ]
         },
         {
