@@ -7,7 +7,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { Component, shallowRef } from "vue";
+import { Component, onMounted, shallowRef } from "vue";
 import { useReactive, TreeNode, TreeOptions, components } from "../core";
 
 //#region *******************************   👉  组件定义    *****************************************
@@ -105,6 +105,10 @@ function onTreeNodeClick(node: TreeNode<Component>) {
     curComponent = shallowRef(node.data);
     transition<boolean>(showRef, { from: false, to: true }, 10);
 }
+
+onMounted(() => {
+    onTreeNodeClick(treeOptions.nodes[0].children[5]);
+});
 </script>
 
 <style lang="less">

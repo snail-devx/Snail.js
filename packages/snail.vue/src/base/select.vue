@@ -1,42 +1,123 @@
-<!-- 下拉选择 组件：
+<!-- 选项菜单 组件：
     1、支持基础的html select ，支持多级选择，支持搜索功能 
+    2、通过 v-model 绑定已选数据
 -->
 <template>
-    <div class="snail-select" :class="{ 'readonly': proprs.readonly }">
-        <!-- 选中选项数据：多选模式 -->
-        <div class="select-result" v-if="proprs.multiple == true">
-            多选模式
-        </div>
-        <!-- 单选模式：存在多个路径的情况 -->
-        <div class="select-result" v-else>
-            单选模式
-        </div>
-        <Icon type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
+    <div class="snail-select" :class="{ 'readonly': props.readonly }" @click="onClick" ref="select">
+        <template v-if="props.items && props.items.length > 0">
+            <!-- 展示选择结果数据：无数据时显示placeholder；多选和单选区分开-->
+            <div v-if="isArrayNotEmpty(selects) == false" class="select-result text-tips"
+                v-text="props.placeholder || '请选择'" />
+            <div v-else-if="props.multiple" class="select-result multi" v-text="selects.join('、')"
+                :title="selects.join('、')" />
+            <div v-else class="select-result single">
+                <div v-for="item in selects" class="result-item" v-text="item.text" />
+            </div>
+            <Icon type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
+        </template>
         <!-- 无选项时的适配：提示无选项。。。 -->
+        <div v-else class="no-items text-tips">暂无可选项</div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { ref, shallowRef, watch, onActivated, onDeactivated, useTemplateRef } from "vue";
 import Icon from "./icon.vue";
-import { SelectEvents, SelectOptions } from "./models/select-model";
+import { SelectItem, SelectEvents, SelectOptions, SelectPopupOptions, SelectBaseEvents, SelectNode } from "./models/select-model";
+import SelectPopup from "./components/select-popup.vue";
+import { usePopup } from "../popup/manager";
+import { hasAny, IAsyncScope, isArrayNotEmpty, IScope } from "snail.core";
+import { buildSelectNodes, refreshSelectNodes } from "./utils/select-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const proprs = defineProps<SelectOptions<any>>();
+const props = defineProps<SelectOptions<any>>();
 const emits = defineEmits<SelectEvents<any>>();
+const valuesModel = defineModel<SelectItem<any>[]>({ default: [] });
+const { follow } = usePopup();
+/** 【选择项】节点集合 */
+const selectNodes: SelectNode<any>[] = buildSelectNodes(props.items);
+/** 组件根元素*/
+const rootDom = useTemplateRef("select");
+/** 已选结果数据 */
+const selects = shallowRef<SelectItem<any>[]>();
+/** 跟随弹窗作用域 */
+var followScope: IAsyncScope<SelectItem<any>[]> = undefined;
 //  2、可选配置选项
 defineOptions({ name: "Select", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 选项菜单 点击时
+ * - 弹出选择项
+ */
+async function onClick() {
+    if (props.readonly == true || rootDom.value == undefined) {
+        return;
+    }
+    //  已存在则销毁
+    if (followScope != undefined) {
+        followScope.destroy();
+        followScope = undefined;
+        return;
+    }
+    //  构建已选数据：单选时，仅取最后一个选择节点
+    const values: SelectItem<any>[] = valuesModel.value && valuesModel.value.length > 0
+        ? [...valuesModel.value]
+        : [];
+    props.multiple != true && values.length > 1 && values.splice(0, values.length - 1);
+    //  打开弹窗：跟随宽度，并在合适时机关闭掉
+    followScope = follow(rootDom.value, {
+        // component: shallowRef(SelectPopup),
+        name: "SelectPopup",
+        followWidth: true,
+        followX: "start",
+        spaceClient: 10,
+        spaceY: 2,
+
+        closeOnMask: true,
+        closeOnResize: true,
+        closeOnTarget: true,
+
+        props: Object.freeze(Object.assign<SelectPopupOptions<any>, Record<string, any>>(
+            //  弹窗配置选项：将选项解构，避免响应式干扰
+            {
+                items: refreshSelectNodes(selectNodes, values),
+                level: 1,
+                search: props.search,
+                searchPlaceholder: props.searchPlaceholder,
+                multiple: props.multiple,
+                values: [...valuesModel.value],
+            },
+            //  事件监听、例外属性处理
+            {
+                onChange: onSelectItemChange,
+            }
+        )),
+    });
+    await followScope;
+    followScope = undefined;
+}
+/**
+ * 选项改变时
+ * @param items 
+ */
+function onSelectItemChange(items: SelectItem<any>[]) {
+    items = hasAny(items) ? [...items] : [];
+    selects.value = items;
+    valuesModel.value = items;
+    emits("change", items);
+}
 
 // *****************************************   👉  组件渲染    *****************************************
-//  1、数据初始化、变化监听
-//  2、生命周期响应
+</script>
 
-//      监听组件激活和卸载，适配KeepAlive组件内使用
-onActivated(() => console.log("onActivated"));
-onDeactivated(() => console.log("onDeactivated"));
+<script lang="ts">
+import { onAppCreated } from "./utils/app-util";
+//  非组件实例逻辑：将【选项弹窗】注册为【弹窗】app实例的全局组件，方便树形复用
+onAppCreated((app, type) => {
+    type == "popup" && app.component("SelectPopup", SelectPopup);
+});
 </script>
 
 <style lang="less">
@@ -61,10 +142,19 @@ onDeactivated(() => console.log("onDeactivated"));
         //  flex 布局：display: flex，align-items 为center
         .flex-cross-center();
         flex-wrap: nowrap;
+
+        >div.text-tips {}
     }
 
     >svg.snail-icon {
         flex-shrink: 0;
+        margin-right: 4px;
+    }
+
+    //  无数据提醒
+    >div.no-items {
+        padding: 0 8px;
+        cursor: text;
     }
 }
 
@@ -72,5 +162,9 @@ onDeactivated(() => console.log("onDeactivated"));
 //  只读样式适配
 .snail-select.readonly {
     cursor: auto;
+
+    >svg.snail-icon {
+        display: none;
+    }
 }
 </style>
