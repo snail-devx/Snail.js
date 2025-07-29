@@ -11,8 +11,7 @@
                 <div class="title" v-text="props.title" />
                 <div class="subtitle" v-if="!!props.subtitle" v-text="props.subtitle" />
                 <div class="status" v-if="props.disabled != true">
-                    <Icon :type="'arrow'" :draw="statusIcon" :title="statusModel == 'expand' ? '收起' : '展开'"
-                        @click="onStatusClick" />
+                    <Icon :type="'arrow'" :title="statusModel == 'expand' ? '收起' : '展开'" @click="onStatusClick" />
                 </div>
             </slot>
         </div>
@@ -29,7 +28,6 @@ import { useAnimation } from "snail.view";
 import { useTemplateRef } from "vue";
 import Icon from "../base/icon.vue";
 import { FoldEvents, FoldOptions, FoldStatus } from "./models/fold-model";
-import { getFoldStatusDraw } from "./utils/fold-util";
 import { useReactive } from "../base/reactive";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -42,8 +40,6 @@ const { watcher } = useReactive();
 const statusModel = defineModel<FoldStatus>("status", { default: "expand" });
 //      监听折叠状态，进行样式计算
 watcher(statusModel, updateFoldStyle);
-/**     展开、收起图标绘制路径 */
-const statusIcon: string = getFoldStatusDraw();
 /**     折叠面板内容区域引用 */
 const foldBodyDom = useTemplateRef("foldBody");
 //  2、可选配置选项

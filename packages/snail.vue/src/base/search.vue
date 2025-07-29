@@ -2,10 +2,10 @@
 <template>
     <div class="snail-search" :class="props.readonly ? 'readonly' : ''">
         <input type="search" :placeholder="props.placeholder" :readonly="props.readonly == true"
-            v-model.trim="textModel" @keyup.enter="onSearch" />
+            v-model.trim="textModel" @keyup="onSearch($event)" />
         <div>
             <Icon class="search-button" :type="'custom'" :draw="searchIon" :size="24" :color="'#707070'"
-                @click="onSearch" />
+                @click="onSearch(undefined)" />
         </div>
     </div>
 </template>
@@ -30,9 +30,14 @@ defineOptions({ name: "Search", inheritAttrs: true, });
 /**
  * 搜索按钮点击
  */
-function onSearch() {
-    //  后期做一些验证，将旧值存储起来，没变化时不做触发
-    props.readonly || emits("search", textModel.value);
+function onSearch(evt: KeyboardEvent) {
+    if (props.readonly == true) {
+        return;
+    }
+    //  enter 回车健，或者自动完成时，触发搜索逻辑：后期做一些验证，将旧值存储起来，没变化时不做触发
+    if (evt == undefined || evt.code == "Enter" || props.autoComplete == true) {
+        emits("search", textModel.value)
+    }
 }
 
 </script>

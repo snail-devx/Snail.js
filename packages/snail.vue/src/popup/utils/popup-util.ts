@@ -95,7 +95,7 @@ const initPopupApp: () => void = (function () {
              *          定义descriptors不定义为 ref还不行，传过去虽然是Array，但openDialog中push元素后，组件内部接收不到
              */
             popupApp = createApp(PopupApp, { descriptors: DESCRIPTORS.value });
-            triggerAppCreated(popupApp).mount(container);
+            triggerAppCreated(popupApp, "popup").mount(container);
         }
     }
 })();

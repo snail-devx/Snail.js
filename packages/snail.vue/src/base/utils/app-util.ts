@@ -6,14 +6,14 @@ import { App, createApp } from "vue";
 import { mustFunction, mustObject, IScope, useScope, removeFromArray } from "snail.core";
 
 /** 应用创建后的通知方法集合 */
-const appCreatedFns: Array<(app: App) => void> = [];
+const appCreatedFns: Array<(app: App, type?: string) => void> = [];
 
 /**
  * app实例创建完之后的回调通知
  * @param fn 回调通知
  * @returns 通知句柄，可销毁回调通知，一般在外部销毁时执行
  */
-export function onAppCreated(fn: (app: App) => void): IScope {
+export function onAppCreated(fn: (app: App, type?: string) => void): IScope {
     mustFunction(fn, "fn");
     appCreatedFns.push(fn);
     return useScope().onDestroy(() => removeFromArray(appCreatedFns, fn));
@@ -21,9 +21,10 @@ export function onAppCreated(fn: (app: App) => void): IScope {
 /**
  * 触发app创建后事件
  * @param app 创建的app实例
+ * @param type app创建类型；满足区分特定app实例使用
  * @returns app自身
  */
-export function triggerAppCreated(app: App): App {
-    appCreatedFns.forEach(fn => fn(app));
+export function triggerAppCreated(app: App, type?: string): App {
+    appCreatedFns.forEach(fn => fn(app, type));
     return app;
 }

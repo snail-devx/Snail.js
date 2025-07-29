@@ -68,7 +68,7 @@ export function usePopup(): IPopupManager & IScope {
             scope = useAsyncScope<T>(deferred.promise);
             scope.onDestroy(() => destroyPopup(popupId, extOptions.popupStatus, deferred));
         }
-        return scope.destroyed ? scope : scopes.add(scope);
+        return scope.destroyed || manager.destroyed ? scope : scopes.add(scope);
     }
     /**
      * 对话框
@@ -86,7 +86,7 @@ export function usePopup(): IPopupManager & IScope {
             scope = useAsyncScope<T>(deferred.promise);
             monitorDialog(popupId, scope, extOptions.dialogStatus, deferred, options.transitionDuration);
         }
-        return scope.destroyed ? scope : scopes.add(scope);
+        return scope.destroyed || manager.destroyed ? scope : scopes.add(scope);
     }
     /**
     * 跟随弹窗
@@ -122,7 +122,7 @@ export function usePopup(): IPopupManager & IScope {
             scope = useAsyncScope<T>(deferred.promise);
             scope.onDestroy(() => destroyPopup(popupId, extOptions.followStatus, deferred));
         }
-        return scope.destroyed ? scope : scopes.add(scope);
+        return scope.destroyed || manager.destroyed ? scope : scopes.add(scope);
     }
 
     // *****************************************   👉  弹窗的扩充方法：方便调用    **********************************
@@ -166,7 +166,9 @@ export function usePopup(): IPopupManager & IScope {
      * @returns 弹窗异步作用域，外部可手动关闭弹窗；为undefined则检测通过
      */
     function checkOptions<T, R>(options: T, checkFunc: (options: T) => string | undefined): IAsyncScope<R> | undefined {
-        const message = checkFunc(options);
+        const message = manager.destroyed == true
+            ? "checkOptions: manager destroyed."
+            : checkFunc(options);
         if (isStringNotEmpty(message) == true) {
             const deferred = defer<R>();
             deferred.reject(message);

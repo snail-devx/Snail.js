@@ -10,6 +10,12 @@
         box-sizing: border-box !important;
     }
 
+    //  文本展示，默认14px
+    div,
+    span {
+        font-size: 14px;
+    }
+
     //  input 输入框等，去掉默认的外边框；仅针对输入类型的，后续逐步扩充。checkbox、radio等先忽略
     input[type="search"],
     input[type="text"],
@@ -19,6 +25,9 @@
     input[type="number"] {
         outline: 0 !important;
         appearance: none !important;
+
+        //  给个最小宽度，避免走默认导致部分宽度不够时撑开外部容器的情况
+        min-width: 10px;
 
         margin: 0;
         border: 1px solid #DDDFED;
@@ -52,4 +61,19 @@
         margin: 0;
         padding: 0;
     }
+}
+
+// *****************************************   👉  一些公共样式    *****************************************
+@import "snail.view/dist/styles/base-mixins.less";
+
+.snail-app {
+
+    //  文本提示信息
+    .text-tips {
+        //  文本溢出时出省略号
+        .text-ellipsis();
+        //  提示文本样式：400 weight，14px size，#8A9099 color
+        .tip-text();
+    }
+
 }
