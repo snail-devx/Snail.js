@@ -133,7 +133,7 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectNode<any>, 
 
         childFollowTScope = follow(childFollowTargetDom, {
             name: "SelectPopup",
-            followY: "center",
+            followY: "ratio",
             spaceClient: 10,
             props: selectPopupOptions,
         });

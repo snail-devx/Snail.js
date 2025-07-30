@@ -25,34 +25,42 @@ export type FollowOptions = PopupOptions & {
     followHeight?: boolean;
 
     /**
-     * x轴方向上跟随 target 的效果
-     * - start ： 和 target 起始位置（left）一致
-     * - center：和 target 中心位置一致
-     * - end ： 和 target 结束位置（right）一致
-     * - 不指定则自动计算，得到合适位置（尽可能将元素展示全）；计算顺序
-     * - -- 右侧（end）展示，左侧（start）展示，followX = start、followX = end、followX=center、微调left值
+     * x轴方向上的跟随策略
+     * - 支持传入一个或者多个，依次尝试选举最优位置（全宽度展示，否则取最大宽度位置）
+     * - 不传入则按照默认策略；["after","before","start","end","center","ratio"]
+     * - 可选策略值如下：
+     * - - start  ： 起点跟随，和 target 起始位置（left）一致
+     * - - end    ： 终点跟随，和 target 结束位置（right）一致
+     * - - center ： 中心跟随，和 target 中心位置一致
+     * - - before ： 之前跟随，组件在 target 左侧展示
+     * - - after  ： 之后跟随，组件在 target 右侧展示
+     * - - ratio  ： 比例跟随，按比例（target中心点/窗口宽度）锚定位置，动态计算left值。
      */
-    followX?: "start" | "center" | "end";
+    followX?: FollowStrategy | FollowStrategy[];
     /**
-     * y轴方向上的位置跟随效果
-     * - start ： 和 target 起始位置（top）一致
-     * - center：和 target 中心位置一致
-     * - end ： 和 target 结束位置（bottom）一致
-     * - 不指定则自动计算，得到合适位置（尽可能将元素展示全）；计算顺序
-     * - -- 底部（end）展示，顶部（start）展示，followY = start、followY=end、followY=center、微调top值
+     * y轴方向上的跟随策略
+     * - 支持传入一个或者多个，依次尝试选举最优位置（全高度展示，否则取最大高度位置）
+     * - 不传入则按照默认策略；["after","before","start","end","center","ratio"]
+     * - 可选策略值如下：
+     * - - start  ： 起点跟随，和 target 起始位置（top）一致
+     * - - end    ： 终点跟随，和 target 结束位置（bottom）一致
+     * - - center ： 中心跟随，和 target 中心位置一致
+     * - - before ： 之前跟随，组件在 target 顶部展示
+     * - - after  ： 之后跟随，组件在 target 底部展示
+     * - - ratio  ： 比例跟随，按比例（target中心点/窗口高度）锚定位置，动态计算top值。
      */
-    followY?: "start" | "center" | "end";
+    followY?: FollowStrategy | FollowStrategy[];
 
     /**
      * x轴方向上 target 之间的留白空间
-     * - 默认0；仅在 followX 为 start、end时生效 
+     * - 默认0； followX 为 center、ratio 时间距失效
      * - 增加间距，提升展示效果
      * - 
      */
     spaceX?: number;
     /**
      * y轴方向上 target 之间的留白空间
-     * - 默认0；仅在 followY 为 start、end时生效 
+     * - 默认0；followY 为 center、ratio 时间距失效
      * - 增加间距，提升展示效果
      */
     spaceY?: number;
@@ -84,6 +92,11 @@ export type FollowOptions = PopupOptions & {
      */
     closeOnTarget?: boolean;
 };
+/**
+ * 跟随策略
+ * - 详细值定义，参照 FollowOptions.followX 和 FollowOptions.followY
+ */
+export type FollowStrategy = "start" | "center" | "end" | "before" | "after" | "ratio";
 
 /**
  * 跟随弹窗 句柄

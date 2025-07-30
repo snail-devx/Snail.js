@@ -1,8 +1,8 @@
 /**
  * 跟随弹窗 助手方法
  */
-import { isNumberNotNaN } from "snail.core";
-import { FollowOptions } from "../models/follow-model";
+import { isArray, isArrayNotEmpty, isNumberNotNaN, isString, isStringNotEmpty, throwIfFalse, throwIfUndefined } from "snail.core";
+import { FollowOptions, FollowStrategy } from "../models/follow-model";
 
 /**
  * 检测弹窗配置选项
@@ -29,8 +29,10 @@ export function calcFollowX(options: FollowOptions, target: DOMRectReadOnly, wid
         return { left: `-${width}px` };
     }
     //  计算left值，若操作了宽度值，则强制更新回去：
-    const position = deducePosition(options.followX, target.left, target.right, width, window.innerWidth, space, spaceClient)
-        || deduceAutoPosition(target.left, target.right, width, window.innerWidth, space, spaceClient);
+    const position = electPosition(
+        getFollowStrategy(options.followX) || ["after", "before", "start", "end", "center", "ratio"],
+        target.left, target.right, width, window.innerWidth, space, spaceClient
+    );
     const style: { left: string, width?: string } = { left: `${position.start}px` };
     position.size == undefined || (style.width = `${position.size}px`);
     return style;
@@ -50,14 +52,65 @@ export function calcFollowY(options: FollowOptions, target: DOMRectReadOnly, hei
         return { top: `-${height}px` };
     }
     //  计算top值，若操作了高度值，则强制更新回去：
-    const position = deducePosition(options.followY, target.top, target.bottom, height, window.innerHeight, space, spaceClient)
-        || deduceAutoPosition(target.top, target.bottom, height, window.innerHeight, space, spaceClient);
+    const position = electPosition(
+        getFollowStrategy(options.followY) || ["after", "before", "start", "end", "center", "ratio"],
+        target.top, target.bottom, height, window.innerHeight, space, spaceClient
+    );
     const style: { top?: string, height?: string } = { top: `${position.start}px` };
     position.size == undefined || (style.height = `${position.size}px`);
     return style;
 }
 
-//#region ***************************************************************** 私有方法 *****************************************************************
+//#region ***************************************************************** 私有变量、方法 *****************************************************************
+/**
+ * 获取跟随策略
+ * @param strategy 
+ * @returns 策略数组，未传入则返回undefined
+ */
+function getFollowStrategy(strategy?: FollowStrategy | FollowStrategy[]): FollowStrategy[] | undefined {
+    return isStringNotEmpty(strategy)
+        ? [strategy as FollowStrategy]
+        : isArrayNotEmpty(strategy)
+            ? strategy as FollowStrategy[]
+            : undefined;
+}
+/**
+ * 选举跟随位置
+ * @param strategy 跟随策略数组
+ * @param targetStart 目标元素起始位置，left、top
+ * @param targetEnd 目标元素结束位置，right、bottom
+ * @param contentSize 当前内容元素大小，width、height
+ * @param clientSize 客户端大小：window.innerWidth、window.innerHeight
+ * @param space 留白空间：offsetX、offsetY
+ * @param spaceClient 边缘位置
+ * @returns 
+ */
+function electPosition(strategy: FollowStrategy[], targetStart: number, targetEnd: number, contentSize: number, clientSize: number, space: number, spaceClient: number)
+    : { start: number, size?: number } {
+    var maxPosition: { start: number, size?: number } = undefined;
+    for (const fs of strategy) {
+        const tmp = deducePosition(fs, targetStart, targetEnd, contentSize, clientSize, space, spaceClient);
+        //  位置计算无效，继续尝试
+        if (tmp == undefined) {
+            continue;
+        }
+        //  无需调整尺寸，即可展示，则直接返回
+        if (tmp.size == undefined) {
+            return tmp;
+        }
+        //  记录最大尺寸展示位置
+        if (maxPosition == undefined || maxPosition.size < tmp.size) {
+            maxPosition = tmp;
+        }
+    }
+    //  选择最大尺寸位置，若无则报错
+    if (maxPosition == undefined) {
+        const msg = `electPosition: invalid follow strategy, deduce position failed. strategy: ${strategy.join(",")}.`;
+        throw new Error(msg);
+    }
+    return maxPosition;
+}
+
 /**
  * 位置推断：传入固定策略进行推断
  * @param strategy 位置类型；传入非支持值则返回undefined
@@ -69,35 +122,38 @@ export function calcFollowY(options: FollowOptions, target: DOMRectReadOnly, hei
  * @param spaceClient 边缘位置
  * @returns 推断结果，undefined表示 strategy 值无效
  */
-function deducePosition(strategy: "start" | "center" | "end", targetStart: number, targetEnd: number, contentSize: number, clientSize: number, space: number, spaceClient: number)
+function deducePosition(strategy: FollowStrategy, targetStart: number, targetEnd: number, contentSize: number, clientSize: number, space: number, spaceClient: number)
     : { start: number, size?: number } | undefined {
+    //  计算一些变量，方便后面复用
+    /**     最大的结束位置 */
+    const maxEnd = clientSize - spaceClient;
     //  根据策略计算位置
     switch (strategy) {
-        //  跟随起始位置：看结束位置是否够边缘位置。起始位置 + 间距
+        //  target结束位置 之后展示；展示不全，则缩放尺寸
+        case "after": {
+            const start = targetEnd + space;
+            return {
+                start,
+                size: start + contentSize > maxEnd ? maxEnd - start : undefined,
+            }
+        }
+        //  target开始位置 之前展示；展示不全，则缩放尺寸
+        case "before": {
+            const start = targetStart - contentSize - space;
+            return {
+                start: Math.max(spaceClient, start),
+                size: start < spaceClient ? (targetStart - space - spaceClient) : undefined,
+            }
+        }
+        //  和target相同开始值；展示不全，则缩放尺寸
         case "start": {
-            const maxEnd = clientSize - spaceClient;
             const start = targetStart + space;
             return {
                 start,
                 size: start + contentSize > maxEnd ? maxEnd - start : undefined,
             };
         }
-        //  和target中心点保持一致：取消间距
-        case "center": {
-            const center = parseInt(targetStart + (targetEnd - targetStart) / 2 as any);
-            //  起始位置，展示不全，则计算size偏移量，并强制起始位置为 spaceClient
-            var tmp = parseInt(center - contentSize / 2 as any);
-            var sizeOffset: number = Math.min(0, tmp - spaceClient);
-            const start = sizeOffset < 0 ? spaceClient : tmp;
-            //  结束位置是否能够展示全，展示不全，继续调整size偏移量
-            tmp = parseInt(center + contentSize / 2 as any);
-            sizeOffset += Math.min(0, clientSize - spaceClient - tmp);
-            return {
-                start,
-                size: sizeOffset < 0 ? contentSize + sizeOffset : undefined
-            };
-        }
-        //  跟随结束位置：固定结束位置，起始位置若超过 spaceClient，则需要调整size。结束位置 - 间距
+        //  和target相同结束位置；展示不全，则缩放尺寸
         case "end": {
             const tmpStart = targetEnd - space - contentSize;
             const sizeOffset = Math.min(0, tmpStart - spaceClient);
@@ -106,55 +162,42 @@ function deducePosition(strategy: "start" | "center" | "end", targetStart: numbe
                 size: sizeOffset < 0 ? contentSize + sizeOffset : undefined
             };
         }
-        //  其他情况，不属于制式规则，返回undefined
-        default: return undefined;
-    }
-}
-
-/**
- * 推断的【自动位置】
- * @param targetStart 目标元素起始位置，left、top
- * @param targetEnd 目标元素结束位置，right、bottom
- * @param contentSize 当前内容元素大小，width、height
- * @param clientSize 客户端大小
- * @param space 留白空间：offsetX、offsetY
- * @param spaceClient 边缘位置
- * @return 最合适的跟随效果（位置+大小）
- */
-function deduceAutoPosition(targetStart: number, targetEnd: number, contentSize: number, clientSize: number, space: number, spaceClient: number)
-    : { start: number, size?: number } {
-    const maxEnd = clientSize - spaceClient;
-    //  尝试在targetEnd后面全部展示
-    var tmpStart = targetEnd + space;
-    if (tmpStart + contentSize <= maxEnd) {
-        return { start: tmpStart };
-    }
-    //  尝试在targetStart前面全部展示
-    tmpStart = targetStart - contentSize - space;
-    if (tmpStart >= spaceClient) {
-        return { start: tmpStart };
-    }
-    //  尝试 follow效果：start、end、center处理；无需调整大小时则是最完美状态，则直接返回
-    for (const strategy of ["start", "end", "center"]) {
-        const position = deducePosition(strategy as any, targetStart, targetEnd, contentSize, clientSize, space, spaceClient);
-        if (position.size == undefined) {
-            return position;
+        //  和target相同中心点；展示不全，则缩放尺寸；取消间距
+        case "center": {
+            const center = parseInt(targetStart + (targetEnd - targetStart) / 2 as any);
+            //  起始位置，展示不全，则计算size偏移量，并强制起始位置为 spaceClient
+            var tmp = parseInt(center - contentSize / 2 as any);
+            var sizeOffset: number = Math.min(0, tmp - spaceClient);
+            const start = sizeOffset < 0 ? spaceClient : tmp;
+            //  结束位置是否能够展示全，展示不全，继续调整size偏移量
+            tmp = parseInt(center + contentSize / 2 as any);
+            sizeOffset += Math.min(0, maxEnd - tmp);
+            return {
+                start,
+                size: sizeOffset < 0 ? contentSize + sizeOffset : undefined
+            };
+        }
+        //  按比例（target中心点/窗口尺寸）锚定位置，动态计算位置；展示不全，则缩放尺寸
+        case "ratio": {
+            const maxSize = maxEnd - spaceClient;
+            //  能展示全，则等比例微调start值：此时不考虑 space 间距值
+            if (contentSize < maxSize) {
+                const center = parseInt(targetStart + (targetEnd - targetStart) / 2 as any);
+                const startSize = parseInt((center / clientSize) * contentSize as any);
+                return {
+                    start: center - startSize,
+                }
+            }
+            //  展示不全，直接贴边展示；等于最大值时，不调整size值
+            return {
+                start: spaceClient,
+                size: contentSize == maxSize ? undefined : maxSize
+            };
+        }
+        //  其他情况，不属于制式规则，返回undefined；后期考虑报错
+        default: {
+            return undefined;
         }
     }
-    //  尝试微调start值，进行展示，此时不考虑 space 间距值
-    const maxSize = maxEnd - spaceClient;
-    //      能展示全，则等比例微调start值：此时不考虑 space 间距值
-    if (contentSize < maxSize) {
-        const center = parseInt(targetStart + (targetEnd - targetStart) / 2 as any);
-        const startSize = parseInt((center / clientSize) * contentSize as any);
-        return {
-            start: center - startSize,
-        }
-    }
-    //      展示不全，直接贴边展示；等于最大值时，不调整size值
-    return {
-        start: spaceClient,
-        size: contentSize == maxSize ? undefined : maxSize
-    };
 }
 //#endregion
