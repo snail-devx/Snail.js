@@ -36,7 +36,7 @@ const emits = defineEmits<SelectEvents<any>>();
 const valuesModel = defineModel<SelectItem<any>[]>({ default: [] });
 const { follow } = usePopup();
 /** 【选择项】节点集合 */
-const selectNodes: SelectNode<any>[] = buildSelectNodes(props.items);
+const selectNodes: Readonly<SelectNode<any>[]> = Object.freeze(buildSelectNodes(props.items));
 /** 组件根元素*/
 const rootDom = useTemplateRef("select");
 /** 已选结果数据 */

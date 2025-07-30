@@ -2,7 +2,7 @@
  * 选项菜单组件 助手方法
  */
 
-import { isArrayNotEmpty, isBoolean, isStringNotEmpty } from "snail.core";
+import { isArrayNotEmpty, isBoolean, isStringNotEmpty, newId } from "snail.core";
 import { SelectItem, SelectNode, SelectOptions } from "../models/select-model";
 import { shallowRef } from "vue";
 
@@ -12,10 +12,12 @@ import { shallowRef } from "vue";
  * @param items 
  * @returns 
  */
-export function buildSelectNodes(items: SelectItem<any>[]): SelectNode<any>[] {
+export function buildSelectNodes(items: SelectItem<any>[]): Readonly<SelectNode<any>[]> {
     return isArrayNotEmpty(items)
         ? items.map(item => {
-            const children = item.type == "group" ? buildSelectNodes(item.children) : undefined;
+            const children = item.type == "group"
+                ? buildSelectNodes(item.children)
+                : undefined;
             //  返回前，对item做冻结处理，并干掉children属性
             {
                 item = { ...item };
@@ -25,11 +27,13 @@ export function buildSelectNodes(items: SelectItem<any>[]): SelectNode<any>[] {
 
                 Object.freeze(item);
             }
-            return {
-                item, children,
+            return Object.freeze<SelectNode<any>>({
+                id: newId(),
+                item,
+                children,
                 selected: shallowRef(false),
                 disabled: shallowRef(false)
-            };
+            });
         })
         : [];
 }
@@ -39,7 +43,7 @@ export function buildSelectNodes(items: SelectItem<any>[]): SelectNode<any>[] {
  * @param nodes 
  * @param values 
  */
-export function refreshSelectNodes(nodes: SelectNode<any>[], values: SelectItem<any>[]): SelectNode<any>[] {
+export function refreshSelectNodes(nodes: Readonly<SelectNode<any>[]>, values: SelectItem<any>[]): Readonly<SelectNode<any>[]> {
     //  取消 disabled属性；查看是否为选中将诶点
     values = values || [];
     if (isArrayNotEmpty(nodes) == true) {
@@ -58,7 +62,7 @@ export function refreshSelectNodes(nodes: SelectNode<any>[], values: SelectItem<
  * @param text 
  * @returns 是否有命中节点
  */
-export function searchSelectNode(nodes: SelectNode<any>[], text: string): boolean {
+export function searchSelectNode(nodes: Readonly<SelectNode<any>[]>, text: string): boolean {
     if (isArrayNotEmpty(nodes) == false) {
         return false;
     }

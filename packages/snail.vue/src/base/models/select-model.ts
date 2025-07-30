@@ -1,5 +1,6 @@
 import { ShallowRef } from "vue";
 import { PlaceholderOptions, ReadonlyOptions } from "./base-mode";
+import { IScope } from "snail.core";
 
 /**
  * 选项菜单 基础配置选项
@@ -116,7 +117,7 @@ export type SelectPopupOptions<T> = Omit<SelectBaseOptions<T>, "items"> & {
      *      multiple                是否【多选模式】
      */
 
-    items: SelectNode<T>[];
+    items: Readonly<SelectNode<T>[]>;
 
     /**
      * 已选【选择项】
@@ -131,10 +132,26 @@ export type SelectPopupOptions<T> = Omit<SelectBaseOptions<T>, "items"> & {
 }
 
 /**
+ * 选项菜单组件弹窗配置选项扩展
+ */
+export type SelectPopupOptionsExtend = {
+    /**
+     * 子选项弹窗的销毁定时器
+     * - 父级弹窗可根据需要销毁定时器，取消子选择弹窗销毁
+     * - 鼠标离开弹窗时，做延迟销毁；避免回到 此弹窗 的父【选择项】时，又重新打开此弹窗
+     */
+    childDestroyTimer: ShallowRef<IScope>;
+}
+
+/**
  * 【选择项】节点对象
  * - 用于 select-popup.vue 组件
  */
 export type SelectNode<T> = {
+    /**
+     * 节点Id
+     */
+    id: string;
     /**
      * 【选择项】节点
      */
@@ -143,7 +160,7 @@ export type SelectNode<T> = {
      * 【选择项】子节点
      * - 仅 item.type 为 group 时生效
      */
-    children?: SelectNode<T>[];
+    children?: Readonly<SelectNode<T>[]>;
     /**
      * 是否选中
      */
@@ -153,4 +170,24 @@ export type SelectNode<T> = {
      * - true ；禁用，不显示自身、和子节点
      */
     disabled: ShallowRef<boolean>;
+}
+/**
+ * 【选择项】节点事件
+ */
+export type SelectNodeEvents = {
+    /**
+     * 点击事件
+     * @param el 【选择项】节点dom元素
+     */
+    click: [el: HTMLDivElement],
+    /**
+     * 鼠标进入事件
+     * @param el 【选择项】节点dom元素
+     */
+    enter: [el: HTMLDivElement],
+    /**
+     * 鼠标离开事件
+     * @param el 【选择项】节点dom元素
+     */
+    leave: [el: HTMLDivElement]
 }
