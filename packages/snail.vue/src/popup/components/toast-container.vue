@@ -1,14 +1,12 @@
 <!-- 提示组件：
-    模拟Toast提示，兼容PC、移动端 
-    不直接对外提供，外部使用toast方法使用
+    1、模拟Toast提示，兼容PC、移动端 
+    2、不直接对外提供，外部使用toast方法使用
 -->
 <template>
-    <div ref="toast" class="snail-toast" :class="{ 'show-toast': showToastRef }" @mouseenter="onMouseEvent(false)"
-        @mouseleave="onMouseEvent(true)">
-        <!-- 关闭按钮 -->
+    <div class="snail-toast" :class="{ 'show-toast': showToastRef }" :style="{ 'z-index': zIndex }"
+        @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
         <Icon type="close" class="close-icon" :fill="closeFillRef" :size="20" @mouseenter="closeFillRef = 'red'"
             @mouseleave="closeFillRef = '#707070'" @click="onToastClose" />
-        <!-- 图标和文本 -->
         <div class="icon" v-if="props.type">
             <Icon :type="props.type" fill="black" :size="18" />
         </div>
@@ -19,11 +17,12 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { ToastOptions } from "../models/toast-model";
 import Icon from "../../base/icon.vue"
-import { PopupHandle } from "../manager";
+import { PopupDescriptor, PopupHandle, PopupOptions } from "../manager";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<ToastOptions & PopupHandle<any>>();
+const { options, zIndex, extOptions } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
+const props: ToastOptions = options.props as any;
 /** 是否显示toast弹窗 */
 const showToastRef = ref(false);
 /** 计算出来的填充颜色 */
@@ -49,7 +48,7 @@ function onMouseEvent(isLeave: boolean) {
  */
 function onToastClose() {
     showToastRef.value = false;
-    setTimeout(props.closePopup, 200);
+    setTimeout(extOptions.closePopup, 200);
 }
 
 // *****************************************   👉  组件渲染    *****************************************

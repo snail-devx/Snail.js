@@ -5,27 +5,27 @@
 <template>
     <!-- <Transition name="snail-follow">
     </Transition> -->
-    <Dynamic class="snail-follow" :name="props.name" :component="props.component" :url="props.url"
-        v-if="loadingRef && props.followStatus.value != 'close'" v-bind="props.props" :class="props.followStatus.value"
-        :style="rootStyleRef" :in-follow="true" :close-follow="closeFollow" :follow-status="props.followStatus" />
+    <Dynamic class="snail-follow" :name="options.name" :component="options.component" :url="options.url"
+        v-if="loadingRef == true && popupStatus.value != 'close'" :style="{ 'z-index': zIndex }"
+        :class="popupStatus.value" v-bind:style="rootStyleRef" v-bind="options.props" :in-follow="true"
+        :close-follow="closeFollow" :follow-status="popupStatus" />
 </template>
 
 <script setup lang="ts">
-import { shallowRef, onMounted, useTemplateRef, nextTick, watch, getCurrentInstance, ShallowRef } from "vue";
+import { shallowRef, onMounted, nextTick, getCurrentInstance, ShallowRef } from "vue";
 import Dynamic from "../../container/dynamic.vue";
-import { FollowExtend, FollowHandle, FollowOptions } from "../models/follow-model";
+import { FollowExtend, FollowOptions } from "../models/follow-model";
 import { calcFollowX, calcFollowY } from "../utils/follow-util";
 import { ElementSize, IObserver, useObserver, WidthStyle, HeightStyle, PositionStyle } from "snail.view";
-import { useReactive } from "../../base/reactive";
 import { useTimer } from "snail.core";
+import { PopupDescriptor } from "../models/popup-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<FollowOptions & FollowHandle<any> & FollowExtend>();
-const { closeFollow } = props;
+const { options, extOptions, popupStatus, zIndex } = defineProps<PopupDescriptor<FollowOptions, FollowExtend<any>>>();
+const { closeFollow } = extOptions;
 const { onClient, onSize, onEvent } = useObserver() as IObserver;
 const { onTimeout } = useTimer();
-const { watcher } = useReactive();
 /** 是否进行组件加载：为了让 Transition 生效，在 onMounted 设置为 true */
 const loadingRef = shallowRef<boolean>(false);
 /**  跟随组件根节点*/
@@ -45,27 +45,23 @@ function buildFollow() {
     if (rootDom.value == undefined) {
         return;
     }
-    const targetRect: DOMRectReadOnly = props.target.getBoundingClientRect();
+    const targetRect: DOMRectReadOnly = extOptions.target.getBoundingClientRect();
     //  计算组件实际尺寸：若启用了跟随宽度、高度，则强制和target尺寸保持一致
-    const rootSize: ElementSize = Object.create(null);
-    {
-        rootDom.value.style.width = props.followWidth ? `${targetRect.width}px` : "";
-        rootDom.value.style.height = props.followHeight ? `${targetRect.height}px` : "";
-        const rootRect: DOMRectReadOnly = rootDom.value.getBoundingClientRect();
-        Object.assign<ElementSize, ElementSize>(rootSize, { width: rootRect.width, height: rootRect.height })
-    }
+    rootDom.value.style.width = options.followWidth ? `${targetRect.width}px` : "";
+    rootDom.value.style.height = options.followHeight ? `${targetRect.height}px` : "";
+    var rootRect: DOMRectReadOnly = rootDom.value.getBoundingClientRect();
     //  进行跟随位置计算：结合高度、宽度做推断
     rootStyleRef.value = Object.assign({},
-        calcFollowX(props, targetRect, rootSize.width),
-        calcFollowY(props, targetRect, rootSize.height),
+        calcFollowX(options, targetRect, rootRect.width),
+        calcFollowY(options, targetRect, rootRect.height),
     )
     console.log("target rect: ", targetRect);
     console.log("follow root style: ", rootStyleRef.value);
-    //  计算完成后，重新取一下根元素尺寸缓存起来
-    {
-        const rootRect: DOMRectReadOnly = rootDom.value.getBoundingClientRect();
-        Object.assign<ElementSize, ElementSize>(preSize, { width: rootRect.width, height: rootRect.height });
-    }
+    //  若宽高变化，则先强制设置；然后重新取一下根元素尺寸缓存起来
+    rootStyleRef.value.width && (rootDom.value.style.width = rootStyleRef.value.width);
+    rootStyleRef.value.height && (rootDom.value.style.height = rootStyleRef.value.height);
+    rootRect = rootDom.value.getBoundingClientRect();
+    Object.assign<ElementSize, ElementSize>(preSize, { width: rootRect.width, height: rootRect.height });
 }
 
 /**
@@ -89,55 +85,29 @@ onMounted(() => {
             : instance.vnode.el.nextElementSibling;
         rootDom.value.classList.contains("snail-follow") || rootDom.value.classList.add("snail-follow");
         //  第一次触发时，为初始化计算，不做处理
-        onClient(props.target, () => preSize.width == 0 && preSize.height == 0
-            ? buildFollow()
-            : props.closeOnTarget && closeFollow()
+        onClient(extOptions.target, () => preSize.width != 0 && preSize.height != 0 && options.closeOnTarget
+            ? closeFollow()
+            : buildFollow()
         );
         //  监听【跟随组件】大小变化；延迟启动（避免初始化时多次执行计算）
         onTimeout(onSize, 1000, rootDom.value, onRootSize);
         //  监听全局事件，进行rezie、esc和mask处理；延迟启动，开发时发现vue会在外部点击时，触发一下事件，事件冒泡到了window上
         onTimeout(function () {
-            onEvent(window, "resize", () => props.closeOnResize == true
+            onEvent(window, "resize", () => options.closeOnResize
                 ? closeFollow(undefined)
                 : buildFollow()
             );
-            onEvent(window, "keyup", (evet: KeyboardEvent) => props.closeOnEscape == true
+            onEvent(window, "keyup", (evet: KeyboardEvent) => options.closeOnEscape
                 && evet.key === "Escape" && closeFollow(undefined)
             );
             //  监听点击：非【跟随组件】中的元素点击时才触发时关闭
-            onEvent(window, "click", (event: MouseEvent) => props.closeOnMask == true
+            onEvent(window, "click", (event: MouseEvent) => options.closeOnMask
                 && rootDom.value != event.target
                 && rootDom.value.contains(event.target as HTMLElement) == false
                 && closeFollow(undefined)
             );
         }, 100);
     })
-    // //  监听渲染元素事件
-    // nextTick(() => {
-    //     //  第一次触发时，为初始化计算，不做处理
-    //     onClient(props.target, () => preSize.width == 0 && preSize.height == 0
-    //         ? buildFollow()
-    //         : props.closeOnTarget && closeFollow()
-    //     );
-    //     //  监听【跟随组件】大小变化；延迟启动（避免初始化时多次执行计算）
-    //     onTimeout(onSize, 1000, rootDom.value, onRootSize);
-    // });
-    // //  监听全局事件，进行rezie、esc和mask处理；延迟启动，开发时发现vue会在外部点击时，触发一下事件，事件冒泡到了window上
-    // onTimeout(() => {
-    //     onEvent(window, "resize", () => props.closeOnResize == true
-    //         ? closeFollow(undefined)
-    //         : buildFollow()
-    //     );
-    //     onEvent(window, "keyup", (evet: KeyboardEvent) => props.closeOnEscape == true
-    //         && evet.key === "Escape" && closeFollow(undefined)
-    //     );
-    //     //  监听点击：非【跟随组件】中的元素点击时才触发时关闭
-    //     onEvent(window, "click", (event: MouseEvent) => props.closeOnMask == true
-    //         && rootDom.value != event.target
-    //         && rootDom.value.contains(event.target as HTMLElement) == false
-    //         && closeFollow(undefined)
-    //     );
-    // }, 200);
 });
 </script>
 

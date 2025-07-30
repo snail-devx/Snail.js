@@ -12,6 +12,7 @@ import { useReactive, TreeNode, TreeOptions, components } from "../core";
 
 //#region *******************************   👉  组件定义    *****************************************
 //  👉 基础组件：
+import BaseTest from "./base/base-test.vue";
 import ButtonTest from "./base/button-test.vue";
 import ChooseTest from "./base/choose-test.vue";
 import HeaderFooterTest from "./base/header-footer-test.vue";
@@ -53,6 +54,7 @@ const treeOptions: TreeOptions<Component> = {
         {
             text: "基础组件",
             children: [
+                { text: "基础测试组件", data: BaseTest, clickable: true },
                 { text: "Button 按钮组件", data: ButtonTest, clickable: true },
                 { text: "Choose 选择组件", data: ChooseTest, clickable: true },
                 { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, },
@@ -107,7 +109,7 @@ function onTreeNodeClick(node: TreeNode<Component>) {
 }
 
 onMounted(() => {
-    onTreeNodeClick(treeOptions.nodes[0].children[5]);
+    onTreeNodeClick(treeOptions.nodes[0].children[6]);
 });
 </script>
 

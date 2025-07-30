@@ -2,7 +2,7 @@
  * 公共通用数据结构：
  *  1、在弹窗、模态弹窗、跟随弹窗的效果下复用
  */
-import { Component, ShallowRef } from "vue";
+import { ShallowRef } from "vue";
 import { ComponentOptions } from "../../container/models/component-model";
 
 /**
@@ -39,20 +39,6 @@ export type PopupOptions = ComponentOptions & {
 }
 
 /**
- * 弹窗标识信息
- */
-export type PopupFlagOptions = {
-    /**
-     * 分配给弹窗的Id值
-     */
-    id: number;
-    /**
-     * 实际分配的zIndex值
-     */
-    zIndex: number;
-}
-
-/**
  * 弹出组件句柄
  */
 export type PopupHandle<T> = {
@@ -77,11 +63,36 @@ export type PopupHandle<T> = {
 export type PopupStatus = ShallowRef<"open" | "active" | "unactive" | "close">;
 
 /**
- * 弹窗扩展信息
+ * 弹窗对象描述器
+ * - 给弹窗容器使用，传递过去作为props使用
  */
-export type PopupExtend = {
+export type PopupDescriptor<Options extends PopupOptions, ExtOptions> = {
     /**
-     * 弹窗状态
+     * 弹窗Id
+     * - 自动分配，全局唯一
+     */
+    popupId: string,
+    /**
+     * 弹窗状态：响应式
      */
     popupStatus: PopupStatus;
+
+    /**
+     * 弹窗配置选项
+     * - 由外部传递过来的业务数据配置信息
+     * - 约束具体弹窗的业务组件和业务组件所需props等数据
+     */
+    options: Options;
+
+    /**
+     * 弹窗扩展配置选项
+     * - 由 popup、follow等方法内部组件：如关闭弹窗方法、钩子函数等
+     * - 配合业务组件使用的一些配置数据
+     */
+    extOptions: ExtOptions;
+
+    /**
+     * 实际分配的zIndex值
+     */
+    zIndex: number;
 }

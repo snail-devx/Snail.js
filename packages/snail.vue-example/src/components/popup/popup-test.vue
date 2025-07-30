@@ -19,7 +19,7 @@ defineOptions({ name: "PopupText", inheritAttrs: true, });
 // *****************************************   👉  方法+事件    ****************************************
 function onPopupClick() {
     popup.popup({
-        component: shallowRef(DialogChildContent),
+        component: DialogChildContent,
         props: {
 
         },

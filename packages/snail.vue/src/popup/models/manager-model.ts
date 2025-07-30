@@ -2,7 +2,7 @@ import { IAsyncScope, IScope } from "snail.core";
 import { ComponentOptions } from "../../container/models/component-model";
 import { AllStyle } from "snail.view";
 import { DialogOptions } from "./dialog-model";
-import { PopupFlagOptions, PopupOptions } from "./popup-model";
+import { PopupOptions } from "./popup-model";
 import { Component } from "vue";
 import { ConfirmOptions } from "./confirm-model";
 import { IconType } from "../../base/models/icon-model";
@@ -53,22 +53,4 @@ export interface IPopupManager {
      * @param options 提示框配置选项
      */
     toast(type: IconType, message: string, options?: Omit<ToastOptions, "type" | "message">): void;
-}
-
-/**
- * 弹窗描述器
- */
-export type PopupDescriptor<Options extends PopupOptions, ExtOptions> = PopupFlagOptions & {
-    /**
-     * 弹窗打开的容器组件：如DialogContainer、PopupContainer、、、
-     */
-    container: Component;
-    /**
-     * 弹窗配置选项
-     */
-    options: Options,
-    /**
-     * 扩展数据
-     */
-    extOptions: ExtOptions;
 }

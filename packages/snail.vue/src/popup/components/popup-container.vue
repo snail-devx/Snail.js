@@ -4,31 +4,26 @@
     3、每个弹窗容器就是一个app实例，实现互不干扰
 -->
 <template>
-    <Dynamic class="snail-popup" v-if="loadingRef && props.popupStatus.value != 'close'" :name="props.name"
-        :component="props.component" :url="props.url" :in-popup="props.inPopup" :close-popup="props.closePopup"
-        v-bind="props.props" />
+    <Dynamic class="snail-popup" :name="options.name" :component="options.component" :url="options.url"
+        v-if="loadingRef == true && popupStatus.value != 'close'" :style="{ 'z-index': zIndex }" v-bind="options.props"
+        :in-popup="true" :close-popup="extOptions.closePopup" />
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, onMounted } from "vue";
+import { shallowRef, onMounted } from "vue";
 import Dynamic from "../../container/dynamic.vue";
-import { PopupExtend, PopupFlagOptions, PopupHandle, PopupOptions } from "../models/popup-model";
+import { PopupDescriptor, PopupHandle, PopupOptions } from "../models/popup-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<PopupOptions & PopupHandle<any> & PopupExtend & PopupFlagOptions>();
+const { options, zIndex, extOptions, popupStatus } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
 /** 是否加载组件：模拟出动画效果 */
 const loadingRef = shallowRef<boolean>(false);
 //  2、可选配置选项
 defineOptions({ name: "PopupContainer", inheritAttrs: true, });
 
-// *****************************************   👉  方法+事件    ****************************************
-
 // *****************************************   👉  组件渲染    *****************************************
-onMounted(() => {
-    loadingRef.value = true;
-    //  监听点击和keyup事件，进行弹窗关闭
-});
+onMounted(() => loadingRef.value = true);
 </script>
 
 <style lang="less">

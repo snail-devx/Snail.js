@@ -22,7 +22,7 @@ defineOptions({ name: "DialogTest", inheritAttrs: false, });
  */
 function onOpenClick() {
     const dialog = popup.dialog({
-        component: shallowRef(DialogContent),
+        component: DialogContent,
         closeOnEscape: true,
         closeOnMask: true,
         props: {

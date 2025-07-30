@@ -1,25 +1,25 @@
 <!-- 对话框弹窗容器：支持外部传入动画，不转则使用默认的 -->
 <template>
-    <Transition :name="props.transition || 'snail-dialog'">
-        <div class="snail-dialog" v-if="loadingRef && props.dialogStatus.value != 'close'" :class="props.rootClass"
-            v-bind:class="props.dialogStatus.value" @click.self="props.closeOnMask && props.closeDialog();">
-            <Dynamic class="dialog-body" :name="props.name" :component="props.component" :url="props.url"
-                :in-dialog="props.inDialog" :close-dialog="props.closeDialog" :on-dialog-close="props.onDialogClose"
-                v-bind="props.props" />
+    <Transition :name="options.transition || 'snail-dialog'">
+        <div :class="['snail-dialog', options.rootClass, popupStatus]" :style="{ 'z-index': zIndex }"
+            v-if="loadingRef && popupStatus.value != 'close'" @click.self="options.closeOnMask && closeDialog();">
+            <Dynamic class="dialog-body" :name="options.name" :component="options.component" :url="options.url"
+                v-bind="options.props" :in-dialog="true" :close-dialog="closeDialog" :on-dialog-close="onDialogClose" />
         </div>
     </Transition>
 </template>
 
 <script setup lang="ts">
 import { onMounted, shallowRef } from "vue";
-import { DialogOptions, DialogHandle, DailogExtend } from "../models/dialog-model";
-import { PopupFlagOptions } from "../models/popup-model";
+import { DialogOptions, DialogHandle } from "../models/dialog-model";
+import { PopupDescriptor } from "../models/popup-model";
 import Dynamic from "../../container/dynamic.vue";
 import { useObserver } from "snail.view";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<DialogOptions & DialogHandle<any> & DailogExtend & PopupFlagOptions>();
+const { options, extOptions, popupStatus, zIndex } = defineProps<PopupDescriptor<DialogOptions, DialogHandle<any>> & DialogOptions>();
+const { closeDialog, onDialogClose } = extOptions;
 /** 监听器 */
 const { onEvent } = useObserver();
 /** 是否进行组件加载：为了让 Transition 生效，在 onMounted 设置为 true */
@@ -31,8 +31,8 @@ defineOptions({ name: "DialogContainer", inheritAttrs: true, });
 onMounted(() => {
     loadingRef.value = true;
     onEvent(window, "keyup", (event: KeyboardEvent) => {
-        event.key === "Escape" && props.dialogStatus.value == "active"
-            && props.closeOnEscape && props.closeDialog();
+        event.key === "Escape" && popupStatus.value == "active"
+            && options.closeOnEscape && closeDialog();
     });
 });
 </script>

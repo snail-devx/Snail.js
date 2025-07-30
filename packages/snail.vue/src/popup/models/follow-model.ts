@@ -2,7 +2,7 @@
  * 跟随效果 弹窗
  */
 
-import { PopupExtend, PopupOptions, PopupStatus } from "./popup-model";
+import { PopupOptions, PopupStatus } from "./popup-model";
 
 /**
  * 跟随弹窗 配置选项
@@ -103,13 +103,9 @@ export type FollowHandle<T> = {
 /**
  * 跟随弹窗 扩展配置
  */
-export type FollowExtend = {
+export type FollowExtend<T> = FollowHandle<T> & {
     /**
      * 跟随的目标元素
      */
     target: HTMLElement;
-    /**
-     * 跟随状态
-     */
-    followStatus: PopupStatus;
 }

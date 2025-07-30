@@ -33,8 +33,8 @@ export type DialogOptions = PopupOptions & {
      * 动画持续时间
      * - 配合 transition 使用；单位ms，默认100ms
      * - 外部传入自定义动画时，传入动画持续时间，否则可能导致关闭时动画失效
-     */
-    transitionDuration?: number;
+     * 暂时不对外开放
+    transitionDuration?: number;*/
 
     /**
      * 模态弹窗的自定义class
@@ -63,14 +63,4 @@ export type DialogHandle<T> = {
      * @param fn 关闭时执行的钩子函数，支持异步，返回false时将阻止弹窗关闭
      */
     onDialogClose(fn: () => false | undefined | Promise<false | undefined>): void;
-}
-
-/**
- * 弹窗扩展信息
- */
-export type DailogExtend = {
-    /**
-     * 弹窗状态
-     */
-    dialogStatus: PopupStatus;
 }

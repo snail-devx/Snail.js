@@ -25,7 +25,7 @@ import ChildContent from "./child-content.vue";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const followOpitions: FollowOptions = Object.freeze<FollowOptions>({
-    component: shallowRef(ChildContent),
+    component: ChildContent,
     closeOnEscape: true,
     closeOnMask: true,
     closeOnResize: true,

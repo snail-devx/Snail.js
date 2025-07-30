@@ -34,7 +34,7 @@ defineOptions({ name: "DialogContentTest", inheritAttrs: true, });
 // 👉 方法+事件
 function open() {
     popup.dialog({
-        component: shallowRef(DialogContentTest),
+        component: DialogContentTest,
         props: {
             xxx: 111,
             onCustomEvent(data: number) {
