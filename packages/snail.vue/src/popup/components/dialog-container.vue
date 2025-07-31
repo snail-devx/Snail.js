@@ -44,7 +44,7 @@ onMounted(() => {
 .snail-dialog {
     position: fixed;
     // x、y起始位置：left:0,top:0
-    .left-right-start();
+    .left-top-start();
     // width:100%；height:100%
     .wh-fill();
     // flex 布局：display: flex，align-items、justify-content 都为center

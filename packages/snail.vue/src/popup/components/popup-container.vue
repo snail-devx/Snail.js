@@ -33,6 +33,6 @@ onMounted(() => loadingRef.value = true);
 .snail-popup {
     position: fixed;
     // x、y起始位置：left:0,top:0
-    .left-right-start();
+    .left-top-start();
 }
 </style>

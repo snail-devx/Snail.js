@@ -74,7 +74,7 @@ onUnmounted(() => {
     border-radius: 10px;
     padding: 20px 35px 20px 15px;
     //  通过left、rigth进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)
-    .left-right-center();
+    .left-top-center();
     //  动画展示
     transition: opacity .5s ease;
     opacity: 0;
