@@ -110,6 +110,7 @@ function onTreeNodeClick(node: TreeNode<Component>) {
 
 onMounted(() => {
     onTreeNodeClick(treeOptions.nodes[0].children[6]);
+    // onTreeNodeClick(treeOptions.nodes[3].children[1]);
 });
 </script>
 

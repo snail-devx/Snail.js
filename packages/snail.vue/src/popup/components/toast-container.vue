@@ -3,10 +3,10 @@
     2、不直接对外提供，外部使用toast方法使用
 -->
 <template>
-    <div class="snail-toast" :class="{ 'show-toast': showToastRef }" :style="{ 'z-index': zIndex }"
+    <div class="snail-toast" :class="[popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
         @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
         <Icon type="close" class="close-icon" :fill="closeFillRef" :size="20" @mouseenter="closeFillRef = 'red'"
-            @mouseleave="closeFillRef = '#707070'" @click="onToastClose" />
+            @mouseleave="closeFillRef = '#707070'" @click="closePopup();" />
         <div class="icon" v-if="props.type">
             <Icon :type="props.type" fill="black" :size="18" />
         </div>
@@ -18,17 +18,19 @@ import { ref, onMounted, onUnmounted } from "vue";
 import { ToastOptions } from "../models/toast-model";
 import Icon from "../../base/icon.vue"
 import { PopupDescriptor, PopupHandle, PopupOptions } from "../manager";
+import { IScope, useTimer } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { options, zIndex, extOptions } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
+const { options, extOptions, zIndex, popupStatus, popupTransition } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
+const { onTimeout } = useTimer();
+//  解构一些常用参数
+const { closePopup } = extOptions;
 const props: ToastOptions = options.props as any;
-/** 是否显示toast弹窗 */
-const showToastRef = ref(false);
 /** 计算出来的填充颜色 */
 const closeFillRef = ref("#707070");
 /** 自动销毁时的定时器 */
-var destroyTimer: NodeJS.Timeout;
+var destroyTimer: IScope;
 //  2、可选配置选项
 defineOptions({ name: "ToastContainer", inheritAttrs: true });
 
@@ -39,27 +41,13 @@ defineOptions({ name: "ToastContainer", inheritAttrs: true });
  * @param isLeave 是鼠标离开还是进入
  */
 function onMouseEvent(isLeave: boolean) {
-    destroyTimer && clearTimeout(destroyTimer);
-    destroyTimer = undefined;
-    isLeave && (destroyTimer = setTimeout(onToastClose, 2000));
-}
-/**
- * 关闭toast
- */
-function onToastClose() {
-    showToastRef.value = false;
-    setTimeout(extOptions.closePopup, 200);
+    destroyTimer && destroyTimer.destroy();
+    destroyTimer = isLeave ? onTimeout(closePopup, 1500) : undefined;
 }
 
 // *****************************************   👉  组件渲染    *****************************************
 // 监听大小变化，进行水平、垂直居中处理
-onMounted(() => {
-    destroyTimer = setTimeout(onToastClose, 2000);
-    setTimeout(() => showToastRef.value = true, 1);
-});
-onUnmounted(() => {
-    destroyTimer && clearTimeout(destroyTimer);
-});
+onMounted(() => onMouseEvent(true));
 </script>
 
 <style lang="less">
@@ -73,20 +61,13 @@ onUnmounted(() => {
     max-height: 200px;
     border-radius: 10px;
     padding: 20px 35px 20px 15px;
-    //  通过left、rigth进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)
-    .left-right-center();
-    //  动画展示
-    transition: opacity .5s ease;
-    opacity: 0;
     //  内容展示
     display: flex;
     overflow: hidden;
     color: white;
     background: rgba(0, 0, 0, 0.7);
-
-    &.show-toast {
-        opacity: 1;
-    }
+    //  通过left、rigth进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)
+    .left-top-center();
 
     >svg.close-icon {
         position: absolute;

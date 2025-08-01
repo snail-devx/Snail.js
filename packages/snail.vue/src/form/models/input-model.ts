@@ -1,5 +1,5 @@
 import { BaseStyle, FlexBoxStyle, WidthStyle } from "snail.view"
-import { DisabledOptions, PlaceholderOptions, ReadonlyOptions, TitleOptions } from "../../base/models/base-mode";
+import { DisabledOptions, PlaceholderOptions, ReadonlyOptions, TitleOptions } from "../../base/models/base-model";
 
 /**
  * 输入框配置选项

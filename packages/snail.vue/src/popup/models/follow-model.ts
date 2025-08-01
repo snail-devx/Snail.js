@@ -2,7 +2,8 @@
  * 跟随效果 弹窗
  */
 
-import { PopupOptions, PopupStatus } from "./popup-model";
+import { ShallowRef } from "vue";
+import { PopupHandle, PopupOptions, PopupStatusOptions } from "./popup-model";
 
 /**
  * 跟随弹窗 配置选项
@@ -27,7 +28,7 @@ export type FollowOptions = PopupOptions & {
     /**
      * x轴方向上的跟随策略
      * - 支持传入一个或者多个，依次尝试选举最优位置（全宽度展示，否则取最大宽度位置）
-     * - 不传入则按照默认策略；["after","before","start","end","center","ratio"]
+     * - 不传入则按照默认策略；["start","end","after","before","center","ratio"]
      * - 可选策略值如下：
      * - - start  ： 起点跟随，和 target 起始位置（left）一致
      * - - end    ： 终点跟随，和 target 结束位置（right）一致
@@ -102,23 +103,65 @@ export type FollowStrategy = "start" | "center" | "end" | "before" | "after" | "
  * 跟随弹窗 句柄
  * - 用于在 弹窗组件 内部进行模式判断和关闭跟随弹窗
  */
-export type FollowHandle<T> = {
-    /**
-     * 组件是否处于【跟随弹窗】模式
-     */
-    inFollow?: boolean;
-    /**
-     * 关闭跟随
-     * @param data 关闭时传递数据
-     */
-    closeFollow(data?: T): void;
+export type FollowHandle<T> = PopupHandle<T> & {
 }
 /**
  * 跟随弹窗 扩展配置
  */
-export type FollowExtend<T> = FollowHandle<T> & {
+export type FollowExtend = PopupStatusOptions & {
     /**
      * 跟随的目标元素
      */
     target: HTMLElement;
+
+    /**
+     * x轴方向的跟随策略：响应式
+     * - 基于外部传入的跟随策略，计算选举出来的最优策略值
+     */
+    followX: ShallowRef<FollowStrategy>;
+    /**
+     * y轴方向的跟随策略：响应式
+     * - 基于外部传入的跟随策略，计算选举出来的最优策略值
+     */
+    followY: ShallowRef<FollowStrategy>;
+
+    /**
+     * Follow弹窗是否【钉住】了
+     * - 为true时，closeOnMask、closeOnEscape失效
+     * - 满足 子弹窗 点击等操作时，不自动销毁父级弹窗
+     */
+    pinned: ShallowRef<boolean>;
+}
+
+/**
+ * 跟随策略 配置选项
+ */
+export type FollowStrategyOptions = {
+    /**
+     * x轴的跟随策略
+     */
+    followX?: FollowStrategy,
+    /**
+     * x轴的跟随策略
+     */
+    followY?: FollowStrategy;
+}
+
+/**
+ * 跟随选举结果
+ */
+export type FollowElectResult = {
+    /**
+     * 跟随策略
+     */
+    strategy: FollowStrategy;
+    /**
+     * 开始位置：x/top
+     */
+    start: number;
+    /**
+     * 调整后的尺寸（width/height)
+     * - 为undefined表示无需调整尺寸
+     */
+    size?: number;
 }

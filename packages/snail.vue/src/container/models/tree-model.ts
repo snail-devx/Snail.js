@@ -1,4 +1,4 @@
-import { DisabledOptions } from "../../base/models/base-mode";
+import { DisabledOptions } from "../../base/models/base-model";
 
 /**
  * 树组件配置选项

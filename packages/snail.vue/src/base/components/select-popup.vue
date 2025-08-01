@@ -6,11 +6,10 @@
     5、搜索框需要搜索时，对外发送事件，由【../select.vue】完成搜索处理，并更新选项数据
 -->
 <template>
-    <div v-if="classRef['text-tips']" :class="classRef" @mouseleave="onLeavePopup"
-        @mouseenter.self="mouseStatus = 'Enter'">
+    <div v-if="classRef['text-tips']" :class="classRef" @mouseenter="onEnterPopup" @mouseleave="onLeavePopup">
         暂无可选项
     </div>
-    <div v-else :class="classRef" @mouseleave="onLeavePopup" @mouseenter.self="mouseStatus = 'Enter'">
+    <div v-else :class="classRef" :style="props.popupStyle" @mouseenter="onEnterPopup" @mouseleave="onLeavePopup">
         <Search v-if="props.search" :placeholder="props.searchPlaceholder || '请输入'" :auto-complete="true"
             @search="onSearch" />
         <template v-if="noMatched == false" v-for="node in props.items" :key="node.id">
@@ -26,26 +25,29 @@
 </template>
 
 <script setup lang="ts">
-import { IAsyncScope, isArrayNotEmpty, IScope, newId, tidyString, useTimer } from "snail.core";
-import { shallowRef, computed, onUpdated, ShallowRef, } from "vue";
+import { IAsyncScope, isArrayNotEmpty, IScope, tidyString, useTimer } from "snail.core";
+import { shallowRef, computed, ShallowRef, } from "vue";
 import { usePopup } from "../../popup/manager";
 import { searchSelectNode } from "../utils/select-util";
+import { useReactive } from "../reactive";
 //  依赖的其他vue组件
 import Search from "../search.vue";
 import Empty from "../../prompt/empty.vue";
 import SelectNodeVue from "./select-node.vue";
 //  使用到的数据类型
-import { PopupStatus, } from "../../popup/models/popup-model";
-import { FollowHandle } from "../../popup/models/follow-model";
+import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
 import { SearchEvents } from "../models/search-model";
 import { SelectBaseEvents, SelectItem, SelectNode, SelectPopupOptions, SelectPopupOptionsExtend } from "../models/select-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<SelectPopupOptions<any> & SelectPopupOptionsExtend & FollowHandle<SelectItem<any>[]> & { followStatus: PopupStatus }>();
+const props = defineProps<SelectPopupOptions<any> & SelectPopupOptionsExtend & FollowHandle<SelectItem<any>[]> & FollowExtend>();
 const emits = defineEmits<SelectBaseEvents<any> & SearchEvents>();
 const { follow } = usePopup();
 const { onTimeout } = useTimer();
+const { watcher } = useReactive();
+//  解构一些响应式变量，方便访问
+const { popupStatus, pinned, parentPinned } = props;
 /** 弹窗所需的类样式信息 */
 const classRef = computed(() => ({
     "select-popup": true,
@@ -66,19 +68,29 @@ var mouseStatus: "Enter" | "Leave" = "Leave";
 /** 子【选择项】follow弹窗跟随的目标元素 */
 var childFollowTargetDom: HTMLElement = undefined;
 /** 子【选择项】follow弹窗作用域 */
-var childFollowTScope: IAsyncScope<SelectItem<any>[]> = undefined;
+var childFollowScope: IAsyncScope<SelectItem<any>[]> = undefined;
 //  3、可选配置选项
 defineOptions({ name: "SelectPopup", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
+ * 鼠标进入弹窗时
+ * - 【钉住】父级弹窗
+ */
+function onEnterPopup() {
+    mouseStatus = "Enter";
+    parentPinned && (parentPinned.value = true);
+}
+/**
  * 鼠标离开弹窗时
+ * - 取消【钉住】父级弹窗
  */
 function onLeavePopup() {
     mouseStatus = "Leave";
+    parentPinned && (parentPinned.value = false);
     //  非1级弹窗自动关闭；若没有打开子弹窗，则自动关闭：做个延迟，避免回到 此弹窗 的父【选择项】时，又重新打开此弹窗
-    if (props.level > 1 && (childFollowTScope == undefined || childFollowTScope.destroyed)) {
-        props.childDestroyTimer.value = onTimeout(props.closeFollow, 200, undefined);
+    if (props.level > 1 && (childFollowScope == undefined || childFollowScope.destroyed)) {
+        props.childDestroyTimer.value = onTimeout(props.closePopup, 200, undefined);
     }
 }
 /**
@@ -94,9 +106,11 @@ function onSearch(text: string) {
  * @param path 选项路径，从父->子
  */
 function onSelected(...path: SelectItem<any>[]) {
-    const values = path.filter(item => item != undefined);
-    emits("change", values);
-    props.multiple || props.closeFollow(values);
+    if (popupStatus.value != "closed") {
+        const values = path.filter(item => item != undefined);
+        emits("change", values);
+        props.multiple || props.closePopup(values);
+    }
 }
 
 /**
@@ -104,44 +118,50 @@ function onSelected(...path: SelectItem<any>[]) {
  */
 async function onEnterSelectNode(target: HTMLDivElement, node: SelectNode<any>, parent?: SelectNode<any>) {
     //  非【打开】状态，不响应：点击【选择项】关闭当前弹窗时，异步销毁过程中，鼠标移动到其他【选择项】了，此时不能再打开了
-    if (props.followStatus.value != "open") {
+    if (popupStatus.value == "closed") {
         return;
     }
-    //  由子弹窗进入的父级弹窗，取消子弹窗的销毁逻辑
-    {
-        childFollowTScope && childFollowTScope.destroyed == false && childDestroyTimer.value && childDestroyTimer.value.destroy();
+    //  目前还有子弹窗存在时，做一些特例逻辑
+    if (childFollowScope && childFollowScope.destroyed == false) {
+        //  取消子弹窗的销毁逻辑
+        childDestroyTimer.value && childDestroyTimer.value.destroy();
         childDestroyTimer.value = undefined;
-    }
-    //  以前的子若没有销毁，则根据情况判断销毁或者保留
-    if (childFollowTScope && childFollowTScope.destroyed == false) {
+        //  target和之前的子弹窗选项 target 一致时，不用重复弹窗；否则销毁之前弹窗，再弹出新的
         if (target == childFollowTargetDom) {
             return;
         }
-        childFollowTScope.destroy();
+        childFollowScope.destroy();
+        childFollowScope = undefined;
         childFollowTargetDom = undefined;
     }
     //  二级分类选项，弹出子选项follow弹窗；此时强制无需search
     if (node.item.type == "group" && parent) {
         childFollowTargetDom = target;
-        const selectPopupOptions: SelectPopupOptions<any> & SelectPopupOptionsExtend = {
-            items: node.children,
-            search: false,
-            level: props.level + 1,
-            values: props.values,
-            childDestroyTimer: childDestroyTimer,
-        };
-
-        childFollowTScope = follow(childFollowTargetDom, {
+        childFollowScope = follow(childFollowTargetDom, {
             name: "SelectPopup",
-            followY: "ratio",
             spaceClient: 10,
-            props: selectPopupOptions,
+            followY: "ratio",
+            //  x轴方向上的跟随策略：根据当前弹窗的x轴跟随策略，自动做优化，尽量避免3+级弹窗会覆盖主以前的弹窗
+            followX: props.followX.value == "before"
+                ? ["before", "after", "ratio"]
+                : ["after", "before", "ratio"],
+            //  子级【选择项】弹窗配置数据
+            props: Object.freeze<SelectPopupOptions<any> & SelectPopupOptionsExtend>({
+                items: node.children,
+                search: false,
+                level: props.level + 1,
+                values: props.values,
+                popupStyle: props.popupStyle,
+
+                childDestroyTimer: childDestroyTimer,
+                parentPinned: pinned,
+            }),
         });
         //  等待弹窗结束，如果有选中项，则对外分发
-        const datas = await childFollowTScope;
+        const datas = await childFollowScope;
         isArrayNotEmpty(datas) && onSelected(parent ? parent.item : undefined, node.item, ...datas);
         //  若销毁下级弹窗时，未进入当前弹窗，则触发当前弹窗的鼠标离开事件
-        props.followStatus.value == "open" && onTimeout(() => mouseStatus != "Enter" && onLeavePopup(), 10);
+        popupStatus.value == "open" && onTimeout(() => mouseStatus != "Enter" && onLeavePopup(), 10);
     }
 }
 /**
@@ -158,7 +178,10 @@ function onClickSelectNode(node: SelectNode<any>, parent?: SelectNode<any>) {
 }
 
 // *****************************************   👉  组件渲染    *****************************************
-// onUpdated(() => console.log("-0-000000000000000000000000000000", props.level));
+//  监听【pinned】变化，当前弹窗【钉住】了，则父级弹窗同步【钉住】
+watcher(pinned, newValue => newValue == true && parentPinned && (parentPinned.value = true));
+//  监听【popupStatus】变化，同步销毁子级弹窗：usePopup会自定管理子弹窗销毁，但为异步有延迟，这里更为即时
+watcher(popupStatus, newValue => newValue == "closed" && childFollowScope && childFollowScope.destroy());
 </script>
 
 <style lang="less">
@@ -185,7 +208,7 @@ function onClickSelectNode(node: SelectNode<any>, parent?: SelectNode<any>) {
 // *****************************************   👉  特殊样式适配    *****************************************
 //  子的选项弹窗
 .select-popup.child-popup {
-    min-width: 150px;
+    min-width: 200px;
     max-width: 250px;
     padding-top: 6px;
 }

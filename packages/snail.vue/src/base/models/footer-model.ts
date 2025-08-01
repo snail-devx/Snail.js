@@ -1,4 +1,4 @@
-import { ConfirmAreaOptions } from "./base-mode";
+import { ConfirmAreaOptions } from "./base-model";
 
 /**
  * 底部组件配置选项

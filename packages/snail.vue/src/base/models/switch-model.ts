@@ -1,4 +1,4 @@
-import { ReadonlyOptions } from "./base-mode";
+import { ReadonlyOptions } from "./base-model";
 
 /**
  * 开关组件 配置选项

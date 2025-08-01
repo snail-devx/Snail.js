@@ -58,22 +58,22 @@
 			".wh-fill-hidden();"
 		]
 	},
-	"left-right-start": {
-		"prefix": ".left-right-start",
+	"left-top-start": {
+		"prefix": ".left-top-start",
 		"scope": "less",
 		"description": "left:0,top:0；辅助 fixed、absolute定位使用",
 		"body": [
-			"//  left、right起始位置：left: 0; top: 0",
-			".left-right-start();"
+			"//  left、 top起始位置：left: 0; top: 0",
+			".left-top-start();"
 		]
 	},
-	"left-right-center": {
-		"prefix": ".left-right-center",
+	"left-top-center": {
+		"prefix": ".left-top-center",
 		"scope": "less",
-		"description": "通过left、rigth进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)",
+		"description": "通过left、 top进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)",
 		"body": [
-			"//  通过left、rigth进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)",
-			".left-right-center();"
+			"//  通过left、 top进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)",
+			".left-top-center();"
 		]
 	},
 	// *****************************************   👉  弹性盒子    *****************************************"

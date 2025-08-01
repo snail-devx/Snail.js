@@ -3,7 +3,7 @@
  */
 
 import { HeightStyle, MarginStyle, WidthStyle } from "snail.view";
-import { ReadonlyOptions } from "./base-mode";
+import { ReadonlyOptions } from "./base-model";
 
 /**
  * 选择 组件配置选项

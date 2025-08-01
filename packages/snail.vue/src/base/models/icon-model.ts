@@ -1,4 +1,4 @@
-import { TitleOptions } from "./base-mode";
+import { TitleOptions } from "./base-model";
 
 /**
  * 图标配置选项

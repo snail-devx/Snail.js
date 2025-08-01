@@ -3,16 +3,21 @@
     2、通过 v-model 绑定已选数据
 -->
 <template>
-    <div class="snail-select" :class="{ 'readonly': props.readonly }" @click="onClick" ref="select">
+    <div class="snail-select" :class="{ 'readonly': props.readonly }" @click="onClick()" ref="select">
         <template v-if="props.items && props.items.length > 0">
             <!-- 展示选择结果数据：无数据时显示placeholder；多选和单选区分开-->
             <div v-if="isArrayNotEmpty(selects) == false" class="select-result text-tips"
                 v-text="props.placeholder || '请选择'" />
             <div v-else-if="props.multiple" class="select-result multi" v-text="selects.join('、')"
                 :title="selects.join('、')" />
-            <div v-else class="select-result single">
-                <div v-for="item in selects" class="result-item" v-text="item.text" />
+            <div v-else class="select-result single" :title="selects.map(item => item.text).join('-')">
+                <template v-for="(item, index) in selects">
+                    <div class="result-item" :class="[`item-${index + 1}`]" v-text="item.text" />
+                    <div class="divider" v-if="selects.length > 1 && index + 1 != selects.length" />
+                </template>
             </div>
+            <Icon v-if="props.delete && isArrayNotEmpty(selects)" type="close" :size="20" color="#8a9099"
+                @click="onDeleteSelects" />
             <Icon type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
         </template>
         <!-- 无选项时的适配：提示无选项。。。 -->
@@ -21,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated, useTemplateRef } from "vue";
+import { shallowRef, useTemplateRef } from "vue";
 import Icon from "./icon.vue";
 import { SelectItem, SelectEvents, SelectOptions, SelectPopupOptions, SelectBaseEvents, SelectNode } from "./models/select-model";
 import SelectPopup from "./components/select-popup.vue";
@@ -39,6 +44,8 @@ const { follow } = usePopup();
 const selectNodes: Readonly<SelectNode<any>[]> = Object.freeze(buildSelectNodes(props.items));
 /** 组件根元素*/
 const rootDom = useTemplateRef("select");
+/** 是否是【删除】选择项按钮点击了 */
+var isDeleteItemClicked: boolean = false;
 /** 已选结果数据 */
 const selects = shallowRef<SelectItem<any>[]>();
 /** 跟随弹窗作用域 */
@@ -52,7 +59,7 @@ defineOptions({ name: "Select", inheritAttrs: true, });
  * - 弹出选择项
  */
 async function onClick() {
-    if (props.readonly == true || rootDom.value == undefined) {
+    if (isDeleteItemClicked == true || props.readonly == true || rootDom.value == undefined) {
         return;
     }
     //  已存在则销毁
@@ -88,6 +95,7 @@ async function onClick() {
                 searchPlaceholder: props.searchPlaceholder,
                 multiple: props.multiple,
                 values: [...valuesModel.value],
+                popupStyle: props.popupStyle,
             },
             //  事件监听、例外属性处理
             {
@@ -97,6 +105,15 @@ async function onClick() {
     });
     await followScope;
     followScope = undefined;
+}
+/**
+ * 删除已选【选择项】
+ * - 进行变量标记，不能直接stop事件冒泡，否则会影响全局监听的click事件
+ */
+function onDeleteSelects() {
+    isDeleteItemClicked = true;
+    setTimeout(() => isDeleteItemClicked = false, 0);
+    onSelectItemChange([]);
 }
 /**
  * 选项改变时
@@ -110,6 +127,10 @@ function onSelectItemChange(items: SelectItem<any>[]) {
 }
 
 // *****************************************   👉  组件渲染    *****************************************
+//  未支持，先报错，后期再后话
+if (props.multiple == true) {
+    throw new Error("暂时还没支持【多选】操作");
+}
 </script>
 
 <script lang="ts">
@@ -138,15 +159,35 @@ onAppCreated((app, type) => {
     //  已选结果区域
     >div.select-result {
         flex: 1;
-        padding: 0 6px;
+        overflow: hidden;
+        padding: 0 10px 0 6px;
         //  flex 布局：display: flex，align-items 为center
         .flex-cross-center();
         flex-wrap: nowrap;
 
         >div.text-tips {}
+
+        //  单选模式
+        &.single>.result-item> {
+            flex: auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        //  单选 选项之间的分隔符，简化处理，有需求各自定制
+        &.single>.divider {
+            width: 7px;
+            height: 1px;
+            flex-shrink: 0;
+            background-color: gray;
+            margin: 0 4px;
+        }
+
+        //  多选模式
     }
 
-    >svg.snail-icon {
+    >svg.snail-icon:last-child {
         flex-shrink: 0;
         margin-right: 4px;
     }

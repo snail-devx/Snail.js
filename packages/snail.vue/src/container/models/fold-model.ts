@@ -1,4 +1,4 @@
-import { DisabledOptions, TitleOptions } from "../../base/models/base-mode";
+import { DisabledOptions, TitleOptions } from "../../base/models/base-model";
 
 /**
  * 折叠面板配置选项

@@ -1,6 +1,6 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <Select :items="items" :search="true" style="width: 200px;" />
+    <Select :items="items" :search="true" :delete="true" style="width: 200px;" />
     <Select :items="items" :search="true" style="width: 200px;position: absolute;right: 10px; top: 20px;" />
 </template>
 

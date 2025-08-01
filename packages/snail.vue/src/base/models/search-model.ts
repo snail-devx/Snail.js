@@ -1,4 +1,4 @@
-import { PlaceholderOptions, ReadonlyOptions } from "./base-mode";
+import { PlaceholderOptions, ReadonlyOptions } from "./base-model";
 
 /**
  * 搜索组件配置选项

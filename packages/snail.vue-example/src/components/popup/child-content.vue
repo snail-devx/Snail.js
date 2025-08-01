@@ -1,12 +1,10 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <div style="width: 400px;height: 300px;background-color: rosybrown;">
+    <div class="test-popup-child-content" style="background-color: rosybrown;">
         <button @click="open();">打开弹窗</button>
         <button @click="onClose">关闭</button>
         <button @click="trigger();">触发事件</button>
-        <div>inDialog：{{ inDialog }} ；closeDialog：{{ typeof closeDialog }}</div>
         <div>inPopup：{{ inPopup }} closePopup：{{ typeof closePopup }}</div>
-        <div>inFollow：{{ inFollow }} closeFollow：{{ typeof closeFollow }}</div>
         <div>自定义传入内容：{{ $attrs }}</div>
     </div>
 </template>
@@ -20,9 +18,8 @@ import DialogContentTest from "./child-content.vue";
 // 👉 组件定义
 //  1、props、data
 const {
-    inDialog, closeDialog, onDialogClose,
     inPopup, closePopup,
-    inFollow, closeFollow,
+    onBeforeClose,
 } = defineProps<DialogHandle<any> & PopupHandle<any> & FollowHandle<any>>()
 const emits = defineEmits<{
     (e: "customEvent", data: number)
@@ -34,6 +31,7 @@ defineOptions({ name: "DialogContentTest", inheritAttrs: true, });
 // 👉 方法+事件
 function open() {
     popup.dialog({
+        // transition: "snail-scale",
         component: DialogContentTest,
         props: {
             xxx: 111,
@@ -47,19 +45,24 @@ function open() {
  * 关闭事件
  */
 function onClose() {
-    (closeDialog || closePopup || closeFollow)();
+    closePopup();
 };
 function trigger() {
     emits("customEvent", 12);
 }
 
 // 👉 组件渲染
-//  1、数据初始化、变化监听
-onDialogClose && onDialogClose(() => {
+//  1、数据初始化、变化监听；仅dialog对话框才有此方法
+onBeforeClose && onBeforeClose(() => {
     return new Date().getSeconds() % 2 == 0 ? false : undefined;
 })
 //  2、生命周期响应
 
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+.test-popup-child-content {
+    width: 400px;
+    height: 300px;
+}
+</style>

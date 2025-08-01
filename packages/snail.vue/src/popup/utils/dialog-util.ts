@@ -3,9 +3,9 @@
  * - 为了简化Manager中代码，不对外独立使用
  */
 import { FlatPromise, IScope, isStringNotEmpty } from "snail.core";
-import { DialogHandle, DialogOptions } from "../models/dialog-model";
+import { DialogOptions } from "../models/dialog-model";
 import { checkPopup, destroyPopup } from "./popup-util";
-import { PopupStatus } from "../manager";
+import { PopupDescriptor, PopupStatus } from "../manager";
 
 /**
  * 检测弹窗配置选项
@@ -30,15 +30,16 @@ const DIALOGS: { scope: IScope, status: PopupStatus }[] = [];
  * 监听弹窗
  * - 将之前的弹窗 设置为 非激活状态
  * - 关闭弹窗时，将它和之后的弹窗强制关闭，上一个弹窗设置为激活
- * @param popupId openPopup返回的唯一标记，销毁时使用
+ * @param descriptor openPopup返回的弹窗描述器
  * @param scope 弹窗作用域
  * @param status 弹窗状态，响应式
  * @param task 弹窗任务，在外部通过destroy销毁时，同步任务状态用
  */
-export function monitorDialog<T>(popupId: string, scope: IScope, status: PopupStatus, task: FlatPromise<T>) {
+export function monitorDialog<T>(descriptor: PopupDescriptor<any, any>, scope: IScope, task: FlatPromise<T>) {
     //  当前弹窗激活，之前的所有弹窗全部 失焦
-    status.value = "active";
-    const index = DIALOGS.push(Object.freeze({ scope, status })) - 1;
+    const { popupStatus } = descriptor;
+    popupStatus.value = "active";
+    const index = DIALOGS.push(Object.freeze({ scope, status: popupStatus })) - 1;
     index > 0 && (DIALOGS[index - 1].status.value = "unactive");
     //  响应弹窗销毁操作：
     scope.onDestroy(function () {
@@ -50,11 +51,11 @@ export function monitorDialog<T>(popupId: string, scope: IScope, status: PopupSt
         //  清理之后的所有弹窗
         DIALOGS.splice(index).forEach((item, index) => {
             if (index > 0 && item.scope.destroyed == false) {
-                item.status.value = "close";
+                item.status.value = "closed";
                 item.scope.destroy();
             }
         });
         //  清理自己
-        destroyPopup(popupId, status, task);
+        destroyPopup(descriptor, task);
     });
 }

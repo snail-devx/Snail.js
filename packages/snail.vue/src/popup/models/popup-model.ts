@@ -19,6 +19,20 @@ export type PopupOptions = ComponentOptions & {
     props?: Record<string, any>;
 
     /**
+     * 弹窗动画名
+     * - 不传则默认“snail-fade”
+     * - 动画规则：打开弹窗时，为 [transition]-in ；关闭弹窗时，为[transition]-out
+     * - - 传入 "snail-scale"，则打开弹窗为 "snail-scale-in"；关闭弹窗时为 "snail-scale-out"
+     */
+    transition?: string;
+    /**
+     * 动画持续时间
+     * - 配合 transition 使用；单位ms，默认500ms
+     * - 外部传入自定义动画时，传入动画持续时间，否则可能导致关闭时动画失效
+     */
+    transitionDuration?: number;
+
+    /**
      * 自定义class
      * - 绑定到内容组件根元素上
      * - 可以直接在props中指定，无需特殊设置
@@ -44,8 +58,11 @@ export type PopupOptions = ComponentOptions & {
 export type PopupHandle<T> = {
     /**
      * 组件是否在【弹出窗口】中
+     * - popup  ：  普通弹出弹窗
+     * - dialog ：  模态对话弹窗
+     * - follow ：  跟随效果弹窗
      */
-    inPopup: Readonly<boolean>;
+    inPopup: Readonly<"popup" | "dialog" | "follow">;
     /**
      * 关闭弹窗
      * @param data 关闭时传递数据
@@ -56,26 +73,31 @@ export type PopupHandle<T> = {
 /**
  * 弹窗状态：响应式
  * - open       打开
- * - active     激活
- * - unactive   非激活
- * - close      关闭
+ * - active     激活，针对Dialog弹窗生效
+ * - unactive   非激活，针对Dialog弹窗生效
+ * - closed     关闭
  */
-export type PopupStatus = ShallowRef<"open" | "active" | "unactive" | "close">;
+export type PopupStatus = ShallowRef<"open" | "active" | "unactive" | "closed">;
+/**
+ * 弹窗状态 配置选项
+ */
+export type PopupStatusOptions = {
+    /**
+     * 弹窗状态：响应式
+     */
+    popupStatus: PopupStatus;
+}
 
 /**
  * 弹窗对象描述器
  * - 给弹窗容器使用，传递过去作为props使用
  */
-export type PopupDescriptor<Options extends PopupOptions, ExtOptions> = {
+export type PopupDescriptor<Options extends PopupOptions, ExtOptions> = PopupStatusOptions & {
     /**
      * 弹窗Id
      * - 自动分配，全局唯一
      */
     popupId: string,
-    /**
-     * 弹窗状态：响应式
-     */
-    popupStatus: PopupStatus;
 
     /**
      * 弹窗配置选项
@@ -95,4 +117,11 @@ export type PopupDescriptor<Options extends PopupOptions, ExtOptions> = {
      * 实际分配的zIndex值
      */
     zIndex: number;
+
+    /**
+     * 弹窗动画名
+     * - 约束打开、关闭动画；基于 PopupOptions.transition 构建出来的
+     * - 具体使用方，将此值绑定的根元素上
+     */
+    popupTransition: ShallowRef<string>;
 }

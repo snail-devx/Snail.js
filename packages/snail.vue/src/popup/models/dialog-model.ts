@@ -1,7 +1,7 @@
 /**
  * 模态弹窗数据结构
  */
-import { PopupOptions, PopupStatus } from "./popup-model";
+import { PopupHandle, PopupOptions } from "./popup-model";
 
 /**
  * 模态弹窗 配置选项
@@ -25,18 +25,6 @@ export type DialogOptions = PopupOptions & {
     closeOnEscape?: boolean;
 
     /**
-     * 模态弹窗动画名
-     * - 不传则使用默认，具体有弹窗容器确认，如dialog为 snail-dialog
-     */
-    transition?: string;
-    /**
-     * 动画持续时间
-     * - 配合 transition 使用；单位ms，默认100ms
-     * - 外部传入自定义动画时，传入动画持续时间，否则可能导致关闭时动画失效
-     * 暂时不对外开放
-    transitionDuration?: number;*/
-
-    /**
      * 模态弹窗的自定义class
      * - 绑定到模态弹窗的根元素上
      */
@@ -47,20 +35,11 @@ export type DialogOptions = PopupOptions & {
  * 弹窗组件句柄
  * - 用于在弹窗内容组件中进行模式判断和关闭
  */
-export type DialogHandle<T> = {
-    /**
-     * 组件是否处于【模态弹窗】模式
-     */
-    inDialog: Readonly<boolean>;
-    /**
-     * 关闭弹窗
-     * @param data 关闭时传递数据
-     */
-    closeDialog(data?: T): void;
+export type DialogHandle<T> = PopupHandle<T> & {
     /**
      * 注册监听【弹窗关闭】事件方法
      * - 仅支持注册一次，多次注册以最后一次的为准
      * @param fn 关闭时执行的钩子函数，支持异步，返回false时将阻止弹窗关闭
      */
-    onDialogClose(fn: () => false | undefined | Promise<false | undefined>): void;
+    onBeforeClose(fn: () => false | undefined | Promise<false | undefined>): void;
 }

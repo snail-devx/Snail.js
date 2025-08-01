@@ -45,29 +45,12 @@ export function usePopup(): IPopupManager & IScope {
     //#region *************************************实现接口：IPopupManager接口方法*************************************
     /**
      * 弹出
-     * - 弹窗位置位置、大小、动画效果等由组件自己完成
      * @param options 弹窗配置选项
-     * @param container 自己指定的 Popup弹窗容器，起源于 toast 自己处理Popup弹窗容器
      * @returns 弹窗异步作用域，外部可手动关闭弹窗
      */
-    function popup<T>(options: PopupOptions, container?: Component): IAsyncScope<T> {
-        var scope = checkOptions<PopupOptions, T>(options, checkPopup);
-        if (scope == undefined) {
-            const deferred = defer<T>();
-            const extOptions = Object.freeze<PopupHandle<T>>({
-                inPopup: true,
-                closePopup: data => {
-                    if (scope.destroyed == false) {
-                        descriptor.popupStatus.value = "close";
-                        deferred.resolve(data);
-                    }
-                },
-            });
-            const descriptor = openPopup(container || PopupContainer, options, extOptions);
-            descriptor.popupStatus.value = "active";
-            scope = useAsyncScope<T>(deferred.promise);
-            scope.onDestroy(() => destroyPopup(descriptor.popupId, descriptor.popupStatus, deferred));
-        }
+    function popup<T>(options: PopupOptions): IAsyncScope<T> {
+        const scope = checkOptions<PopupOptions, T>(options, checkPopup)
+            || popupInCustomContainer(PopupContainer, options);
         return addScope2Scopes(scope);
     }
     /**
@@ -82,36 +65,36 @@ export function usePopup(): IPopupManager & IScope {
         if (scope == undefined) {
             const deferred = defer<T>();
             /** 弹窗关闭的钩子函数：弹窗任务完成后，自动销毁 */
-            const hook = useHook<"onDialogClose">();
+            const hook = useHook<"onBeforeClose">();
             deferred.promise.finally(hook.destroy);
             /** 弹窗是否正在关闭中 */
             var isClosing: boolean = false;
             /** 弹窗扩展配置选项 */
             const extOptions = Object.freeze<DialogHandle<T>>({
-                inDialog: true,
-                async closeDialog(data?: T) {
+                inPopup: "dialog",
+                async closePopup(data?: T) {
                     if (hook.destroyed == true || isClosing == true) {
                         return;
                     }
                     //  执行拦截器，返回false则取消关闭
                     {
                         isClosing = true;
-                        const rt = await hook.runHookAsync("onDialogClose", { mode: "one", order: "desc" });
+                        const rt = await hook.runHookAsync("onBeforeClose", { mode: "one", order: "desc" });
                         isClosing = false;
                         if (rt.success != true) {
-                            console.warn("run onDialogClose failed", rt.reason, rt.ex);
+                            console.warn("run onBeforeClose failed", rt.reason, rt.ex);
                             return;
                         }
                     }
                     //  关闭弹窗，任务完成
-                    descriptor.popupStatus.value = "close";
+                    descriptor.popupStatus.value = "closed";
                     deferred.resolve(data);
                 },
-                onDialogClose: fn => hook.register("onDialogClose", fn),
+                onBeforeClose: fn => hook.register("onBeforeClose", fn),
             });
             const descriptor = openPopup(DialogContainer, options, extOptions);
             scope = useAsyncScope<T>(deferred.promise);
-            monitorDialog(descriptor.popupId, scope, descriptor.popupStatus, deferred);
+            monitorDialog(descriptor, scope, deferred);
         }
         return addScope2Scopes(scope);
     }
@@ -123,29 +106,20 @@ export function usePopup(): IPopupManager & IScope {
     * @returns 弹窗异步作用域，外部可手动关闭弹窗
     */
     function follow<T>(target: HTMLElement, options: FollowOptions): IAsyncScope<T> {
-        //  基础配置选项验证、target必须为html元素
-        var scope = checkOptions<FollowOptions, T>(options, checkFollow);
-        if (scope == undefined && target instanceof HTMLElement == false) {
+        var scope: IAsyncScope<T> = undefined;
+        if (target instanceof HTMLElement == false) {
             const deferred = defer<T>();
             deferred.reject("follow: target must be an HTMLElement.");
             scope = useAsyncScope(deferred.promise);
         }
-        //  准备弹窗，启动【跟随】效果：和popup很像，后续考虑和popup做一下优化
+        //  打开弹窗：覆盖 inPopup 值，并将target传递下去
         if (scope == undefined) {
-            const deferred = defer<T>();
-            const extOptions = Object.freeze<FollowExtend<T>>({
-                inFollow: true,
-                closeFollow(data?: T) {
-                    if (scope.destroyed == false) {
-                        descriptor.popupStatus.value = "close";
-                        deferred.resolve(data);
-                    }
-                },
+            const extOptions: Pick<FollowHandle<T>, "inPopup"> & Pick<FollowExtend, "target"> = {
+                inPopup: "follow",
                 target: target,
-            });
-            const descriptor = openPopup(FollowContainer, options, extOptions);
-            scope = useAsyncScope<T>(deferred.promise);
-            scope.onDestroy(() => destroyPopup(descriptor.popupId, descriptor.popupStatus, deferred));
+            };
+            scope = checkOptions<FollowOptions, T>(options, checkFollow)
+                || popupInCustomContainer(FollowContainer, options, extOptions);
         }
         return addScope2Scopes(scope);
     }
@@ -174,14 +148,14 @@ export function usePopup(): IPopupManager & IScope {
      */
     function toast(type: IconType, message: string, options?: Omit<ToastOptions, "type" | "message">): void {
         /* 中转到popup实现，但使用ToastContainer作为弹窗容器；模拟 url 值，仅为通过验证 */
-        popup({
+        popupInCustomContainer(ToastContainer, {
             url: "#ToastContainer",
             props: {
                 ...(options || Object.create(null)),
                 type,
                 message
             }
-        }, ToastContainer);
+        });
     }
     //#endregion
 
@@ -216,6 +190,33 @@ export function usePopup(): IPopupManager & IScope {
         return scope.destroyed || manager.destroyed
             ? scope
             : scopes.add(scope);
+    }
+    /**
+     * 在自定义容器中打开【弹出】组件
+     * - 内部自动构建 PopupHandle<T> 相关参数
+     * - 外部也可通过 extOptions 覆盖构建的PopupHandle<T> 相关参数
+     * @param container 自定义容器，无效则自动使用 PopupContainer
+     * @param options 弹窗配置选项
+     * @param extOptions 扩展的一些自定义参数
+     * @returns 弹窗异步作用域，外部可手动关闭弹窗
+     */
+    function popupInCustomContainer<T, Options extends PopupOptions, ExtOptions extends Record<string, any>>(container: Component, options: Options, extOptions?: ExtOptions)
+        : IAsyncScope<T> {
+        const deferred = defer<T>();
+        extOptions = Object.freeze<PopupHandle<T> & ExtOptions>({
+            inPopup: "popup",
+            closePopup: data => {
+                if (scope.destroyed == false) {
+                    descriptor.popupStatus.value = "closed";
+                    deferred.resolve(data);
+                }
+            },
+            ...extOptions
+        });
+        const descriptor = openPopup(container || PopupContainer, options, extOptions);
+        const scope = useAsyncScope<T>(deferred.promise);
+        scope.onDestroy(() => destroyPopup(descriptor, deferred));
+        return scope;
     }
     //#endregion
 

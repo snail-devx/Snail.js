@@ -8,7 +8,7 @@
 
 // *****************************************   👉  base 相关导出    ****************************************
 //  类型导出
-export * from "./base/models/base-mode";
+export * from "./base/models/base-model";
 export * from "./base/models/button-model";
 export * from "./base/models/choose-model";
 export * from "./base/models/footer-model";

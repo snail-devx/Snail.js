@@ -1,8 +1,8 @@
 /**
  * 跟随弹窗 助手方法
  */
-import { isArray, isArrayNotEmpty, isNumberNotNaN, isString, isStringNotEmpty, throwIfFalse, throwIfUndefined } from "snail.core";
-import { FollowOptions, FollowStrategy } from "../models/follow-model";
+import { isArrayNotEmpty, isNumberNotNaN, isStringNotEmpty } from "snail.core";
+import { FollowElectResult, FollowOptions, FollowStrategy } from "../models/follow-model";
 
 /**
  * 检测弹窗配置选项
@@ -21,21 +21,17 @@ export function checkFollow(options: FollowOptions): string | undefined {
  * @param width 跟随组件的宽度
  * @returns 水平方向的跟随效果：left标记坐标位置，width标记组件新的宽度；undefined表示不设置，
  */
-export function calcFollowX(options: FollowOptions, target: DOMRectReadOnly, width: number): { left: string, width?: string } {
+export function calcFollowX(options: FollowOptions, target: DOMRectReadOnly, width: number): FollowElectResult {
+    /* 若target已经显示不全了，则不再显示follow */
     const space = isNumberNotNaN(options.spaceX) ? options.spaceX : 0;
     const spaceClient = isNumberNotNaN(options.spaceClient) ? options.spaceClient : 0;
-    //  若target已经显示不全了，则不再显示follow
     if ((target.left < spaceClient) || (target.right + spaceClient > window.innerWidth)) {
-        return { left: `-${width}px` };
+        return { strategy: undefined, start: -width };
     }
-    //  计算left值，若操作了宽度值，则强制更新回去：
-    const position = electPosition(
-        getFollowStrategy(options.followX) || ["after", "before", "start", "end", "center", "ratio"],
+    return electPosition(
+        getFollowStrategy(options.followX) || ["start", "end", "after", "before", "center", "ratio"],
         target.left, target.right, width, window.innerWidth, space, spaceClient
     );
-    const style: { left: string, width?: string } = { left: `${position.start}px` };
-    position.size == undefined || (style.width = `${position.size}px`);
-    return style;
 }
 /**
  * 计算y轴方向的【跟随效果】
@@ -44,21 +40,17 @@ export function calcFollowX(options: FollowOptions, target: DOMRectReadOnly, wid
  * @param height 跟随组件的高度
  * @returns 水平方向的跟随效果：top、bottom标记坐标位置，height标记组件新的高度；undefined表示不设置，
  */
-export function calcFollowY(options: FollowOptions, target: DOMRectReadOnly, height: number): { top?: string, height?: string } {
-    //  若target已经显示不全了，则不再显示follow
+export function calcFollowY(options: FollowOptions, target: DOMRectReadOnly, height: number): FollowElectResult {
+    /* 若target已经显示不全了，则不再显示follow */
     const space = isNumberNotNaN(options.spaceY) ? options.spaceY : 0;
     const spaceClient = isNumberNotNaN(options.spaceClient) ? options.spaceClient : 0;
     if ((target.top < spaceClient) || (target.bottom + spaceClient > window.innerHeight)) {
-        return { top: `-${height}px` };
+        return { strategy: undefined, start: -height };
     }
-    //  计算top值，若操作了高度值，则强制更新回去：
-    const position = electPosition(
+    return electPosition(
         getFollowStrategy(options.followY) || ["after", "before", "start", "end", "center", "ratio"],
         target.top, target.bottom, height, window.innerHeight, space, spaceClient
     );
-    const style: { top?: string, height?: string } = { top: `${position.start}px` };
-    position.size == undefined || (style.height = `${position.size}px`);
-    return style;
 }
 
 //#region ***************************************************************** 私有变量、方法 *****************************************************************
@@ -86,8 +78,8 @@ function getFollowStrategy(strategy?: FollowStrategy | FollowStrategy[]): Follow
  * @returns 
  */
 function electPosition(strategy: FollowStrategy[], targetStart: number, targetEnd: number, contentSize: number, clientSize: number, space: number, spaceClient: number)
-    : { start: number, size?: number } {
-    var maxPosition: { start: number, size?: number } = undefined;
+    : FollowElectResult {
+    var maxPosition: FollowElectResult = undefined;
     for (const fs of strategy) {
         const tmp = deducePosition(fs, targetStart, targetEnd, contentSize, clientSize, space, spaceClient);
         //  位置计算无效，继续尝试
@@ -123,44 +115,34 @@ function electPosition(strategy: FollowStrategy[], targetStart: number, targetEn
  * @returns 推断结果，undefined表示 strategy 值无效
  */
 function deducePosition(strategy: FollowStrategy, targetStart: number, targetEnd: number, contentSize: number, clientSize: number, space: number, spaceClient: number)
-    : { start: number, size?: number } | undefined {
+    : FollowElectResult | undefined {
     //  计算一些变量，方便后面复用
     /**     最大的结束位置 */
     const maxEnd = clientSize - spaceClient;
     //  根据策略计算位置
     switch (strategy) {
-        //  target结束位置 之后展示；展示不全，则缩放尺寸
+        //  start：和target相同开始值；展示不全，则缩放尺寸
+        //  after：target结束位置 之后展示；展示不全，则缩放尺寸 
+        case "start":
         case "after": {
-            const start = targetEnd + space;
+            const start = (strategy == "start" ? targetStart : targetEnd) + space;
             return {
-                start,
-                size: start + contentSize > maxEnd ? maxEnd - start : undefined,
-            }
-        }
-        //  target开始位置 之前展示；展示不全，则缩放尺寸
-        case "before": {
-            const start = targetStart - contentSize - space;
-            return {
-                start: Math.max(spaceClient, start),
-                size: start < spaceClient ? (targetStart - space - spaceClient) : undefined,
-            }
-        }
-        //  和target相同开始值；展示不全，则缩放尺寸
-        case "start": {
-            const start = targetStart + space;
-            return {
+                strategy,
                 start,
                 size: start + contentSize > maxEnd ? maxEnd - start : undefined,
             };
         }
-        //  和target相同结束位置；展示不全，则缩放尺寸
+        //  before：target开始位置 之前展示；展示不全，则缩放尺寸
+        //  end   ：和target相同结束位置；展示不全，则缩放尺寸
+        case "before":
         case "end": {
-            const tmpStart = targetEnd - space - contentSize;
-            const sizeOffset = Math.min(0, tmpStart - spaceClient);
+            const maxEnd = (strategy == "before" ? targetStart : targetEnd) - space;
+            const start = maxEnd - contentSize;
             return {
-                start: tmpStart + sizeOffset,
-                size: sizeOffset < 0 ? contentSize + sizeOffset : undefined
-            };
+                strategy,
+                start: Math.max(spaceClient, start),
+                size: start < spaceClient ? (maxEnd - spaceClient) : undefined,
+            }
         }
         //  和target相同中心点；展示不全，则缩放尺寸；取消间距
         case "center": {
@@ -173,6 +155,7 @@ function deducePosition(strategy: FollowStrategy, targetStart: number, targetEnd
             tmp = parseInt(center + contentSize / 2 as any);
             sizeOffset += Math.min(0, maxEnd - tmp);
             return {
+                strategy,
                 start,
                 size: sizeOffset < 0 ? contentSize + sizeOffset : undefined
             };
@@ -185,13 +168,15 @@ function deducePosition(strategy: FollowStrategy, targetStart: number, targetEnd
                 const center = parseInt(targetStart + (targetEnd - targetStart) / 2 as any);
                 const startSize = parseInt((center / clientSize) * contentSize as any);
                 return {
+                    strategy,
                     start: center - startSize,
                 }
             }
             //  展示不全，直接贴边展示；等于最大值时，不调整size值
             return {
+                strategy,
                 start: spaceClient,
-                size: contentSize == maxSize ? undefined : maxSize
+                size: contentSize != maxSize ? maxSize : undefined
             };
         }
         //  其他情况，不属于制式规则，返回undefined；后期考虑报错

@@ -61,6 +61,33 @@
         margin: 0;
         padding: 0;
     }
+
+    //  自定义滚动条样式
+    & {
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+            border-radius: 12px;
+            background-color: transparent;
+        }
+
+        ::-webkit-scrollbar-button {
+            display: none !important;
+            height: 0;
+            width: 0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background-color: rgba(180, 180, 180, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+        }
+
+        ::-webkit-scrollbar-track {
+            border-radius: 10px;
+            background-color: transparent;
+        }
+    }
 }
 
 // *****************************************   👉  一些公共样式    *****************************************
@@ -75,5 +102,69 @@
         //  提示文本样式：400 weight，14px size，#8A9099 color
         .tip-text();
     }
+}
 
+// *****************************************   👉  公共动画    *****************************************
+//  淡入动画
+.snail-fade-in {
+    opacity: 1;
+    animation: snail-fade-in 0.4s ease-in-out;
+
+    @keyframes snail-fade-in {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+}
+
+//  淡出动画
+.snail-fade-out {
+    opacity: 0;
+    animation: snail-fade-out 0.4s ease-in-out;
+
+    @keyframes snail-fade-out {
+        0% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+        }
+    }
+}
+
+//  放大进入
+.snail-scale-in {
+    scale: 1;
+    animation: snail-scale-in 0.2s ease-in-out;
+
+    @keyframes snail-scale-in {
+        0% {
+            scale: 0;
+        }
+
+        100% {
+            scale: 1;
+        }
+    }
+}
+
+//  缩小退出
+.snail-scale-out {
+    scale: 0;
+    animation: snail-scale-out 0.2s ease-in-out;
+
+    @keyframes snail-scale-out {
+        0% {
+            scale: 1;
+        }
+
+        100% {
+            scale: 0;
+        }
+    }
 }

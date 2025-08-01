@@ -1,4 +1,4 @@
-import { MessageOptions } from "../../base/models/base-mode";
+import { MessageOptions } from "../../base/models/base-model";
 
 /**
  * 空状态配置选项

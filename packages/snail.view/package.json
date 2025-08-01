@@ -3,7 +3,7 @@
     "description": "对视图界面做的一些封装。如样式计算助手方法，常用样式less混入、变量等；dom相关助手类",
     "author": "snail_dev@163.com",
     "license": "MIT",
-    "version": "1.0.16",
+    "version": "1.0.17",
     "type": "module",
     "main": "dist/snail.view.js",
     "module": "dist/snail.view.js",

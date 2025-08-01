@@ -1,6 +1,7 @@
 import { ShallowRef } from "vue";
-import { PlaceholderOptions, ReadonlyOptions } from "./base-mode";
+import { PlaceholderOptions, ReadonlyOptions } from "./base-model";
 import { IScope } from "snail.core";
+import { HeightStyle } from "snail.view";
 
 /**
  * 选项菜单 基础配置选项
@@ -28,6 +29,12 @@ export type SelectBaseOptions<T> = {
      * - items为多级时，不支持【多选模式】；传入会报错
      */
     multiple?: boolean;
+
+    /**
+     * 选择项 follow弹窗样式
+     * - 支持指定弹窗高度，如最大高度，不指定则默认尽可能展示全
+     */
+    popupStyle?: HeightStyle;
 }
 /**
  * 选项菜单 基础事件
@@ -141,6 +148,11 @@ export type SelectPopupOptionsExtend = {
      * - 鼠标离开弹窗时，做延迟销毁；避免回到 此弹窗 的父【选择项】时，又重新打开此弹窗
      */
     childDestroyTimer: ShallowRef<IScope>;
+    /**
+     * 父级弹窗的pin状态
+     * - 可在子弹窗中设置为true，这样父级弹窗就不会自动关闭了
+     */
+    parentPinned: ShallowRef<boolean>;
 }
 
 /**

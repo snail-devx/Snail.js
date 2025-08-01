@@ -1,4 +1,4 @@
-import { ConfirmAreaOptions, MessageOptions, TitleOptions } from "../../base/models/base-mode";
+import { ConfirmAreaOptions, MessageOptions, TitleOptions } from "../../base/models/base-model";
 
 /**
  * 确认弹窗配置选项

@@ -4,9 +4,9 @@
     3、每个弹窗容器就是一个app实例，实现互不干扰
 -->
 <template>
-    <Dynamic class="snail-popup" :name="options.name" :component="options.component" :url="options.url"
-        v-if="loadingRef == true && popupStatus.value != 'close'" :style="{ 'z-index': zIndex }" v-bind="options.props"
-        :in-popup="true" :close-popup="extOptions.closePopup" />
+    <Dynamic class="snail-popup" :class="[popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
+        :name="options.name" :component="options.component" :url="options.url" v-bind="options.props" :in-popup="true"
+        :close-popup="extOptions.closePopup" />
 </template>
 
 <script setup lang="ts">
@@ -16,7 +16,7 @@ import { PopupDescriptor, PopupHandle, PopupOptions } from "../models/popup-mode
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { options, zIndex, extOptions, popupStatus } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
+const { options, zIndex, extOptions, popupStatus, popupTransition } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
 /** 是否加载组件：模拟出动画效果 */
 const loadingRef = shallowRef<boolean>(false);
 //  2、可选配置选项
@@ -33,6 +33,6 @@ onMounted(() => loadingRef.value = true);
 .snail-popup {
     position: fixed;
     // x、y起始位置：left:0,top:0
-    .left-right-start();
+    .left-top-start();
 }
 </style>

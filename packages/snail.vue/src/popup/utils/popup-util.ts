@@ -3,9 +3,9 @@
  * - 为了简化Manager中代码，不对外独立使用
  */
 
-import { PopupDescriptor, PopupOptions, PopupStatus } from "../models/popup-model";
+import { PopupDescriptor, PopupOptions } from "../models/popup-model";
 import { triggerAppCreated } from "../../base/utils/app-util"
-import { createApp, ref, App, Component, shallowRef } from "vue";
+import { createApp, App, Component, shallowRef } from "vue";
 import { FlatPromise, isObject, isStringNotEmpty, mustObject, throwIfFalse } from "snail.core";
 
 /** 默认的Z-index值 */
@@ -47,6 +47,7 @@ export function openPopup<Options extends PopupOptions, ExtOptions extends Recor
         options: options,
         extOptions: extOptions,
         zIndex: options.zIndex || DEFAULT_ZINDEX,
+        popupTransition: shallowRef<string>(`${options.transition || "snail-fade"}-in`),
     });
     {
         const app = createApp(container, descriptor);
@@ -59,22 +60,28 @@ export function openPopup<Options extends PopupOptions, ExtOptions extends Recor
 }
 /**
  * 销毁弹窗
- * @param popupId openPopup返回的唯一标记，销毁时使用
- * @param status 弹窗状态，响应式
+ * @param descriptor openPopup返回的弹窗描述器
  * @param task 弹窗任务，在外部通过destroy销毁时，同步任务状态用
  */
-export function destroyPopup<T>(popupId: string, status: PopupStatus, task: FlatPromise<T>) {
+export function destroyPopup<T>(descriptor: PopupDescriptor<PopupOptions, any>, task: FlatPromise<T>) {
+    const { popupId, popupStatus, options, popupTransition } = descriptor;
     //  任务保底：若状态不是“close”，则是外部执行 scope.destroy() 强制销毁；维护弹窗状态
-    if (status.value != "close") {
+    if (popupStatus.value != "closed") {
         console.warn("force close after scope.destroy called.");
-        status.value = "close";
+        popupStatus.value = "closed";
         task.resolve(undefined);
     }
-    //  销毁app实例
+    //  强制将动画值设置为【关闭】
+    popupTransition.value = `${options.transition || "snail-fade"}-out`;
+    //  销毁app实例：销毁时做一下延迟，实现销毁动画
     const app = POPUPMAPS.get(popupId);
-    if (app) {
-        app.unmount();
-        app._container.remove();
+    if (app != undefined) {
+        POPUPMAPS.delete(popupId);
+        //  延迟销毁，实现销毁动画
+        setTimeout(() => {
+            app._container.remove();
+            app.unmount();
+        }, options.transitionDuration > 0 ? options.transitionDuration : 500);
     }
 }
 

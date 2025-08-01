@@ -100,7 +100,7 @@ function onItemClick(item: ChooseItemDetail, index: number) {
             position: absolute;
             content: "";
             //  left、right起始位置：left: 0; top: 0
-            .left-right-start();
+            .left-top-start();
             //  width:100%；height:100%；overflow: hidden
             .wh-fill-hidden();
         }

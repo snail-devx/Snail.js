@@ -25,6 +25,7 @@ function onOpenClick() {
         component: DialogContent,
         closeOnEscape: true,
         closeOnMask: true,
+        // transition: "snail-scale",
         props: {
             onCustomEvent(data: number) {
                 console.log("接收自定义事件：", data);
