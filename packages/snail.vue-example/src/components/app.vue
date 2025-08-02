@@ -8,7 +8,7 @@
 </template>
 <script setup lang="ts">
 import { Component, onMounted, shallowRef } from "vue";
-import { useReactive, TreeNode, TreeOptions, components } from "../core";
+import { useReactive, Tree2Node, Tree2Options, components, TreeNodeOptions, TreeOptions, TreeNodeModel, TreeNodeSoltOptions } from "../core";
 
 //#region *******************************   👉  组件定义    *****************************************
 //  👉 基础组件：
@@ -40,77 +40,87 @@ import EmptyTest from "./prompt/empty-test.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 const { transition } = useReactive();
-const { Tree } = components;
+const { Tree, Tree2 } = components;
 /** 当前展示组件*/
 var curComponent: Component = undefined;
 /** 是否显示组件 */
 const showRef = shallowRef(false);
-/** 树组件配置选项 */
+
+/**
+ * 组件树 配置选项
+ */
 const treeOptions: TreeOptions<Component> = {
-    nodeExtend: {
-        foldDisabled: true,
+    search: {
+        placeholder: "大爷常来玩儿..",
+        autoComplete: true,
+    },
+    nodeOptions: {
+        // foldDisabled: true,
     },
     nodes: [
         {
             text: "基础组件",
+            fixed: true,
             children: [
-                { text: "基础测试组件", data: BaseTest, clickable: true },
-                { text: "Button 按钮组件", data: ButtonTest, clickable: true },
-                { text: "Choose 选择组件", data: ChooseTest, clickable: true },
-                { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, },
-                { text: "Icon 图标组件", data: IconTest, clickable: true },
-                { text: "Search 搜索组件", data: SearchTest, clickable: true },
-                { text: "Select 选项菜单组件", data: SelectTest, clickable: true },
-                { text: "Switch 开关组件", data: SwitchTest, clickable: true },
+                { text: "基础测试组件", data: BaseTest, clickable: true, searchable: true, },
+                { text: "Button 按钮组件", data: ButtonTest, clickable: true, searchable: true, },
+                { text: "Choose 选择组件", data: ChooseTest, clickable: true, searchable: true, },
+                { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, searchable: true, },
+                { text: "Icon 图标组件", data: IconTest, clickable: true, searchable: true, },
+                { text: "Search 搜索组件", data: SearchTest, clickable: true, searchable: true, },
+                { text: "Select 选项菜单组件", data: SelectTest, clickable: true, searchable: true, },
+                { text: "Switch 开关组件", data: SwitchTest, clickable: true, searchable: true, },
             ],
         },
         {
             text: "容器组件",
             children: [
-                { text: "Dynamic 动态组件", data: DynamicTest, clickable: true },
-                { text: "Fold 折叠组件", data: FoldTest, clickable: true },
-                { text: "Scroll 滚动组件", data: ScrollTest, clickable: true },
-                { text: "Table 表格组件", data: TableTest, clickable: true },
-                { text: "Tree 树组件", data: TreeTest, clickable: true },
+                { text: "Dynamic 动态组件", data: DynamicTest, clickable: true, searchable: true, },
+                { text: "Fold 折叠组件", data: FoldTest, clickable: true, searchable: true, },
+                { text: "Scroll 滚动组件", data: ScrollTest, clickable: true, searchable: true, },
+                { text: "Table 表格组件", data: TableTest, clickable: true, searchable: true, },
+                { text: "Tree 树组件", data: TreeTest, clickable: true, searchable: true, },
             ]
         },
         {
             text: "表单组件",
             children: [
-                { text: "Input 输入框组件", data: InputTest, clickable: true },
+                { text: "Input 输入框组件", data: InputTest, clickable: true, searchable: true, },
             ]
         },
         {
             text: "弹窗管理",
             children: [
-                { text: "Dialog 模态弹窗", data: DialogTest, clickable: true },
-                { text: "Follow 跟随弹窗", data: FollowTest, clickable: true },
-                { text: "Popup 弹出", data: PopupTest, clickable: true },
+                { text: "Dialog 模态弹窗", data: DialogTest, clickable: true, searchable: true, },
+                { text: "Follow 跟随弹窗", data: FollowTest, clickable: true, searchable: true, },
+                { text: "Popup 弹出", data: PopupTest, clickable: true, searchable: true, },
             ]
         },
         {
             text: "提示组件",
             children: [
-                { text: "DragVerify 滑块验证", data: DragVerifyTest, clickable: true },
-                { text: "Empty 空状态", data: EmptyTest, clickable: true },
-                { text: "Loading 加载状态", data: LoadingTest, clickable: true },
+                { text: "DragVerify 滑块验证", data: DragVerifyTest, clickable: true, searchable: true, },
+                { text: "Empty 空状态", data: EmptyTest, clickable: true, searchable: true, },
+                { text: "Loading 加载状态", data: LoadingTest, clickable: true, searchable: true, },
             ]
         }
-    ]
+    ],
 }
 
 // *****************************************   👉  方法事件    *****************************************
 /**
  * 树节点点击时
+ * @param node 
+ * @param parents 
  */
-function onTreeNodeClick(node: TreeNode<Component>) {
+function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<Component>[]) {
+    console.log(node, parents);
     curComponent = shallowRef(node.data);
     transition<boolean>(showRef, { from: false, to: true }, 10);
 }
 
 onMounted(() => {
-    onTreeNodeClick(treeOptions.nodes[0].children[6]);
-    // onTreeNodeClick(treeOptions.nodes[3].children[1]);
+    onTreeNodeClick(treeOptions.nodes[0].children[6], undefined);
 });
 </script>
 

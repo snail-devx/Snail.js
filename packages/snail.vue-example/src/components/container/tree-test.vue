@@ -9,12 +9,12 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components, TreeOptions } from "../../core"
+import { components, Tree2Options } from "../../core"
 const { Tree } = components;
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const treeOptions = ref<TreeOptions<number>>({
+const treeOptions = ref<Tree2Options<number>>({
     nodes: [
         {
             text: "1", data: 1, clickable: true,

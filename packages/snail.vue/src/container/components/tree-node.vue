@@ -1,56 +1,60 @@
 <!-- 树节点 组件
-    1、配合Tree组件使用；根节点区域不使用 tree-node 作为class名称，太通用了，很容易被覆盖
-    2、展示节点和节点下的子节点，用于构建出属性结构
-    3、后期考虑支持节点动画，移除或者展示时做一些效果优化
+    1、展示一个树节点和它的子节点 
+    2、支持插槽，由外部自定义展示内容；根据配置插槽可完全重写 树节点
 -->
 <template>
-    <div class="node-panel" v-if="node.disabled != true">
-        <!-- 树节点自身渲染区域：若外部传入【】，则不用渲染缩进、图标、节点名称等 -->
-        <div class="node" :class="[`level-${level}`, node.clickable ? 'clickable' : '']">
-            <template v-if="extend.rewrite == true">
-                <slot v-bind="{ node, parent, level, toggleFold }" />
+    <div class="snail-tree-node" v-if="show" :class="[`level-${level}`, node.clickable ? 'clickable' : '']">
+        <template v-if="options.rewrite == true">
+            <slot :="slotOptions" />
+        </template>
+        <template v-else>
+            <div class="indent" />
+            <div class="node-fold" v-if="options.foldDisabled != true">
+                <Icon v-if="showChildren" :class="statusRef" :type="'custom'" :size="24" :color="'#8a8099'"
+                    :draw="'M 298.667 426.667 l 213.333 256 l 213.333 -256 Z'" @click="toggleFold" />
+            </div>
+            <div class="node-text" :title="node.text" v-text="node.text" @click="onNodeClick(node)" />
+            <div class="node-slot">
+                <slot :="slotOptions" />
+            </div>
+        </template>
+    </div>
+    <div class="snail-tree-children" v-if="show && showChildren" ref="children">
+        <TreeNode v-for="child in node.children" :key="child.id || newId()" :node="child" :parent="node"
+            :level="nextLevel" :options="options" :context="context" :judger="judger"
+            @click="(node, parents) => onChildNodeClick(node, parents)">
+            <template #="slotProps">
+                <slot :="slotProps" />
             </template>
-            <template v-else>
-                <div class="indent" />
-                <div class="node-fold" v-if="extend.foldDisabled != true">
-                    <Icon v-if="hasChildrenRef" :class="statusRef" :type="'custom'" :size="24" :color="'#8a8099'"
-                        :draw="'M 298.667 426.667 l 213.333 256 l 213.333 -256 Z'" @click="toggleFold" />
-                </div>
-                <span class="node-text" :title="node.text" v-text="node.text" @click="onNodeClick(node, parent)" />
-                <div class="node-slot">
-                    <slot v-bind="{ node, parent, level, toggleFold }" />
-                </div>
-            </template>
-        </div>
-        <!-- 子节点区域：遍历子，插槽绑定时，将插槽绑定属性同步向外传递 -->
-        <div class="children" v-if="hasChildrenRef" ref="children">
-            <TreeNode v-for="child in node.children" :key="newId()" :node="child" :parent="node" :level="nextLevel"
-                :extend="extend" @click="onNodeClick">
-                <template #="slotProps">
-                    <slot :="slotProps" />
-                </template>
-            </TreeNode>
-        </div>
+        </TreeNode>
     </div>
 </template>
 
 <script setup lang="ts">
-import { shallowRef, computed, useTemplateRef } from "vue";
-import { TreeNodeEvents, TreeNodeOptions } from "../models/tree-model";
-import { isArrayNotEmpty, newId, throwIfTrue } from "snail.core";
-import Icon from "../../base/icon.vue";
+import { newId, throwIfTrue } from "snail.core";
 import { useAnimation } from "snail.view";
+import { shallowRef, computed, useTemplateRef } from "vue";
+import { TreeNodeEvents, TreeNodeModel, TreeNodeOptions, TreeNodeSoltOptions as TreeNodeSlotOptions } from "../models/tree-model";
+import Icon from "../../base/icon.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { node, parent, level, extend = {} } = defineProps<TreeNodeOptions<any>>();
+const { node, parent, options, level, context, judger } = defineProps<TreeNodeOptions<any>>();
 throwIfTrue(level > 10, "tree node level cannot exceed 10.");
 const emits = defineEmits<TreeNodeEvents<any>>();
 const { transition } = useAnimation();
+/**     树节点的上下文 */
+const { show, showChildren } = context.getContext(node);
+/**     树节点的【插槽】配置选项 */
+const slotOptions = Object.freeze<TreeNodeSlotOptions<any>>({
+    node,
+    parent,
+    level,
+    toggle: toggleFold,
+    click: () => onNodeClick(node),
+});
 /**     折叠状态，默认展开 */
 const statusRef = shallowRef<"expand" | "fold">("expand");
-/**     是否有子节点 */
-const hasChildrenRef = computed(() => isArrayNotEmpty(node.children));
 /**     下一个层级： */
 const nextLevel: number = level + 1;
 /**     子节点区域Dom元素引用 */
@@ -73,9 +77,9 @@ function toggleFold() {
     }
     //  有子节点时，计算位置动画效果
     if (childrenDom.value) {
-        const minHeight = childrenDom.value.previousElementSibling.getBoundingClientRect().height;
-        const maxHeight = minHeight + childrenDom.value.getBoundingClientRect().height;
-        transition(childrenDom.value.parentElement, {
+        const minHeight = 0;
+        const maxHeight = childrenDom.value.scrollHeight;
+        transition(childrenDom.value, {
             from: { transition: "height 0.2s ease", overflow: "hidden", height: `${statusRef.value == 'fold' ? maxHeight : minHeight}px` },
             to: { height: `${statusRef.value == 'fold' ? minHeight : maxHeight}px` },
             end: statusRef.value == 'fold' ? { height: `${minHeight}px`, overflow: 'hidden' } : {}
@@ -84,14 +88,19 @@ function toggleFold() {
 }
 /**
  * 树节点点击时
- * - 支持自身节点，子节点
- * - 子节点点击时，逐步往上冒泡
- * - 这里不写类型，避免和 TreeNode.vue 组件名称重复
  * @param node 
- * @param parent 
  */
-function onNodeClick(node, parent?) {
-    node.clickable == true && emits("click", node, parent);
+function onNodeClick(node: TreeNodeModel<any>) {
+    node.clickable == true && emits("click", node, parent ? [parent] : undefined);
+}
+/**
+ * 子节点点击事件：把自己的父节点加进来
+ * @param child     子节点 
+ * @param parents   已有的父节点路径
+ */
+function onChildNodeClick(child: TreeNodeModel<any>, parents: TreeNodeModel<any>[]) {
+    parents = parent ? [parent, ...parents] : parents;
+    emits("click", child, parents);
 }
 </script>
 
@@ -99,111 +108,108 @@ function onNodeClick(node, parent?) {
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/base-mixins.less";
 
-.node-panel {
+//  节点自身
+.snail-tree-node {
     width: 100%;
+    //  flex 布局：display: flex，align-items 为center
+    .flex-cross-center();
+    flex-wrap: nowrap;
+    height: 40px;
 
-    //  节点自身
-    >.node {
-        //  flex 布局：display: flex，align-items 为center
-        .flex-cross-center();
-        flex-wrap: nowrap;
-        height: 40px;
+    &:hover {
+        background-color: #f8f9fa;
+    }
 
-        &:hover {
-            background-color: #f8f9fa;
-        }
+    //  缩进、图标、插槽区域：不缩放
+    >.indent,
+    >.snail-icon,
+    >.node-slot {
+        flex-shrink: 0;
+    }
 
-        //  缩进、图标、插槽区域：不缩放
-        >.indent,
-        >.snail-icon,
-        >.node-slot {
-            flex-shrink: 0;
-        }
+    //  节点折叠区域
+    >.node-fold {
+        width: 24px;
+        height: 100%;
+        //  flex 布局：display: flex，align-items、justify-content 都为center
+        .flex-center();
 
-        //  节点折叠区域
-        >.node-fold {
-            width: 24px;
-            height: 100%;
-            //  flex 布局：display: flex，align-items、justify-content 都为center
-            .flex-center();
+        >.snail-icon {
+            transition: transform 0.1s ease-in;
 
-            >.snail-icon {
-                transition: transform 0.1s ease-in;
-
-                //  折叠状态时，图标旋转一下
-                &.fold {
-                    transform: rotate(-90deg);
-                }
+            //  折叠状态时，图标旋转一下
+            &.fold {
+                transform: rotate(-90deg);
             }
         }
-
-        //  节点文本、插槽区域：文本溢出隐藏
-        >.node-text,
-        >.node-slot {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        >.node-text {
-            flex: 1;
-            min-width: 30px;
-            color: #2e3033;
-        }
-
-        //  节点可点击时，节点文本区域鼠标手型
-        &.clickable>.node-text {
-            cursor: pointer;
-        }
     }
 
-    //  子节点容器
-    >.children {
-        width: 100%;
+    //  节点文本、插槽区域：文本溢出隐藏
+    >.node-text,
+    >.node-slot {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
+
+    >.node-text {
+        flex: 1;
+        min-width: 30px;
+        color: #2e3033;
+    }
+
+    //  节点可点击时，节点文本区域鼠标手型
+    &.clickable>.node-text {
+        cursor: pointer;
+    }
+}
+
+//  子节点容器
+.snail-tree-children {
+    width: 100%;
 }
 
 // *****************************************   👉  特殊样式适配    *****************************************
 //  缩进层级样式适配：最多支持10级缩进
 @levelIndent: 24px;
 
-.node-panel>.level-1>.indent {
-    padding-left: 0;
+.snail-tree-node.level-1>.indent {
+    padding-left: 4px;
 }
 
-.node-panel>.level-2>.indent {
+.snail-tree-node.level-2>.indent {
     padding-left: 1*@levelIndent;
 }
 
-.node-panel>.level-3>.indent {
+.snail-tree-node.level-3>.indent {
     padding-left: 2*@levelIndent;
 }
 
-.node-panel>.level-4>.indent {
+.snail-tree-node.level-4>.indent {
     padding-left: 3*@levelIndent;
 }
 
-.node-panel>.level-5>.indent {
+.snail-tree-node.level-5>.indent {
     padding-left: 4*@levelIndent;
 }
 
-.node-panel>.level-6>.indent {
+.snail-tree-node.level-6>.indent {
     padding-left: 5*@levelIndent;
 }
 
-.node-panel>.level-7>.indent {
+.snail-tree-node.level-7>.indent {
     padding-left: 6*@levelIndent;
 }
 
-.node-panel>.level-8>.indent {
+.snail-tree-node.level-8>.indent {
     padding-left: 7*@levelIndent;
 }
 
-.node-panel>.level-9>.indent {
+.snail-tree-node.level-9>.indent {
     padding-left: 8*@levelIndent;
 }
 
-.node-panel>.level-10>.indent {
+.snail-tree-node.level-10>.indent {
     padding-left: 9*@levelIndent;
 }
 </style>

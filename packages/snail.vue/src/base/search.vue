@@ -31,6 +31,7 @@ defineOptions({ name: "Search", inheritAttrs: true, });
  * 搜索按钮点击
  */
 function onSearch(evt: KeyboardEvent) {
+    /* autoComplete时：这里需要注意一下，组合按键，或者按下 ctrl等非文本键，都会触发，后续优化 */
     if (props.readonly == true) {
         return;
     }

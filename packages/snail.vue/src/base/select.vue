@@ -92,7 +92,6 @@ async function onClick() {
                 items: refreshSelectNodes(selectNodes, values),
                 level: 1,
                 search: props.search,
-                searchPlaceholder: props.searchPlaceholder,
                 multiple: props.multiple,
                 values: [...valuesModel.value],
                 popupStyle: props.popupStyle,

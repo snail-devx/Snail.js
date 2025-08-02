@@ -1,99 +1,99 @@
-import { DisabledOptions } from "../../base/models/base-model";
+/**
+ * 树组件 相关实体
+ * - 基于 snail.core中的TreeNode做扩展
+ */
+
+import { SearchOptions } from "../../base/models/search-model";
+import { ITreeContext, TreeNode, TreeNodeExtend } from "../../base/models/tree-base";
 
 /**
- * 树组件配置选项
+ * 树组件 配置选项
  */
 export type TreeOptions<T> = {
     /**
-     * 树节点
+     * 树节点 集合
      */
-    nodes: TreeNode<T>[];
+    nodes: TreeNodeModel<T>[];
 
     /**
-     * 树节点的扩展配置
-     * - 用于对树节点做进一步控制
+     * 树节点搜索配置
+     * - 不配置则不启用【搜索】功能
      */
-    nodeExtend?: TreeNodeExtendOptions;
+    search?: SearchOptions;
+    /**
+     * 树节点的配置选项
+     */
+    nodeOptions?: TreeNodeRenderOptions,
 }
 /**
  * 树组件事件
  */
-export type TreeEvents<T> = {
+export type TreeEvents<T> = TreeNodeEvents<T> & {
+
 }
-
-/**
- * 树节点
- * - disabled       不展示节点和子节点
- */
-export type TreeNode<T> = DisabledOptions & {
-    /**
-     * 树节点 文本
-     */
-    text: string;
-    /**
-     * 节点类型
-     * - 用于外部构建插槽时做区分使用
-     */
-    type?: string;
-    /**
-     * 树节点附加数据
-     */
-    data?: T;
-
-    /**
-     * 是否可点击
-     * - true 此节点可点击，点击时触发 click 事件
-     * - false 此节点不可点击
-     */
-    clickable?: boolean;
-
-    /**
-     * 子节点 数据
-     */
-    children?: TreeNode<T>[];
-}
-
 /**
  * 树节点 组件配置选项
  */
 export type TreeNodeOptions<T> = {
     /**
-     * 树节点
+     * 要渲染的树节点
      */
-    node: TreeNode<T>;
+    node: TreeNodeModel<T>;
     /**
      * 父节点
      */
-    parent?: TreeNode<T>;
+    parent?: TreeNodeModel<T>;
+
     /**
-     * 节点层级
-     * - 从1开始
+     * 树节点所处层级
+     * - 用于控制缩进
      */
     level: number;
+
     /**
-     * 节点的扩展配置
-     * - 用于对树节点做进一步控制
+     * 树节点的配置选项
      */
-    extend?: TreeNodeExtendOptions;
+    options?: TreeNodeRenderOptions,
+
+    /**
+     * 树组件的上下文对象
+     */
+    context: ITreeContext<T>,
+
+    /**
+     * 节点判断器：判断节点是否需要显示
+     * @param node 
+     * @returns true，节点可显示，false，节点不显示
+     */
+    judger: (node: TreeNodeModel<T>) => boolean;
 }
 /**
  * 树节点事件
  */
 export type TreeNodeEvents<T> = {
     /**
-     * 点击树节点
-     * - 节点 clickable 为 true 时，点击此节点时触发
+     * 树节点 点击事件
      * @param node 点击的树节点
-     * @param parent node 所属 父节点
+     * @param parents node的父节点路径，从【顶级父节点】->【直属父节点】
      */
-    click: [node: TreeNode<T>, parent?: TreeNode<T>];
+    (el: "click", node: TreeNodeModel<T>, parents?: TreeNodeModel<T>[])
 }
 
+
 /**
- * 树节点扩展配置选项
+ * 树节点数据结构
+ * - 简化外部使用 树节点 时需要频繁写 TreeNode<T, TreeNodeExtend>；
+ * - 避免和 Vue 组件“tree-node.vue”命名重复
+ * - 推荐使用时，将此对象做响应式，否则 .hidden 等 更新时，无法实时反应到树上
  */
-export type TreeNodeExtendOptions = {
-    //  后续支持传入 展开切换 图标样式等、、做一些内置性质的扩展工作
+export type TreeNodeModel<T> = TreeNode<T, TreeNodeExtend>;
+
+/**
+ * 树节点 渲染配置选项
+ */
+export type TreeNodeRenderOptions = {
+    /* 后续支持传入 展开切换 图标样式等、、做一些内置性质的扩展工作 */
+
     /**
      * 是否禁用【折叠】子节点操作
      * - true 时禁用 折叠操作
@@ -105,4 +105,32 @@ export type TreeNodeExtendOptions = {
      * - false 时，插槽仅作为扩展元素，如自定义操作等
      */
     rewrite?: boolean;
+}
+
+/**
+ * 树节点 插槽配置选项
+ */
+export type TreeNodeSoltOptions<T> = {
+    /**
+         * 当前节点
+         */
+    node: TreeNodeModel<T>;
+    /**
+     * 父节点
+     */
+    parent?: TreeNodeModel<T>;
+
+    /**
+     * 所处层级
+     */
+    level: number;
+
+    /**
+     * 点击节点
+     */
+    click(): void;
+    /**
+     * 切换【子节点】折叠窗台
+     */
+    toggle(): void;
 }

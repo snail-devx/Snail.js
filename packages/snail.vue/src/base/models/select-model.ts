@@ -2,6 +2,7 @@ import { ShallowRef } from "vue";
 import { PlaceholderOptions, ReadonlyOptions } from "./base-model";
 import { IScope } from "snail.core";
 import { HeightStyle } from "snail.view";
+import { SearchOptions } from "./search-model";
 
 /**
  * 选项菜单 基础配置选项
@@ -13,15 +14,10 @@ export type SelectBaseOptions<T> = {
     items: SelectItem<T>[];
 
     /**
-     * 启用 【搜索】功能
-     * - 为true时，支持本地搜索【选择项】文本值
+     * 搜索功能配置
+     * - 不配置则不启用【搜索】功能
      */
-    search?: boolean;
-    /**
-     * 搜索框提示语
-     * - search 为true时生效
-     */
-    searchPlaceholder?: string;
+    search?: SearchOptions;
 
     /**
      * 是否【多选模式】

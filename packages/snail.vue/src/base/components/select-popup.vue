@@ -10,8 +10,7 @@
         暂无可选项
     </div>
     <div v-else :class="classRef" :style="props.popupStyle" @mouseenter="onEnterPopup" @mouseleave="onLeavePopup">
-        <Search v-if="props.search" :placeholder="props.searchPlaceholder || '请输入'" :auto-complete="true"
-            @search="onSearch" />
+        <Search v-if="props.search" :="props.search" @search="onSearch" />
         <template v-if="noMatched == false" v-for="node in props.items" :key="node.id">
             <SelectNodeVue :="node" :id="node.id" @enter="el => onEnterSelectNode(el, node, undefined)"
                 @click="onClickSelectNode(node, undefined)" />
@@ -148,7 +147,7 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectNode<any>, 
             //  子级【选择项】弹窗配置数据
             props: Object.freeze<SelectPopupOptions<any> & SelectPopupOptionsExtend>({
                 items: node.children,
-                search: false,
+                search: undefined,
                 level: props.level + 1,
                 values: props.values,
                 popupStyle: props.popupStyle,
