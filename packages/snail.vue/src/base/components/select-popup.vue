@@ -12,8 +12,8 @@
         </template>
         <template v-else>
             <Search v-if="props.search" :="props.search" @search="onSearch" />
-            <SelectNode v-for="item in items" :key="item.id || newId()" :item="item" :context="context"
-                :show-children="true" @enter="onEnterSelectNode" @click="onClickSelectNode" />
+            <SelectNode v-for="item in items" :key="item.id || newId()" :multiple="props.multiple" :item="item"
+                :context="context" :show-children="true" @enter="onEnterSelectNode" @click="onClickSelectNode" />
             <Empty v-if="items.length == 0" :message="'无结果'" />
         </template>
     </div>
@@ -160,7 +160,6 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
                 context: context,
                 search: undefined,
                 level: props.level + 1,
-                values: props.values,
                 popupStyle: props.popupStyle,
 
                 childDestroyTimer: childDestroyTimer,

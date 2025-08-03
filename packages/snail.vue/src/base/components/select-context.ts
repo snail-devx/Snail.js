@@ -1,0 +1,52 @@
+/**
+ * 【选项菜单】组件上下文
+ */
+
+import { IScope } from "snail.core";
+import { ISelectContext, SelectItem } from "../models/select-model";
+import { useTreeContext } from "./tree-context";
+import { ShallowRef } from "vue";
+
+/**
+ * 使用【选项菜单】上下文
+ * @param items 已有【选择项】集合
+ * @param selects 已选【选择项】集合；响应式，方便自动计算
+ * @returns 选项菜单 上下文+作用域
+ */
+export function useSelectContext<T>(items: SelectItem<T>[], selects: ShallowRef<SelectItem<T>[]>): ISelectContext<T> & IScope {
+    const treeContxt = useTreeContext<T>(items);
+
+    //#region *************************************实现接口：ISelectContext 接口方法*************************************
+    /**
+     * 指定节点是否选中了
+     * @param multiple 是否是【多选模式】
+     * @param item 要判断的节点
+     * @returns true 选中，false 未选中
+     */
+    function selected(multiple: boolean, item: SelectItem<T>): boolean {
+        if (selects.value) {
+            return multiple == true
+                ? selects.value.includes(item)
+                : selects.value[selects.value.length - 1] == item;
+        }
+        return false;
+    }
+    /**
+     * 获取已选【选择项】的展示文本
+     * @param multiple 是否是【多选模式】
+     * @param showPath 是否显示路径
+     * @returns 已选【选择项】的展示文本
+     */
+    function selectedText(multiple: boolean, showPath: boolean): string {
+        if (selects.value) {
+            return multiple == true || showPath == true
+                ? selects.value.map(item => item.text).join(multiple ? "、" : " / ")
+                : selects.value[selects.value.length - 1].text
+        }
+        return "";
+    }
+    //#endregion
+
+    //  借助 useTreeContext 实现基础功能，然后挂载自身实现方法
+    return Object.freeze({ ...treeContxt, selected, selectedText });
+}

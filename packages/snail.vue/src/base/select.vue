@@ -20,14 +20,12 @@
 </template>
 
 <script setup lang="ts">
+import { hasAny, IAsyncScope, isArrayNotEmpty } from "snail.core";
 import { computed, shallowRef, useTemplateRef } from "vue";
+import { usePopup } from "../popup/manager";
 import Icon from "./icon.vue";
 import SelectPopup from "./components/select-popup.vue";
-import { usePopup } from "../popup/manager";
-import { hasAny, IAsyncScope, isArrayNotEmpty } from "snail.core";
-import { SelectEvents, SelectItem, SelectOptions, SelectPopupOptions } from "./models/select-model";
-import { ITreeContext } from "./models/tree-base";
-import { useTreeContext } from "./components/tree-context";
+import { ISelectContext, SelectEvents, SelectItem, SelectOptions, SelectPopupOptions } from "./models/select-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -35,20 +33,14 @@ const props = defineProps<SelectOptions<any>>();
 const emits = defineEmits<SelectEvents<any>>();
 const valuesModel = defineModel<SelectItem<any>[]>({ default: [] });
 const { follow } = usePopup();
-/** 树上下文 */
-const context: ITreeContext<any> = useTreeContext<any>(props.items);
+/** 已选结果数据 */
+const selects = shallowRef<SelectItem<any>[]>([...valuesModel.value]);
+/** 【选项菜单】上下文 */
+const context: ISelectContext<any> = useSelectContext<any>(props.items, selects);
 /** 组件根元素*/
 const rootDom = useTemplateRef("select");
-/** 已选结果数据 */
-const selects = shallowRef<SelectItem<any>[]>();
 /** 选择的结果文本 */
-const selectText = computed(() => hasAny(selects.value)
-    ? (props.multiple == true || props.showPath == true
-        ? selects.value.map(item => item.text).join(props.multiple ? "、" : " / ")
-        : selects.value[selects.value.length - 1].text
-    )
-    : ""
-);
+const selectText = computed(() => context.selectedText(props.multiple, props.showPath));
 /** 跟随弹窗作用域 */
 var followScope: IAsyncScope<SelectItem<any>[]> = undefined;
 //  2、可选配置选项
@@ -95,7 +87,6 @@ async function onClick() {
                 level: 1,
                 search: props.search,
                 multiple: props.multiple,
-                values: [...valuesModel.value],
                 popupStyle: props.popupStyle,
             },
             //  事件监听、例外属性处理
@@ -125,6 +116,8 @@ function onSelectItemChange(items: SelectItem<any>[]) {
 
 <script lang="ts">
 import { onAppCreated } from "./utils/app-util";
+import { useSelectContext } from "./components/select-context";
+import { an } from "vitest/dist/chunks/reporters.d.BFLkQcL6";
 //  非组件实例逻辑：将【选项弹窗】注册为【弹窗】app实例的全局组件，方便树形复用
 onAppCreated((app, type) => {
     type == "popup" && app.component("SelectPopup", SelectPopup);

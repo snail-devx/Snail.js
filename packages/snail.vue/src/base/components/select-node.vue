@@ -10,8 +10,9 @@
         <div class="item-text" v-text="item.text" />
         <Icon v-if="item.type == 'group'" :type="'arrow'" :color="'#8a9099'" />
     </div>
-    <SelectNode v-if="show" v-for="child in children" :key="child.id || newId()" :item="child" :context="context"
-        :show-children="false" @enter="el => emits('enter', el, child, item)" @click="emits('click', child, item)" />
+    <SelectNode v-if="show" v-for="child in children" :key="child.id || newId()" :multiple="multiple" :item="child"
+        :context="context" :show-children="false" @enter="el => emits('enter', el, child, item)"
+        @click="emits('click', child, item)" />
 </template>
 
 <script setup lang="ts">
@@ -22,7 +23,7 @@ import { SelectItem, SelectNodeEvents, SelectNodeOptions } from "../models/selec
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { item, showChildren, context } = defineProps<SelectNodeOptions<any>>();
+const { multiple, item, showChildren, context } = defineProps<SelectNodeOptions<any>>();
 const emits = defineEmits<SelectNodeEvents<any>>();
 /** 自身是否展示 */
 const show = computed(() => context.canShow(item));
@@ -38,8 +39,11 @@ const classRef = computed(() => ({
     clickable: item.clickable,
     group: item.type == 'group',
     item: item.type != 'group',
-    // selected: selected.value
+    selected: selected.value,
 }));
+/** 当前节点是否选中了 */
+const selected = computed(() => context.selected(multiple, item));
+
 //  2、可选配置选项
 defineOptions({ name: "SelectNode", inheritAttrs: true, });
 // *****************************************   👉  事件、方法    *****************************************

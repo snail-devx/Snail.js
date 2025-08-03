@@ -82,6 +82,27 @@ export type SelectEvents<T> = SelectBaseEvents<T> & {
 }
 
 /**
+ * 【选项菜单】 组件上下文
+ */
+export interface ISelectContext<T> extends ITreeContext<T> {
+    /**
+     * 指定节点是否选中了
+     * @param multiple 是否是【多选模式】
+     * @param item 要判断的节点
+     * @returns true 选中，false 未选中
+     */
+    selected(multiple: boolean, item: SelectItem<T>): boolean;
+    /**
+     * 获取已选【选择项】的展示文本
+     * @param multiple 是否是【多选模式】
+     * @param showPath 是否显示路径
+     * @returns 已选【选择项】的展示文本
+     */
+    selectedText(multiple: boolean, showPath: boolean): string;
+}
+
+
+/**
  * 【选项菜单】 弹窗组件配置选项
  */
 export type SelectPopupOptions<T> = SelectBaseOptions<T> & {
@@ -95,12 +116,7 @@ export type SelectPopupOptions<T> = SelectBaseOptions<T> & {
     /**
      * 树形上下文
      */
-    context: ITreeContext<T>;
-
-    /**
-     * 已选【选择项】
-     */
-    values?: SelectItem<T>[];
+    context: ISelectContext<T>;
 
     /**
      * 第几级 选项弹窗
@@ -130,13 +146,17 @@ export type SelectPopupExtend = {
  */
 export type SelectNodeOptions<T> = {
     /**
+     * 是否为【多选模式】
+     */
+    multiple: boolean;
+    /**
      * 要展示的节点
      */
     item: SelectItem<T>;
     /**
      * 树形上下文
      */
-    context: ITreeContext<T>;
+    context: ISelectContext<T>;
 
     /**
      * 是否显示子节点
