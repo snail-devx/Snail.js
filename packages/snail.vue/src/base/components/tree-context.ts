@@ -25,7 +25,6 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeCo
         const result = searchTree(nodes, text);
         /** 匹配成功的集合，暂时不维护
         matched.value = result.matched; */
-        console.log(10);
         failed.value = result.failed;
     }
     /**

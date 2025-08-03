@@ -1,39 +1,49 @@
 <!-- 选项菜单【选择项】节点组件
-    1、若有子项，则展示箭头；不做任何事件控制 
+    1、展示自身和直属子节点；鼠标以上子节点时，触发事件，通知 select-popup.vue
+        1、自身若有子项，则展示箭头；不做任何事件控制 
     2、配合 ./select-popup.vue 使用，无法独立使用
+        1、命名为 Select-Node ，避免和SelectItem数据结构重复，且此处展示 自身 + 子 ，不是单纯的 Item 自身数据，Node 更合适
  -->
 <template>
-    <div class="select-node" :class="classRef" :title="item.text" ref="select-node"
-        @mouseenter="emits('enter', selectNodDom)" @mouseleave="() => emits('leave', selectNodDom)"
-        @click="() => emits('click', selectNodDom)">
+    <div class="select-node" :class="classRef" v-if="show" :title="item.text" ref="select-node"
+        @mouseenter="emits('enter', selectNodDom, item)" @click="() => emits('click', item)">
         <div class="item-text" v-text="item.text" />
         <Icon v-if="item.type == 'group'" :type="'arrow'" :color="'#8a9099'" />
     </div>
+    <SelectNode v-if="show" v-for="child in children" :key="child.id || newId()" :item="child" :context="context"
+        :show-children="false" @enter="el => emits('enter', el, child, item)" @click="emits('click', child, item)" />
 </template>
 
 <script setup lang="ts">
 import Icon from "../icon.vue";
-import { computed, useTemplateRef } from "vue";
-import { SelectNodeEvents, SelectNodeOptions } from "../models/select-model";
+import { newId } from "snail.core";
+import { computed, onUpdated, useTemplateRef } from "vue";
+import { SelectItem, SelectNodeEvents, SelectNodeOptions } from "../models/select-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { item } = defineProps<SelectNodeOptions<any>>();
-const emits = defineEmits<SelectNodeEvents>();
+const { item, showChildren, context } = defineProps<SelectNodeOptions<any>>();
+const emits = defineEmits<SelectNodeEvents<any>>();
+/** 自身是否展示 */
+const show = computed(() => context.canShow(item));
+/** 子节点数据 */
+const children = showChildren == true && item.type == "group"
+    ? computed(() => (item.children || []).filter(context.canShow))
+    : [] as SelectItem<any>[];
 /** 【选择项】节点Dom元素 */
 const selectNodDom = useTemplateRef("select-node");
 /** 自定义的class样式：动态计算 */
 const classRef = computed(() => ({
+    child: showChildren != true,
     clickable: item.clickable,
     group: item.type == 'group',
     item: item.type != 'group',
     // selected: selected.value
 }));
-
 //  2、可选配置选项
 defineOptions({ name: "SelectNode", inheritAttrs: true, });
-
 // *****************************************   👉  事件、方法    *****************************************
+
 </script>
 
 <style lang="less">

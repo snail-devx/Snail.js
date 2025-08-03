@@ -71,8 +71,8 @@ async function onClick() {
         : [];
     props.multiple != true && values.length > 1 && values.splice(0, values.length - 1);
     //  打开弹窗：跟随宽度，并在合适时机关闭掉
+    context.doSearch(undefined);
     followScope = follow(rootDom.value, {
-        // component: shallowRef(SelectPopup),
         name: "SelectPopup",
         followWidth: true,
         followX: "start",

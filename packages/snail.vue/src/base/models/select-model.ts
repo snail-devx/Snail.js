@@ -124,24 +124,27 @@ export type SelectNodeOptions<T> = {
      * 树形上下文
      */
     context: ITreeContext<T>;
+
+    /**
+     * 是否显示子节点
+     */
+    showChildren: boolean;
 }
 /**
  * 【选项菜单】节点 组件事件
  */
-export type SelectNodeEvents = {
-    /**
-     * 点击事件
-     * @param el 【选择项】节点dom元素
-     */
-    click: [el: HTMLDivElement],
+export type SelectNodeEvents<T> = {
     /**
      * 鼠标进入事件
      * @param el 【选择项】节点dom元素
+     * @param item 【选择项】
+     * @param parent 父节点
      */
-    enter: [el: HTMLDivElement],
+    enter: [el: HTMLDivElement, item: SelectItem<T>, parent?: SelectItem<T>],
     /**
-     * 鼠标离开事件
-     * @param el 【选择项】节点dom元素
+     * 点击事件
+     * @param item 【选择项】
+     * @param parent 父节点
      */
-    leave: [el: HTMLDivElement]
+    click: [item: SelectItem<T>, parent?: SelectItem<T>],
 }

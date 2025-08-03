@@ -1,7 +1,7 @@
 <!-- 组件介绍写到这里 -->
 <template>
     1111111111111111111111111111111111111111111
-    <Select :items="items" :search="{}" :delete="true" style="width: 200px;" />
+    <Select :items="items" :search="{ autoComplete: true }" :delete="true" style="width: 200px;" />
     <Select :items="items" :search="{}" style="width: 200px;position: absolute;right: 10px; top: 20px;" />
 </template>
 

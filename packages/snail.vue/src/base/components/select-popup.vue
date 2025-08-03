@@ -6,27 +6,22 @@
     5、搜索框需要搜索时，对外发送事件，由【../select.vue】完成搜索处理，并更新选项数据
 -->
 <template>
-    <div v-if="classRef['text-tips']" :class="classRef" @mouseenter="onEnterPopup" @mouseleave="onLeavePopup">
-        暂无可选项
-    </div>
-    <div v-else :class="classRef" :style="props.popupStyle" @mouseenter="onEnterPopup" @mouseleave="onLeavePopup">
-        <Search v-if="props.search" :="props.search" @search="context.doSearch" />
-        <template v-if="noMatched == false" v-for="node in props.items" :key="node.id">
-            <SelectNode :item="node" :context="context" @enter="el => onEnterSelectNode(el, node, undefined)"
-                @click="onClickSelectNode(node, undefined)" />
-            <template v-if="node.type == 'group' && isArrayNotEmpty(node.children) == true">
-                <SelectNode class="child" v-for="child in node.children" :key="child.id" :item="child"
-                    :context="context" @enter="el => onEnterSelectNode(el, child, node)"
-                    @click="onClickSelectNode(child, node);" />
-            </template>
+    <div :class="classRef" :style="props.popupStyle" @mouseenter="onEnterPopup" @mouseleave="onLeavePopup">
+        <template v-if="classRef['child-popup'] && classRef['text-tips']">
+            暂无选项
         </template>
-        <Empty v-if="noMatched" :message="'无结果'" />
+        <template v-else>
+            <Search v-if="props.search" :="props.search" @search="onSearch" />
+            <SelectNode v-for="item in items" :key="item.id || newId()" :item="item" :context="context"
+                :show-children="true" @enter="onEnterSelectNode" @click="onClickSelectNode" />
+            <Empty v-if="items.length == 0" :message="'无结果'" />
+        </template>
     </div>
 </template>
 
 <script setup lang="ts">
-import { IAsyncScope, isArrayNotEmpty, IScope, tidyString, useTimer } from "snail.core";
-import { shallowRef, computed, ShallowRef, } from "vue";
+import { IAsyncScope, isArrayNotEmpty, IScope, newId, useTimer } from "snail.core";
+import { shallowRef, computed, ShallowRef, ComputedRef, } from "vue";
 import { usePopup } from "../../popup/manager";
 import { useReactive } from "../reactive";
 //  依赖的其他vue组件
@@ -48,18 +43,18 @@ const { onTimeout } = useTimer();
 const { watcher } = useReactive();
 //  解构一些响应式变量，方便访问
 const { popupStatus, pinned, parentPinned } = props;
+/** 能够展示的【选择项】 */
+const items: ComputedRef<SelectItem<any>[]> = computed(() => (props.items || []).filter(context.canShow));
 /** 弹窗所需的类样式信息 */
 const classRef = computed(() => ({
     "snail-select-popup": true,
     /** 子【选择项】弹窗 */
     'child-popup': props.level > 1,
     /** 无【选择项】的文本提示区域 */
-    'text-tips': isArrayNotEmpty(props.items) == false,
+    'text-tips': items.value.length == 0,
     /** 【选择项】中是否存在分组 */
-    "has-group": (props.items || []).find(node => node.type == "group") != undefined,
+    "has-group": items.value.find(node => node.type == "group") != undefined,
 }));
-/** 搜索时，未匹配到任何【选择项】；仅在第一级弹窗有效 */
-const noMatched = shallowRef<boolean>(false);
 /** 子弹窗销毁的定时器；鼠标离开弹窗时，做延迟销毁；避免回到 此弹窗 的父【选择项】时，又重新打开此弹窗*/
 const childDestroyTimer: ShallowRef<IScope> = shallowRef(undefined);
 //  2、临时变量
@@ -73,6 +68,22 @@ var childFollowScope: IAsyncScope<SelectItem<any>[]> = undefined;
 defineOptions({ name: "Select2Popup", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 销毁子【选择项】弹窗
+ * @param onlyTimer 是否仅销毁 子的定时器；false时全部销毁
+ */
+function destroyChildFollow(onlyTimer?: boolean) {
+    //  取消子弹窗的销毁逻辑
+    childDestroyTimer.value && childDestroyTimer.value.destroy();
+    childDestroyTimer.value = undefined;
+    //  销毁子弹窗
+    if (onlyTimer != true && childFollowScope && childFollowScope.destroyed == false) {
+        childFollowScope.destroy();
+        childFollowScope = undefined;
+        childFollowTargetDom = undefined;
+    }
+}
+
 /**
  * 鼠标进入弹窗时
  * - 【钉住】父级弹窗
@@ -92,6 +103,16 @@ function onLeavePopup() {
     if (props.level > 1 && (childFollowScope == undefined || childFollowScope.destroyed)) {
         props.childDestroyTimer.value = onTimeout(props.closePopup, 200, undefined);
     }
+}
+
+/**
+ * 搜索选项时
+ * @param text 
+ */
+function onSearch(text: string) {
+    //  搜索时，先将弹出的子弹窗关闭掉；否则搜索未匹配子弹窗时，会存在效果漂移问题；后续考虑优化，此种情况，Follow弹窗应立即销毁
+    destroyChildFollow();
+    context.doSearch(text);
 }
 /**
  * 选项选择后
@@ -115,16 +136,12 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
     }
     //  目前还有子弹窗存在时，做一些特例逻辑
     if (childFollowScope && childFollowScope.destroyed == false) {
-        //  取消子弹窗的销毁逻辑
-        childDestroyTimer.value && childDestroyTimer.value.destroy();
-        childDestroyTimer.value = undefined;
-        //  target和之前的子弹窗选项 target 一致时，不用重复弹窗；否则销毁之前弹窗，再弹出新的
-        if (target == childFollowTargetDom) {
+        //  取消子弹窗的销毁逻辑；target和之前的子弹窗选项 target 一致时，不用重复弹窗；否则销毁之前弹窗，再弹出新的
+        const isSameTarget = target == childFollowTargetDom;
+        destroyChildFollow(isSameTarget);
+        if (isSameTarget == true) {
             return;
         }
-        childFollowScope.destroy();
-        childFollowScope = undefined;
-        childFollowTargetDom = undefined;
     }
     //  二级分类选项，弹出子选项follow弹窗；此时强制无需search
     if (node.type == "group" && parent) {
@@ -199,18 +216,18 @@ watcher(popupStatus, newValue => newValue == "closed" && childFollowScope && chi
 }
 
 // *****************************************   👉  特殊样式适配    *****************************************
-//  子的选项弹窗
+//  子的选项弹窗：无选项时显示【无选项】
 .snail-select-popup.child-popup {
     min-width: 200px;
     max-width: 250px;
     padding-top: 6px;
-}
 
-//  无可用选项
-.snail-select-popup.text-tips {
-    padding: 0 12px;
-    width: 100px !important;
-    justify-content: center;
+    //  无可用选项
+    &.text-tips {
+        padding: 0 12px;
+        width: 100px !important;
+        justify-content: center;
+    }
 }
 
 //  有分组时
