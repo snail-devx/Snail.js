@@ -1,8 +1,9 @@
 /**
  * 树组件 助手类方法
  */
-import { hasAny, isStringNotEmpty, TreeNode } from "snail.core";
-import { TreeNodeExtend, TreeSearchResult } from "../../base/models/tree-base";
+import { hasAny, isStringNotEmpty } from "snail.core";
+import { TreeNode, TreeNodeExtend, TreeSearchResult } from "../src/base/models/tree-base";
+import { Tree2Node } from "./tree2-model";
 
 /**
  * 搜索树
@@ -18,7 +19,7 @@ export function searchTree<T>(nodes: TreeNode<T, TreeNodeExtend>[], text: string
         var matched: boolean = false;
         //  子节点匹配，若子节点匹配上了，则父节点自动匹配上
         if (hasAny(node.children) == true) {
-            const childResult = searchTree<T>(node.children, text);
+            const childResult = searchTree<T>(node.children!, text);
             result.matched.push(...childResult.matched);
             result.failed.push(...childResult.failed);
             matched = childResult.matched.length > 0;

@@ -12,11 +12,12 @@
     <div v-else :class="classRef" :style="props.popupStyle" @mouseenter="onEnterPopup" @mouseleave="onLeavePopup">
         <Search v-if="props.search" :="props.search" @search="context.doSearch" />
         <template v-if="noMatched == false" v-for="node in props.items" :key="node.id">
-            <SelectNode :item="node" @enter="el => onEnterSelectNode(el, node, undefined)"
+            <SelectNode :item="node" :context="context" @enter="el => onEnterSelectNode(el, node, undefined)"
                 @click="onClickSelectNode(node, undefined)" />
             <template v-if="node.type == 'group' && isArrayNotEmpty(node.children) == true">
                 <SelectNode class="child" v-for="child in node.children" :key="child.id" :item="child"
-                    @enter="el => onEnterSelectNode(el, child, node)" @click="onClickSelectNode(child, node);" />
+                    :context="context" @enter="el => onEnterSelectNode(el, child, node)"
+                    @click="onClickSelectNode(child, node);" />
             </template>
         </template>
         <Empty v-if="noMatched" :message="'无结果'" />

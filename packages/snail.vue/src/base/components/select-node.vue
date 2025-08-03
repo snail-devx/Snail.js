@@ -31,7 +31,7 @@ const classRef = computed(() => ({
 }));
 
 //  2、可选配置选项
-defineOptions({ name: "Select2ode", inheritAttrs: true, });
+defineOptions({ name: "SelectNode", inheritAttrs: true, });
 
 // *****************************************   👉  事件、方法    *****************************************
 </script>

@@ -82,6 +82,13 @@ export interface ITreeContext<T> {
     doSearch(text: string): void;
 
     /**
+     * 指定节点是否可显示
+     * @param node 要判断的节点
+     * @returns 能显示返回true；否则返回false
+     */
+    canShow(node: TreeNode<T, TreeNodeExtend>): boolean;
+
+    /**
      * 获取指定树节点的上下文
      * @param node 
      * @returns 节点上下文

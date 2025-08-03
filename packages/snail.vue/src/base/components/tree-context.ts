@@ -28,6 +28,16 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeCo
         console.log(10);
         failed.value = result.failed;
     }
+    /**
+     * 指定节点是否可显示
+     * @param node 要判断的节点
+     * @returns 能显示返回true；否则返回false
+     */
+    function canShow(node: TreeNode<T, TreeNodeExtend>): boolean {
+        /* 显示条件：节点未配置隐藏，如在【搜索】模式下，还需要匹配上搜索文本 */
+        return node.hidden != true
+            && (failed.value == undefined || failed.value.includes(node) == false);
+    }
 
     /**
      * 获取指定树节点的上下文
@@ -35,9 +45,9 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeCo
      * @returns
      */
     function getContext(node: TreeNode<T, TreeNodeExtend>): ITreeNodeContext<T> {
-        const show = computed(() => nodeShow(node));
+        const show = computed(() => canShow(node));
         const showChildren = computed(() => node.children
-            ? node.children.filter(nodeShow).length > 0
+            ? node.children.filter(canShow).length > 0
             : false
         );
         return { show, showChildren };
@@ -45,20 +55,11 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeCo
     //#endregion
 
     //#region ************************************* 辅助方法 *************************************
-    /**
-     * 节点是否显示
-     * @param node 
-     * @returns true：显示；false：不显示
-     */
-    function nodeShow(node: TreeNode<T, TreeNodeExtend>): boolean {
-        /* 显示条件：节点未配置隐藏，如在【搜索】模式下，还需要匹配上搜索文本 */
-        return node.hidden != true
-            && (failed.value == undefined || failed.value.includes(node) == false);
-    }
+
     //#endregion
 
     //  构建context上下文
-    const context = mountScope<ITreeContext<T>>({ doSearch, getContext });
+    const context = mountScope<ITreeContext<T>>({ doSearch, canShow, getContext });
     context.onDestroy(() => {
         scopes.destroy();
         failed.value = undefined;

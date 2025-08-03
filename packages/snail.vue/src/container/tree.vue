@@ -8,7 +8,7 @@
         <Search v-if="props.search" :="props.search" @search="context.doSearch" />
         <Scroll :scroll-y="true">
             <TreeNode v-for="node in props.nodes || []" :key="node.id || newId()" :node="node" :parent="undefined"
-                :level="1" :options="props.nodeOptions" :context="context" :judger="nodeJudger"
+                :level="1" :options="props.nodeOptions" :context="context"
                 @click="(node, parents) => emits('click', node, parents)">
                 <template #="slotProps">
                     <slot :="slotProps" />
@@ -26,7 +26,6 @@ import { TreeEvents, TreeNodeModel, TreeOptions } from "./models/tree-model";
 import Scroll from "./scroll.vue";
 import Search from "../base/search.vue";
 import TreeNode from "./components/tree-node.vue";
-import { searchTree } from "./utils/tree-util";
 import { ITreeContext } from "../base/models/tree-base";
 import { useTreeContext } from "../base/components/tree-context";
 
@@ -42,14 +41,6 @@ const noMatchedNodes = shallowRef<TreeNodeModel<any>[]>([])
 defineOptions({ name: "Tree", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
-/**
- * 节点判断器
- * @param node 
- *@return true，节点可显示，false，节点不显示
- */
-function nodeJudger(node: TreeNodeModel<any>): boolean {
-    return node.hidden != true && noMatchedNodes.value.includes(node) == false;
-}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听

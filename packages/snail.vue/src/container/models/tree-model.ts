@@ -58,14 +58,7 @@ export type TreeNodeOptions<T> = {
     /**
      * 树组件的上下文对象
      */
-    context: ITreeContext<T>,
-
-    /**
-     * 节点判断器：判断节点是否需要显示
-     * @param node 
-     * @returns true，节点可显示，false，节点不显示
-     */
-    judger: (node: TreeNodeModel<T>) => boolean;
+    context: ITreeContext<T>
 }
 /**
  * 树节点事件

@@ -80,7 +80,7 @@ export type SelectPopupOptions<T> = SelectBaseOptions<T> & {
      */
 
     /**
-     * 树形【选择项】节点上下文
+     * 树形上下文
      */
     context: ITreeContext<T>;
 
@@ -120,6 +120,10 @@ export type SelectNodeOptions<T> = {
      * 要展示的节点
      */
     item: SelectItem<T>;
+    /**
+     * 树形上下文
+     */
+    context: ITreeContext<T>;
 }
 /**
  * 【选项菜单】节点 组件事件

@@ -21,7 +21,7 @@
     </div>
     <div class="snail-tree-children" v-if="show && showChildren" ref="children">
         <TreeNode v-for="child in node.children" :key="child.id || newId()" :node="child" :parent="node"
-            :level="nextLevel" :options="options" :context="context" :judger="judger"
+            :level="nextLevel" :options="options" :context="context"
             @click="(node, parents) => onChildNodeClick(node, parents)">
             <template #="slotProps">
                 <slot :="slotProps" />
@@ -39,7 +39,7 @@ import Icon from "../../base/icon.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { node, parent, options, level, context, judger } = defineProps<TreeNodeOptions<any>>();
+const { node, parent, options = {}, level, context } = defineProps<TreeNodeOptions<any>>();
 throwIfTrue(level > 10, "tree node level cannot exceed 10.");
 const emits = defineEmits<TreeNodeEvents<any>>();
 const { transition } = useAnimation();

@@ -21,5 +21,6 @@
         "packages/*/rollup.config.js",
         "scripts/**/*.js",
         "typings/**/*.d.ts",
+        "packages/snail.vue/obsolete/tree-util.ts",
     ]
 }

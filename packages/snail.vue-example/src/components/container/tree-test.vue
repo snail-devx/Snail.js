@@ -9,12 +9,12 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components, Tree2Options } from "../../core"
+import { components, TreeOptions } from "../../core"
 const { Tree } = components;
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const treeOptions = ref<Tree2Options<number>>({
+const treeOptions = ref<TreeOptions<number>>({
     nodes: [
         {
             text: "1", data: 1, clickable: true,
@@ -50,7 +50,7 @@ const treeOptions = ref<Tree2Options<number>>({
         }
     ],
     //  树节点扩展配置
-    nodeExtend: { rewrite: false, foldDisabled: false }
+    nodeOptions: { rewrite: false, foldDisabled: false }
 });
 // setTimeout(() => {
 //     treeOptions.value.nodes[0].disabled = true;
