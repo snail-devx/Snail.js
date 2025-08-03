@@ -5,13 +5,13 @@
         1、命名为 Select-Node ，避免和SelectItem数据结构重复，且此处展示 自身 + 子 ，不是单纯的 Item 自身数据，Node 更合适
  -->
 <template>
-    <div class="select-node" :class="classRef" v-if="show" :title="item.text" ref="select-node"
-        @mouseenter="emits('enter', selectNodDom, item)" @click="() => emits('click', item)">
+    <div class="select-node" :class="classRef" v-if="showRef" :title="item.text" ref="select-node"
+        @mouseenter="emits('enter', rootDom, item)" @click="() => emits('click', item)">
         <div class="item-text" v-text="item.text" />
         <Icon v-if="item.type == 'group'" :type="'arrow'" :color="'#8a9099'" />
     </div>
-    <SelectNode v-if="show" v-for="child in children" :key="child.id || newId()" :multiple="multiple" :item="child"
-        :context="context" :show-children="false" @enter="el => emits('enter', el, child, item)"
+    <SelectNode v-if="showRef" v-for="child in showChildrenRef" :key="child.id || newId()" :multiple="multiple"
+        :item="child" :context="context" :show-children="false" @enter="el => emits('enter', el, child, item)"
         @click="emits('click', child, item)" />
 </template>
 
@@ -25,25 +25,24 @@ import { SelectItem, SelectNodeEvents, SelectNodeOptions } from "../models/selec
 //  1、props、data
 const { multiple, item, showChildren, context } = defineProps<SelectNodeOptions<any>>();
 const emits = defineEmits<SelectNodeEvents<any>>();
+/** 【选择项】根节点Dom元素 */
+const rootDom = useTemplateRef("select-node");
+/** 当前节点是否选中了 */
+const selectedRef = computed(() => context.selected(multiple, item));
 /** 自身是否展示 */
-const show = computed(() => context.canShow(item));
-/** 子节点数据 */
-const children = showChildren == true && item.type == "group"
+const showRef = computed(() => context.canShow(item));
+/** 子【选择项】是否展示：只有【分组选择项】才可显示子*/
+const showChildrenRef = showChildren == true && item.type == "group"
     ? computed(() => (item.children || []).filter(context.canShow))
     : [] as SelectItem<any>[];
-/** 【选择项】节点Dom元素 */
-const selectNodDom = useTemplateRef("select-node");
 /** 自定义的class样式：动态计算 */
 const classRef = computed(() => ({
     child: showChildren != true,
     clickable: item.clickable,
     group: item.type == 'group',
     item: item.type != 'group',
-    selected: selected.value,
+    selected: selectedRef.value,
 }));
-/** 当前节点是否选中了 */
-const selected = computed(() => context.selected(multiple, item));
-
 //  2、可选配置选项
 defineOptions({ name: "SelectNode", inheritAttrs: true, });
 // *****************************************   👉  事件、方法    *****************************************

@@ -19,32 +19,27 @@
 </template>
 
 <script setup lang="ts">
-import { isStringNotEmpty, newId } from "snail.core";
-import { shallowRef } from "vue";
-import { TreeEvents, TreeNodeModel, TreeOptions } from "./models/tree-model";
+import { newId } from "snail.core";
+import { TreeEvents, TreeOptions } from "./models/tree-model";
 //  三方组件
 import Scroll from "./scroll.vue";
 import Search from "../base/search.vue";
 import TreeNode from "./components/tree-node.vue";
-import { ITreeContext } from "../base/models/tree-base";
-import { useTreeContext } from "../base/components/tree-context";
+import { ITreeBaseContext } from "../base/models/tree-base";
+import { useTreeContext } from "../base/components/tree-base";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<TreeOptions<any>>();
 const emits = defineEmits<TreeEvents<any>>();
 /** 树的上下文 */
-const context: ITreeContext<any> = useTreeContext<any>(props.nodes);
-/** 搜索没匹配上的节点集合：操作的时候，修改value值，而不是push操作数组元素 */
-const noMatchedNodes = shallowRef<TreeNodeModel<any>[]>([])
+const context: ITreeBaseContext<any> = useTreeContext<any>(props.nodes);
 //  2、可选配置选项
 defineOptions({ name: "Tree", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
 
 // *****************************************   👉  组件渲染    *****************************************
-//  1、数据初始化、变化监听
-//  2、生命周期响应
 </script>
 
 <style lang="less">

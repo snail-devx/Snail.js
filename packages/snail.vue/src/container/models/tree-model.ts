@@ -4,7 +4,7 @@
  */
 
 import { SearchOptions } from "../../base/models/search-model";
-import { ITreeContext, TreeNode, TreeNodeExtend } from "../../base/models/tree-base";
+import { ITreeBaseContext, TreeNode, TreeNodeExtend } from "../../base/models/tree-base";
 
 /**
  * 树组件 配置选项
@@ -58,7 +58,7 @@ export type TreeNodeOptions<T> = {
     /**
      * 树组件的上下文对象
      */
-    context: ITreeContext<T>
+    context: ITreeBaseContext<T>
 }
 /**
  * 树节点事件
@@ -103,7 +103,7 @@ export type TreeNodeRenderOptions = {
 /**
  * 树节点 插槽配置选项
  */
-export type TreeNodeSoltOptions<T> = {
+export type TreeNodeSlotOptions<T> = {
     /**
          * 当前节点
          */

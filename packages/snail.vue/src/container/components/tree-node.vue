@@ -3,14 +3,14 @@
     2、支持插槽，由外部自定义展示内容；根据配置插槽可完全重写 树节点
 -->
 <template>
-    <div class="snail-tree-node" v-if="show" :class="[`level-${level}`, node.clickable ? 'clickable' : '']">
+    <div class="snail-tree-node" v-if="showRef" :class="classRef">
         <template v-if="options.rewrite == true">
             <slot :="slotOptions" />
         </template>
         <template v-else>
             <div class="indent" />
             <div class="node-fold" v-if="options.foldDisabled != true">
-                <Icon v-if="showChildren" :class="statusRef" :type="'custom'" :size="24" :color="'#8a8099'"
+                <Icon v-if="showChildrenRef" :class="statusRef" :type="'custom'" :size="24" :color="'#8a8099'"
                     :draw="'M 298.667 426.667 l 213.333 256 l 213.333 -256 Z'" @click="toggleFold" />
             </div>
             <div class="node-text" :title="node.text" v-text="node.text" @click="onNodeClick(node)" />
@@ -19,7 +19,7 @@
             </div>
         </template>
     </div>
-    <div class="snail-tree-children" v-if="show && showChildren" ref="children">
+    <div class="snail-tree-children" v-if="showRef && showChildrenRef" ref="children">
         <TreeNode v-for="child in node.children" :key="child.id || newId()" :node="child" :parent="node"
             :level="nextLevel" :options="options" :context="context"
             @click="(node, parents) => onChildNodeClick(node, parents)">
@@ -34,7 +34,7 @@
 import { newId, throwIfTrue } from "snail.core";
 import { useAnimation } from "snail.view";
 import { shallowRef, computed, useTemplateRef } from "vue";
-import { TreeNodeEvents, TreeNodeModel, TreeNodeOptions, TreeNodeSoltOptions as TreeNodeSlotOptions } from "../models/tree-model";
+import { TreeNodeEvents, TreeNodeModel, TreeNodeOptions, TreeNodeSlotOptions } from "../models/tree-model";
 import Icon from "../../base/icon.vue";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -43,8 +43,16 @@ const { node, parent, options = {}, level, context } = defineProps<TreeNodeOptio
 throwIfTrue(level > 10, "tree node level cannot exceed 10.");
 const emits = defineEmits<TreeNodeEvents<any>>();
 const { transition } = useAnimation();
-/**     树节点的上下文 */
-const { show, showChildren } = context.getContext(node);
+/**     节点是否可显示 */
+const showRef = computed(() => context.canShow(node));
+/**     节点的子节点是否可显示 */
+const showChildrenRef = computed(() => context.canShowChildren(node))
+/**     自定义绑定的类样式：层级节点和可点击标记等 */
+const classRef = computed(() => {
+    const array = [`level-${level}`];
+    node.clickable && array.push("clickable")
+    return array;
+});
 /**     树节点的【插槽】配置选项 */
 const slotOptions = Object.freeze<TreeNodeSlotOptions<any>>({
     node,
@@ -91,7 +99,8 @@ function toggleFold() {
  * @param node 
  */
 function onNodeClick(node: TreeNodeModel<any>) {
-    node.clickable == true && emits("click", node, parent ? [parent] : undefined);
+    node.clickable == true
+        && emits("click", node, parent ? [parent] : undefined);
 }
 /**
  * 子节点点击事件：把自己的父节点加进来

@@ -3,7 +3,7 @@ import { PlaceholderOptions, ReadonlyOptions } from "./base-model";
 import { IScope } from "snail.core";
 import { HeightStyle } from "snail.view";
 import { SearchOptions } from "./search-model";
-import { ITreeContext, TreeNode, TreeNodeExtend } from "./tree-base";
+import { ITreeBaseContext, TreeNode, TreeNodeExtend } from "./tree-base";
 
 /**
  * 选项菜单 基础配置选项
@@ -84,7 +84,7 @@ export type SelectEvents<T> = SelectBaseEvents<T> & {
 /**
  * 【选项菜单】 组件上下文
  */
-export interface ISelectContext<T> extends ITreeContext<T> {
+export interface ISelectContext<T> extends ITreeBaseContext<T> {
     /**
      * 指定节点是否选中了
      * @param multiple 是否是【多选模式】

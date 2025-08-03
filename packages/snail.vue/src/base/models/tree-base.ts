@@ -65,9 +65,9 @@ export type TreeNodeExtend = {
 }
 
 /**
- * 树的上下文对象
+ * 树的基础上下文对象
  */
-export interface ITreeContext<T> {
+export interface ITreeBaseContext<T> {
     /**
      * 执行搜索
      * @param text 搜索文本
@@ -75,32 +75,18 @@ export interface ITreeContext<T> {
     doSearch(text: string): void;
 
     /**
-     * 指定节点是否可显示
+     * 能否显示指定【树节点】
      * @param node 要判断的节点
      * @returns 能显示返回true；否则返回false
      */
     canShow(node: TreeNode<T, TreeNodeExtend>): boolean;
-
     /**
-     * 获取指定树节点的上下文
-     * @param node 
-     * @returns 节点上下文
+     * 能否显示指定【树节点】的子节点
+     * - 不会判断node节点自身是否可显示
+     * @param node 要判断的节点
+     * @returns 能显示返回true；否则返回false
      */
-    getContext(node: TreeNode<T, TreeNodeExtend>): ITreeNodeContext<T>
-}
-/**
- * 树节点 上下文
- */
-export interface ITreeNodeContext<T> {
-    /**
-     * 节点是否展示：响应式
-     */
-    show: ShallowRef<boolean>;
-    /**
-     * 是否显示子节点
-     * - 若node.children有值，但不能显示出来，则也算无子节点
-     */
-    showChildren: ShallowRef<boolean>;
+    canShowChildren(node: TreeNode<T, TreeNodeExtend>): boolean;
 }
 
 /**

@@ -1,5 +1,9 @@
+/**
+ * 树的基础组件信息
+ *  1、组件基础上下文 默认实现
+ */
 import { hasAny, IScope, isStringNotEmpty, mountScope, useScopes } from "snail.core";
-import { ITreeContext, TreeNodeExtend, TreeSearchResult, TreeNode, ITreeNodeContext } from "../models/tree-base";
+import { ITreeBaseContext, TreeNodeExtend, TreeSearchResult, TreeNode } from "../models/tree-base";
 import { computed, shallowRef } from "vue";
 
 /**
@@ -7,7 +11,7 @@ import { computed, shallowRef } from "vue";
  * @param nodes 树节点集合
  * @returns 上下文对象+作用域
  */
-export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeContext<T> & IScope {
+export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeBaseContext<T> & IScope {
     /** 构建的子作用域 */
     const scopes = useScopes();
     /** 搜索时已成功【匹配】的节点集合  匹配成功的集合，暂时不维护
@@ -28,7 +32,7 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeCo
         failed.value = result.failed;
     }
     /**
-     * 指定节点是否可显示
+     * 能否显示指定【树节点】
      * @param node 要判断的节点
      * @returns 能显示返回true；否则返回false
      */
@@ -37,19 +41,16 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeCo
         return node.hidden != true
             && (failed.value == undefined || failed.value.includes(node) == false);
     }
-
     /**
-     * 获取指定树节点的上下文
-     * @param node 
-     * @returns
+     * 能否显示指定【树节点】的子节点
+     * - 不会判断node节点自身是否可显示
+     * @param node 要判断的节点
+     * @returns 能显示返回true；否则返回false
      */
-    function getContext(node: TreeNode<T, TreeNodeExtend>): ITreeNodeContext<T> {
-        const show = computed(() => canShow(node));
-        const showChildren = computed(() => node.children
+    function canShowChildren(node: TreeNode<T, TreeNodeExtend>): boolean {
+        return node.children
             ? node.children.filter(canShow).length > 0
             : false
-        );
-        return { show, showChildren };
     }
     //#endregion
 
@@ -58,7 +59,7 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeCo
     //#endregion
 
     //  构建context上下文
-    const context = mountScope<ITreeContext<T>>({ doSearch, canShow, getContext });
+    const context = mountScope<ITreeBaseContext<T>>({ doSearch, canShow, canShowChildren });
     context.onDestroy(() => {
         scopes.destroy();
         failed.value = undefined;

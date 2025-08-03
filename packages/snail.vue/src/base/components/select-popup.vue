@@ -12,9 +12,9 @@
         </template>
         <template v-else>
             <Search v-if="props.search" :="props.search" @search="onSearch" />
-            <SelectNode v-for="item in items" :key="item.id || newId()" :multiple="props.multiple" :item="item"
+            <SelectNode v-for="item in itemsRef" :key="item.id || newId()" :multiple="props.multiple" :item="item"
                 :context="context" :show-children="true" @enter="onEnterSelectNode" @click="onClickSelectNode" />
-            <Empty v-if="items.length == 0" :message="'无结果'" />
+            <Empty v-if="itemsRef.length == 0" :message="'无结果'" />
         </template>
     </div>
 </template>
@@ -36,27 +36,26 @@ import { SelectBaseEvents, SelectItem, SelectPopupExtend, SelectPopupOptions } f
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<SelectPopupOptions<any> & SelectPopupExtend & FollowHandle<SelectItem<any>[]> & FollowExtend>();
-const { context } = props;
 const emits = defineEmits<SelectBaseEvents<any> & SearchEvents>();
 const { follow } = usePopup();
 const { onTimeout } = useTimer();
 const { watcher } = useReactive();
 //  解构一些响应式变量，方便访问
-const { popupStatus, pinned, parentPinned } = props;
+const { context, popupStatus, pinned, parentPinned } = props;
 /** 能够展示的【选择项】 */
-const items: ComputedRef<SelectItem<any>[]> = computed(() => (props.items || []).filter(context.canShow));
+const itemsRef = computed(() => (props.items || []).filter(context.canShow));
 /** 弹窗所需的类样式信息 */
 const classRef = computed(() => ({
     "snail-select-popup": true,
     /** 子【选择项】弹窗 */
     'child-popup': props.level > 1,
     /** 无【选择项】的文本提示区域 */
-    'text-tips': items.value.length == 0,
+    'text-tips': itemsRef.value.length == 0,
     /** 【选择项】中是否存在分组 */
-    "has-group": items.value.find(node => node.type == "group") != undefined,
+    "has-group": itemsRef.value.find(node => node.type == "group") != undefined,
 }));
 /** 子弹窗销毁的定时器；鼠标离开弹窗时，做延迟销毁；避免回到 此弹窗 的父【选择项】时，又重新打开此弹窗*/
-const childDestroyTimer: ShallowRef<IScope> = shallowRef(undefined);
+const childDestroyTimerRef: ShallowRef<IScope> = shallowRef(undefined);
 //  2、临时变量
 /** 针对当前弹窗时的鼠标状态 */
 var mouseStatus: "Enter" | "Leave" = "Leave";
@@ -74,8 +73,8 @@ defineOptions({ name: "Select2Popup", inheritAttrs: true, });
  */
 function destroyChildFollow(onlyTimer?: boolean) {
     //  取消子弹窗的销毁逻辑
-    childDestroyTimer.value && childDestroyTimer.value.destroy();
-    childDestroyTimer.value = undefined;
+    childDestroyTimerRef.value && childDestroyTimerRef.value.destroy();
+    childDestroyTimerRef.value = undefined;
     //  销毁子弹窗
     if (onlyTimer != true && childFollowScope && childFollowScope.destroyed == false) {
         childFollowScope.destroy();
@@ -134,9 +133,8 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
     if (popupStatus.value == "closed") {
         return;
     }
-    //  目前还有子弹窗存在时，做一些特例逻辑
+    //  目前还有子弹窗存在时：target和之前的子弹窗选项 target 一致时，不用重复弹窗；否则销毁之前弹窗，再弹出新的
     if (childFollowScope && childFollowScope.destroyed == false) {
-        //  取消子弹窗的销毁逻辑；target和之前的子弹窗选项 target 一致时，不用重复弹窗；否则销毁之前弹窗，再弹出新的
         const isSameTarget = target == childFollowTargetDom;
         destroyChildFollow(isSameTarget);
         if (isSameTarget == true) {
@@ -162,7 +160,7 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
                 level: props.level + 1,
                 popupStyle: props.popupStyle,
 
-                childDestroyTimer: childDestroyTimer,
+                childDestroyTimer: childDestroyTimerRef,
                 parentPinned: pinned,
             }),
         });
@@ -181,7 +179,6 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
 function onClickSelectNode(node: SelectItem<any>, parent?: SelectItem<any>) {
     //  选择项 可点击时，才有效；多选时，修改一下选中状态
     if (node.clickable == true) {
-        // props.multiple && (node = true);
         onSelected(parent ? parent : undefined, node);
     }
 }

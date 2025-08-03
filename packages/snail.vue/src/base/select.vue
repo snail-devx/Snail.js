@@ -4,23 +4,19 @@
 -->
 <template>
     <div class="snail-select" :class="{ 'readonly': props.readonly }" @click="onClick()" ref="select">
-        <template v-if="props.items && props.items.length > 0">
-            <!-- 展示选择结果数据：无数据时显示placeholder；多选和单选区分开-->
-            <div v-if="isArrayNotEmpty(selects) == false" class="select-result text-tips"
-                v-text="props.placeholder || '请选择'" />
-            <div v-else class="select-result" :title="selectText">
-                <div class="select-text" v-text="selectText">
-                </div>
+        <template v-if="hasAny(props.items) == true">
+            <div v-if="hasAny(selectsRef)" class="select-result" :title="selectTextRef">
+                <div class="select-text" v-text="selectTextRef" />
             </div>
+            <div v-else class="select-result text-tips" v-text="props.placeholder || '请选择'" />
             <Icon type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
         </template>
-        <!-- 无选项时的适配：提示无选项。。。 -->
         <div v-else class="no-items text-tips">暂无可选项</div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { hasAny, IAsyncScope, isArrayNotEmpty } from "snail.core";
+import { hasAny, IAsyncScope } from "snail.core";
 import { computed, shallowRef, useTemplateRef } from "vue";
 import { usePopup } from "../popup/manager";
 import Icon from "./icon.vue";
@@ -33,14 +29,14 @@ const props = defineProps<SelectOptions<any>>();
 const emits = defineEmits<SelectEvents<any>>();
 const valuesModel = defineModel<SelectItem<any>[]>({ default: [] });
 const { follow } = usePopup();
-/** 已选结果数据 */
-const selects = shallowRef<SelectItem<any>[]>([...valuesModel.value]);
-/** 【选项菜单】上下文 */
-const context: ISelectContext<any> = useSelectContext<any>(props.items, selects);
 /** 组件根元素*/
 const rootDom = useTemplateRef("select");
+/** 已选【选择项】集合：默认从v-model中初始化 */
+const selectsRef = shallowRef<SelectItem<any>[]>([...valuesModel.value]);
+/** 【选项菜单】上下文 */
+const context: ISelectContext<any> = useSelectContext<any>(props.items, selectsRef);
 /** 选择的结果文本 */
-const selectText = computed(() => context.selectedText(props.multiple, props.showPath));
+const selectTextRef = computed(() => context.selectedText(props.multiple, props.showPath));
 /** 跟随弹窗作用域 */
 var followScope: IAsyncScope<SelectItem<any>[]> = undefined;
 //  2、可选配置选项
@@ -104,7 +100,7 @@ async function onClick() {
  */
 function onSelectItemChange(items: SelectItem<any>[]) {
     items = hasAny(items) ? [...items] : [];
-    selects.value = items;
+    selectsRef.value = items;
     valuesModel.value = items;
     emits("change", items);
 }

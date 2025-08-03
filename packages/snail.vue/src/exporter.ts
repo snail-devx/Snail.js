@@ -18,6 +18,7 @@ export * from "./base/models/reactive-model";
 export * from "./base/models/search-model";
 export * from "./base/models/select-model";
 export * from "./base/models/switch-model";
+export * from "./base/models/tree-base";
 //  组件导出
 import Button from "./base/button.vue";
 import Choose from "./base/choose.vue";
@@ -27,6 +28,7 @@ import Icon from "./base/icon.vue";
 import Search from "./base/search.vue";
 import Select from "./base/select.vue";
 import Switch from "./base/switch.vue";
+export * from "./base/components/tree-base";
 //  方法导出
 export * from "./base/reactive";
 export * from "./base/utils/app-util";

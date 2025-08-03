@@ -4,16 +4,16 @@
 
 import { IScope } from "snail.core";
 import { ISelectContext, SelectItem } from "../models/select-model";
-import { useTreeContext } from "./tree-context";
+import { useTreeContext } from "./tree-base";
 import { ShallowRef } from "vue";
 
 /**
  * 使用【选项菜单】上下文
  * @param items 已有【选择项】集合
- * @param selects 已选【选择项】集合；响应式，方便自动计算
+ * @param selectsRef 已选【选择项】集合；响应式，方便自动计算
  * @returns 选项菜单 上下文+作用域
  */
-export function useSelectContext<T>(items: SelectItem<T>[], selects: ShallowRef<SelectItem<T>[]>): ISelectContext<T> & IScope {
+export function useSelectContext<T>(items: SelectItem<T>[], selectsRef: ShallowRef<SelectItem<T>[]>): ISelectContext<T> & IScope {
     const treeContxt = useTreeContext<T>(items);
 
     //#region *************************************实现接口：ISelectContext 接口方法*************************************
@@ -24,10 +24,10 @@ export function useSelectContext<T>(items: SelectItem<T>[], selects: ShallowRef<
      * @returns true 选中，false 未选中
      */
     function selected(multiple: boolean, item: SelectItem<T>): boolean {
-        if (selects.value) {
+        if (selectsRef.value) {
             return multiple == true
-                ? selects.value.includes(item)
-                : selects.value[selects.value.length - 1] == item;
+                ? selectsRef.value.includes(item)
+                : selectsRef.value[selectsRef.value.length - 1] == item;
         }
         return false;
     }
@@ -38,10 +38,10 @@ export function useSelectContext<T>(items: SelectItem<T>[], selects: ShallowRef<
      * @returns 已选【选择项】的展示文本
      */
     function selectedText(multiple: boolean, showPath: boolean): string {
-        if (selects.value) {
+        if (selectsRef.value) {
             return multiple == true || showPath == true
-                ? selects.value.map(item => item.text).join(multiple ? "、" : " / ")
-                : selects.value[selects.value.length - 1].text
+                ? selectsRef.value.map(item => item.text).join(multiple ? "、" : " / ")
+                : selectsRef.value[selectsRef.value.length - 1].text
         }
         return "";
     }
