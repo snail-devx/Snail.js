@@ -45,10 +45,14 @@ defineOptions({ name: "FollowContainer", inheritAttrs: true, });
  * 构建跟随效果
  */
 function buildFollow() {
+    //  若弹窗已经关闭了，则不用再计算了
+    if (popupStatus.value == "closed") {
+        return;
+    }
+    //  跟随宽度、高度，则强制和target尺寸保持一致；若需要跟随高度、宽度，则overflow做一下
     console.group("%cstart run buildFollow:", "color:red");
     const targetRect: DOMRectReadOnly = extOptions.target.getBoundingClientRect();
     console.log("-- target:", targetRect, extOptions.target);
-    //  跟随宽度、高度，则强制和target尺寸保持一致；若需要跟随高度、宽度，则overflow做一下
     css.operate(rootDom.value, "add", {
         style: {
             width: options.followWidth ? `${targetRect.width}px` : "",
