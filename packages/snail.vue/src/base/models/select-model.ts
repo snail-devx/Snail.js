@@ -26,6 +26,12 @@ export type SelectBaseOptions<T> = {
      * - items为多级时，不支持【多选模式】；传入会报错
      */
     multiple?: boolean;
+    /**
+     * 是否显示【路径】
+     * - 为true时，显示选项的父级文本路径，用“ / ”分割
+     * - 仅针对【单选模式】生效
+     */
+    showPath?: boolean;
 
     /**
      * 选择项 follow弹窗样式
@@ -46,7 +52,14 @@ export type SelectBaseEvents<T> = {
 /**
  * 选项菜单组件的【选择项】
  */
-export type SelectItem<T> = TreeNode<T, TreeNodeExtend>;
+export type SelectItem<T> = TreeNode<T, TreeNodeExtend & {
+    /**
+    * 节点类型
+    * - group  分组选择项；可包含子节点
+    * - item   选择项；默认值；不可包含子节点，即使传入也会忽略
+    */
+    type?: "group" | "item";
+}>;
 
 /**
  * 选项菜单组件 配置选项

@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import Icon from "../icon.vue";
 import { newId } from "snail.core";
-import { computed, onUpdated, useTemplateRef } from "vue";
+import { computed, useTemplateRef } from "vue";
 import { SelectItem, SelectNodeEvents, SelectNodeOptions } from "../models/select-model";
 
 // *****************************************   👉  组件定义    *****************************************

@@ -23,13 +23,6 @@ export type TreeNode<T, Extend extends Record<string, any> | void = void> = {
     data?: T;
 
     /**
-     * 节点类型
-     * - 作为标记存在
-     * - 如 目录 节点、叶子节点、视图节点，项目节点
-     */
-    type?: any;
-
-    /**
      * 子选择项 数据源
      */
     children?: TreeNode<T, Extend>[];

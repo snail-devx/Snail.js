@@ -8,13 +8,9 @@
             <!-- 展示选择结果数据：无数据时显示placeholder；多选和单选区分开-->
             <div v-if="isArrayNotEmpty(selects) == false" class="select-result text-tips"
                 v-text="props.placeholder || '请选择'" />
-            <div v-else-if="props.multiple" class="select-result multi" v-text="selects.join('、')"
-                :title="selects.join('、')" />
-            <div v-else class="select-result single" :title="selects.map(item => item.text).join('-')">
-                <template v-for="(item, index) in selects">
-                    <div class="result-item" :class="[`item-${index + 1}`]" v-text="item.text" />
-                    <div class="divider" v-if="selects.length > 1 && index + 1 != selects.length" />
-                </template>
+            <div v-else class="select-result" :title="selectText">
+                <div class="select-text" v-text="selectText">
+                </div>
             </div>
             <Icon type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
         </template>
@@ -24,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef, useTemplateRef } from "vue";
+import { computed, shallowRef, useTemplateRef } from "vue";
 import Icon from "./icon.vue";
 import SelectPopup from "./components/select-popup.vue";
 import { usePopup } from "../popup/manager";
@@ -45,6 +41,14 @@ const context: ITreeContext<any> = useTreeContext<any>(props.items);
 const rootDom = useTemplateRef("select");
 /** 已选结果数据 */
 const selects = shallowRef<SelectItem<any>[]>();
+/** 选择的结果文本 */
+const selectText = computed(() => hasAny(selects.value)
+    ? (props.multiple == true || props.showPath == true
+        ? selects.value.map(item => item.text).join(props.multiple ? "、" : " / ")
+        : selects.value[selects.value.length - 1].text
+    )
+    : ""
+);
 /** 跟随弹窗作用域 */
 var followScope: IAsyncScope<SelectItem<any>[]> = undefined;
 //  2、可选配置选项
@@ -151,29 +155,13 @@ onAppCreated((app, type) => {
         .flex-cross-center();
         flex-wrap: nowrap;
 
-        >div.text-tips {}
-
-        //  单选模式
-        &.single>.result-item> {
-            flex: auto;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        >div.select-text {
+            //  文本溢出时出省略号
+            .text-ellipsis();
         }
-
-        //  单选 选项之间的分隔符，简化处理，有需求各自定制
-        &.single>.divider {
-            width: 7px;
-            height: 1px;
-            flex-shrink: 0;
-            background-color: gray;
-            margin: 0 4px;
-        }
-
-        //  多选模式
     }
 
-    >svg.snail-icon:last-child {
+    >svg.snail-icon {
         flex-shrink: 0;
         margin-right: 4px;
     }
