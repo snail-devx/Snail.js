@@ -8,14 +8,16 @@
             <!-- 展示选择结果数据：无数据时显示placeholder；多选和单选区分开-->
             <div v-if="isArrayNotEmpty(selects) == false" class="select-result text-tips"
                 v-text="props.placeholder || '请选择'" />
-            <div v-else-if="props.multiple" class="select-result multi" v-text="selects.join('、')"
-                :title="selects.join('、')" />
-            <div v-else class="select-result single" :title="selects.map(item => item.text).join('-')">
+            <div v-else-if="props.multiple" class="select-result multi" v-text="selects!.join('、')"
+                :title="selects!.join('、')" />
+            <div v-else class="select-result single" :title="selects!.map(item => item.text).join('-')">
                 <template v-for="(item, index) in selects">
                     <div class="result-item" :class="[`item-${index + 1}`]" v-text="item.text" />
-                    <div class="divider" v-if="selects.length > 1 && index + 1 != selects.length" />
+                    <div class="divider" v-if="selects!.length > 1 && index + 1 != selects!.length" />
                 </template>
             </div>
+            <Icon v-if="props.delete && isArrayNotEmpty(selects)" type="close" :size="20" color="#8a9099"
+                @click="onDeleteSelects" />
             <Icon type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
         </template>
         <!-- 无选项时的适配：提示无选项。。。 -->
@@ -25,30 +27,31 @@
 
 <script setup lang="ts">
 import { shallowRef, useTemplateRef } from "vue";
-import Icon from "./icon.vue";
-import SelectPopup from "./components/select-popup.vue";
-import { usePopup } from "../popup/manager";
-import { hasAny, IAsyncScope, isArrayNotEmpty } from "snail.core";
-import { SelectEvents, SelectItem, SelectOptions, SelectPopupOptions } from "./models/select-model";
-import { ITreeContext } from "./models/tree-base";
-import { useTreeContext } from "./components/tree-context";
+import Icon from "../src/base/icon.vue";
+import { Select2Item, Select2Events, Select2Options, Select2PopupOptions, Select2BaseEvents, Select2Node } from "./select2-model";
+import SelectPopup from "./select2-popup.vue";
+import { usePopup } from "../src/popup/manager";
+import { hasAny, IAsyncScope, isArrayNotEmpty, IScope } from "snail.core";
+import { buildSelectNodes, refreshSelectNodes } from "./select-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<SelectOptions<any>>();
-const emits = defineEmits<SelectEvents<any>>();
-const valuesModel = defineModel<SelectItem<any>[]>({ default: [] });
+const props = defineProps<Select2Options<any>>();
+const emits = defineEmits<Select2Events<any>>();
+const valuesModel = defineModel<Select2Item<any>[]>({ default: [] });
 const { follow } = usePopup();
-/** 树上下文 */
-const context: ITreeContext<any> = useTreeContext<any>(props.items);
+/** 【选择项】节点集合 */
+const selectNodes: Readonly<Select2Node<any>[]> = Object.freeze(buildSelectNodes(props.items));
 /** 组件根元素*/
 const rootDom = useTemplateRef("select");
+/** 是否是【删除】选择项按钮点击了 */
+var isDeleteItemClicked: boolean = false;
 /** 已选结果数据 */
-const selects = shallowRef<SelectItem<any>[]>();
+const selects = shallowRef<Select2Item<any>[]>();
 /** 跟随弹窗作用域 */
-var followScope: IAsyncScope<SelectItem<any>[]> = undefined;
+var followScope: IAsyncScope<Select2Item<any>[]> = undefined!;
 //  2、可选配置选项
-defineOptions({ name: "Select", inheritAttrs: true, });
+defineOptions({ name: "Select2", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -56,24 +59,24 @@ defineOptions({ name: "Select", inheritAttrs: true, });
  * - 弹出选择项
  */
 async function onClick() {
-    if (props.readonly == true || rootDom.value == undefined) {
+    if (isDeleteItemClicked == true || props.readonly == true || rootDom.value == undefined) {
         return;
     }
     //  已存在则销毁
     if (followScope != undefined) {
         followScope.destroy();
-        followScope = undefined;
+        followScope = undefined!;
         return;
     }
     //  构建已选数据：单选时，仅取最后一个选择节点
-    const values: SelectItem<any>[] = valuesModel.value && valuesModel.value.length > 0
+    const values: Select2Item<any>[] = valuesModel.value && valuesModel.value.length > 0
         ? [...valuesModel.value]
         : [];
     props.multiple != true && values.length > 1 && values.splice(0, values.length - 1);
     //  打开弹窗：跟随宽度，并在合适时机关闭掉
     followScope = follow(rootDom.value, {
         // component: shallowRef(SelectPopup),
-        name: "SelectPopup",
+        name: "Select2Popup",
         followWidth: true,
         followX: "start",
         spaceClient: 10,
@@ -83,11 +86,10 @@ async function onClick() {
         closeOnResize: true,
         closeOnTarget: true,
 
-        props: Object.freeze(Object.assign<SelectPopupOptions<any>, Record<string, any>>(
+        props: Object.freeze(Object.assign<Select2PopupOptions<any>, Record<string, any>>(
             //  弹窗配置选项：将选项解构，避免响应式干扰
             {
-                items: props.items,
-                context: context,
+                items: refreshSelectNodes(selectNodes, values),
                 level: 1,
                 search: props.search,
                 multiple: props.multiple,
@@ -101,13 +103,22 @@ async function onClick() {
         )),
     });
     await followScope;
-    followScope = undefined;
+    followScope = undefined!;
+}
+/**
+ * 删除已选【选择项】
+ * - 进行变量标记，不能直接stop事件冒泡，否则会影响全局监听的click事件
+ */
+function onDeleteSelects() {
+    isDeleteItemClicked = true;
+    setTimeout(() => isDeleteItemClicked = false, 0);
+    onSelectItemChange([]);
 }
 /**
  * 选项改变时
  * @param items 
  */
-function onSelectItemChange(items: SelectItem<any>[]) {
+function onSelectItemChange(items: Select2Item<any>[]) {
     items = hasAny(items) ? [...items] : [];
     selects.value = items;
     valuesModel.value = items;
@@ -115,15 +126,17 @@ function onSelectItemChange(items: SelectItem<any>[]) {
 }
 
 // *****************************************   👉  组件渲染    *****************************************
-//  1、数据初始化、变化监听
-//  2、生命周期响应
+//  未支持，先报错，后期再后话
+if (props.multiple == true) {
+    throw new Error("暂时还没支持【多选】操作");
+}
 </script>
 
 <script lang="ts">
-import { onAppCreated } from "./utils/app-util";
+import { onAppCreated } from "../src/base/utils/app-util";
 //  非组件实例逻辑：将【选项弹窗】注册为【弹窗】app实例的全局组件，方便树形复用
 onAppCreated((app, type) => {
-    type == "popup" && app.component("SelectPopup", SelectPopup);
+    type == "popup" && app.component("Select2Popup", SelectPopup);
 });
 </script>
 

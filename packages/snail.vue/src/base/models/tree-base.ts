@@ -5,9 +5,7 @@
  * 3、封装树的基础共性操作，如显隐判断、搜索查询等
  */
 
-import { IScope } from "snail.core";
 import { ShallowRef } from "vue";
-
 
 /**
  * 树节点

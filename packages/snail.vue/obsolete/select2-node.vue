@@ -3,7 +3,7 @@
     2、配合 ./select-popup.vue 使用，无法独立使用
  -->
 <template>
-    <div class="select-node" :class="classRef" :title="item.text" ref="select-node"
+    <div v-if="!disabled.value" class="select-node" :class="classRef" :title="item.text" ref="select-node"
         @mouseenter="emits('enter', selectNodDom)" @mouseleave="() => emits('leave', selectNodDom)"
         @click="() => emits('click', selectNodDom)">
         <div class="item-text" v-text="item.text" />
@@ -12,14 +12,14 @@
 </template>
 
 <script setup lang="ts">
+import { Select2Node, Select2NodeEvents } from "../models/select2-model";
 import Icon from "../icon.vue";
 import { computed, useTemplateRef } from "vue";
-import { SelectNodeEvents, SelectNodeOptions } from "../models/select-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { item } = defineProps<SelectNodeOptions<any>>();
-const emits = defineEmits<SelectNodeEvents>();
+const { item, disabled, selected } = defineProps<Select2Node<any>>();
+const emits = defineEmits<Select2NodeEvents>();
 /** 【选择项】节点Dom元素 */
 const selectNodDom = useTemplateRef("select-node");
 /** 自定义的class样式：动态计算 */
@@ -27,13 +27,14 @@ const classRef = computed(() => ({
     clickable: item.clickable,
     group: item.type == 'group',
     item: item.type != 'group',
-    // selected: selected.value
+    selected: selected.value
 }));
 
 //  2、可选配置选项
 defineOptions({ name: "Select2ode", inheritAttrs: true, });
 
 // *****************************************   👉  事件、方法    *****************************************
+
 </script>
 
 <style lang="less">
@@ -41,7 +42,7 @@ defineOptions({ name: "Select2ode", inheritAttrs: true, });
 @import "snail.view/dist/styles/base-mixins.less";
 
 //  【选择项】节点类样式，强制约束在【.snail-select】使用
-.snail-select-popup>div.select-node {
+.select-popup>div.select-node {
     height: 32px;
     flex-shrink: 0;
     padding-left: 12px;

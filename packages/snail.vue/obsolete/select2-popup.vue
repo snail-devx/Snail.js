@@ -10,12 +10,12 @@
         暂无可选项
     </div>
     <div v-else :class="classRef" :style="props.popupStyle" @mouseenter="onEnterPopup" @mouseleave="onLeavePopup">
-        <Search v-if="props.search" :="props.search" @search="context.doSearch" />
+        <Search v-if="props.search" :="props.search" @search="onSearch" />
         <template v-if="noMatched == false" v-for="node in props.items" :key="node.id">
-            <SelectNode :item="node" @enter="el => onEnterSelectNode(el, node, undefined)"
+            <SelectNodeVue :="node" :id="node.id" @enter="el => onEnterSelectNode(el, node, undefined)"
                 @click="onClickSelectNode(node, undefined)" />
-            <template v-if="node.type == 'group' && isArrayNotEmpty(node.children) == true">
-                <SelectNode class="child" v-for="child in node.children" :key="child.id" :item="child"
+            <template v-if="node.item.type == 'group' && isArrayNotEmpty(node.children) == true">
+                <SelectNodeVue class="child" v-for="child in node.children" :key="child.id" :="child" :id="child.id"
                     @enter="el => onEnterSelectNode(el, child, node)" @click="onClickSelectNode(child, node);" />
             </template>
         </template>
@@ -26,22 +26,22 @@
 <script setup lang="ts">
 import { IAsyncScope, isArrayNotEmpty, IScope, tidyString, useTimer } from "snail.core";
 import { shallowRef, computed, ShallowRef, } from "vue";
-import { usePopup } from "../../popup/manager";
-import { useReactive } from "../reactive";
+import { usePopup } from "../src/popup/manager";
+import { searchSelectNode } from "./select-util";
+import { useReactive } from "../src/base/reactive";
 //  依赖的其他vue组件
-import Search from "../search.vue";
-import Empty from "../../prompt/empty.vue";
-import SelectNode from "./select-node.vue";
+import Search from "../src/base/search.vue";
+import Empty from "../src/prompt/empty.vue";
+import SelectNodeVue from "./select2-node.vue";
 //  使用到的数据类型
-import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
-import { SearchEvents } from "../models/search-model";
-import { SelectBaseEvents, SelectItem, SelectPopupExtend, SelectPopupOptions } from "../models/select-model";
+import { FollowExtend, FollowHandle } from "../src//popup/models/follow-model";
+import { SearchEvents } from "../src/base/models/search-model";
+import { Select2BaseEvents, Select2Item, Select2Node, Select2PopupOptions, Select2PopupOptionsExtend } from "./select2-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<SelectPopupOptions<any> & SelectPopupExtend & FollowHandle<SelectItem<any>[]> & FollowExtend>();
-const { context } = props;
-const emits = defineEmits<SelectBaseEvents<any> & SearchEvents>();
+const props = defineProps<Select2PopupOptions<any> & Select2PopupOptionsExtend & FollowHandle<Select2Item<any>[]> & FollowExtend>();
+const emits = defineEmits<Select2BaseEvents<any> & SearchEvents>();
 const { follow } = usePopup();
 const { onTimeout } = useTimer();
 const { watcher } = useReactive();
@@ -49,25 +49,25 @@ const { watcher } = useReactive();
 const { popupStatus, pinned, parentPinned } = props;
 /** 弹窗所需的类样式信息 */
 const classRef = computed(() => ({
-    "snail-select-popup": true,
+    "select-popup": true,
     /** 子【选择项】弹窗 */
     'child-popup': props.level > 1,
     /** 无【选择项】的文本提示区域 */
     'text-tips': isArrayNotEmpty(props.items) == false,
     /** 【选择项】中是否存在分组 */
-    "has-group": (props.items || []).find(node => node.type == "group") != undefined,
+    "has-group": (props.items || []).find(node => node.item.type == "group") != undefined,
 }));
 /** 搜索时，未匹配到任何【选择项】；仅在第一级弹窗有效 */
 const noMatched = shallowRef<boolean>(false);
 /** 子弹窗销毁的定时器；鼠标离开弹窗时，做延迟销毁；避免回到 此弹窗 的父【选择项】时，又重新打开此弹窗*/
-const childDestroyTimer: ShallowRef<IScope> = shallowRef(undefined);
+const childDestroyTimer: ShallowRef<IScope> = shallowRef(undefined!);
 //  2、临时变量
 /** 针对当前弹窗时的鼠标状态 */
 var mouseStatus: "Enter" | "Leave" = "Leave";
 /** 子【选择项】follow弹窗跟随的目标元素 */
-var childFollowTargetDom: HTMLElement = undefined;
+var childFollowTargetDom: HTMLElement = undefined!;
 /** 子【选择项】follow弹窗作用域 */
-var childFollowScope: IAsyncScope<SelectItem<any>[]> = undefined;
+var childFollowScope: IAsyncScope<Select2Item<any>[]> = undefined!;
 //  3、可选配置选项
 defineOptions({ name: "Select2Popup", inheritAttrs: true, });
 
@@ -93,10 +93,18 @@ function onLeavePopup() {
     }
 }
 /**
+ * 搜索事件
+ * @param text 
+ */
+function onSearch(text: string) {
+    text = tidyString(text) || "";
+    noMatched.value = searchSelectNode(props.items, text.toLowerCase()) == false;
+}
+/**
  * 选项选择后
  * @param path 选项路径，从父->子
  */
-function onSelected(...path: SelectItem<any>[]) {
+function onSelected(...path: Select2Item<any>[]) {
     if (popupStatus.value != "closed") {
         const values = path.filter(item => item != undefined);
         emits("change", values);
@@ -107,7 +115,7 @@ function onSelected(...path: SelectItem<any>[]) {
 /**
  * 鼠标进入【选择项】
  */
-async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, parent?: SelectItem<any>) {
+async function onEnterSelectNode(target: HTMLDivElement, node: Select2Node<any>, parent?: Select2Node<any>) {
     //  非【打开】状态，不响应：点击【选择项】关闭当前弹窗时，异步销毁过程中，鼠标移动到其他【选择项】了，此时不能再打开了
     if (popupStatus.value == "closed") {
         return;
@@ -116,20 +124,20 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
     if (childFollowScope && childFollowScope.destroyed == false) {
         //  取消子弹窗的销毁逻辑
         childDestroyTimer.value && childDestroyTimer.value.destroy();
-        childDestroyTimer.value = undefined;
+        childDestroyTimer.value = undefined!;
         //  target和之前的子弹窗选项 target 一致时，不用重复弹窗；否则销毁之前弹窗，再弹出新的
         if (target == childFollowTargetDom) {
             return;
         }
         childFollowScope.destroy();
-        childFollowScope = undefined;
-        childFollowTargetDom = undefined;
+        childFollowScope = undefined!;
+        childFollowTargetDom = undefined!;
     }
     //  二级分类选项，弹出子选项follow弹窗；此时强制无需search
-    if (node.type == "group" && parent) {
+    if (node.item.type == "group" && parent) {
         childFollowTargetDom = target;
         childFollowScope = follow(childFollowTargetDom, {
-            name: "SelectPopup",
+            name: "Select2Popup",
             spaceClient: 10,
             followY: "ratio",
             //  x轴方向上的跟随策略：根据当前弹窗的x轴跟随策略，自动做优化，尽量避免3+级弹窗会覆盖主以前的弹窗
@@ -137,9 +145,8 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
                 ? ["before", "after", "ratio"]
                 : ["after", "before", "ratio"],
             //  子级【选择项】弹窗配置数据
-            props: Object.freeze<SelectPopupOptions<any> & SelectPopupExtend>({
-                items: node.children,
-                context: context,
+            props: Object.freeze<Select2PopupOptions<any> & Select2PopupOptionsExtend>({
+                items: node.children!,
                 search: undefined,
                 level: props.level + 1,
                 values: props.values,
@@ -151,7 +158,7 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
         });
         //  等待弹窗结束，如果有选中项，则对外分发
         const datas = await childFollowScope;
-        isArrayNotEmpty(datas) && onSelected(parent ? parent : undefined, node, ...datas);
+        isArrayNotEmpty(datas) && onSelected(parent ? parent.item : undefined!, node.item, ...datas);
         //  若销毁下级弹窗时，未进入当前弹窗，则触发当前弹窗的鼠标离开事件
         popupStatus.value == "open" && onTimeout(() => mouseStatus != "Enter" && onLeavePopup(), 10);
     }
@@ -161,11 +168,11 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
  * @param item 
  * @param parent 
  */
-function onClickSelectNode(node: SelectItem<any>, parent?: SelectItem<any>) {
+function onClickSelectNode(node: Select2Node<any>, parent?: Select2Node<any>) {
     //  选择项 可点击时，才有效；多选时，修改一下选中状态
-    if (node.clickable == true) {
-        // props.multiple && (node = true);
-        onSelected(parent ? parent : undefined, node);
+    if (node.item.clickable == true) {
+        props.multiple && (node.selected.value = true);
+        onSelected(parent ? parent.item : undefined!, node.item);
     }
 }
 
@@ -180,7 +187,7 @@ watcher(popupStatus, newValue => newValue == "closed" && childFollowScope && chi
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/base-mixins.less";
 
-.snail-select-popup {
+.select-popup {
     max-height: 90%;
     min-height: 32px;
     overflow: auto;
@@ -199,19 +206,19 @@ watcher(popupStatus, newValue => newValue == "closed" && childFollowScope && chi
 
 // *****************************************   👉  特殊样式适配    *****************************************
 //  子的选项弹窗
-.snail-select-popup.child-popup {
+.select-popup.child-popup {
     min-width: 200px;
     max-width: 250px;
     padding-top: 6px;
 }
 
 //  无可用选项
-.snail-select-popup.text-tips {
+.select-popup.text-tips {
     padding: 0 12px;
     width: 100px !important;
     justify-content: center;
 }
 
 //  有分组时
-.snail-select-popup.has-group {}
+.select-popup.has-group {}
 </style>

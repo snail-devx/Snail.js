@@ -1,7 +1,8 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <Select :items="items" :search="true" :delete="true" style="width: 200px;" />
-    <Select :items="items" :search="true" style="width: 200px;position: absolute;right: 10px; top: 20px;" />
+    1111111111111111111111111111111111111111111
+    <Select :items="items" :search="{}" :delete="true" style="width: 200px;" />
+    <Select :items="items" :search="{}" style="width: 200px;position: absolute;right: 10px; top: 20px;" />
 </template>
 
 <script setup lang="ts">
@@ -12,65 +13,65 @@ import { components, SelectItem } from "../../core";
 //  1、props、data
 const { Select } = components;
 const items: SelectItem<number>[] = [
-    { text: "1", type: "item" },
+    { text: "1", type: "item", clickable: true, searchable: true },
     {
         text: "2", type: "group", children: [
             { text: "2-1", type: "group" },
             {
                 text: "2-2", type: "group", children: [
-                    { text: "2-2-1", type: "item" },
-                    { text: "2-2-2 2-2-2 2-2-2 2-2-2 2-2-2 2-2-2 2-2-2 2-2-2", type: "item" }
+                    { text: "2-2-1", type: "item", clickable: true, searchable: true },
+                    { text: "2-2-2 2-2-2 2-2-2 2-2-2 2-2-2 2-2-2 2-2-2 2-2-2", type: "item", clickable: true, searchable: true }
                 ]
             }
         ]
     },
     {
         text: "3", type: "group", children: [
-            { text: "3-1", type: "item" },
+            { text: "3-1", type: "item", clickable: true, searchable: true },
             {
                 text: "3-2", type: "group", children: [
-                    { text: "3-2-1", type: "item" },
+                    { text: "3-2-1", type: "item", clickable: true, searchable: true },
                     {
                         text: "3-2-2", type: "group", children: [
-                            { text: "3-2-2-1", type: "item" },
-                            { text: "3-2-2-2", type: "item" }
+                            { text: "3-2-2-1", type: "item", clickable: true, searchable: true },
+                            { text: "3-2-2-2", type: "item", clickable: true, searchable: true }
 
                         ]
                     },
                     {
                         text: "3-2-3", type: "group", children: [
-                            { text: "3-2-3-1", type: "item" },
+                            { text: "3-2-3-1", type: "item", clickable: true, searchable: true },
                             {
                                 text: "3-2-3-2", type: "group", children: [
-                                    { text: "3-2-3-2-1", type: "item" },
-                                    { text: "3-2-3-2-2", type: "item" },
-                                    { text: "3-2-3-2-3", type: "item" },
-                                    { text: "3-2-3-2-4", type: "item" },
-                                    { text: "3-2-3-2-5", type: "item" },
-                                    { text: "3-2-3-2-6", type: "item" },
-                                    { text: "3-2-3-2-7", type: "item" },
-                                    { text: "3-2-3-2-8", type: "item" },
-                                    { text: "3-2-3-2-9", type: "item" },
-                                    { text: "3-2-3-2-10", type: "item" },
-                                    { text: "3-2-3-2-11", type: "item" },
-                                    { text: "3-2-3-2-12", type: "item" },
-                                    { text: "3-2-3-2-13", type: "item" },
-                                    { text: "3-2-3-2-14", type: "item" },
-                                    { text: "3-2-3-2-15", type: "item" },
-                                    { text: "3-2-3-2-16", type: "item" },
-                                    { text: "3-2-3-2-17", type: "item" },
-                                    { text: "3-2-3-2-18", type: "item" },
-                                    { text: "3-2-3-2-19", type: "item" },
-                                    { text: "3-2-3-2-20", type: "item" },
-                                    { text: "3-2-3-2-21", type: "item" },
-                                    { text: "3-2-3-2-22", type: "item" },
-                                    { text: "3-2-3-2-23", type: "item" },
-                                    { text: "3-2-3-2-24", type: "item" },
-                                    { text: "3-2-3-2-25", type: "item" },
-                                    { text: "3-2-3-2-26", type: "item" },
-                                    { text: "3-2-3-2-27", type: "item" },
-                                    { text: "3-2-3-2-28", type: "item" },
-                                    { text: "3-2-3-2-29", type: "item" },
+                                    { text: "3-2-3-2-1", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-2", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-3", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-4", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-5", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-6", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-7", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-8", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-9", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-10", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-11", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-12", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-13", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-14", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-15", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-16", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-17", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-18", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-19", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-20", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-21", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-22", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-23", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-24", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-25", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-26", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-27", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-28", type: "item", clickable: true, searchable: true },
+                                    { text: "3-2-3-2-29", type: "item", clickable: true, searchable: true },
 
                                 ]
                             }

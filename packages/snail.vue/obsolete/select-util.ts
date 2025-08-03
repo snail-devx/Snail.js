@@ -3,7 +3,7 @@
  */
 
 import { isArrayNotEmpty, isBoolean, isStringNotEmpty, newId } from "snail.core";
-import { SelectItem, SelectNode, SelectOptions } from "../models/select-model";
+import { Select2Item, Select2Node, Select2Options } from "./select2-model";
 import { shallowRef } from "vue";
 
 /**
@@ -12,11 +12,11 @@ import { shallowRef } from "vue";
  * @param items 
  * @returns 
  */
-export function buildSelectNodes(items: SelectItem<any>[]): Readonly<SelectNode<any>[]> {
+export function buildSelectNodes(items: Select2Item<any>[]): Readonly<Select2Node<any>[]> {
     return isArrayNotEmpty(items)
         ? items.map(item => {
             const children = item.type == "group"
-                ? buildSelectNodes(item.children)
+                ? buildSelectNodes(item.children!)
                 : undefined;
             //  返回前，对item做冻结处理，并干掉children属性
             {
@@ -27,7 +27,7 @@ export function buildSelectNodes(items: SelectItem<any>[]): Readonly<SelectNode<
 
                 Object.freeze(item);
             }
-            return Object.freeze<SelectNode<any>>({
+            return Object.freeze<Select2Node<any>>({
                 id: newId(),
                 item,
                 children,
@@ -43,14 +43,14 @@ export function buildSelectNodes(items: SelectItem<any>[]): Readonly<SelectNode<
  * @param nodes 
  * @param values 
  */
-export function refreshSelectNodes(nodes: Readonly<SelectNode<any>[]>, values: SelectItem<any>[]): Readonly<SelectNode<any>[]> {
+export function refreshSelectNodes(nodes: Readonly<Select2Node<any>[]>, values: Select2Item<any>[]): Readonly<Select2Node<any>[]> {
     //  取消 disabled属性；查看是否为选中将诶点
     values = values || [];
     if (isArrayNotEmpty(nodes) == true) {
         for (const node of nodes) {
             node.disabled.value = false;
             node.selected.value = values.length > 0 && values.includes(node.item);
-            refreshSelectNodes(node.children, values);
+            refreshSelectNodes(node.children!, values);
         }
     }
     return nodes;
@@ -62,14 +62,14 @@ export function refreshSelectNodes(nodes: Readonly<SelectNode<any>[]>, values: S
  * @param text 
  * @returns 是否有命中节点
  */
-export function searchSelectNode(nodes: Readonly<SelectNode<any>[]>, text: string): boolean {
+export function searchSelectNode(nodes: Readonly<Select2Node<any>[]>, text: string): boolean {
     if (isArrayNotEmpty(nodes) == false) {
         return false;
     }
     var matched: boolean = false;
     for (const node of nodes) {
         //  子节点是否命中；若命中，则强制自身也命中
-        const childMatched = searchSelectNode(node.children, text);
+        const childMatched = searchSelectNode(node.children!, text);
         if (childMatched == true) {
             node.disabled.value = false;
             matched = true;

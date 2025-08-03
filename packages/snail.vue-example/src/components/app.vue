@@ -8,7 +8,7 @@
 </template>
 <script setup lang="ts">
 import { Component, onMounted, shallowRef } from "vue";
-import { useReactive, Tree2Node, Tree2Options, components, TreeNodeOptions, TreeOptions, TreeNodeModel, TreeNodeSoltOptions } from "../core";
+import { useReactive, components, TreeOptions, TreeNodeModel, TreeNodeSoltOptions } from "../core";
 
 //#region *******************************   👉  组件定义    *****************************************
 //  👉 基础组件：
@@ -40,7 +40,7 @@ import EmptyTest from "./prompt/empty-test.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 const { transition } = useReactive();
-const { Tree, Tree2 } = components;
+const { Tree } = components;
 /** 当前展示组件*/
 var curComponent: Component = undefined;
 /** 是否显示组件 */
