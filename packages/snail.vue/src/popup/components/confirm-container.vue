@@ -40,7 +40,6 @@ defineOptions({ name: "ConfirmContainer", inheritAttrs: true, });
         flex: 1;
         margin: 20px 40px;
         overflow: auto;
-        font-size: 14px;
         word-wrap: break-word;
     }
 }

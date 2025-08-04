@@ -46,7 +46,6 @@ defineOptions({ name: "Empty", inheritAttrs: true, });
 
     >div.message {
         color: #babdc2;
-        font-size: 14px;
         font-weight: 400;
         padding: 0 10px 10px 10px;
     }

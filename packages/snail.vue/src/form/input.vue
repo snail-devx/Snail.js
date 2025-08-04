@@ -68,7 +68,6 @@ console.warn("Input:还没实现 验证相关逻辑")
 
     >.input-title {
         flex-shrink: 0;
-        font-size: 14px;
         padding-top: 6px;
 
         >span.text {

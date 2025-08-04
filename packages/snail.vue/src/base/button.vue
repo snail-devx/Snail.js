@@ -22,7 +22,6 @@ defineOptions({ name: "Button", inheritAttrs: true, });
 .snail-button {
     cursor: pointer;
     border-radius: 2px;
-    font-size: 14px;
     white-space: nowrap;
     user-select: none;
     // flex 布局：display: flex，align-items、justify-content 都为center

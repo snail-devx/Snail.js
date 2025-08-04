@@ -123,7 +123,6 @@ function onStatusClick() {
 
         >.title {
             padding-left: 20px;
-            font-size: 14px;
             font-weight: bold;
             color: #2e3033;
         }
