@@ -63,7 +63,7 @@ export function useAnimation(): IAnimationManager & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IAnimationManager>({ transition });
+    const manager = mountScope<IAnimationManager>({ transition }, "IAnimationManager");
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
 }

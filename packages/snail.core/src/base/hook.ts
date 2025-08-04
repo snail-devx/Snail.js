@@ -138,7 +138,7 @@ export function useHook<HookCodes>(): IHookManager<HookCodes> & IScope {
     //#region 
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IHookManager<HookCodes>>({ register, runHook, runHookAsync, remove });
+    const manager = mountScope<IHookManager<HookCodes>>({ register, runHook, runHookAsync, remove }, "IHookManager");
     manager.onDestroy(() => hookMap.clear());
     return Object.freeze(manager);
 }

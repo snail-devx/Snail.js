@@ -1,4 +1,4 @@
-import { isPromise, mustFunction } from "./data";
+import { isPromise, isStringNotEmpty, mustFunction } from "./data";
 import { throwIfFalse, throwIfTrue } from "./error";
 import { run } from "./function";
 import { IScope, IAsyncScope, IScopes, KeyScopeUseResult } from "./models/scope-model";
@@ -14,9 +14,10 @@ const mountHandles: Array<(scope: IScope) => void> = [];
  * - 挂载时配置为 只读、不可枚举
  * - 让target拥有自己的专有【作用域】，如给IHttpClient、IScriptManager等接口实例提供【作用域】功能
  * @param target 要挂载【作用域】的实例
+ * @param type target的类型，用于 Object.prototype.toString.call(target) 的返回值；不传入则忽略
  * @returns 挂载了IScope的target实例
  */
-export function mountScope<T>(target: T): T & IScope {
+export function mountScope<T>(target: T, type?: string): T & IScope {
     throwIfFalse(typeof (target) === "object", "mountScope: target must be an Object.");
     var destroyed: boolean = false;
     const handles: Array<() => void> = [];
@@ -49,6 +50,12 @@ export function mountScope<T>(target: T): T & IScope {
             }
         }
     }) as T & IScope;
+    //  挂载自定义类型，方便进行销毁时做区分
+    isStringNotEmpty(type) == true && Object.defineProperty(scope, Symbol.toStringTag, {
+        value: type,
+        enumerable: false,
+        writable: false
+    });
     //  返回挂载【作用域】；触发【onMountScope】句柄方法
     mountHandles.forEach(fn => run(fn, scope));
     return scope;
@@ -69,7 +76,7 @@ export function onMountScope(fn: (scope: IScope) => void): void {
  * @returns 全新的IScope实例
  */
 export function useScope(): IScope {
-    return mountScope<IScope>(Object.create(null));
+    return mountScope<IScope>(Object.create(null), "IScope");
 }
 /**
  * 使用【作用域组】
@@ -118,7 +125,7 @@ export function useScopes(): IScopes {
         }
     });
     //  监听【作用域】销毁事件，执行子作用域的销毁逻辑
-    mountScope(scopes).onDestroy(function () {
+    mountScope(scopes, "IScopes").onDestroy(function () {
         /*  先备份子作用域，清理后再执行destroy方法；避免remove过程中影响map的keys索引 */
         const tmpScopes = [...children.keys()];
         children.clear();
@@ -136,7 +143,7 @@ export function useScopes(): IScopes {
  */
 export function useAsyncScope<T>(task: Promise<T>): IAsyncScope<T> {
     throwIfFalse(isPromise(task), "useAsyncScope: task must be a Promise.");
-    const scope = mountScope<Promise<T>>(task) as IAsyncScope<T>
+    const scope = mountScope<Promise<T>>(task, "IAsyncScope") as IAsyncScope<T>
     task.finally(scope.destroy);
     return scope;
 }

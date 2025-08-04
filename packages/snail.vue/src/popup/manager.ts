@@ -6,8 +6,8 @@
  * 4、统一管理 弹出层z-index值等
  * 5、【后续支持】全局配置z-index起始值，容器组件、、、
  */
-import { Component, shallowRef } from "vue";
-import { defer, IAsyncScope, IScope, IScopes, isStringNotEmpty, mountScope, throwIfFalse, useAsyncScope, useHook, useScopes } from "snail.core";
+import { Component } from "vue";
+import { defer, IAsyncScope, IScope, IScopes, isStringNotEmpty, mountScope, useAsyncScope, useHook, useScopes } from "snail.core";
 import { checkDialog, monitorDialog } from "./utils/dialog-util";
 import { checkFollow } from "./utils/follow-util";
 import { checkPopup, destroyPopup, openPopup } from "./utils/popup-util";
@@ -39,9 +39,6 @@ export * from "./models/toast-model"
  * @returns 全新的【弹窗管理器】实例+作用域对象
  */
 export function usePopup(): IPopupManager & IScope {
-    /** 作用域组：管理动画效果子作用域 */
-    const scopes: IScopes = useScopes();
-
     //#region *************************************实现接口：IPopupManager接口方法*************************************
     /**
      * 弹出
@@ -224,7 +221,9 @@ export function usePopup(): IPopupManager & IScope {
     const manager = mountScope<IPopupManager>({
         popup, dialog, follow,
         confirm, toast
-    });
+    }, "IPopupManager");
+    /** 作用域组：管理动画效果子作用域 */
+    const scopes: IScopes = useScopes();
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
 }

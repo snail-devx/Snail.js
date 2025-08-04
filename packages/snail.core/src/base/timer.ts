@@ -20,8 +20,6 @@ export * from "./models/timer-model"
  * @returns 全新的【定时器】实例
  */
 export function useTimer(): ITimer & IScope {
-    /** 作用域组：管理动画效果子作用域 */
-    const scopes: IScopes = useScopes();
 
     //#region *************************************实现接口：ITimer接口方法*************************************
     /**
@@ -62,7 +60,8 @@ export function useTimer(): ITimer & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manger = mountScope<ITimer>({ onTimeout, onInterval });
+    const manger = mountScope<ITimer>({ onTimeout, onInterval }, "ITimer");
+    const scopes: IScopes = useScopes();
     manger.onDestroy(scopes.destroy);
     return Object.freeze(manger);
 }

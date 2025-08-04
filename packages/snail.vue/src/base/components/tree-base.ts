@@ -2,9 +2,9 @@
  * 树的基础组件信息
  *  1、组件基础上下文 默认实现
  */
-import { hasAny, IScope, isStringNotEmpty, mountScope, useScopes } from "snail.core";
+import { hasAny, IScope, isStringNotEmpty, mountScope } from "snail.core";
 import { ITreeBaseContext, TreeNodeExtend, TreeSearchResult, TreeNode } from "../models/tree-base";
-import { computed, shallowRef } from "vue";
+import { shallowRef } from "vue";
 
 /**
  * 使用【树上下文】
@@ -12,8 +12,6 @@ import { computed, shallowRef } from "vue";
  * @returns 上下文对象+作用域
  */
 export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeBaseContext<T> & IScope {
-    /** 构建的子作用域 */
-    const scopes = useScopes();
     /** 搜索时已成功【匹配】的节点集合  匹配成功的集合，暂时不维护
     const matched = shallowRef<TreeNode<T>[]>(); */
     /** 搜索时未成功【匹配】的节点集合 */
@@ -91,9 +89,12 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeBa
     //#endregion
 
     //  构建context上下文
-    const context = mountScope<ITreeBaseContext<T>>({ doSearch, isPatched, isShow, isShowChildren, getPath });
+    const context = mountScope<ITreeBaseContext<T>>({
+        doSearch,
+        isPatched, isShow, isShowChildren,
+        getPath
+    }, "ITreeBaseContext");
     context.onDestroy(() => {
-        scopes.destroy();
         failed.value = undefined;
         patched.value = undefined;
     });

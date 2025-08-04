@@ -3,7 +3,7 @@
  */
 
 import { App } from "vue";
-import { mustFunction, mustObject, IScope, useScope, removeFromArray } from "snail.core";
+import { mustFunction, IScope, useScope, removeFromArray } from "snail.core";
 
 /** 私有类型：App类型 
  * - normal 普通app实例

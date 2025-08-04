@@ -1,7 +1,7 @@
 import { mustFunction, mustString, hasAny, hasOwnProperty, isFunction, isObject, newId, tidyString } from "./data";
 import { run } from "./function";
 import { EventHandle, EventSender, IEventManager } from "./models/event-model";
-import { checkScope, IScope, mountScope, useScope } from "./scope";
+import { checkScope, IScope, mountScope } from "./scope";
 
 // 把自己的类型共享出去
 export * from "./models/event-model";
@@ -124,7 +124,7 @@ export function useEvent(): IEventManager & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IEventManager>({ on, once, off, trigger });
+    const manager = mountScope<IEventManager>({ on, once, off, trigger }, "IEventManager");
     manager.onDestroy(() => Object.keys(events).forEach(key => delete events[key]));
     return Object.freeze(manager);
 }

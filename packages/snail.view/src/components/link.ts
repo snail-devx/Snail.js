@@ -95,14 +95,12 @@ export function useLink(options?: Partial<LinkOptions>): ILinkManager & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<ILinkManager>({ register, theme });
-    {
-        manager.onDestroy(() => {
-            event.off(EVENT_ChangeTheme, theme);
-            destroylink(scopeLinks, true)
-        });
-        event.on(EVENT_ChangeTheme, theme);
-    }
+    const manager = mountScope<ILinkManager>({ register, theme }, "ILinkManager");
+    manager.onDestroy(() => {
+        event.off(EVENT_ChangeTheme, theme);
+        destroylink(scopeLinks, true)
+    });
+    event.on(EVENT_ChangeTheme, theme);
     return Object.freeze(manager);
 }
 /** 全局的link映射表

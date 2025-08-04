@@ -83,7 +83,7 @@ export function useServer(): IServerManager & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IServerManager>({ register, has, get, getUrl, remove });
+    const manager = mountScope<IServerManager>({ register, has, get, getUrl, remove }, "IServerManager");
     manager.onDestroy(() => Object.keys(servers).forEach(remove));
     return Object.freeze(manager);
 }

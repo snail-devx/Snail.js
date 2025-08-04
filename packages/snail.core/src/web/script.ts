@@ -198,7 +198,7 @@ export function useScript(options?: Partial<ScriptOptions>): IScriptManager & IS
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IScriptManager>({ register, has, load, loads });
+    const manager = mountScope<IScriptManager>({ register, has, load, loads }, "IScriptManager");
     manager.onDestroy(() => destroyScript(SCRIPTS));
     return Object.freeze(manager);
 }

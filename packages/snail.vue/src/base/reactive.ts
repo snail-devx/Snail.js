@@ -3,9 +3,9 @@
  *  1、针对Vue的响应式相关功能，做一些便捷封装
  *  2、方便使用，减少重复性代码量
  */
-import { Ref, ShallowRef, watch, WatchSource } from "vue";
+import { watch, WatchSource } from "vue";
 import { IReactiveManager, ReactiveVar } from "./models/reactive-model";
-import { IAsyncScope, IScope, IScopes, isObject, isPromise, mountScope, RunResult, throwIfFalse, useAsyncScope, useScopes, wait } from "snail.core";
+import { IScope, IScopes, isObject, isPromise, mountScope, RunResult, throwIfFalse, useScopes, wait } from "snail.core";
 
 /**
  * 使用【响应式管理器】
@@ -13,9 +13,6 @@ import { IAsyncScope, IScope, IScopes, isObject, isPromise, mountScope, RunResul
  * @returns 全新的【响应式管理器】+作用域
  */
 export function useReactive(): IReactiveManager & IScope {
-    /** 作用域组：管理动画效果子作用域 */
-    const scopes: IScopes = useScopes();
-
     //#region *************************************实现接口：IReactiveManager接口方法*************************************
     /**
      * 【过渡】变量值
@@ -84,7 +81,8 @@ export function useReactive(): IReactiveManager & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IReactiveManager>({ transition, load, watcher });
+    const manager = mountScope<IReactiveManager>({ transition, load, watcher }, "IReactiveManager");
+    const scopes: IScopes = useScopes();
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
 }

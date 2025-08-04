@@ -4,7 +4,7 @@
  * 注意事项：
  *  1、不提供全局【观察者】对象；这个涉到不少子scope的销毁，在全局挂着始终不好
  */
-import { checkScope, IScope, IScopes, mountScope, mustFunction, mustString, run, throwIfFalse, useScope, useScopes } from "snail.core";
+import { checkScope, IScope, IScopes, mountScope, mustFunction, mustString, run, throwIfFalse, useScopes } from "snail.core";
 import { ElementSize, IObserver } from "../models/observer-model";
 
 // 把自己的类型共享出去
@@ -105,7 +105,7 @@ export function useObserver(): IObserver & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IObserver>({ onEvent, onSize, onClient });
+    const manager = mountScope<IObserver>({ onEvent, onSize, onClient }, "IObserver");
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
 }

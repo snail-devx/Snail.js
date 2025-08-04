@@ -98,7 +98,7 @@ export function useHttp(options?: Partial<HttpOptions>): IHttpClient & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const hc = mountScope<IHttpClient>({ intercept, send, get, post });
+    const hc = mountScope<IHttpClient>({ intercept, send, get, post }, "IHttpClient");
     hc.onDestroy(() => scopeInterceptors.splice(0));
     return Object.freeze(hc);
 }

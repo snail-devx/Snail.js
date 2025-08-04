@@ -1,4 +1,4 @@
-import { onMountScope, script } from "snail.core";
+import { getType, onMountScope, script } from "snail.core";
 import { linkMap } from "snail.view";
 
 export * from "snail.core";
@@ -21,4 +21,11 @@ script.register(
 )
 
 //  挂载Scope时，若在Vue的setup中，则自动销毁
-onMountScope(scope => getCurrentScope() && onScopeDispose(scope.destroy));
+onMountScope(scope => {
+    const type = getType(scope);
+    console.log(`%c${type}:`, "color:green", "scope mounted");
+    getCurrentScope() && onScopeDispose(() => {
+        console.log(`%c${type}:`, "color:blue", "scope auto destroyed");
+        scope.destroy();
+    });
+});

@@ -85,7 +85,7 @@ export function useVersion(options?: Partial<VersionOptions>): IVersionManager &
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IVersionManager>({ getVersion, addFile, formart });
+    const manager = mountScope<IVersionManager>({ getVersion, addFile, formart }, "IVersionManager");
     manager.onDestroy(() => Object.keys(versionFiles).forEach(key => delete versionFiles[key]));
     return Object.freeze(manager);
 }
