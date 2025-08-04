@@ -45,6 +45,8 @@ const rollupOptions = await builder.build([{
     name: "SnailView",
     format: "es",
     assets: [
+        //  动画库
+        "styles/animation.less",
         //  混入规则样式
         "styles/base-mixins.less",
     ]
