@@ -42,8 +42,8 @@ const { onTimeout } = useTimer();
 const { watcher } = useReactive();
 //  解构一些响应式变量，方便访问
 const { context, popupStatus, pinned, parentPinned } = props;
-/** 能够展示的【选择项】 */
-const itemsRef = computed(() => (props.items || []).filter(context.canShow));
+/** 能够展示的【选择项】：需要【补丁】节点 */
+const itemsRef = computed(() => (props.items || []).filter(item => context.isShow(item, true)));
 /** 弹窗所需的类样式信息 */
 const classRef = computed(() => ({
     "snail-select-popup": true,

@@ -43,10 +43,10 @@ const { node, parent, options = {}, level, context } = defineProps<TreeNodeOptio
 throwIfTrue(level > 10, "tree node level cannot exceed 10.");
 const emits = defineEmits<TreeNodeEvents<any>>();
 const { transition } = useAnimation();
-/**     节点是否可显示 */
-const showRef = computed(() => context.canShow(node));
-/**     节点的子节点是否可显示 */
-const showChildrenRef = computed(() => context.canShowChildren(node))
+/**     节点是否显示：需要补丁节点 */
+const showRef = computed(() => context.isShow(node, true));
+/**     子节点是否显示：需要补丁节点*/
+const showChildrenRef = computed(() => context.isShowChildren(node, true))
 /**     自定义绑定的类样式：层级节点和可点击标记等 */
 const classRef = computed(() => {
     const array = [`level-${level}`];

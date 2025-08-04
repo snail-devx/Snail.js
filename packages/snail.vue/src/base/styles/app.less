@@ -1,5 +1,8 @@
 // Vue实例级别相关css，用于约束全局样式
 
+@import "snail.view/dist/styles/base-mixins.less";
+
+/*****************************************   👉  snail-app 下默认样式  *****************************************/
 .snail-app {
     //  指定默认字体
     font-family: "Microsoft YaHei", "微软雅黑", "Hiragino Sans GB", "tahoma", "arial", "simsun", "宋体", "sans-serif";
@@ -90,9 +93,7 @@
     }
 }
 
-// *****************************************   👉  一些公共样式    *****************************************
-@import "snail.view/dist/styles/base-mixins.less";
-
+/*****************************************   👉  snail-app 下默认样式  *******************************************/
 .snail-app {
 
     //  文本提示信息
@@ -101,70 +102,5 @@
         .text-ellipsis();
         //  提示文本样式：400 weight，14px size，#8A9099 color
         .tip-text();
-    }
-}
-
-// *****************************************   👉  公共动画    *****************************************
-//  淡入动画
-.snail-fade-in {
-    opacity: 1;
-    animation: snail-fade-in 0.4s ease-in-out;
-
-    @keyframes snail-fade-in {
-        0% {
-            opacity: 0;
-        }
-
-        100% {
-            opacity: 1;
-        }
-    }
-}
-
-//  淡出动画
-.snail-fade-out {
-    opacity: 0;
-    animation: snail-fade-out 0.4s ease-in-out;
-
-    @keyframes snail-fade-out {
-        0% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 0;
-        }
-    }
-}
-
-//  放大进入
-.snail-scale-in {
-    scale: 1;
-    animation: snail-scale-in 0.2s ease-in-out;
-
-    @keyframes snail-scale-in {
-        0% {
-            scale: 0;
-        }
-
-        100% {
-            scale: 1;
-        }
-    }
-}
-
-//  缩小退出
-.snail-scale-out {
-    scale: 0;
-    animation: snail-scale-out 0.2s ease-in-out;
-
-    @keyframes snail-scale-out {
-        0% {
-            scale: 1;
-        }
-
-        100% {
-            scale: 0;
-        }
     }
 }

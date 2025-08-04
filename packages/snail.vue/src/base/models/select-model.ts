@@ -80,6 +80,23 @@ export type SelectEvents<T> = SelectBaseEvents<T> & {
      *      change                   选中的【选择项】改变时
      */
 }
+/**
+ * 选项菜单 组件的Slot配置选项
+ */
+export type SelectSlotOptions<T> = {
+    /**
+     * 关闭Follow弹窗
+     * - 将隐藏已弹出的选项 follow 弹窗
+     * @returns 已弹出则销毁成功返回true；未弹出则销毁失败返回false
+     */
+    closeFollow(): boolean;
+    /**
+     * 停止事件冒泡
+     * - 解决问题：插槽内元素需要处理自定义click事件，此时不希望Select组件响应click事件
+     * @param delay 在此延迟时间内，停止事件冒泡
+     */
+    stopPropagation(delay: number);
+}
 
 /**
  * 【选项菜单】 组件上下文

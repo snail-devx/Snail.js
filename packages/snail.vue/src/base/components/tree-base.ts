@@ -18,6 +18,8 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeBa
     const matched = shallowRef<TreeNode<T>[]>(); */
     /** 搜索时未成功【匹配】的节点集合 */
     const failed = shallowRef<TreeNode<T>[]>();
+    /** 搜索时的补丁节点集合：子节点名称时，父级路径上节点没命中，则作为路径修补节点存在 */
+    const patched = shallowRef<TreeNode<T>[]>();
 
     //#region *************************************实现接口：ITreeContext 接口方法*************************************
     /**
@@ -30,27 +32,57 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeBa
         /** 匹配成功的集合，暂时不维护
         matched.value = result.matched; */
         failed.value = result.failed;
+        patched.value = result.patched;
+    }
+
+    /**
+     * 是否是【补丁】节点
+     * - 子节点搜索命中时，父级路径上节点没命中，则作父级路径节点作为路径修补节点存在，避免命中子节点展示不出来
+     * @param node 要判断的节点
+     * @returns true 是补丁节点，false 不是补丁节点
+     */
+    function isPatched(node: TreeNode<T>): boolean {
+        return patched.value ? patched.value.includes(node) : false;
     }
     /**
-     * 能否显示指定【树节点】
+     * 是否显示【树节点】
      * @param node 要判断的节点
+     * @param needPatched 是否需要【补丁】节点。true时（补丁节点始终显示）；false时（根据hidden和搜索结果判断）
      * @returns 能显示返回true；否则返回false
      */
-    function canShow(node: TreeNode<T, TreeNodeExtend>): boolean {
-        /* 显示条件：节点未配置隐藏，如在【搜索】模式下，还需要匹配上搜索文本 */
-        return node.hidden != true
-            && (failed.value == undefined || failed.value.includes(node) == false);
+    function isShow(node: TreeNode<T, TreeNodeExtend>, needPatched: boolean): boolean {
+        //  隐藏节点，强制不显示
+        if (node.hidden == true) {
+            return false;
+        }
+        //  显示节点，且搜索匹配成功了，则强制显示
+        if (failed.value == undefined || failed.value.includes(node) == false) {
+            return true;
+        }
+        //  显示将诶点，未匹配成功，根据需要看是否是【补丁】节点
+        return needPatched == true ? isPatched(node) : false;
     }
     /**
-     * 能否显示指定【树节点】的子节点
+     * 是否显示指定【树节点】的子节点
      * - 不会判断node节点自身是否可显示
      * @param node 要判断的节点
+     * @param needPatched 是否需要【补丁】节点。true时（补丁节点始终显示）；false时（根据hidden和搜索结果判断）
      * @returns 能显示返回true；否则返回false
      */
-    function canShowChildren(node: TreeNode<T, TreeNodeExtend>): boolean {
+    function isShowChildren(node: TreeNode<T, TreeNodeExtend>, needPatched: boolean): boolean {
+        //  有子节点，至少有一个【子节点】是 显示 的时，则需要显示子节点
         return node.children
-            ? node.children.filter(canShow).length > 0
-            : false
+            ? node.children.find(child => isShow(child, needPatched)) != undefined
+            : false;
+    }
+
+    /**
+     * 获取指定【树节点】的路径
+     * @param node 树节点
+     * @returns 从【顶级节点】->【指定节点】的全路径数据
+     */
+    function getPath(node: TreeNode<T, TreeNodeExtend>): TreeNode<T, TreeNodeExtend>[] {
+        return searchPath(nodes, node);
     }
     //#endregion
 
@@ -59,10 +91,11 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeBa
     //#endregion
 
     //  构建context上下文
-    const context = mountScope<ITreeBaseContext<T>>({ doSearch, canShow, canShowChildren });
+    const context = mountScope<ITreeBaseContext<T>>({ doSearch, isPatched, isShow, isShowChildren, getPath });
     context.onDestroy(() => {
         scopes.destroy();
         failed.value = undefined;
+        patched.value = undefined;
     });
     return Object.freeze(context);
 }
@@ -77,24 +110,51 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeBa
  * @returns 搜索结果
  */
 function searchTree<T>(nodes: TreeNode<T, TreeNodeExtend>[], text: string): TreeSearchResult<T> {
-    const result = Object.freeze<TreeSearchResult<T>>({ matched: [], failed: [] });
+    const result = Object.freeze<TreeSearchResult<T>>({ matched: [], failed: [], patched: [] });
     for (const node of nodes || []) {
-        var matched: boolean = false;
-        //  子节点匹配，若子节点匹配上了，则父节点自动匹配上
+        //  自身是否匹配上
+        const matched: boolean = node.fixed == true || text == undefined || (node.text || "").toLowerCase().indexOf(text) != -1;
+        matched ? result.matched.push(node) : result.failed.push(node);
+        //  子节点匹配（有匹配成功的，或者有【补丁】节点）
+        var childMatched: boolean = false;
         if (hasAny(node.children) == true) {
             const childResult = searchTree<T>(node.children, text);
             result.matched.push(...childResult.matched);
             result.failed.push(...childResult.failed);
-            matched = childResult.matched.length > 0;
+            result.patched.push(...childResult.patched);
+            childMatched = childResult.matched.length > 0 || childResult.patched.length > 0;
         }
-        //  自身节点匹配：若为固定节点，则不参与【搜索】匹配；自身不参与搜索，则强制匹配不成功
-        matched = matched || node.fixed == true;
-        if (matched == false && node.searchable == true) {
-            matched = text == undefined
-                || (node.text || "").toLowerCase().indexOf(text) != -1;
-        }
-        matched ? result.matched.push(node) : result.failed.push(node);
+        //  若自身没匹配上，但有子节点匹配上了，则把 当前节点 加入【补丁】节点集合中
+        childMatched && matched == false && result.patched.push(node);
     }
     return result;
+}
+
+/**
+ * 搜索节点路径
+ * @param nodes 
+ * @param target 
+ */
+function searchPath<T>(nodes: TreeNode<T>[], target: TreeNode<T>): TreeNode<T>[] {
+    /** 先找当前层级，再找子级；当前层级+子级 同步找；二者都能实现，
+     *      二者各有优缺点，先采用第一种
+     *      第一种对常用层级在上层时，更友好；更符合使用习惯
+     *      第二种对常用层级在 上半部分时更友好
+     */
+
+    //  找当前层级，找不到，再找子节点
+    for (const node of nodes || []) {
+        if (target === node) {
+            return [node];
+        }
+    }
+    //  找子节点
+    for (const node of nodes || []) {
+        const childPath = searchPath(node.children, target);
+        if (childPath.length > 0) {
+            return [node, ...childPath];
+        }
+    }
+    return [];
 }
 //#endregion

@@ -1,14 +1,20 @@
 <!-- 组件介绍写到这里 -->
 <template>
     1111111111111111111111111111111111111111111
-    <Select :items="items" :search="{ autoComplete: true }" :delete="true" style="width: 200px;" />
-    <Select :items="items" :search="{}" :show-path="true"
+    <Select :items="items" :search="{ autoComplete: true }" style="width: 200px;" />
+    <Select :items="items" :search="{}" :show-path="true" v-model="selectValues"
         style="width: 200px;position: absolute;right: 10px; top: 20px;" />
+    <Select :items="items" :search="{}" :show-path="true" v-model="selectValues"
+        style="width: 200px;position: absolute;right: 50%; top: 50%;">
+        <template v-slot="{ closeFollow, stopPropagation }: SelectSlotOptions<any>">
+            哈哈哈 <button @click="() => { closeFollow(); stopPropagation(500); }">哈哈得到</button>
+        </template>
+    </Select>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components, SelectItem } from "../../core";
+import { components, SelectItem, SelectSlotOptions } from "../../core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -83,8 +89,10 @@ const items: SelectItem<number>[] = [
             }
         ]
     },
-    { text: "4", type: "item" }
+    { text: "4-不可点击-item", type: "item" }
 ];
+/** 已选节点值 */
+const selectValues = shallowRef<SelectItem<number>[]>([]);
 //  2、可选配置选项
 defineOptions({ name: "SelectTest", inheritAttrs: true, });
 
@@ -92,6 +100,9 @@ defineOptions({ name: "SelectTest", inheritAttrs: true, });
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
+watch(selectValues, () => {
+    console.log(selectValues.value);
+});
 //  2、生命周期响应
 
 //      监听组件激活和卸载，适配KeepAlive组件内使用

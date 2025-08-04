@@ -5,12 +5,12 @@
 -->
 <template>
     <div class="snail-tree">
-        <Search v-if="props.search" :="props.search" @search="context.doSearch" />
+        <Search v-if="props.search" :="props.search" @search="onSearch" />
         <Scroll :scroll-y="true">
             <TreeNode v-for="node in props.nodes || []" :key="node.id || newId()" :node="node" :parent="undefined"
                 :level="1" :options="props.nodeOptions" :context="context"
                 @click="(node, parents) => emits('click', node, parents)">
-                <template #="slotProps">
+                <template #="slotProps: TreeNodeSlotOptions<any>">
                     <slot :="slotProps" />
                 </template>
             </TreeNode>
@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { newId } from "snail.core";
-import { TreeEvents, TreeOptions } from "./models/tree-model";
+import { TreeEvents, TreeNodeSlotOptions, TreeOptions } from "./models/tree-model";
 //  三方组件
 import Scroll from "./scroll.vue";
 import Search from "../base/search.vue";
@@ -34,10 +34,19 @@ const props = defineProps<TreeOptions<any>>();
 const emits = defineEmits<TreeEvents<any>>();
 /** 树的上下文 */
 const context: ITreeBaseContext<any> = useTreeContext<any>(props.nodes);
-//  2、可选配置选项
+//  2、可选配置选项：对外可访问contxt属性
+defineExpose({ context });
 defineOptions({ name: "Tree", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 搜索时
+ * @param text 
+ */
+function onSearch(text: string) {
+    context.doSearch(text);
+    emits("searched", text);
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 </script>
@@ -52,7 +61,7 @@ defineOptions({ name: "Tree", inheritAttrs: true, });
     .flex-column();
 
     .snail-search {
-        flex-direction: 0;
+        flex-shrink: 0;
         margin: 12px 12px 12px 12px;
     }
 

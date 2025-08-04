@@ -1,12 +1,15 @@
 <!-- 选项菜单 组件：
     1、支持基础的html select ，支持多级选择，支持搜索功能 
     2、通过 v-model 绑定已选数据
+    3、选中数据显示，支持插槽
 -->
 <template>
     <div class="snail-select" :class="{ 'readonly': props.readonly }" @click="onClick()" ref="select">
         <template v-if="hasAny(props.items) == true">
-            <div v-if="hasAny(selectsRef)" class="select-result" :title="selectTextRef">
-                <div class="select-text" v-text="selectTextRef" />
+            <div v-if="hasAny(valuesModel)" class="select-result">
+                <slot :="slotOptions">
+                    <div class="select-text" :title="selectTextRef" v-text="selectTextRef" />
+                </slot>
             </div>
             <div v-else class="select-result text-tips" v-text="props.placeholder || '请选择'" />
             <Icon type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
@@ -16,12 +19,13 @@
 </template>
 
 <script setup lang="ts">
-import { hasAny, IAsyncScope } from "snail.core";
-import { computed, shallowRef, useTemplateRef } from "vue";
+import { hasAny, IAsyncScope, IScope, useTimer } from "snail.core";
+import { computed, shallowRef, useTemplateRef, watch } from "vue";
 import { usePopup } from "../popup/manager";
 import Icon from "./icon.vue";
 import SelectPopup from "./components/select-popup.vue";
-import { ISelectContext, SelectEvents, SelectItem, SelectOptions, SelectPopupOptions } from "./models/select-model";
+import { ISelectContext, SelectEvents, SelectItem, SelectOptions, SelectPopupOptions, SelectSlotOptions } from "./models/select-model";
+import { useSelectContext } from "./components/select-context";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -29,20 +33,46 @@ const props = defineProps<SelectOptions<any>>();
 const emits = defineEmits<SelectEvents<any>>();
 const valuesModel = defineModel<SelectItem<any>[]>({ default: [] });
 const { follow } = usePopup();
+const { onTimeout } = useTimer();
 /** 组件根元素*/
 const rootDom = useTemplateRef("select");
-/** 已选【选择项】集合：默认从v-model中初始化 */
-const selectsRef = shallowRef<SelectItem<any>[]>([...valuesModel.value]);
 /** 【选项菜单】上下文 */
-const context: ISelectContext<any> = useSelectContext<any>(props.items, selectsRef);
+const context: ISelectContext<any> = useSelectContext<any>(props.items, valuesModel);
 /** 选择的结果文本 */
 const selectTextRef = computed(() => context.selectedText(props.multiple, props.showPath));
+/** 插槽配置选项 */
+const slotOptions = Object.freeze<SelectSlotOptions<any>>({ closeFollow, stopPropagation, });
 /** 跟随弹窗作用域 */
 var followScope: IAsyncScope<SelectItem<any>[]> = undefined;
+/** 停止事件冒泡的作用域对象 */
+var stopPropagationScope: IScope = undefined;
 //  2、可选配置选项
 defineOptions({ name: "Select", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 关闭Follow弹窗
+ * - 将隐藏已弹出的选项 follow 弹窗
+ * @returns 已弹出则销毁成功返回true；未弹出则销毁失败返回false
+ */
+function closeFollow(): boolean {
+    if (followScope != undefined) {
+        followScope.destroy();
+        followScope = undefined;
+        return true;
+    }
+    return false;
+}
+/**
+ * 停止事件冒泡
+ * - 解决问题：插槽内元素需要处理自定义click事件，此时不希望Select组件响应click事件
+ * @param delay 在此延迟时间内，停止事件冒泡
+ */
+function stopPropagation(delay: number) {
+    stopPropagationScope && stopPropagationScope.destroy();
+    stopPropagationScope = onTimeout(() => stopPropagationScope = undefined, delay);
+}
+
 /**
  * 选项菜单 点击时
  * - 弹出选择项
@@ -51,10 +81,8 @@ async function onClick() {
     if (props.readonly == true || rootDom.value == undefined) {
         return;
     }
-    //  已存在则销毁
-    if (followScope != undefined) {
-        followScope.destroy();
-        followScope = undefined;
+    //  已存在则销毁；处于停止冒泡时，不做响应
+    if (closeFollow() == true || stopPropagationScope != undefined) {
         return;
     }
     //  构建已选数据：单选时，仅取最后一个选择节点
@@ -100,7 +128,6 @@ async function onClick() {
  */
 function onSelectItemChange(items: SelectItem<any>[]) {
     items = hasAny(items) ? [...items] : [];
-    selectsRef.value = items;
     valuesModel.value = items;
     emits("change", items);
 }
@@ -112,8 +139,6 @@ function onSelectItemChange(items: SelectItem<any>[]) {
 
 <script lang="ts">
 import { onAppCreated } from "./utils/app-util";
-import { useSelectContext } from "./components/select-context";
-import { an } from "vitest/dist/chunks/reporters.d.BFLkQcL6";
 //  非组件实例逻辑：将【选项弹窗】注册为【弹窗】app实例的全局组件，方便树形复用
 onAppCreated((app, type) => {
     type == "popup" && app.component("SelectPopup", SelectPopup);
@@ -137,6 +162,7 @@ onAppCreated((app, type) => {
 
     //  已选结果区域
     >div.select-result {
+        height: 30px;
         flex: 1;
         overflow: hidden;
         padding: 0 10px 0 6px;

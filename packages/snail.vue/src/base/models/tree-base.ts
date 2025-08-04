@@ -37,7 +37,7 @@ export type TreeNodeExtend = {
      * 节点Id，确保唯一
      * - 不传入则内部自动 newId()
      */
-    id?: string;
+    readonly id?: string;
 
     /**
      * 是否可点击
@@ -75,18 +75,34 @@ export interface ITreeBaseContext<T> {
     doSearch(text: string): void;
 
     /**
-     * 能否显示指定【树节点】
+     * 是否是【补丁】节点
+     * - 子节点搜索命中时，父级路径上节点没命中，则作父级路径节点作为路径修补节点存在，避免命中子节点展示不出来
      * @param node 要判断的节点
+     * @returns true 是补丁节点，false 不是补丁节点
+     */
+    isPatched(node: TreeNode<T>): boolean;
+    /**
+     * 是否显示【树节点】
+     * @param node 要判断的节点
+     * @param needPatched 是否需要【补丁】节点。true时（补丁节点始终显示）；false时（根据hidden和搜索结果判断）
      * @returns 能显示返回true；否则返回false
      */
-    canShow(node: TreeNode<T, TreeNodeExtend>): boolean;
+    isShow(node: TreeNode<T, TreeNodeExtend>, needPatched: boolean): boolean;
     /**
-     * 能否显示指定【树节点】的子节点
+     * 是否显示指定【树节点】的子节点
      * - 不会判断node节点自身是否可显示
      * @param node 要判断的节点
+     * @param needPatched 是否需要【补丁】节点。true时（补丁节点始终显示）；false时（根据hidden和搜索结果判断）
      * @returns 能显示返回true；否则返回false
      */
-    canShowChildren(node: TreeNode<T, TreeNodeExtend>): boolean;
+    isShowChildren(node: TreeNode<T, TreeNodeExtend>, needPatched: boolean): boolean;
+
+    /**
+     * 获取指定【树节点】的路径
+     * @param node 树节点
+     * @returns 从【顶级节点】->【指定节点】的全路径数据
+     */
+    getPath(node: TreeNode<T, TreeNodeExtend>): TreeNode<T, TreeNodeExtend>[];
 }
 
 /**
@@ -101,4 +117,10 @@ export type TreeSearchResult<T> = {
      * 未匹配上的节点集合
      */
     failed: TreeNode<T>[];
+    /** 
+     * 搜索时的【补丁】节点集合
+     * - 子节点搜索命中时，父级路径上节点没命中，则作父级路径节点作为路径修补节点存在，避免命中子节点展示不出来
+     * - 仅在有搜索条件时成立，补丁节点同时在【failed】节点集合中
+     */
+    patched: TreeNode<T>[];
 }

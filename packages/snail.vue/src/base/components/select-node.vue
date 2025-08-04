@@ -29,11 +29,11 @@ const emits = defineEmits<SelectNodeEvents<any>>();
 const rootDom = useTemplateRef("select-node");
 /** 当前节点是否选中了 */
 const selectedRef = computed(() => context.selected(multiple, item));
-/** 自身是否展示 */
-const showRef = computed(() => context.canShow(item));
-/** 子【选择项】是否展示：只有【分组选择项】才可显示子*/
+/** 节点是否显示：需要【补丁】节点 */
+const showRef = computed(() => context.isShow(item, true));
+/** 子节点是否显示：需要【补丁】节点；只有【分组选择项】才可显示子*/
 const showChildrenRef = showChildren == true && item.type == "group"
-    ? computed(() => (item.children || []).filter(context.canShow))
+    ? computed(() => (item.children || []).filter(item => context.isShow(item, true)))
     : [] as SelectItem<any>[];
 /** 自定义的class样式：动态计算 */
 const classRef = computed(() => ({

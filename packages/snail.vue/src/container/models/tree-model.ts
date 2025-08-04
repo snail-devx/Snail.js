@@ -29,7 +29,11 @@ export type TreeOptions<T> = {
  * 树组件事件
  */
 export type TreeEvents<T> = TreeNodeEvents<T> & {
-
+    /**
+     * 搜索完成后
+     * @param text 搜索文本
+     */
+    (el: "searched", text: string);
 }
 /**
  * 树节点 组件配置选项
