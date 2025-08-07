@@ -103,6 +103,7 @@ function onSwitchChange() {
 
 //  只读状态样式
 .snail-switch.readonly {
-    cursor: default;
+    // cursor: default;
+    cursor: not-allowed;
 }
 </style>

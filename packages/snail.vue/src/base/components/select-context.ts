@@ -2,10 +2,11 @@
  * 【选项菜单】组件上下文
  */
 
-import { IScope } from "snail.core";
+import { IScope, mountScope } from "snail.core";
 import { ISelectContext, SelectItem } from "../models/select-model";
 import { useTreeContext } from "./tree-base";
 import { ShallowRef } from "vue";
+import { ITreeBaseContext } from "../models/tree-base";
 
 /**
  * 使用【选项菜单】上下文
@@ -14,8 +15,6 @@ import { ShallowRef } from "vue";
  * @returns 选项菜单 上下文+作用域
  */
 export function useSelectContext<T>(items: SelectItem<T>[], selectsRef: ShallowRef<SelectItem<T>[]>): ISelectContext<T> & IScope {
-    const treeContxt = useTreeContext<T>(items);
-
     //#region *************************************实现接口：ISelectContext 接口方法*************************************
     /**
      * 指定节点是否选中了
@@ -48,5 +47,18 @@ export function useSelectContext<T>(items: SelectItem<T>[], selectsRef: ShallowR
     //#endregion
 
     //  借助 useTreeContext 实现基础功能，然后挂载自身实现方法
-    return Object.freeze({ ...treeContxt, selected, selectedText });
+    const context: ISelectContext<T> & IScope = Object.create(null);
+    {
+        const treeContxt = useTreeContext<T>(items);
+        Object.assign(
+            context,
+            treeContxt,
+            { selected, selectedText }
+        );
+        mountScope(context, "ISelectContext");
+        //  相互监听销毁，实现自动销毁
+        treeContxt.onDestroy(() => context.destroyed || context.destroy());
+        context.onDestroy(() => treeContxt.destroyed || treeContxt.destroy());
+    }
+    return Object.freeze(context);
 }

@@ -15,13 +15,13 @@
         load component error：<span>{{ dynamicErrorRef }}</span>
     </div>
     <!-- 组件加载过程中的等待提示 -->
-    <SnailLoading v-else-if="dynamicComponentRef == undefined" :show="true" :disabled-mask="true" />
+    <Loading v-else-if="dynamicComponentRef == undefined" :show="true" :mask-disabled="true" />
 </template>
 
 <script setup lang="ts">
 import { Component, onErrorCaptured, ref, shallowRef } from "vue";
 import { delay, isObject, isStringNotEmpty, script, } from "snail.core";
-import SnailLoading from "../prompt/loading.vue"
+import Loading from "../prompt/loading.vue"
 import { ComponentOptions } from "./models/component-model";
 import { useReactive } from "../base/reactive";
 

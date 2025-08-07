@@ -54,7 +54,7 @@ const classRef = computed(() => {
     return array;
 });
 /**     树节点的【插槽】配置选项 */
-const slotOptions = Object.freeze<TreeNodeSlotOptions<any>>({
+const slotOptions = Object.freeze<TreeNodeSlotOptions<TreeNodeModel<any>>>({
     node,
     parent,
     level,

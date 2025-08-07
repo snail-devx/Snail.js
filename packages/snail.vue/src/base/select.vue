@@ -5,13 +5,13 @@
 -->
 <template>
     <div class="snail-select" :class="{ 'readonly': props.readonly }" @click="onClick()" ref="select">
-        <template v-if="hasAny(props.items) == true">
-            <div v-if="hasAny(valuesModel)" class="select-result">
+        <template v-if="props.items && props.items.length > 0">
+            <div v-if="valuesModel.length > 0" class="select-result">
                 <slot :="slotOptions">
                     <div class="select-text" :title="selectTextRef" v-text="selectTextRef" />
                 </slot>
             </div>
-            <div v-else class="select-result text-tips" v-text="props.placeholder || '请选择'" />
+            <div v-else class="select-result text-tips" v-text="props.readonly ? '' : (props.placeholder || '请选择')" />
             <Icon type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
         </template>
         <div v-else class="no-items text-tips">暂无可选项</div>
@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { hasAny, IAsyncScope, IScope, useTimer } from "snail.core";
-import { computed, shallowRef, useTemplateRef, watch } from "vue";
+import { computed, useTemplateRef } from "vue";
 import { usePopup } from "../popup/manager";
 import Icon from "./icon.vue";
 import SelectPopup from "./components/select-popup.vue";
@@ -41,7 +41,7 @@ const context: ISelectContext<any> = useSelectContext<any>(props.items, valuesMo
 /** 选择的结果文本 */
 const selectTextRef = computed(() => context.selectedText(props.multiple, props.showPath));
 /** 插槽配置选项 */
-const slotOptions = Object.freeze<SelectSlotOptions<any>>({ closeFollow, stopPropagation, });
+const slotOptions = Object.freeze<SelectSlotOptions>({ clear });
 /** 跟随弹窗作用域 */
 var followScope: IAsyncScope<SelectItem<any>[]> = undefined;
 /** 停止事件冒泡的作用域对象 */
@@ -51,11 +51,11 @@ defineOptions({ name: "Select", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
- * 关闭Follow弹窗
+ * 销毁Follow弹窗
  * - 将隐藏已弹出的选项 follow 弹窗
  * @returns 已弹出则销毁成功返回true；未弹出则销毁失败返回false
  */
-function closeFollow(): boolean {
+function destroyFollow(): boolean {
     if (followScope != undefined) {
         followScope.destroy();
         followScope = undefined;
@@ -64,13 +64,19 @@ function closeFollow(): boolean {
     return false;
 }
 /**
- * 停止事件冒泡
- * - 解决问题：插槽内元素需要处理自定义click事件，此时不希望Select组件响应click事件
- * @param delay 在此延迟时间内，停止事件冒泡
+ * 清空已选【选择项】
+ * @param closeFollow 是否关闭【选择项】Follow弹窗
+ * @param stopPropagation 是否停止事件冒泡
  */
-function stopPropagation(delay: number) {
+function clear(closeFollow: boolean, stopPropagation: boolean): void {
+    valuesModel.value = [];
+    //  销毁弹窗
+    closeFollow && destroyFollow();
+    //  停止事件冒泡
     stopPropagationScope && stopPropagationScope.destroy();
-    stopPropagationScope = onTimeout(() => stopPropagationScope = undefined, delay);
+    stopPropagationScope = stopPropagation
+        ? onTimeout(() => stopPropagationScope = undefined, 200)
+        : undefined;
 }
 
 /**
@@ -82,7 +88,7 @@ async function onClick() {
         return;
     }
     //  已存在则销毁；处于停止冒泡时，不做响应
-    if (closeFollow() == true || stopPropagationScope != undefined) {
+    if (destroyFollow() == true || stopPropagationScope != undefined) {
         return;
     }
     //  构建已选数据：单选时，仅取最后一个选择节点

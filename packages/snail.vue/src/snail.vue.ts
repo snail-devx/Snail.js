@@ -10,10 +10,12 @@ import "./base/styles/app.less"
 
 //  挂载Scope时，若在Vue的setup中，则自动销毁
 onMountScope(scope => {
-    const type = getType(scope);
-    console.log(`%c${type}:`, "color:green", "scope mounted");
-    getCurrentScope() && onScopeDispose(() => {
-        console.log(`%c${type}:`, "color:blue", "scope auto destroyed");
-        scope.destroy();
-    });
+    getCurrentScope() && onScopeDispose(scope.destroy);
+
+    // const type = getType(scope);
+    // console.log(`%c${type}:`, "color:green", "scope mounted");
+    // getCurrentScope() && onScopeDispose(() => {
+    //     console.log(`%c${type}:`, "color:blue", "scope auto destroyed");
+    //     scope.destroy();
+    // });
 });

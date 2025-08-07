@@ -107,15 +107,15 @@ export type TreeNodeRenderOptions = {
 /**
  * 树节点 插槽配置选项
  */
-export type TreeNodeSlotOptions<T> = {
+export type TreeNodeSlotOptions<Node> = {
     /**
          * 当前节点
          */
-    node: TreeNodeModel<T>;
+    node: Node;
     /**
      * 父节点
      */
-    parent?: TreeNodeModel<T>;
+    parent?: Node;
 
     /**
      * 所处层级

@@ -83,19 +83,13 @@ export type SelectEvents<T> = SelectBaseEvents<T> & {
 /**
  * 选项菜单 组件的Slot配置选项
  */
-export type SelectSlotOptions<T> = {
+export type SelectSlotOptions = {
     /**
-     * 关闭Follow弹窗
-     * - 将隐藏已弹出的选项 follow 弹窗
-     * @returns 已弹出则销毁成功返回true；未弹出则销毁失败返回false
+     * 清空已选【选择项】
+     * @param closeFollow 是否关闭【选择项】Follow弹窗
+     * @param stopPropagation 是否停止事件冒泡
      */
-    closeFollow(): boolean;
-    /**
-     * 停止事件冒泡
-     * - 解决问题：插槽内元素需要处理自定义click事件，此时不希望Select组件响应click事件
-     * @param delay 在此延迟时间内，停止事件冒泡
-     */
-    stopPropagation(delay: number);
+    clear(closeFollow: boolean, stopPropagation: boolean): void;
 }
 
 /**
@@ -117,7 +111,6 @@ export interface ISelectContext<T> extends ITreeBaseContext<T> {
      */
     selectedText(multiple: boolean, showPath: boolean): string;
 }
-
 
 /**
  * 【选项菜单】 弹窗组件配置选项

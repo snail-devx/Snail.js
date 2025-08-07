@@ -239,8 +239,8 @@ importers:
         specifier: '>=2.0.12'
         version: 2.0.12(typescript@5.8.3)
       snail.view:
-        specifier: '>=1.0.18'
-        version: 1.0.19(typescript@5.8.3)
+        specifier: '>=1.0.20'
+        version: 1.0.20(typescript@5.8.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -282,8 +282,8 @@ importers:
         specifier: '>=2.0.12'
         version: 2.0.12(typescript@5.8.3)
       snail.view:
-        specifier: '>=1.0.18'
-        version: 1.0.19(typescript@5.8.3)
+        specifier: '>=1.0.20'
+        version: 1.0.20(typescript@5.8.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -3920,8 +3920,8 @@ packages:
     transitivePeerDependencies:
       - typescript
 
-  /snail.view@1.0.19(typescript@5.8.3):
-    resolution: {integrity: sha512-qFKNQOmsEB+eKVh6RWA6EwTGir+EpB4pMLMfEwJyKoOeVsE/dKmOk8oc0ewSugTImOdMbUtvpwcVwFLjpc2SoQ==}
+  /snail.view@1.0.20(typescript@5.8.3):
+    resolution: {integrity: sha512-A3InmvKXZyQXE8v0D70IA0FALh+kZMsC3USRVdxhNomv8PtNfstzD1yZBcyaXOb1yWTyyi6zoVz2Ghh6SljkeQ==}
     dependencies:
       snail.core: 2.0.12(typescript@5.8.3)
     transitivePeerDependencies:
