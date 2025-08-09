@@ -3,12 +3,12 @@
     <div :class="['snail-dialog', options.rootClass, popupStatus.value, popupTransition.value]"
         :style="{ 'z-index': zIndex }" @click.self="options.closeOnMask && closePopup();">
         <Dynamic class="dialog-body" :name="options.name" :component="options.component" :url="options.url"
-            v-bind="options.props" :="dialogExtend" />
+            :props="props" v-bind="dialogExtend" v-model="model" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, shallowRef } from "vue";
 import { DialogOptions, DialogHandle } from "../models/dialog-model";
 import { PopupDescriptor } from "../models/popup-model";
 import Dynamic from "../../container/dynamic.vue";
@@ -17,6 +17,7 @@ import { useObserver } from "snail.view";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const { options, extOptions, popupStatus, zIndex, popupTransition } = defineProps<PopupDescriptor<DialogOptions, DialogHandle<any>>>();
+const { props, model = shallowRef(undefined) } = options;
 const { closePopup, onBeforeClose } = extOptions;
 /** 监听器 */
 const { onEvent } = useObserver();

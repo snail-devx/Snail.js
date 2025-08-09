@@ -4,7 +4,8 @@
  -->
 <template>
     <Dynamic class="snail-follow" :class="[popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
-        :name="options.name" :component="options.component" :url="options.url" v-bind="options.props" :="followExt" />
+        :name="options.name" :component="options.component" :url="options.url" :props="props" v-bind="followExt"
+        v-model="model" />
 </template>
 
 <script setup lang="ts">
@@ -19,6 +20,7 @@ import { PopupDescriptor } from "../models/popup-model";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const { options, extOptions, popupStatus, zIndex, popupTransition } = defineProps<PopupDescriptor<FollowOptions, FollowHandle<any> & FollowExtend>>();
+const { props, model = shallowRef(undefined) } = options;
 const { closePopup } = extOptions;
 const { onClient, onSize, onEvent } = useObserver() as IObserver;
 const { onTimeout } = useTimer();

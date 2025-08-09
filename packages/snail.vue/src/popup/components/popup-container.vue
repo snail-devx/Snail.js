@@ -5,25 +5,23 @@
 -->
 <template>
     <Dynamic class="snail-popup" :class="[popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
-        :name="options.name" :component="options.component" :url="options.url" v-bind="options.props" :in-popup="true"
-        :close-popup="extOptions.closePopup" />
+        :name="options.name" :component="options.component" :url="options.url" :props="props" v-bind="extOptions"
+        v-model="model" />
 </template>
 
 <script setup lang="ts">
-import { shallowRef, onMounted } from "vue";
+import { shallowRef } from "vue";
 import Dynamic from "../../container/dynamic.vue";
 import { PopupDescriptor, PopupHandle, PopupOptions } from "../models/popup-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const { options, zIndex, extOptions, popupStatus, popupTransition } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
-/** 是否加载组件：模拟出动画效果 */
-const loadingRef = shallowRef<boolean>(false);
+const { props, model = shallowRef(undefined) } = options;
 //  2、可选配置选项
 defineOptions({ name: "PopupContainer", inheritAttrs: true, });
 
 // *****************************************   👉  组件渲染    *****************************************
-onMounted(() => loadingRef.value = true);
 </script>
 
 <style lang="less">

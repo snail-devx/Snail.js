@@ -45,9 +45,9 @@ export function usePopup(): IPopupManager & IScope {
      * @param options 弹窗配置选项
      * @returns 弹窗异步作用域，外部可手动关闭弹窗
      */
-    function popup<T>(options: PopupOptions): IAsyncScope<T> {
-        const scope = checkOptions<PopupOptions, T>(options, checkPopup)
-            || popupInCustomContainer(PopupContainer, options);
+    function popup<T, Props = void, Model = void>(options: PopupOptions<Props, Model>): IAsyncScope<T> {
+        const scope = checkOptions<any, T>(options, checkPopup)
+            || popupInCustomContainer<T, any, any>(PopupContainer, options);
         return addScope2Scopes(scope);
     }
     /**
@@ -57,8 +57,8 @@ export function usePopup(): IPopupManager & IScope {
      * @param options 弹窗配置选项
      * @returns 弹窗异步作用域，外部可手动关闭弹窗
      */
-    function dialog<T>(options: DialogOptions): IAsyncScope<T> {
-        var scope = checkOptions<DialogOptions, T>(options, checkDialog);
+    function dialog<T, Props = void, Model = void>(options: DialogOptions<Props, Model>): IAsyncScope<T> {
+        var scope = checkOptions<any, T>(options, checkDialog);
         if (scope == undefined) {
             const deferred = defer<T>();
             /** 弹窗关闭的钩子函数：弹窗任务完成后，自动销毁 */
@@ -89,7 +89,7 @@ export function usePopup(): IPopupManager & IScope {
                 },
                 onBeforeClose: fn => hook.register("onBeforeClose", fn),
             });
-            const descriptor = openPopup(DialogContainer, options, extOptions);
+            const descriptor = openPopup<any, DialogHandle<T>>(DialogContainer, options, extOptions);
             scope = useAsyncScope<T>(deferred.promise);
             monitorDialog(descriptor, scope, deferred);
         }
@@ -102,7 +102,7 @@ export function usePopup(): IPopupManager & IScope {
     * @param options 跟随配置选项
     * @returns 弹窗异步作用域，外部可手动关闭弹窗
     */
-    function follow<T>(target: HTMLElement, options: FollowOptions): IAsyncScope<T> {
+    function follow<T, Props = void, Model = void>(target: HTMLElement, options: FollowOptions<Props, Model>): IAsyncScope<T> {
         var scope: IAsyncScope<T> = undefined;
         if (target instanceof HTMLElement == false) {
             const deferred = defer<T>();
@@ -115,8 +115,8 @@ export function usePopup(): IPopupManager & IScope {
                 inPopup: "follow",
                 target: target,
             };
-            scope = checkOptions<FollowOptions, T>(options, checkFollow)
-                || popupInCustomContainer(FollowContainer, options, extOptions);
+            scope = checkOptions<any, T>(options, checkFollow)
+                || popupInCustomContainer<T, any, any>(FollowContainer, options, extOptions);
         }
         return addScope2Scopes(scope);
     }

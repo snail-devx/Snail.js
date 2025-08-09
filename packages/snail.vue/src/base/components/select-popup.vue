@@ -30,13 +30,12 @@ import Empty from "../../prompt/empty.vue";
 import SelectNode from "./select-node.vue";
 //  使用到的数据类型
 import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
-import { SearchEvents } from "../models/search-model";
 import { SelectBaseEvents, SelectItem, SelectPopupExtend, SelectPopupOptions } from "../models/select-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<SelectPopupOptions<any> & SelectPopupExtend & FollowHandle<SelectItem<any>[]> & FollowExtend>();
-const emits = defineEmits<SelectBaseEvents<any> & SearchEvents>();
+const emits = defineEmits<SelectBaseEvents<any>>();
 const { follow } = usePopup();
 const { onTimeout } = useTimer();
 const { watcher } = useReactive();

@@ -6,17 +6,19 @@
         <button @click="trigger();">触发事件</button>
         <div>inPopup：{{ inPopup }} closePopup：{{ typeof closePopup }}</div>
         <div>自定义传入内容：{{ $attrs }}</div>
+        <div>v-Model：绑定值为 {{ bvModel }}</div>
     </div>
 </template>
-
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components, DialogHandle, FollowHandle, PopupHandle, usePopup } from "../../core"
+import { components, DialogHandle, FollowHandle, PopupHandle, usePopup, useTimer } from "../../core"
 const { } = components;
 import DialogContentTest from "./child-content.vue";
 
 // 👉 组件定义
 //  1、props、data
+const bvModel = defineModel<boolean>();
+const { onInterval } = useTimer();
 const {
     inPopup, closePopup,
     onBeforeClose,
@@ -30,7 +32,7 @@ defineOptions({ name: "DialogContentTest", inheritAttrs: true, });
 
 // 👉 方法+事件
 function open() {
-    popup.dialog({
+    popup.dialog<any, Record<string, any>, boolean>({
         // transition: "snail-scale",
         component: DialogContentTest,
         props: {
@@ -38,7 +40,8 @@ function open() {
             onCustomEvent(data: number) {
                 console.log("接收自定义事件：", data);
             }
-        }
+        },
+        model: shallowRef(false),
     })
 }
 /**
@@ -56,8 +59,8 @@ function trigger() {
 onBeforeClose && onBeforeClose(() => {
     return new Date().getSeconds() % 2 == 0 ? false : undefined;
 })
+onInterval(() => bvModel.value = !bvModel.value, 1000);
 //  2、生命周期响应
-
 </script>
 
 <style lang="less">

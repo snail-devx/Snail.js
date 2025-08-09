@@ -3,21 +3,15 @@
  *  1、在弹窗、模态弹窗、跟随弹窗的效果下复用
  */
 import { ShallowRef } from "vue";
-import { ComponentOptions } from "../../container/models/component-model";
+import { ComponentBindOptions, ComponentOptions } from "../../container/models/component-model";
 
 /**
  * 弹窗配置选项
  * - 约束弹出组件信息
  * - 弹出组件时传递的参数信息
+ * @see ComponentBindOptions 了解 Props、Model 泛型参数的含义
  */
-export type PopupOptions = ComponentOptions & {
-    /**
-     * 传递给组件的属性值，执行v-bind绑定到要显示的组件
-     * - key为属性名称，遵循vue解析规则
-     * - 若为事件监听，则使用onXXX
-     */
-    props?: Record<string, any>;
-
+export type PopupOptions<Props = void, Model = void> = ComponentOptions & ComponentBindOptions<Props, Model> & {
     /**
      * 弹窗动画名
      * - 不传则默认“snail-fade”

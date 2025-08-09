@@ -4,17 +4,14 @@
     3、可以捕捉url地址错误等异常情况，但组件内部错误，如setup中报错，这里不会进行处理，由被组件自身消化
 -->
 <template>
-    <!-- 加载组件区域 -->
-    <component :is="dynamicComponentRef" v-bind="$attrs" ref="componentRef">
+    <component ref="componentRef" :is="dynamicComponentRef" :="props" v-bind="$attrs">
         <template v-for="(_, name) in $slots" v-slot:[name]="slotData" :key="name">
             <slot :name="name" v-bind="slotData" />
         </template>
     </component>
-    <!-- 加载错误时的展示区域 -->
     <div class="snail-dynamic-error" v-if="dynamicErrorRef != undefined" v-bind="$attrs">
         load component error：<span>{{ dynamicErrorRef }}</span>
     </div>
-    <!-- 组件加载过程中的等待提示 -->
     <Loading v-else-if="dynamicComponentRef == undefined" :show="true" :mask-disabled="true" />
 </template>
 
@@ -22,12 +19,12 @@
 import { Component, onErrorCaptured, ref, shallowRef } from "vue";
 import { delay, isObject, isStringNotEmpty, script, } from "snail.core";
 import Loading from "../prompt/loading.vue"
-import { ComponentOptions } from "./models/component-model";
 import { useReactive } from "../base/reactive";
+import { DynamicOptions } from "./models/dynamic-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { name, component, url } = defineProps<ComponentOptions>();
+const { name, component, url, props = {} } = defineProps<DynamicOptions<Record<string, any>>>();
 const { watcher } = useReactive();
 /**      动态加载组件的ref实例引用 */
 const componentRef = ref(null);

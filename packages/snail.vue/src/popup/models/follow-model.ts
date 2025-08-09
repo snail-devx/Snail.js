@@ -4,12 +4,14 @@
 
 import { ShallowRef } from "vue";
 import { PopupHandle, PopupOptions, PopupStatusOptions } from "./popup-model";
+import { ComponentBindOptions } from "../../container/models/component-model";
 
 /**
  * 跟随弹窗 配置选项
  * - 传入的组件，根据配置跟随 target 位置和大小；
+ * @see ComponentBindOptions 了解 Props、Model 泛型参数的含义
  */
-export type FollowOptions = PopupOptions & {
+export type FollowOptions<Props = void, Model = void> = PopupOptions<Props, Model> & {
     /**
      * 启用【宽度】跟随
      * - 为true则和 target 宽度保持一致

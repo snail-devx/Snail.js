@@ -6,8 +6,8 @@
         style="width: 200px;position: absolute;right: 10px; top: 20px;" />
     <Select :items="items" :search="{}" :show-path="true" v-model="selectValues"
         style="width: 200px;position: absolute;right: 50%; top: 50%;">
-        <template v-slot="{ closeFollow, stopPropagation }: SelectSlotOptions<any>">
-            哈哈哈 <button @click="() => { closeFollow(); stopPropagation(500); }">哈哈得到</button>
+        <template v-slot="{ clear }: SelectSlotOptions">
+            哈哈哈 <button @click="clear(true, true)">哈哈得到</button>
         </template>
     </Select>
 </template>

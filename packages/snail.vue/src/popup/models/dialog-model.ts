@@ -2,12 +2,14 @@
  * 模态弹窗数据结构
  */
 import { PopupHandle, PopupOptions } from "./popup-model";
+import { ComponentBindOptions } from "../../container/models/component-model";
 
 /**
  * 模态弹窗 配置选项
  * - 继承 ComponentOptions ，动态加载组件
+ * @see ComponentBindOptions 了解 Props、Model 泛型参数的含义
  */
-export type DialogOptions = PopupOptions & {
+export type DialogOptions<Props = void, Model = void> = PopupOptions<Props, Model> & {
     /**
      * 禁用【遮罩层】
      * - 目前没实现，先忽略

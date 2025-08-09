@@ -24,7 +24,7 @@ import { computed, useTemplateRef } from "vue";
 import { usePopup } from "../popup/manager";
 import Icon from "./icon.vue";
 import SelectPopup from "./components/select-popup.vue";
-import { ISelectContext, SelectEvents, SelectItem, SelectOptions, SelectPopupOptions, SelectSlotOptions } from "./models/select-model";
+import { ISelectContext, SelectBaseEvents, SelectEvents, SelectItem, SelectOptions, SelectPopupOptions, SelectSlotOptions } from "./models/select-model";
 import { useSelectContext } from "./components/select-context";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -98,7 +98,7 @@ async function onClick() {
     props.multiple != true && values.length > 1 && values.splice(0, values.length - 1);
     //  打开弹窗：跟随宽度，并在合适时机关闭掉
     context.doSearch(undefined);
-    followScope = follow(rootDom.value, {
+    followScope = follow<any, SelectPopupOptions<any> & ExtractComponentEvents<SelectBaseEvents<any>>>(rootDom.value, {
         name: "SelectPopup",
         followWidth: true,
         followX: "start",
@@ -109,21 +109,17 @@ async function onClick() {
         closeOnResize: true,
         closeOnTarget: true,
 
-        props: Object.freeze(Object.assign<SelectPopupOptions<any>, Record<string, any>>(
-            //  弹窗配置选项：将选项解构，避免响应式干扰
-            {
-                items: props.items,
-                context: context,
-                level: 1,
-                search: props.search,
-                multiple: props.multiple,
-                popupStyle: props.popupStyle,
-            },
-            //  事件监听、例外属性处理
-            {
-                onChange: onSelectItemChange,
-            }
-        )),
+        props: {
+            // 弹窗属性
+            items: props.items,
+            context: context,
+            level: 1,
+            search: props.search,
+            multiple: props.multiple,
+            popupStyle: props.popupStyle,
+            //  事件监听
+            onChange: onSelectItemChange,
+        }
     });
     await followScope;
     followScope = undefined;
@@ -145,6 +141,7 @@ function onSelectItemChange(items: SelectItem<any>[]) {
 
 <script lang="ts">
 import { onAppCreated } from "./utils/app-util";
+import { ExtractComponentEvents } from "../exporter";
 //  非组件实例逻辑：将【选项弹窗】注册为【弹窗】app实例的全局组件，方便树形复用
 onAppCreated((app, type) => {
     type == "popup" && app.component("SelectPopup", SelectPopup);
