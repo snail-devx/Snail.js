@@ -1,13 +1,22 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    Scroll 示例还没实现
+    <Scroll :scroll-y="true" style="width: 200px;height: 200px;" @xbar="console.log" @ybar="console.log"
+        @left="console.log('滚动到最左侧')" @right="console.log('滚动到最右侧')" @top="console.log('滚动到最顶部')"
+        @bottom="console.log('滚动到最底部')">
+        <div style=" width: 100%;height: 200%;background-color: gray;">
+            200px;
+            顶顶顶顶
+        </div>
+    </Scroll>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { components } from "../../core"
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
+const { Scroll } = components;
 //  2、可选配置选项
 defineOptions({ name: "ScrollTest", inheritAttrs: true, });
 

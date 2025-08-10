@@ -3,32 +3,94 @@
     2、支持PC、移动端；移动端为上下加载、下拉刷新
 -->
 <template>
-    <div class="snail-scroll" :class="{ 'scroll-x': props.scrollX == true, 'scroll-y': props.scrollY == true }">
+    <div class="snail-scroll" ref="scroll-root" :class="classRef" @scroll="refreshScrollInfo">
         <slot></slot>
     </div>
 </template>
 
 <script setup lang="ts">
-import { onActivated, onDeactivated } from "vue";
-import { ScrollOptions, ScrollEvents } from "./models/scroll-model"
+import { computed, onMounted, useTemplateRef } from "vue";
+import { ScrollOptions, ScrollEvents, ScrollStatus } from "./models/scroll-model"
+import { useObserver } from "snail.view";
+import { useTimer } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<ScrollOptions>();
-console.warn("scroll 的事件还没实现");
-// const emits = defineEmits<ScrollEvents>();
+const emits = defineEmits<ScrollEvents>();
+const rootDom = useTemplateRef("scroll-root");
+const { onSize } = useObserver();
+const { onInterval } = useTimer();
+/** 动态绑定样式 */
+const classRef = computed(() => ({ 'scroll-x': props.scrollX == true, 'scroll-y': props.scrollY == true }));
+/** 备份滚动条状态信息 */
+var preStatus: ScrollStatus = undefined;
+
 //  2、可选配置选项
 defineOptions({ name: "Scroll", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 刷新滚动信息
+ */
+function refreshScrollInfo() {
+    //  计算滚滚动条状态，并冻结：计算左、右、顶、底时，对应方向需要有滚动条
+    const status: ScrollStatus = {
+        xbar: rootDom.value.scrollWidth > rootDom.value.clientWidth,
+        ybar: rootDom.value.scrollHeight > rootDom.value.clientHeight,
+        left: false,
+        right: false,
+        top: false,
+        bottom: false,
+        scrollwidth: rootDom.value.scrollWidth,
+        scrollheight: rootDom.value.scrollHeight,
+    }
+    if (status.xbar == true) {
+        status.left = rootDom.value.scrollLeft == 0;
+        status.right = (rootDom.value.scrollLeft + rootDom.value.clientWidth) == rootDom.value.scrollWidth;
+    }
+    if (status.ybar == true) {
+        status.top = rootDom.value.scrollTop == 0;
+        status.bottom = (rootDom.value.scrollTop + rootDom.value.clientHeight) == rootDom.value.scrollHeight;
+    }
+    Object.freeze(status);
+    //  计算触发事件：如没缓存上字状态
+    const events: Partial<ScrollEvents> = Object.create(null);
+    if (preStatus != undefined) {
+        preStatus.xbar != status.xbar && (events.xbar = [status.xbar]);
+        preStatus.ybar != status.ybar && (events.ybar = [status.ybar]);
+        // 计算左侧、右侧、顶部、底部变化事件。仅在上次也有滚动条时处理（为避免滚动条从无到有时，顶部、左侧事件误报）
+        if (preStatus.xbar == true && status.xbar == true) {
+            status.left && preStatus.left !== status.left && (events.left = []);
+            status.right && preStatus.right !== status.right && (events.right = []);
+        }
+        if (preStatus.ybar == true && status.ybar == true) {
+            status.top && preStatus.top !== status.top && (events.top = []);
+            status.bottom && preStatus.bottom !== status.bottom && (events.bottom = []);
+        }
+    }
+    preStatus = status;
+    //  缓存本次状态；按需触发事件
+    preStatus = Object.freeze(status);
+    events.xbar && emits("xbar", ...events.xbar);
+    events.left && emits("left");
+    events.right && emits("right");
+    events.ybar && emits("ybar", ...events.ybar);
+    events.top && emits("top");
+    events.bottom && emits("bottom");
+}
 
 // *****************************************   👉  组件渲染    *****************************************
-//  1、数据初始化、变化监听
-//  2、生命周期响应
-
-//      监听组件激活和卸载，适配KeepAlive组件内使用
-onActivated(() => console.log("onActivated"));
-onDeactivated(() => console.log("onDeactivated"));
+onMounted(() => {
+    refreshScrollInfo();
+    onSize(rootDom.value, refreshScrollInfo);
+    //  定时器，监听滚动条的显隐状态：如内部内容变化导致的滚动条显隐
+    onInterval(() => {
+        const isChange = (preStatus.scrollwidth != rootDom.value.scrollWidth)
+            || (preStatus.scrollheight != rootDom.value.scrollHeight)
+        isChange && refreshScrollInfo();
+    }, 100);
+});
 </script>
 
 <style lang="less">

@@ -21,22 +21,71 @@ export type ScrollOptions = {
  */
 export type ScrollEvents = {
     /**
-     * 滚动条显示、隐藏事件
-     * - x轴是否展示，y轴是否显示
+     * 【x轴方向】滚动条变化时
+     * @param show 是否显示。true 滚动条显示；false 滚动条隐藏
      */
-    bar: [x: boolean, y: boolean];
+    xbar: [show: boolean];
+    /**
+     * 【x轴方向】滚到【最左侧】了
+     */
+    left: [];
+    /**
+     * 【x轴方向】滚到【最右侧】了
+     */
+    right: [];
 
     /**
-     * 滚动条触碰事件，到顶了、到底了
+     * 【y轴方向】滚动条变化时
+     * @param show 是否显示。true 滚动条显示；false 滚动条隐藏
      */
-    touch: [type: ScrollTouchType];
+    ybar: [show: boolean];
+    /**
+     * 【y轴方向】滚到【最顶部】了
+     */
+    top: [];
+    /**
+     * 【y轴方向】滚到【最底部】了
+     */
+    bottom: [];
 }
 
 /**
- * 滚动触碰类型
- * - left   最左侧
- * - right  最右侧
- * - top    最顶部
- * - bottom 最底部
+ * 滚动视图状态
+ * - 缓存起来 和下次滚动做比对，触发对应事件
  */
-export type ScrollTouchType = "left" | "right" | "top" | "bottom";
+export type ScrollStatus = {
+    /**
+     * 水平滚动条是否显示
+     */
+    xbar: boolean;
+    /**
+     * 垂直滚动条是否显示
+     */
+    ybar: boolean;
+
+    /**
+     * 滚动到【左侧】了
+     */
+    left: boolean;
+    /**
+     * 滚动到【右侧】了
+     */
+    right: boolean;
+    /**
+     * 滚动到【顶部】了
+     */
+    top: boolean;
+    /**
+     * 滚动到【底部】了
+     */
+    bottom: boolean;
+
+    /**
+     * 滚动视图宽度
+     */
+    scrollwidth: number;
+    /**
+     * 滚动视图高度
+     */
+    scrollheight: number;
+}
