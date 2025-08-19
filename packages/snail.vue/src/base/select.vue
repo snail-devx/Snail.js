@@ -98,7 +98,7 @@ async function onClick() {
     props.multiple != true && values.length > 1 && values.splice(0, values.length - 1);
     //  打开弹窗：跟随宽度，并在合适时机关闭掉
     context.doSearch(undefined);
-    followScope = follow<any, SelectPopupOptions<any> & ExtractComponentEvents<SelectBaseEvents<any>>>(rootDom.value, {
+    followScope = follow<any, SelectPopupOptions<any> & EventsType<SelectBaseEvents<any>>>(rootDom.value, {
         name: "SelectPopup",
         followWidth: true,
         followX: "start",
@@ -141,7 +141,7 @@ function onSelectItemChange(items: SelectItem<any>[]) {
 
 <script lang="ts">
 import { onAppCreated } from "./utils/app-util";
-import { ExtractComponentEvents } from "../exporter";
+import { EventsType } from "../exporter";
 //  非组件实例逻辑：将【选项弹窗】注册为【弹窗】app实例的全局组件，方便树形复用
 onAppCreated((app, type) => {
     type == "popup" && app.component("SelectPopup", SelectPopup);

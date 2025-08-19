@@ -8,7 +8,7 @@
         <Icon type="close" class="close-icon" :fill="closeFillRef" :size="20" @mouseenter="closeFillRef = 'red'"
             @mouseleave="closeFillRef = '#707070'" @click="closePopup();" />
         <div class="icon" v-if="props.type">
-            <Icon :type="props.type" fill="black" :size="18" />
+            <Icon :type="props.type" fill="#707070" :size="20" />
         </div>
         <div class="message" v-html="props.message" />
     </div>
@@ -86,6 +86,7 @@ onMounted(() => onMouseEvent(true));
         .flex-center();
 
         >svg {
+            padding: 2px;
             cursor: none !important;
             background: white;
             border-radius: 50%;

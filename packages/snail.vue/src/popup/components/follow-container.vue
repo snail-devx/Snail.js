@@ -3,9 +3,9 @@
     2、需要构建一层div，用于包裹，否则内部元素查找会特别麻烦
  -->
 <template>
-    <Dynamic class="snail-follow" :class="[popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
-        :name="options.name" :component="options.component" :url="options.url" :props="props" v-bind="followExt"
-        v-model="model" />
+    <Dynamic class="snail-follow initial" :class="[popupStatus.value, popupTransition.value]"
+        :style="{ 'z-index': zIndex }" :name="options.name" :component="options.component" :url="options.url"
+        :props="props" v-bind="followExt" v-model="model" />
 </template>
 
 <script setup lang="ts">
@@ -13,7 +13,7 @@ import { shallowRef, onMounted, nextTick, getCurrentInstance, ShallowRef } from 
 import Dynamic from "../../container/dynamic.vue";
 import { FollowElectResult, FollowExtend, FollowHandle, FollowOptions, FollowStrategy } from "../models/follow-model";
 import { calcFollowX, calcFollowY } from "../utils/follow-util";
-import { ElementSize, IObserver, useObserver, WidthStyle, HeightStyle, PositionStyle, css, OverflowStyle } from "snail.view";
+import { ElementSize, IObserver, useObserver, WidthStyle, HeightStyle, PositionStyle, css, OverflowStyle, TransitionStyle } from "snail.view";
 import { useTimer } from "snail.core";
 import { PopupDescriptor } from "../models/popup-model";
 
@@ -92,7 +92,8 @@ function buildFollow() {
         css.operate(rootDom.value, "add", { style: followStyle });
         const rootRect = rootDom.value.getBoundingClientRect();
         Object.assign<ElementSize, ElementSize>(preSize, { width: rootRect.width, height: rootRect.height });
-        console.log("-- content rect: ", rootRect, rootDom.value)
+        rootDom.value.classList.remove("initial");
+        console.log("-- content rect: ", rootRect, rootDom.value);
     }
     console.groupEnd();
 }
@@ -162,5 +163,11 @@ onMounted(() => {
     transition-property: left, top;
     transition-duration: 500ms;
     transition-timing-function: ease;
+
+    //  初始化位置；避免一开始在0、0位置显示
+    &.initial {
+        transition: none;
+        top: 100%;
+    }
 }
 </style>

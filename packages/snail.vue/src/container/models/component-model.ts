@@ -22,13 +22,12 @@ export type ComponentOptions = {
      */
     url?: string;
 }
-
 /**
  * 提取【组件事件】类型
  * - 将【组件事件】中的key首字母小写，追加上on前缀；key对应的value为监听函数参数
  * - T的类型约束：Record<string, unknown[]>
  */
-export type ExtractComponentEvents<Events> = Events extends Record<string, unknown[]>
+export type EventsType<Events> = Events extends Record<string, unknown[]>
     ? (/* 不用约束必须有key，后续看情况
         keyof T extends never
         ? never
@@ -41,7 +40,7 @@ export type ExtractComponentEvents<Events> = Events extends Record<string, unkno
  * - 有效的 Props 类型：extends Record<string, any>
  * - 有效类型则返回 Props 自身；否则无效，为undefined
  */
-export type ExtractComponentProps<Props> = Props extends Record<string, any> ? Props : undefined;
+export type PropsType<Props> = Props extends Record<string, any> ? Props : undefined;
 
 /**
  * 组件绑定 配置选项
@@ -53,9 +52,9 @@ export type ComponentBindOptions<Props = void, Model = void> = {
      * 传递给组件的属性值，执行 v-bind 绑定
      * - key为属性名称，遵循vue解析规则；若绑定事件，则key为 on事件名称 ，事件名称首字母大写
      * - 通过泛型类型 Props 约束，有效类型：Props extends Record<string, any>
-     * @see ExtractComponentEvents<Events> 获取组件事件类型
+     * @see EventsType<Events> 获取组件事件类型
      */
-    props?: ExtractComponentProps<Props>;
+    props?: PropsType<Props>;
 
     /**
      * 传递给组件的双向绑定数据，执行 v-model 绑定
@@ -64,20 +63,3 @@ export type ComponentBindOptions<Props = void, Model = void> = {
      */
     model?: Model extends (void | never | null | undefined) ? undefined : (ShallowRef<Model> | Ref<Model>);
 }
-
-/**
- * 
- */
-export type ComponentMountOptions = ComponentOptions & {
-    /**
-     * 挂载到哪个dom元素下
-     */
-    target: Element,
-
-    /**
-     * 传递给组件的属性值，执行v-bind绑定到要显示的组件
-     * - key为属性名称，遵循vue解析规则
-     * - 若为事件监听，则使用onXXX
-     */
-    props?: Record<string, any>;
-};
