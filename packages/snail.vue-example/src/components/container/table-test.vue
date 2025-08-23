@@ -1,13 +1,26 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    Table 示例还没实现
+    <Table :header-style="{ height: '100px', backgroundColor: 'gray' }" :scroll-y="true"
+        style="height: 80%;border: 1px solid red;">
+        <template #header>
+            <TableCol width="100px">1111</TableCol>
+        </template>
+        <template #>
+            <TableRow v-for="item in 10" height="40px">
+                <TableCol v-text="item" width="100px" />
+            </TableRow>
+        </template>
+
+    </Table>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { components } from "../../core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
+const { Table, TableCol, TableRow } = components;
 //  2、可选配置选项
 defineOptions({ name: "TableTest", inheritAttrs: true, });
 
