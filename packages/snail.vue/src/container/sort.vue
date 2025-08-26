@@ -4,9 +4,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, getCurrentInstance, onUnmounted, onBeforeUnmount, nextTick } from "vue";
+import { onMounted, getCurrentInstance, onUnmounted, onBeforeUnmount, nextTick, shallowRef } from "vue";
 import { SortEvents, SortOptions } from "./models/sort-model";
-import { newId, script } from "snail.core";
+import { IScope, newId, script, useTimer } from "snail.core";
 import { useReactive } from "../base/reactive";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -14,6 +14,9 @@ import { useReactive } from "../base/reactive";
 const props = defineProps<SortOptions<any>>();
 const emits = defineEmits<SortEvents>();
 const { watcher } = useReactive();
+const { onTimeout } = useTimer();
+/**     Sortable.js 模块 */
+var MODULE_Sortable = undefined;
 /**      排序面板：组件父级元素*/
 var sortPanel: HTMLElement = undefined;
 /**     Sortable对象实例 */
@@ -25,26 +28,27 @@ defineOptions({ name: "Sort", inheritAttrs: true, });
 /**
  * 构建【可拖拽排序】对象
  */
-async function buildSortable() {
+function buildSortable() {
     //  先销毁掉
     {
         sortInstance && sortInstance.destroy();
         sortInstance = undefined;
+        sortPanel.classList.remove("sortable");
     }
     //  可用时，才构建
-    if (props.disabled != true) {
-        const Sortable = await script.load<any>("sortablejs");
-        console.log("sort.vue: buildSortable...");
-        sortInstance = new Sortable(sortPanel, {
+    if (props.disabled != true && MODULE_Sortable != undefined) {
+        sortPanel.classList.add("sortable");
+        sortInstance = new MODULE_Sortable(sortPanel, {
             group: props.group || newId(),
             draggable: props.draggable,
-            handle: props.handle || props.draggable,
             dragClass: props.dragClass || "snail-sort-drag",
             ghostClass: props.ghostClass || "snail-sort-ghost",
+            handle: props.handle || props.draggable,
+            filter: props.filter,
+            preventOnFilter: false,
             animation: props.animation > 0 ? props.animation : 150,
             //  默认配置，还没特别搞懂，先强制
             forceFallback: true,
-            preventOnFilter: false,
             fallbackTolerance: 2,
             //  事件监听
             //      顺序发生变化时，通知外面
@@ -56,15 +60,19 @@ async function buildSortable() {
 }
 
 // *****************************************   👉  组件渲染    *****************************************
-onMounted(() => {
+onMounted(async () => {
     const instance = getCurrentInstance();
     sortPanel = instance.vnode.el.parentElement;
-    //  挂载完成后，先构建一次；避免外部一开始有数据，则不会触发changer监听
-    nextTick(() => {
-        buildSortable();
-        watcher(() => props.disabled, buildSortable);
-        watcher(() => props.changer, buildSortable);
-    })
+    MODULE_Sortable = await script.load<any>("sortablejs");
+    var timerScope: IScope = undefined;
+    //  构建排序；挂载完成后，先构建一次；避免外部一开始有数据，则不会触发changer监听、
+    buildSortable();
+    watcher(() => props.disabled, buildSortable);
+    //      变化器监听：监听外部数据变化，重新构建排序，但做一下延迟，避免频繁触发
+    watcher(() => props.changer, () => {
+        timerScope && timerScope.destroy();
+        timerScope = onTimeout(() => buildSortable(), 100);
+    });
 })
 onBeforeUnmount(() => sortInstance && sortInstance.destroy());
 </script>

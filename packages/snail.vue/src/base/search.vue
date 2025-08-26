@@ -15,7 +15,7 @@ import { SearchEvents, SearchOptions } from "./models/search-model";
 import Icon from "./icon.vue";
 
 // *****************************************   👉  组件定义    *****************************************
-//  1、props、data
+//  1、props、data 
 const props = defineProps<SearchOptions>();
 const emits = defineEmits<SearchEvents>();
 /**     搜索文本 */
