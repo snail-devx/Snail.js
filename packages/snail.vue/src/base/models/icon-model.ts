@@ -34,13 +34,22 @@ export type IconOptions = TitleOptions & {
 
 /**
  * 图标类型
- * - success 成功图标，对勾
- * - close 关闭 用作数据删除，弹窗关闭
- * - error 错误 
- * - warn 警告图标
- * - arrow 向右箭头
- * - trash 垃圾桶图标，常用于【删除】操作
- * - grip   紧握图标，垂直方向，一般用于拖动句柄
- * - custom 自定义图标：此时IconOptions.draw属性传入绘制路径
+ * - 状态类：
+ * - - success      成功图标，对勾
+ * - - error        错误 
+ * - - warn         警告图标
+ * - 操作类：
+ * - - close        关闭 用作数据删除，弹窗关闭
+ * - - trash        垃圾桶图标，常用于【删除】操作
+ * - - download     下载
+ * - 指向类：
+ * - - arrow        向右箭头
+ * - 其他类：
+ * - - grip         紧握图标，垂直方向，一般用于拖动句柄
+ * - - custom       自定义图标：此时IconOptions.draw属性传入绘制路径
  */
-export type IconType = "success" | "close" | "error" | "warn" | "arrow" | "trash" | "grip" | "custom";
+export type IconType = "success" | "error" | "warn"
+    | "close" | "trash" | "download"
+    | "arrow"
+    | "grip"
+    | "custom";
