@@ -14,11 +14,11 @@
         "types": "tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
     },
     "dependencies": {
-        "snail.core": ">=2.0.12"
+        "snail.core": ">=2.0.13"
     },
     "devDependencies": {
         "rollup": ">=4.39.0",
-        "snail.rollup": ">=1.2.8",
+        "snail.rollup": ">=1.2.9",
         "snail.rollup-asset": ">=1.2.1",
         "snail.rollup-script": ">=1.2.4"
     }

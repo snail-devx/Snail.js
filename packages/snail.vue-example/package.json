@@ -11,7 +11,7 @@
     "dev": "rollup --watch -c ./rollup.config.js"
   },
   "dependencies": {
-    "snail.core": ">=2.0.12",
+    "snail.core": ">=2.0.13",
     "snail.view": ">=1.0.20",
     "sortablejs": ">=1.15.6",
     "vue": "^3.5.14"
@@ -28,7 +28,7 @@
     "minimist": "^1.2.8",
     "rollup": "^4.41.0",
     "rollup-plugin-dts": "^6.2.1",
-    "snail.rollup": ">=1.2.8",
+    "snail.rollup": ">=1.2.9",
     "snail.rollup-asset": ">=1.2.1",
     "snail.rollup-html": ">=1.2.3",
     "snail.rollup-inject": ">=1.2.1",
