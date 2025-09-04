@@ -160,6 +160,8 @@ export class Builder implements IRollupBuilder {
                      */
                     freeze: false,
                     externalLiveBindings: false,
+                    //  处理 import * as xxx from 模块时，模块转换方法
+                    interop: component.interop || "default",
                 },
                 plugins,
                 /*  拦截特定警告：后续会添加一些自定义参数，减少警告信息输出

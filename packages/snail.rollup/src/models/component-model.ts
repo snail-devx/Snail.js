@@ -121,6 +121,13 @@ export type ComponentOptions = {
     footer?: string;
 
     /**
+     * 模块转换方法
+     * - 默认值： default
+     * - 详细参照：@see https://www.rollupjs.com/configuration-options/#output-interop
+     */
+    interop?: "compat" | "auto" | "esModule" | "default" | "defaultOnly" | ((id: string) => "compat" | "auto" | "esModule" | "default" | "defaultOnly");
+
+    /**
      * js组件初始化方法
      * - 在rollupbuilder环境初始化加载完成后，调用此方法，完成js组件自身的一些环境依赖信息初始化
      * - 调用前component数据已检测好、并做了默认值构建，请谨慎修改组件值，避免影响功能
