@@ -62,6 +62,8 @@ export function useHttp(options?: Partial<HttpOptions>): IHttpClient & IScope {
                 "accept": options.accept || HTTP_CONFIG.accept || "application/json, text/plain, */*",
                 "content-type": options.contentType || HTTP_CONFIG.contentType || "application/json",
             }
+            //  若data为undefined，则不进行默认content-type值指定：避免get请求给了json请求时发送 options 请求
+            request.data == undefined && (delete defaultHeaders["content-type"]);
             requestPromise = runHttpRequest(request, defaultHeaders);
         }
         //  2、分析结果返回；然后分发执行resolve和reject
