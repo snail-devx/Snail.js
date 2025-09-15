@@ -201,7 +201,8 @@ watcher(popupStatus, newValue => newValue == "closed" && childFollowScope && chi
     box-shadow: 0px 1px 5px 1px #dddfed;
     border: 1px solid #dddfed;
     border-radius: 4px;
-    padding-bottom: 6px;
+    //  取消底部的内边距
+    // padding-bottom: 6px;
     //  flex布局，列 为主轴：display: flex，flex-direction: column;
     .flex-column();
 
@@ -216,6 +217,7 @@ watcher(popupStatus, newValue => newValue == "closed" && childFollowScope && chi
     min-width: 200px;
     max-width: 250px;
     padding-top: 6px;
+    padding-bottom: 6px;
 
     //  无可用选项
     &.text-tips {

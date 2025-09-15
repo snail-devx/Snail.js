@@ -44,7 +44,7 @@ export type ChooseItem<T> = {
     /**
      * 选项值
      */
-    value: any;
+    value: T;
 }
 
 /**

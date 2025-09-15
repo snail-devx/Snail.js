@@ -42,6 +42,7 @@ export type IconOptions = TitleOptions & {
  * - - close        关闭 用作数据删除，弹窗关闭
  * - - trash        垃圾桶图标，常用于【删除】操作
  * - - download     下载
+ * - - print        打印
  * - 指向类：
  * - - arrow        向右箭头
  * - 其他类：
@@ -49,7 +50,7 @@ export type IconOptions = TitleOptions & {
  * - - custom       自定义图标：此时IconOptions.draw属性传入绘制路径
  */
 export type IconType = "success" | "error" | "warn"
-    | "close" | "trash" | "download"
+    | "close" | "trash" | "download" | "print"
     | "arrow"
     | "grip"
     | "custom";
