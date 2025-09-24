@@ -109,7 +109,7 @@
 		"scope": "less",
 		"description": "flex 布局，主轴和交叉轴居右",
 		"body": [
-			"//  flex 布局：display: flex，align-items、justify-content 都为right",
+			"//  flex 布局：display: flex，align-items、justify-content 都为flex-end",
 			".flex-right();"
 		]
 	},

@@ -48,7 +48,7 @@ defineOptions({ name: "Footer", inheritAttrs: true, });
 
 //  2、左对齐时，按钮给左边距
 .snail-footer.left {
-    justify-content: left;
+    justify-content: flex-start;
 }
 
 //  3、居中对齐时，按钮（除第一个外）给左边距
@@ -58,6 +58,6 @@ defineOptions({ name: "Footer", inheritAttrs: true, });
 
 //  4、对齐时，按钮给右边距
 .snail-footer.right {
-    justify-content: right;
+    justify-content: flex-end;
 }
 </style>

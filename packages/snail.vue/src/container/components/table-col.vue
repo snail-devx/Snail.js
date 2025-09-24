@@ -34,7 +34,7 @@ defineOptions({ name: "TableCol", inheritAttrs: true, });
 // *****************************************   👉  特殊样式适配    *****************************************
 //  2、左对齐时，按钮给左边距
 .table-col.left {
-    justify-content: left;
+    justify-content: flex-start;
 }
 
 //  3、居中对齐时，按钮（除第一个外）给左边距
@@ -44,6 +44,6 @@ defineOptions({ name: "TableCol", inheritAttrs: true, });
 
 //  4、对齐时，按钮给右边距
 .table-col.right {
-    justify-content: right;
+    justify-content: flex-end;
 }
 </style>
