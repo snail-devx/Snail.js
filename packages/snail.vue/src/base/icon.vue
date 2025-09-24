@@ -3,15 +3,15 @@
     2、采用svg方式实现，不使用字体图片，按需引入
 -->
 <template>
-    <svg viewBox="0 0 1024 1024" :width="props.size || 24" :height="props.size || 24" :class="type" class="snail-icon"
-        @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+    <svg class="snail-icon" viewBox="0 0 1024 1024" :width="props.size || 24" :height="props.size || 24" :class="type"
+        :style="styleRef" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
         <title v-text="props.title || ''" />
         <path v-for="draw in paths" :d="draw" :fill="colorRef" />
     </svg>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef } from "vue";
+import { computed, ref, shallowRef } from "vue";
 import { IconOptions } from "./models/icon-model";
 import { getSvgDraw } from "./utils/icon-util";
 
@@ -22,6 +22,8 @@ const props = defineProps<IconOptions>();
 const paths = getSvgDraw(props || {} as any);
 /** 图标颜色 */
 const colorRef = shallowRef<string>(props.color);
+/** 图标样式计算：暂时先支持旋转 */
+const styleRef = computed(() => props.rotate ? `transform: rotate(${props.rotate}deg);` : "");
 //  2、可选配置选项
 defineOptions({ name: "Icon", inheritAttrs: true, });
 
