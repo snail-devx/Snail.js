@@ -84,7 +84,7 @@ function onItemClick(item: ChooseItemDetail, index: number) {
         item.checked = newChecked;
         valuesModel.value = newChecked ? item.value : undefined;
     }
-    //  发送事件做通知：在外部同时使用v-model和change事件时，修改valueModel.value值不会立马反应到valuesModel.value中
+    //  延迟change事件；外部同时使用v-model和change事件时，valueModel.value修改不会立马生效
     nextTick(() => emits("change", valuesModel.value));
 }
 </script>

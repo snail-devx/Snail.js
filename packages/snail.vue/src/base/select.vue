@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { hasAny, IAsyncScope, IScope, useTimer } from "snail.core";
-import { computed, useTemplateRef } from "vue";
+import { computed, nextTick, useTemplateRef } from "vue";
 import { usePopup } from "../popup/manager";
 import Icon from "./icon.vue";
 import SelectPopup from "./components/select-popup.vue";
@@ -130,8 +130,9 @@ async function onClick() {
  */
 function onSelectItemChange(items: SelectItem<any>[]) {
     items = hasAny(items) ? [...items] : [];
+    //  更新绑定值，延迟change事件；外部同时使用v-model和change事件时，valueModel.value修改不会立马生效
     valuesModel.value = items;
-    emits("change", items);
+    nextTick(() => emits("change", items));
 }
 
 // *****************************************   👉  组件渲染    *****************************************

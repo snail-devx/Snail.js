@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, shallowRef, useTemplateRef } from "vue";
+import { computed, nextTick, shallowRef, useTemplateRef } from "vue";
 import { InputEvents, InputOptions } from "./models/input-model";
 import Icon from "../base/icon.vue";
 import { css } from "snail.view";
@@ -50,8 +50,9 @@ defineOptions({ name: "Input", inheritAttrs: true, });
 function onValueChange() {
     // 验证通过后，设置到value上，并对外发送change事件
     const text: string = inputDom.value!.value || "";
+    //  更新绑定值，延迟change事件；外部同时使用v-model和change事件时，valueModel.value修改不会立马生效
     inputModel.value = text;
-    emits("change", text);
+    nextTick(() => emits("change", text));
 }
 
 // *****************************************   👉  组件渲染    *****************************************

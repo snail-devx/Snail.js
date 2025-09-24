@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { throwError } from "snail.core";
 import { useAnimation } from "snail.view";
-import { useTemplateRef } from "vue";
+import { nextTick, useTemplateRef } from "vue";
 import Icon from "../base/icon.vue";
 import { FoldEvents, FoldOptions, FoldStatus } from "./models/fold-model";
 import { useReactive } from "../base/reactive";
@@ -85,7 +85,8 @@ function onStatusClick() {
         default:
             throwError(`Fold not support status value: ${statusModel.value}`);
     }
-    emits("change", statusModel.value);
+    //  延迟change事件；外部同时使用v-model和change事件时，valueModel.value修改不会立马生效
+    nextTick(() => emits("change", statusModel.value));
 }
 </script>
 

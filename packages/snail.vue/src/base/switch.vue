@@ -14,6 +14,7 @@
 </template>
 
 <script setup lang="ts">
+import { nextTick } from "vue";
 import { SwitchEvents, SwitchOptions } from "./models/switch-model";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -30,10 +31,12 @@ defineOptions({ name: "Switch", inheritAttrs: true, });
  * 触发开关切换
  */
 function onSwitchChange() {
-    if (props.readonly != true) {
-        switchModel.value = !switchModel.value;
-        emits("change", switchModel.value);
+    if (props.readonly == true) {
+        return;
     }
+    //  更新绑定值，延迟change事件；外部同时使用v-model和change事件时，valueModel.value修改不会立马生效
+    switchModel.value = !switchModel.value;
+    nextTick(() => emits("change", switchModel.value));
 }
 </script>
 
