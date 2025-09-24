@@ -5,20 +5,26 @@
 -->
 <template>
     <div class="snail-choose" :class="props.readonly ? 'readonly' : ''">
-        <div v-for="(item, index) in chooseItemsRef" :key="newId()" class="choose-item"
+        <div v-for="(item, index) in chooseItemsRef" :key="item.key" class="choose-item"
             :class="item.checked ? 'checked' : ''" :style="css.buildStyle(props.itemStyle)"
             @click="onItemClick(item, index)">
-            <input :type="props.type" :checked="item.checked" />
-            <span v-if="item.text" v-text="item.text" />
+            <input v-if="mode == 'native'" :type="props.type" :checked="item.checked" />
+            <div v-else-if="mode == 'beautiful'" class="item-beautiful"
+                :class="[props.type, item.checked ? 'item-checked' : 'item-unchecked']">
+                <Icon v-if="item.checked" :type="'success'" :size="12" :color="props.readonly ? '#8a9099' : 'white'" />
+            </div>
+            <span class="item-text" v-if="item.text" v-text="item.text" />
+            <span class="item-des" v-if="item.description" v-text="item.description" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ComputedRef } from "vue";
+import { computed, ComputedRef, nextTick } from "vue";
 import { newId, isArray } from "snail.core";
 import { css } from "snail.view";
 import { ChooseOptions, ChooseEvents, ChooseItem } from "./models/choose-model";
+import Icon from "./icon.vue";
 
 // *****************************************   👉  私有类型    *****************************************
 /**
@@ -30,12 +36,17 @@ type ChooseItemDetail = ChooseItem<any> & {
      * 是否选中
      */
     checked: boolean;
+    /**
+     * 分配的唯一key值
+     */
+    key: string;
 }
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<ChooseOptions<any>>();
 const emits = defineEmits<ChooseEvents<any>>();
+const { mode = "native" } = props;
 /**     双向绑定数据值：多选时，若传入的非数组，则强制转为空数组 */
 const valuesModel = defineModel<any | any[]>({});
 props.multi && isArray(valuesModel.value) == false && (valuesModel.value = []);
@@ -45,7 +56,8 @@ const chooseItemsRef: ComputedRef<ChooseItemDetail[]> = computed(() => props.ite
         ...item,
         checked: props.multi == true
             ? (valuesModel.value as any[]).includes(item.value)
-            : valuesModel.value == item.value
+            : valuesModel.value == item.value,
+        key: newId(),
     }
 }));
 //  2、可选配置选项
@@ -60,19 +72,20 @@ function onItemClick(item: ChooseItemDetail, index: number) {
         return;
     }
     //  更新选中状态
-    //      多选模式
+    //      多选模式：反选
     if (props.multi == true) {
         item.checked = !item.checked;
         valuesModel.value = chooseItemsRef.value.filter(item => item.checked).map(item => item.value);
     }
-    //      单选模式
+    //      单选模式：如果是只有一个的checkbox模式，则反选（即可取消选中）
     else {
+        const newChecked = props.type == "checkbox" && props.items.length == 1 ? !item.checked : true;
         chooseItemsRef.value.forEach(item => item.checked = false);
-        item.checked = true;
-        valuesModel.value = item.value;
+        item.checked = newChecked;
+        valuesModel.value = newChecked ? item.value : undefined;
     }
-    //  发送事件做通知
-    emits("change", valuesModel.value);
+    //  发送事件做通知：在外部同时使用v-model和change事件时，修改valueModel.value值不会立马反应到valuesModel.value中
+    nextTick(() => emits("change", valuesModel.value));
 }
 </script>
 
@@ -95,6 +108,10 @@ function onItemClick(item: ChooseItemDetail, index: number) {
         //  flex 布局：display: flex，align-items 为center
         .flex-cross-center();
 
+        &:first-child {
+            margin-left: 0;
+        }
+
         //  使用伪类遮住选项和文本，由全局控制点击事件
         &::after {
             position: absolute;
@@ -105,14 +122,44 @@ function onItemClick(item: ChooseItemDetail, index: number) {
             .wh-fill-hidden();
         }
 
+        //  原生模式时，使用input
         >input::checkmark {
             background-color: #2196F3;
             /* 修改为你想要的背景色 */
             border-color: #2196F3;
         }
 
+        //  美化样式
+        >div.item-beautiful {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            overflow: hidden;
+            //  flex 布局：display: flex，align-items、justify-content 都为center
+            .flex-center();
+
+            //  单选框样式
+            &.radio {
+                border-radius: 50%;
+            }
+
+            &.item-unchecked {
+                border: solid 1px #8a9099;
+            }
+
+            // 选中样式
+            &.item-checked {
+                border: solid 1px #4c9aff;
+                background-color: #4c9aff;
+            }
+        }
+
         >span {
             margin-left: 4px;
+
+            &.item-des {
+                color: #8a9099;
+            }
         }
     }
 }
@@ -121,7 +168,20 @@ function onItemClick(item: ChooseItemDetail, index: number) {
 //  只读时的样式适配
 .snail-choose.readonly {
     >div.choose-item {
-        cursor: not-allowed;
+        cursor: initial;
+
+        //  美化样式时：选中状态背景、边框色处理
+        >div.item-beautiful {
+
+            &.item-unchecked {
+                opacity: 0.5;
+            }
+
+            &.item-checked {
+                background-color: #d5d7db;
+                border-color: #d5d7db;
+            }
+        }
     }
 }
 </style>

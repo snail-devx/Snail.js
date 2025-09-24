@@ -21,6 +21,12 @@ export type ChooseOptions<T> = ReadonlyOptions & {
      * - checkbox:  多选框样式
      */
     type: "checkbox" | "radio";
+    /**
+     * 显示模式
+     * - native     原生默认，浏览器自己渲染；不同浏览器效果不一致
+     * - beautiful  美化模式，不同浏览器下效果通义
+     */
+    mode?: "native" | "beautiful";
 
     /**
      * 待选项目
@@ -45,6 +51,11 @@ export type ChooseItem<T> = {
      * 选项值
      */
     value: T;
+
+    /**
+     * 选项描述信息，一般作为解释使用
+     */
+    description?: string;
 }
 
 /**
