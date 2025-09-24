@@ -39,9 +39,10 @@ export interface IReactiveManager {
      * - 仅实现简化版本watch监听；复杂的监听逻辑，自行使用watch方法
      * @param source 监听源
      * @param callback 回调方法：可接收新旧值变化
+     * @param deep 是否进行深度监听；默认false
      * @returns 监听作用域，destroy可销毁监听
      */
-    watcher<T>(source: WatchSource<T>, callback: (newValue: T, oldValue: T) => void): IScope;
+    watcher<T>(source: WatchSource<T>, callback: (newValue: T, oldValue: T) => void, deep?: boolean): IScope;
 }
 
 /**

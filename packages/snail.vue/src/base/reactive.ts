@@ -65,6 +65,7 @@ export function useReactive(): IReactiveManager & IScope {
         // )
     }
 
+
     /**
      * 监听器：监听单个值变化
      * - 内部利用vue的watch逻辑实现
@@ -72,10 +73,11 @@ export function useReactive(): IReactiveManager & IScope {
      * - 仅实现简化版本watch监听；复杂的监听逻辑，自行使用watch方法
      * @param source 监听源
      * @param callback 回调方法：可接收新旧值变化
+     * @param deep 是否进行深度监听；默认false
      * @returns 监听作用域，destroy可销毁监听
      */
-    function watcher<T>(source: WatchSource<T>, callback: (newValue: T, oldValue: T) => void): IScope {
-        const { stop } = watch(source, callback);
+    function watcher<T>(source: WatchSource<T>, callback: (newValue: T, oldValue: T) => void, deep?: boolean) {
+        const { stop } = watch(source, callback, { deep });
         return scopes.get().onDestroy(stop);
     }
     //#endregion
