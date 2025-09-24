@@ -9,12 +9,13 @@
 			"</template>",
 			"",
 			"<script setup lang=\"ts\">",
-			"import { ref, shallowRef, watch ,onActivated, onDeactivated} from \"vue\";",
+			"import { ref, shallowRef, } from \"vue\";",
 			"",
 			"// *****************************************   👉  组件定义    *****************************************",
-			"//  1、props、data",
-			"//  2、可选配置选项",
-			"defineOptions({ name: 组件名称, inheritAttrs: true, });",
+			"//  1、props、event、model、components",
+			"",
+			"//  2、组件交互变量、常量",
+			"",
 			"",
 			"// *****************************************   👉  方法+事件    ****************************************",
 			"",
@@ -22,9 +23,6 @@
 			"//  1、数据初始化、变化监听",
 			"//  2、生命周期响应",
 			"",
-			"//      监听组件激活和卸载，适配KeepAlive组件内使用",
-			"onActivated(() => console.log(\"onActivated\"));",
-			"onDeactivated(() => console.log(\"onDeactivated\"));",
 			"</script>",
 			"",
 			"<style lang=\"less\">",
@@ -36,10 +34,10 @@
 		"description": "Vue组件模板代码"
 	},
 	// *****************************************   👉  公共类样式    *****************************************
-	"tips-text": {
-		"prefix": "tips-text",
+	".text-tips": {
+		"prefix": "text-tips",
 		"scope": "html",
 		"description": "公共类样式：提示文本",
-		"body": "class=\"tips-text\"",
+		"body": "class=\"text-tips\"",
 	}
 }

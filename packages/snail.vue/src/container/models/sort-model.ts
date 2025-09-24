@@ -12,12 +12,19 @@ export type SortOptions<T> = DisabledOptions & {
      * - 如在增加元素时，改变此值实现 新元素 可拖拽排序
      */
     changer: T;
-
     /**
      * 拖动哪个元素
      * - 传入类样式选择器；如 .table-row
      */
     draggable: string;
+    /**
+     * 哪个元素启动拖拽
+     * - 传入类样式选择器；如 .sort-handle
+     * - 不传入则默认 draggable
+     * - 若自定义，则传入 draggable 下的dom元素作为启动拖拽的句柄
+     */
+    handle?: string;
+
     /**
      * 拖动的元素上增加的类样式
      * - 执行拖拽时随着鼠标移动元素，脱离文档流了
@@ -31,13 +38,6 @@ export type SortOptions<T> = DisabledOptions & {
      * - 默认：snail-sort-ghost
      */
     ghostClass?: string;
-    /**
-     * 哪个元素启动拖拽
-     * - 传入类样式选择器；如 .sort-handle
-     * - 不传入则默认 draggable
-     * - 若自定义，则传入 draggable 下的dom元素作为启动拖拽的句柄
-     */
-    handle?: string;
     /**
      * 过滤器，不需要进行拖动的元素
      * - 传入类样式选择器；如 .sort-handle

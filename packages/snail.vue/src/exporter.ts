@@ -8,6 +8,7 @@
 
 // *****************************************   👉  base 相关导出    ****************************************
 //  类型导出
+export * from "./base/models/base-event";
 export * from "./base/models/base-model";
 export * from "./base/models/button-model";
 export * from "./base/models/choose-model";
@@ -38,19 +39,23 @@ export * from "./base/utils/icon-util";
 //  类型导出
 export * from "./container/models/component-model";
 export * from "./container/models/fold-model";
+export * from "./container/models/layout-model";
 export * from "./container/models/scroll-model";
 export * from "./container/models/sort-model";
 export * from "./container/models/table-model";
 export * from "./container/models/tree-model";
+export * from "./container/models/wrapper-model";
 //  组件导出：赋值给 components
 import Dynamic from "./container/dynamic.vue";
 import Fold from "./container/fold.vue";
+import Layout from "./container/layout.vue";
 import Scroll from "./container/scroll.vue";
 import Sort from "./container/sort.vue";
 import Table from "./container/table.vue";
 import TableRow from "./container/components/table-row.vue";
 import TableCol from "./container/components/table-col.vue";
 import Tree from "./container/tree.vue";
+import Wrapper from "./container/wrapper.vue";
 //  方法导出
 export * from "./container/utils/component-util";
 
@@ -83,7 +88,7 @@ export const components = {
     //  base下的组件
     Button, Choose, Footer, Header, Icon, Search, Select, Switch,
     //  container 下的组件
-    Dynamic, Fold, Scroll, Sort, Table, TableRow, TableCol, Tree,
+    Dynamic, Fold, Layout, Scroll, Sort, Table, TableRow, TableCol, Tree, Wrapper,
     //  form 下的组件
     Input,
     //  prompt 下的组件
