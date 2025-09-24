@@ -33,7 +33,7 @@ export type TreeEvents<T> = TreeNodeEvents<T> & {
      * 搜索完成后
      * @param text 搜索文本
      */
-    (el: "searched", text: string);
+    searched: [text: string];
 }
 /**
  * 树节点 组件配置选项
@@ -73,9 +73,8 @@ export type TreeNodeEvents<T> = {
      * @param node 点击的树节点
      * @param parents node的父节点路径，从【顶级父节点】->【直属父节点】
      */
-    (el: "click", node: TreeNodeModel<T>, parents?: TreeNodeModel<T>[])
+    click: [node: TreeNodeModel<T>, parents?: TreeNodeModel<T>[]]
 }
-
 
 /**
  * 树节点数据结构
