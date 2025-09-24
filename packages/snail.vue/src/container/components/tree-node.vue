@@ -3,7 +3,7 @@
     2、支持插槽，由外部自定义展示内容；根据配置插槽可完全重写 树节点
 -->
 <template>
-    <div class="snail-tree-node" v-if="showRef" :class="classRef">
+    <div class="snail-tree-node" v-if="showRef" :class="classRef" @dblclick="onNodeDoubleClick">
         <template v-if="options.rewrite == true">
             <slot :="slotOptions" />
         </template>
@@ -103,6 +103,12 @@ function onNodeClick(node: TreeNodeModel<any>) {
         && emits("click", node, parent ? [parent] : undefined);
 }
 /**
+ * 树节点双击事件
+ */
+function onNodeDoubleClick() {
+    options.foldDisabled != true && toggleFold();
+}
+/**
  * 子节点点击事件：把自己的父节点加进来
  * @param child     子节点 
  * @param parents   已有的父节点路径
@@ -170,6 +176,7 @@ function onChildNodeClick(child: TreeNodeModel<any>, parents: TreeNodeModel<any>
     //  节点可点击时，节点文本区域鼠标手型
     &.clickable>.node-text {
         cursor: pointer;
+        user-select: none;
     }
 }
 
