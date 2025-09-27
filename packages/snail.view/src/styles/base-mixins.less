@@ -27,9 +27,9 @@
 
 //  高度、宽度100%填充满，隐藏溢出的内容
 .wh-fill-hidden() {
-    width: 100%;
-    height: 100%;
     overflow: hidden;
+    //  width:100%；height:100%
+    .wh-fill();
 }
 
 //  left、top起始位置：left: 0; top: 0;
@@ -43,6 +43,21 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+}
+
+//  绝对定位，填充父元素，并定位到0,0位置
+.absolute-fill() {
+    position: absolute;
+    //  width:100%；height:100%
+    .wh-fill();
+    //  left、top起始位置：left: 0; top: 0
+    .left-top-start();
+}
+
+//  绝对定位，填充父元素，隐藏溢出的内容，并定位到0,0位置
+.absolute-fill-hidden() {
+    .absolute-fill();
+    overflow: hidden;
 }
 
 // *****************************************   👉  弹性盒子    *****************************************
