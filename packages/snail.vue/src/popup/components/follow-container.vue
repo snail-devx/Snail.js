@@ -22,7 +22,7 @@ import { PopupDescriptor } from "../models/popup-model";
 const { options, extOptions, popupStatus, zIndex, popupTransition } = defineProps<PopupDescriptor<FollowOptions, FollowHandle<any> & FollowExtend>>();
 const { props, model = shallowRef(undefined) } = options;
 const { closePopup } = extOptions;
-const { onClient, onSize, onEvent } = useObserver() as IObserver;
+const { onClient, onSize, onEvent, onMutation } = useObserver() as IObserver;
 const { onTimeout } = useTimer();
 /** 跟随组件的扩展配置：冻结，传递给实际【内容组件】使用 */
 const followExt = Object.freeze<FollowExtend & FollowHandle<any>>({
@@ -143,6 +143,12 @@ onMounted(() => {
                 && followExt.pinned.value != true
                 && closePopup(undefined)
             );
+            //  监听子元素变化：暂时不监听属性变化
+            onMutation(rootDom.value, {
+                childList: true,/*      观察目标子节点的变化，是否有添加或者删除*/
+                attributes: false,/*    观察属性变动 */
+                subtree: true,/*        观察后代节点，默认为 false */
+            }, buildFollow);
         }, 100);
     })
 });
