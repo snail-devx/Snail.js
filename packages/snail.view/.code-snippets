@@ -67,20 +67,20 @@
 		]
 	},
 	"absolute-fill": {
-		"prefix": ".labsolute-fill",
+		"prefix": ".absolute-fill",
 		"scope": "less",
 		"description": "绝对定位，填充父元素，并定位到0,0位置",
 		"body": [
-			"//  绝对定位，填充父元素",
+			"//  绝对定位，填充父元素，并定位到0,0位置",
 			".absolute-fill();"
 		]
 	},
 	"absolute-fill-hidden": {
-		"prefix": ".labsolute-fill-hidden",
+		"prefix": ".absolute-fill-hidden",
 		"scope": "less",
 		"description": "绝对定位，填充父元素，隐藏溢出的内容，并定位到0,0位置",
 		"body": [
-			"//  绝对定位，填充父元素，隐藏溢出的内容",
+			"//  绝对定位，填充父元素，隐藏溢出的内容，并定位到0,0位置",
 			".absolute-fill-hidden();"
 		]
 	},

@@ -102,10 +102,30 @@ export function useObserver(): IObserver & IScope {
         //  scope销毁时，移除监听
         return scope.onDestroy(() => clearInterval(timer));
     }
+
+    /**
+     * 监听元素的突变
+     *  - 通过options配置支持元素自身属性、子元素、子元素属性等；如支持子元素发生变化时（添加、删除、属性变化）等
+     *  - 内部通过 MutationObserver 实现；详细参照：https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver
+     * - scope销毁时自动移除监听
+     * @param el 监听元素
+     * @param options  配置选项，监听元素的哪些变化
+     * @param fn 回调方法
+     * @returns 作用域，可销毁监听
+     */
+    function onMutation(el: Element, options: MutationObserverInit, fn: (record: MutationRecord[], observer: MutationObserver) => void): IScope {
+        checkScope(manager, "onClient: observer destroyed.");
+        throwIfFalse(el instanceof Element, "onClient: el must be a Element.");
+        mustFunction(fn, "onMutation: fn")
+        const observe = new MutationObserver(fn);
+        observe.observe(el, options);
+        //  构建作用域并销毁方法
+        return scopes.get().onDestroy(() => observe.disconnect());
+    }
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IObserver>({ onEvent, onSize, onClient }, "IObserver");
+    const manager = mountScope<IObserver>({ onEvent, onSize, onClient, onMutation }, "IObserver");
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
 }
