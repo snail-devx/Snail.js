@@ -25,11 +25,31 @@ const { onInterval } = useTimer();
 const classRef = computed(() => ({ 'scroll-x': props.scrollX == true, 'scroll-y': props.scrollY == true }));
 /** 备份滚动条状态信息 */
 var preStatus: ScrollStatus = undefined;
-
 //  2、可选配置选项
 defineOptions({ name: "Scroll", inheritAttrs: true, });
+defineExpose({ scroll, scrollTo });
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 进行滚动操作
+ * - 在当前的滚动条位置基础上，滚动指定单位
+ * @param left 水平滚动单位；null、undefined 表示水平不滚动；小于0向左滚动；大于0向右滚动
+ * @param top 垂直滚动单位；null、undefined 表示垂直不滚动；小于0向上滚动；大于0向下滚动
+ */
+function scroll(left?: number, top?: number): void {
+    left == undefined || (rootDom.value.scrollLeft += left);
+    top == undefined || (rootDom.value.scrollTop += top);
+};
+/**
+ * 滚动到指定位置
+ * @param left 水平滚动条位置；null、undefined 表示水平不滚动
+ * @param top 垂直滚动条位置；null、undefined 表示垂直不滚动
+ */
+function scrollTo(left?: number, top?: number): void {
+    left == undefined || (rootDom.value.scrollLeft = left);
+    top == undefined || (rootDom.value.scrollTop = top);
+}
+
 /**
  * 刷新滚动信息
  */
