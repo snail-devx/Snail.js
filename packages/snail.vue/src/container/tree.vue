@@ -8,8 +8,7 @@
         <Search v-if="props.search" :="props.search" @search="onSearch" />
         <Scroll :scroll-y="true">
             <TreeNode v-for="node in props.nodes || []" :key="node.id || newId()" :node="node" :parent="undefined"
-                :level="1" :options="props.nodeOptions" :context="context"
-                @click="(node, parents) => emits('click', node, parents)">
+                :level="1" :options="props.nodeOptions" :context="context" @click="onTreeNodeClick">
                 <template #="slotProps: TreeNodeSlotOptions<any>">
                     <slot :="slotProps" />
                 </template>
@@ -20,22 +19,25 @@
 
 <script setup lang="ts">
 import { newId } from "snail.core";
-import { TreeEvents, TreeNodeSlotOptions, TreeOptions } from "./models/tree-model";
+import { TreeEvents, TreeNodeModel, TreeNodeSlotOptions, TreeOptions } from "./models/tree-model";
 //  三方组件
 import Scroll from "./scroll.vue";
 import Search from "../base/search.vue";
 import TreeNode from "./components/tree-node.vue";
 import { ITreeBaseContext } from "../base/models/tree-base";
 import { useTreeContext } from "../base/components/tree-base";
+import { shallowRef, ShallowRef } from "vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<TreeOptions<any>>();
 const emits = defineEmits<TreeEvents<any>>();
-/** 树的上下文 */
-const context: ITreeBaseContext<any> = useTreeContext<any>(props.nodes);
+/**     当前激活的节点*/
+const activedNodeRef: ShallowRef<TreeNodeModel<any>> = shallowRef(undefined);
+/**     树的上下文 */
+const context: ITreeBaseContext<any> = useTreeContext<any>(props.nodes, activedNodeRef);
 //  2、可选配置选项：对外可访问contxt属性
-defineExpose({ context });
+defineExpose({ context, onTreeNodeClick });
 defineOptions({ name: "Tree", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -46,6 +48,15 @@ defineOptions({ name: "Tree", inheritAttrs: true, });
 function onSearch(text: string) {
     context.doSearch(text);
     emits("searched", text);
+}
+/**
+ * 树节点点击时
+ * @param node 
+ * @param parents 
+ */
+function onTreeNodeClick(node: TreeNodeModel<any>, parents?: TreeNodeModel<any>[]) {
+    activedNodeRef.value = node;
+    emits('click', node, parents)
 }
 
 // *****************************************   👉  组件渲染    *****************************************

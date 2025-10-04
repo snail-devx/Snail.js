@@ -3,7 +3,9 @@
     2、支持插槽，由外部自定义展示内容；根据配置插槽可完全重写 树节点
 -->
 <template>
-    <div class="snail-tree-node" v-if="showRef" :class="classRef" @dblclick="onNodeDoubleClick">
+    <div v-if="showRef" :class="['snail-tree-node', node.clickable ? 'clickable' : '', `level-${level}`]"
+        ref="tree-node" @mouseenter="isHoveredRef = true" @mouseleave="isHoveredRef = false" @click="onNodeClick(node)"
+        @dblclick="onNodeDoubleClick">
         <template v-if="options.rewrite == true">
             <slot :="slotOptions" />
         </template>
@@ -13,13 +15,13 @@
                 <Icon v-if="showChildrenRef" :class="statusRef" :type="'custom'" :size="24" :color="'#8a8099'"
                     :draw="'M 298.667 426.667 l 213.333 256 l 213.333 -256 Z'" @click="toggleFold" />
             </div>
-            <div class="node-text" :title="node.text" v-text="node.text" @click="onNodeClick(node)" />
+            <div class="node-text" :title="node.text" v-text="node.text" />
             <div class="node-slot">
                 <slot :="slotOptions" />
             </div>
         </template>
     </div>
-    <div class="snail-tree-children" v-if="showRef && showChildrenRef" ref="children">
+    <div class="snail-tree-children hidden" v-if="showRef && showChildrenRef" ref="children">
         <TreeNode v-for="child in node.children" :key="child.id || newId()" :node="child" :parent="node"
             :level="nextLevel" :options="options" :context="context"
             @click="(node, parents) => onChildNodeClick(node, parents)">
@@ -33,7 +35,8 @@
 <script setup lang="ts">
 import { newId, throwIfTrue } from "snail.core";
 import { useAnimation } from "snail.view";
-import { shallowRef, computed, useTemplateRef } from "vue";
+import { useReactive } from "../../base/reactive";
+import { shallowRef, computed, useTemplateRef, ShallowRef, onMounted, nextTick } from "vue";
 import { TreeNodeEvents, TreeNodeModel, TreeNodeOptions, TreeNodeSlotOptions } from "../models/tree-model";
 import Icon from "../../base/icon.vue";
 
@@ -43,23 +46,22 @@ const { node, parent, options = {}, level, context } = defineProps<TreeNodeOptio
 throwIfTrue(level > 10, "tree node level cannot exceed 10.");
 const emits = defineEmits<TreeNodeEvents<any>>();
 const { transition } = useAnimation();
+const { watcher } = useReactive();
+/**     树节点自身Dom */
+const treeNodeDom = useTemplateRef("tree-node");
+/**     节点是否鼠标悬浮上面了 */
+const isHoveredRef: ShallowRef<boolean> = shallowRef(false);
 /**     节点是否显示：需要补丁节点 */
 const showRef = computed(() => context.isShow(node, true));
 /**     子节点是否显示：需要补丁节点*/
-const showChildrenRef = computed(() => context.isShowChildren(node, true))
-/**     自定义绑定的类样式：层级节点和可点击标记等 */
-const classRef = computed(() => {
-    const array = [`level-${level}`];
-    node.clickable && array.push("clickable")
-    return array;
-});
+const showChildrenRef = computed(() => context.isShowChildren(node, true));
 /**     树节点的【插槽】配置选项 */
 const slotOptions = Object.freeze<TreeNodeSlotOptions<TreeNodeModel<any>>>({
     node,
     parent,
     level,
     toggle: toggleFold,
-    click: () => onNodeClick(node),
+    click: () => onNodeClick(node)
 });
 /**     折叠状态，默认展开 */
 const statusRef = shallowRef<"expand" | "fold">("expand");
@@ -67,6 +69,8 @@ const statusRef = shallowRef<"expand" | "fold">("expand");
 const nextLevel: number = level + 1;
 /**     子节点区域Dom元素引用 */
 const childrenDom = useTemplateRef("children");
+/**     是否禁用节点事件：节点的折叠、展开子节点事件处理后，禁止冒泡 */
+var nodeEmitsDisabled: boolean = false;
 //  2、可选配置选项
 defineOptions({ name: "TreeNode", inheritAttrs: true, });
 
@@ -75,6 +79,7 @@ defineOptions({ name: "TreeNode", inheritAttrs: true, });
  * 折叠状态点击时
  */
 function toggleFold() {
+    nodeEmitsDisabled = true;
     switch (statusRef.value) {
         case "expand":
             statusRef.value = "fold";
@@ -88,7 +93,7 @@ function toggleFold() {
         const minHeight = 0;
         const maxHeight = childrenDom.value.scrollHeight;
         transition(childrenDom.value, {
-            from: { transition: "height 0.2s ease", overflow: "hidden", height: `${statusRef.value == 'fold' ? maxHeight : minHeight}px` },
+            from: { transition: `height 0.2s ease`, overflow: "hidden", height: `${statusRef.value == 'fold' ? maxHeight : minHeight}px` },
             to: { height: `${statusRef.value == 'fold' ? minHeight : maxHeight}px` },
             end: statusRef.value == 'fold' ? { height: `${minHeight}px`, overflow: 'hidden' } : {}
         }, 200);
@@ -99,8 +104,10 @@ function toggleFold() {
  * @param node 
  */
 function onNodeClick(node: TreeNodeModel<any>) {
-    node.clickable == true
-        && emits("click", node, parent ? [parent] : undefined);
+    if (node.clickable == true && nodeEmitsDisabled != true) {
+        emits("click", node, parent ? [parent] : undefined);
+    }
+    nodeEmitsDisabled = false;
 }
 /**
  * 树节点双击事件
@@ -117,6 +124,27 @@ function onChildNodeClick(child: TreeNodeModel<any>, parents: TreeNodeModel<any>
     parents = parent ? [parent, ...parents] : parents;
     emits("click", child, parents);
 }
+
+// *****************************************   👉  组件渲染    *****************************************
+//  1、数据初始化、变化监听
+//      监听变化，操作【树节点】自身的class样式，使用原生方式，避免触发vue的组件重绘
+watcher(isHoveredRef, (newValue) => {
+    treeNodeDom.value.classList.remove("hovered");
+    newValue && treeNodeDom.value.classList.add("hovered");
+});
+watcher(() => context.isActived(node), (newValue: boolean) => {
+    treeNodeDom.value.classList.remove("actived");
+    newValue && treeNodeDom.value.classList.add("actived");
+});
+//  2、生命周期响应
+onMounted(() => {
+    //  有子节点的时候，折叠不用展开的层级
+    if (childrenDom.value) {
+        options.expandLevel != undefined && options.expandLevel < nextLevel && toggleFold();
+        childrenDom.value && childrenDom.value.classList.remove("hidden");
+        nodeEmitsDisabled = false;
+    }
+})
 </script>
 
 <style lang="less">
@@ -173,8 +201,8 @@ function onChildNodeClick(child: TreeNodeModel<any>, parents: TreeNodeModel<any>
         color: #2e3033;
     }
 
-    //  节点可点击时，节点文本区域鼠标手型
-    &.clickable>.node-text {
+    //  节点可点击时鼠标手型
+    &.clickable {
         cursor: pointer;
         user-select: none;
     }
@@ -183,6 +211,12 @@ function onChildNodeClick(child: TreeNodeModel<any>, parents: TreeNodeModel<any>
 //  子节点容器
 .snail-tree-children {
     width: 100%;
+
+    &.hidden {
+        height: 0;
+        overflow: hidden;
+        display: none;
+    }
 }
 
 // *****************************************   👉  特殊样式适配    *****************************************

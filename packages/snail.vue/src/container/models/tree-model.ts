@@ -91,6 +91,14 @@ export type TreeNodeRenderOptions = {
     /* 后续支持传入 展开切换 图标样式等、、做一些内置性质的扩展工作 */
 
     /**
+     * 节点展开层级
+     * - 不传入则默认展开所有
+     * - 否则展开传入的层级；从2开始；第一级始终展开；如2则1、2层级展开
+     * - 
+     */
+    expandLevel?: number;
+
+    /**
      * 是否禁用【折叠】子节点操作
      * - true 时禁用 折叠操作
      */
@@ -108,8 +116,8 @@ export type TreeNodeRenderOptions = {
  */
 export type TreeNodeSlotOptions<Node> = {
     /**
-         * 当前节点
-         */
+     * 当前节点
+     */
     node: Node;
     /**
      * 父节点

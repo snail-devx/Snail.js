@@ -4,14 +4,15 @@
  */
 import { hasAny, IScope, isStringNotEmpty, mountScope } from "snail.core";
 import { ITreeBaseContext, TreeNodeExtend, TreeSearchResult, TreeNode } from "../models/tree-base";
-import { shallowRef } from "vue";
+import { ShallowRef, shallowRef } from "vue";
 
 /**
  * 使用【树上下文】
  * @param nodes 树节点集合
+ * @param activeNodeRef 当前激活的树节点引用；不传入，则无法实现 isActived 判断
  * @returns 上下文对象+作用域
  */
-export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeBaseContext<T> & IScope {
+export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[], activeNodeRef?: ShallowRef<TreeNode<T, TreeNodeExtend>>): ITreeBaseContext<T> & IScope {
     /** 搜索时已成功【匹配】的节点集合  匹配成功的集合，暂时不维护
     const matched = shallowRef<TreeNode<T>[]>(); */
     /** 搜索时未成功【匹配】的节点集合 */
@@ -33,6 +34,14 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeBa
         patched.value = result.patched;
     }
 
+    /**
+     * 是否是【已激活】节点
+     * @param node 要判断的节点
+     * @returns true 是已激活节点，false 否
+     */
+    function isActived(node: TreeNode<T>): boolean {
+        return activeNodeRef && activeNodeRef.value == node;
+    }
     /**
      * 是否是【补丁】节点
      * - 子节点搜索命中时，父级路径上节点没命中，则作父级路径节点作为路径修补节点存在，避免命中子节点展示不出来
@@ -91,7 +100,7 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[]): ITreeBa
     //  构建context上下文
     const context = mountScope<ITreeBaseContext<T>>({
         doSearch,
-        isPatched, isShow, isShowChildren,
+        isActived, isPatched, isShow, isShowChildren,
         getPath
     }, "ITreeBaseContext");
     context.onDestroy(() => {

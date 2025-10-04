@@ -75,6 +75,12 @@ export interface ITreeBaseContext<T> {
     doSearch(text: string): void;
 
     /**
+     * 是否是【已激活】节点
+     * @param node 要判断的节点
+     * @returns true 是已激活节点，false 否
+     */
+    isActived(node: TreeNode<T>): boolean;
+    /**
      * 是否是【补丁】节点
      * - 子节点搜索命中时，父级路径上节点没命中，则作父级路径节点作为路径修补节点存在，避免命中子节点展示不出来
      * @param node 要判断的节点
