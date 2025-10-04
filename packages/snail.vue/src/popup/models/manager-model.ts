@@ -55,6 +55,7 @@ export interface IPopupManager {
      * @param type 提示类型：成功、失败、、、
      * @param message 提示消息
      * @param options 提示框配置选项
+     * @returns 弹窗打开结果，外部可手动关闭弹窗
      */
-    toast(type: IconType, message: string, options?: Omit<ToastOptions, "type" | "message">): void;
+    toast(type: IconType, message: string, options?: Omit<ToastOptions, "type" | "message">): IScope;
 }

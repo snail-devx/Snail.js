@@ -81,7 +81,7 @@ defineOptions({ name: "Loading", inheritAttrs: true });
 //  进入和销毁时的动画效果：https://cn.vuejs.org/guide/built-ins/transition.html
 .snail-loading-enter-active,
 .snail-loading-leave-active {
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .snail-loading-enter-from,

@@ -14,7 +14,6 @@
         <div class="layout-end" v-if="$slots.end">
             <slot name="end" />
         </div>
-        "
     </div>
 </template>
 

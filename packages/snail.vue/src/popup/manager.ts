@@ -143,9 +143,9 @@ export function usePopup(): IPopupManager & IScope {
      * @param message 提示消息
      * @returns 弹窗异步作用域，外部可手动关闭弹窗
      */
-    function toast(type: IconType, message: string, options?: Omit<ToastOptions, "type" | "message">): void {
+    function toast(type: IconType, message: string, options?: Omit<ToastOptions, "type" | "message">): IScope {
         /* 中转到popup实现，但使用ToastContainer作为弹窗容器；模拟 url 值，仅为通过验证 */
-        popupInCustomContainer(ToastContainer, {
+        return popupInCustomContainer(ToastContainer, {
             url: "#ToastContainer",
             props: {
                 ...(options || Object.create(null)),
