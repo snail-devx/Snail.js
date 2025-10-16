@@ -28,15 +28,16 @@ export function useObserver(): IObserver & IScope {
      * @param target 监听元素
      * @param name 事件名称
      * @param fn 事件处理方法
+     * @param useCapture 是否使用捕获模式
      * @returns 作用域，可销毁监听
      */
-    function onEvent(target: Element | Window, name: string, fn: (...args: any[]) => void): IScope {
+    function onEvent(target: Element | Window, name: string, fn: (...args: any[]) => void, useCapture?: boolean): IScope {
         checkScope(manager, "onEvent: observer destroyed.");
         throwIfFalse(target instanceof Element || target === window, "onEvent: target must be a Element or Window")
         mustString(name, "onEvent: name");
         mustFunction(fn, "onEvent: fn");
-        target.addEventListener(name, fn);
-        return scopes.get().onDestroy(() => target.removeEventListener(name, fn));
+        target.addEventListener(name, fn, useCapture);
+        return scopes.get().onDestroy(() => target.removeEventListener(name, fn, useCapture));
     }
 
     /**

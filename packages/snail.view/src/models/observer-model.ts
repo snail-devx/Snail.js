@@ -11,9 +11,10 @@ export interface IObserver {
      * @param target 监听元素
      * @param name 事件名称
      * @param fn 事件处理方法
+     * @param useCapture 是否使用捕获模式
      * @returns 作用域，可销毁监听
      */
-    onEvent(target: Element | Window, name: string, fn: (...args: any[]) => void): IScope;
+    onEvent(target: Element | Window, name: string, fn: (...args: any[]) => void, useCapture?: boolean): IScope;
 
     /**
      * 监听元素尺寸变化
