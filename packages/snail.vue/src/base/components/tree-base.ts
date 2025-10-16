@@ -2,7 +2,7 @@
  * 树的基础组件信息
  *  1、组件基础上下文 默认实现
  */
-import { hasAny, IScope, isStringNotEmpty, mountScope } from "snail.core";
+import { hasAny, IScope, isStringNotEmpty, mountScope, newId } from "snail.core";
 import { ITreeBaseContext, TreeNodeExtend, TreeSearchResult, TreeNode } from "../models/tree-base";
 import { ShallowRef, shallowRef } from "vue";
 
@@ -19,6 +19,8 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[], activeNo
     const failed = shallowRef<TreeNode<T>[]>();
     /** 搜索时的补丁节点集合：子节点名称时，父级路径上节点没命中，则作为路径修补节点存在 */
     const patched = shallowRef<TreeNode<T>[]>();
+    /** 树节点Key字典 */
+    const nodeKeyMap: Map<TreeNode<T>, string> = new Map();
 
     //#region *************************************实现接口：ITreeContext 接口方法*************************************
     /**
@@ -91,6 +93,16 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[], activeNo
     function getPath(node: TreeNode<T, TreeNodeExtend>): TreeNode<T, TreeNodeExtend>[] {
         return searchPath(nodes, node);
     }
+    /**
+     * 获取指定【树节点】的唯一Key值
+     * - 相同节点确保唯一，且不变；用于唯一标记此节点
+     * @param node 
+     * @returns 返回节点唯一Key值
+     */
+    function getKey(node: TreeNode<T>): string {
+        nodeKeyMap.has(node) || nodeKeyMap.set(node, newId());
+        return nodeKeyMap.get(node);
+    }
     //#endregion
 
     //#region ************************************* 辅助方法 *************************************
@@ -101,7 +113,7 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[], activeNo
     const context = mountScope<ITreeBaseContext<T>>({
         doSearch,
         isActived, isPatched, isShow, isShowChildren,
-        getPath
+        getPath, getKey
     }, "ITreeBaseContext");
     context.onDestroy(() => {
         failed.value = undefined;

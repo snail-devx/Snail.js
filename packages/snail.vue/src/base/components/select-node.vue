@@ -9,8 +9,11 @@
         @mouseenter="emits('enter', rootDom, item)" @click="() => emits('click', item)">
         <div class="item-text" v-text="item.text" />
         <Icon v-if="item.type == 'group'" :type="'arrow'" :color="'#8a9099'" />
+        <div class="select-status" v-else-if="multiple == true">
+            <Icon type="success" color="white" :size="12" />
+        </div>
     </div>
-    <SelectNode v-if="showRef" v-for="child in showChildrenRef" :key="child.id || newId()" :multiple="multiple"
+    <SelectNode v-if="showRef" v-for="child in showChildrenRef" :key="context.getKey(child)" :multiple="multiple"
         :item="child" :context="context" :show-children="false" @enter="el => emits('enter', el, child, item)"
         @click="emits('click', child, item)" />
 </template>
@@ -94,6 +97,30 @@ defineOptions({ name: "SelectNode", inheritAttrs: true, });
     >svg.snail-icon {
         cursor: default;
         display: none;
+    }
+
+    //  选中状态：仅在多选模式下才显示出来
+    >div.select-status {
+        flex-shrink: 0;
+        margin-left: 4px;
+        height: 14px;
+        width: 14px;
+        border: 1px solid #8a9099;
+        background: white;
+
+        >svg {
+            display: none;
+        }
+    }
+
+    //  选中状态下的选择状态按钮
+    &.selected>div.select-status {
+        border: 1px solid #5ca3ff;
+        background-color: #5ca3ff;
+
+        >svg {
+            display: block;
+        }
     }
 
     //  子选项下的 图标才显示出来

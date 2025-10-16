@@ -6,22 +6,26 @@
     5、搜索框需要搜索时，对外发送事件，由【../select.vue】完成搜索处理，并更新选项数据
 -->
 <template>
-    <div :class="classRef" :style="props.popupStyle" @mouseenter="onEnterPopup" @mouseleave="onLeavePopup">
+    <div :class="classRef" :style="popupStyle" @mouseenter="onEnterPopup" @mouseleave="onLeavePopup">
         <template v-if="classRef['child-popup'] && classRef['text-tips']">
             暂无选项
         </template>
         <template v-else>
-            <Search v-if="props.search" :="props.search" @search="onSearch" />
-            <SelectNode v-for="item in itemsRef" :key="item.id || newId()" :multiple="props.multiple" :item="item"
+            <Search v-if="search" :="search" @search="onSearch" key="select-search" />
+            <SelectNode v-for="item in itemsRef" :key="context.getKey(item)" :multiple="multiple" :item="item"
                 :context="context" :show-children="true" @enter="onEnterSelectNode" @click="onClickSelectNode" />
             <Empty v-if="itemsRef.length == 0" :message="'无结果'" />
+            <!-- 清空已选：仅在第一级弹层中展示，且需有已选【选择项】时 -->
+            <div class="clear-all" v-if="showClearButtonRef" @click="onClearAllClick">
+                清空已选
+            </div>
         </template>
     </div>
 </template>
 
 <script setup lang="ts">
-import { IAsyncScope, isArrayNotEmpty, IScope, newId, useTimer } from "snail.core";
-import { shallowRef, computed, ShallowRef, ComputedRef, } from "vue";
+import { IAsyncScope, isArrayNotEmpty, IScope, isStringNotEmpty, newId, useTimer } from "snail.core";
+import { shallowRef, computed, ShallowRef, ComputedRef, nextTick, } from "vue";
 import { usePopup } from "../../popup/manager";
 import { useReactive } from "../reactive";
 //  依赖的其他vue组件
@@ -30,12 +34,12 @@ import Empty from "../../prompt/empty.vue";
 import SelectNode from "./select-node.vue";
 //  使用到的数据类型
 import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
-import { SelectBaseEvents, SelectItem, SelectPopupExtend, SelectPopupOptions } from "../models/select-model";
+import { SelectItem, SelectPopupEvents, SelectPopupExtend, SelectPopupOptions } from "../models/select-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<SelectPopupOptions<any> & SelectPopupExtend & FollowHandle<SelectItem<any>[]> & FollowExtend>();
-const emits = defineEmits<SelectBaseEvents<any>>();
+const emits = defineEmits<SelectPopupEvents<any>>();
 const { follow } = usePopup();
 const { onTimeout } = useTimer();
 const { watcher } = useReactive();
@@ -53,6 +57,15 @@ const classRef = computed(() => ({
     /** 【选择项】中是否存在分组 */
     "has-group": itemsRef.value.find(node => node.type == "group") != undefined,
 }));
+/** 是否需要【清空】按钮：单选时，若一开始没有选中项，则不需要（点击时，会销毁弹窗，不用显示） */
+const needClearButton = props.multiple == true
+    ? props.level == 1
+    : props.level == 1 && isStringNotEmpty(context.selectedText(false, props.showPath));
+/** 是否显示【清空】按钮：需要清空按钮、且配置了显示时；单选始终显示，多选根据是否有已选*/
+const showClearButtonRef = computed(() => needClearButton && props.showClear && (props.multiple
+    ? context.selectedText(true, props.showPath)
+    : true)
+);
 /** 子弹窗销毁的定时器；鼠标离开弹窗时，做延迟销毁；避免回到 此弹窗 的父【选择项】时，又重新打开此弹窗*/
 const childDestroyTimerRef: ShallowRef<IScope> = shallowRef(undefined);
 //  2、临时变量
@@ -66,6 +79,36 @@ var childFollowScope: IAsyncScope<SelectItem<any>[]> = undefined;
 defineOptions({ name: "Select2Popup", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 监听配置选项改变
+ * - 进行合法性验证
+ */
+function watchOptionsChange() {
+    //  多选时，不能存在 多级菜单：这个规则比较隐蔽，若不符合规则，则强制报错提示出来
+    const inValid = props.multiple == true
+        && itemsRef.value
+        && itemsRef.value.some(item => item.children && item.children.length > 0);
+    if (inValid == true) {
+        const message: string = "select-popup.vue: select item cannot be multi-level when multiple == true";
+        onTimeout(() => {
+            props.closePopup();
+            alert(message);
+            throw new Error(message)
+        }, 0)
+    }
+}
+/**
+ * 发送【选择项】点击事件
+ * @param path 选项路径，从父->子
+ */
+function emitClickEvent(...path: SelectItem<any>[]) {
+    if (popupStatus.value != "closed") {
+        path = path.filter(item => item != undefined);
+        emits("click", path);
+        props.multiple || props.closePopup(path);
+    }
+}
+
 /**
  * 销毁子【选择项】弹窗
  * @param onlyTimer 是否仅销毁 子的定时器；false时全部销毁
@@ -112,17 +155,6 @@ function onSearch(text: string) {
     destroyChildFollow();
     context.doSearch(text);
 }
-/**
- * 选项选择后
- * @param path 选项路径，从父->子
- */
-function onSelected(...path: SelectItem<any>[]) {
-    if (popupStatus.value != "closed") {
-        const values = path.filter(item => item != undefined);
-        emits("change", values);
-        props.multiple || props.closePopup(values);
-    }
-}
 
 /**
  * 鼠标进入【选择项】
@@ -156,6 +188,7 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
                 items: node.children,
                 context: context,
                 search: undefined,
+                multiple: props.multiple,
                 level: props.level + 1,
                 popupStyle: props.popupStyle,
 
@@ -165,7 +198,7 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
         });
         //  等待弹窗结束，如果有选中项，则对外分发
         const datas = await childFollowScope;
-        isArrayNotEmpty(datas) && onSelected(parent ? parent : undefined, node, ...datas);
+        isArrayNotEmpty(datas) && emitClickEvent(parent ? parent : undefined, node, ...datas);
         //  若销毁下级弹窗时，未进入当前弹窗，则触发当前弹窗的鼠标离开事件
         popupStatus.value == "open" && onTimeout(() => mouseStatus != "Enter" && onLeavePopup(), 10);
     }
@@ -177,12 +210,24 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
  */
 function onClickSelectNode(node: SelectItem<any>, parent?: SelectItem<any>) {
     //  选择项 可点击时，才有效；多选时，修改一下选中状态
-    if (node.clickable == true) {
-        onSelected(parent ? parent : undefined, node);
-    }
+    node.clickable && emitClickEvent(parent ? parent : undefined, node);
+}
+/**
+ * 清空已选【选择项】
+ * - 发送改变事件，并关闭弹窗
+ */
+function onClearAllClick() {
+    emits("clear");
+    props.closePopup([]);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
+//  监听【选项】变动，进行事件验证
+{
+    watcher(() => props.multiple, watchOptionsChange);
+    watcher(itemsRef, watchOptionsChange);
+    watchOptionsChange();
+}
 //  监听【pinned】变化，当前弹窗【钉住】了，则父级弹窗同步【钉住】
 watcher(pinned, newValue => newValue == true && parentPinned && (parentPinned.value = true));
 //  监听【popupStatus】变化，同步销毁子级弹窗：usePopup会自定管理子弹窗销毁，但为异步有延迟，这里更为即时
@@ -208,6 +253,27 @@ watcher(popupStatus, newValue => newValue == "closed" && childFollowScope && chi
 
     >div.snail-search {
         margin: 12px;
+    }
+
+    //  清空已选
+    >div.clear-all {
+        flex-shrink: 0;
+        height: 32px;
+        border-top: 1px solid #dddfed;
+        cursor: pointer;
+        color: #8a9099;
+        padding: 0 12px;
+        //  始终在最后展示
+        position: sticky !important;
+        bottom: 0;
+        z-index: 1;
+        background-color: white;
+        //  flex 布局：display: flex，align-items 为center
+        .flex-cross-center();
+
+        &:hover {
+            color: #ff4c4c;
+        }
     }
 }
 

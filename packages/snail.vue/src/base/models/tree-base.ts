@@ -109,6 +109,13 @@ export interface ITreeBaseContext<T> {
      * @returns 从【顶级节点】->【指定节点】的全路径数据
      */
     getPath(node: TreeNode<T, TreeNodeExtend>): TreeNode<T, TreeNodeExtend>[];
+    /**
+     * 获取指定【树节点】的唯一Key值
+     * - 相同节点确保唯一，且不变；用于唯一标记此节点
+     * @param node 
+     * @returns 返回节点唯一Key值
+     */
+    getKey(node: TreeNode<T>): string;
 }
 
 /**

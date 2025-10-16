@@ -6,7 +6,6 @@ import { IScope, mountScope } from "snail.core";
 import { ISelectContext, SelectItem } from "../models/select-model";
 import { useTreeContext } from "./tree-base";
 import { ShallowRef } from "vue";
-import { ITreeBaseContext } from "../models/tree-base";
 
 /**
  * 使用【选项菜单】上下文
@@ -37,7 +36,7 @@ export function useSelectContext<T>(items: SelectItem<T>[], selectsRef: ShallowR
      * @returns 已选【选择项】的展示文本
      */
     function selectedText(multiple: boolean, showPath: boolean): string {
-        if (selectsRef.value) {
+        if (selectsRef.value && selectsRef.value.length) {
             return multiple == true || showPath == true
                 ? selectsRef.value.map(item => item.text).join(multiple ? "、" : " / ")
                 : selectsRef.value[selectsRef.value.length - 1].text

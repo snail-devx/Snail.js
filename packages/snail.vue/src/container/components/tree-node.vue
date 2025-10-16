@@ -22,7 +22,7 @@
         </template>
     </div>
     <div class="snail-tree-children hidden" v-if="showRef && showChildrenRef" ref="children">
-        <TreeNode v-for="child in node.children" :key="child.id || newId()" :node="child" :parent="node"
+        <TreeNode v-for="child in node.children" :key="context.getKey(child)" :node="child" :parent="node"
             :level="nextLevel" :options="options" :context="context"
             @click="(node, parents) => onChildNodeClick(node, parents)">
             <template #="slotProps">

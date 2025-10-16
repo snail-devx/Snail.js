@@ -32,6 +32,12 @@ export type SelectBaseOptions<T> = {
      * - 仅针对【单选模式】生效
      */
     showPath?: boolean;
+    /**
+     * 是否显示【清空已选】按钮
+     * - true：则在弹窗的底部显示【清空已选】按钮，点击时清空所有已选选项
+     * - 若存在多级选项，仅在第一级弹窗中显示
+     */
+    showClear?: boolean;
 
     /**
      * 选择项 follow弹窗样式
@@ -45,7 +51,7 @@ export type SelectBaseOptions<T> = {
 export type SelectBaseEvents<T> = {
     /**
      * 选中的【选择项】改变时
-     * - @param values 已选的【选择项】：多级单选时，为【选择项】路径（父->子）；其他情况为已选的【选择项】
+     * - @param values 已选的【选择项】：单选时，为【选择项】路径（父->子）；其他情况为已选的【选择项】
      */
     change: [values: SelectItem<T>[]]
 }
@@ -70,8 +76,18 @@ export type SelectOptions<T> = ReadonlyOptions & PlaceholderOptions & SelectBase
      *      search                  启用 【搜索】功能
      *      searchPlaceholder       搜索框提示语
      *      multiple                是否【多选模式】
+     *      showPath                显示选项路径
+     *      popupStyle              弹出的选项选择窗体样式
      */
+
+    /**
+     * 禁用【值的路径】
+     * - 仅在 multiple 不为 true 时生效
+     * - 为true时，则v-model绑定时为单个值而非数组
+     */
+    valuePathDisabled?: boolean;
 }
+
 /**
  * 选项菜单 组件 事件
  */
@@ -133,6 +149,20 @@ export type SelectPopupOptions<T> = SelectBaseOptions<T> & {
      * - 从1开始
      */
     level: number;
+}
+/**
+ * 【选项菜单】 弹窗组件事件
+ */
+export type SelectPopupEvents<T> = {
+    /**
+     * 清空选项
+     */
+    clear: [],
+    /**
+     * 选项点击事件
+     * @param path 选中的【选择项】路径；父->子
+     */
+    click: [path: SelectItem<T>[]]
 }
 /**
  * 【选项菜单】 弹窗组件扩展
