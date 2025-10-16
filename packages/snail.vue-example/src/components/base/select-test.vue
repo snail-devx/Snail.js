@@ -4,12 +4,28 @@
     <Select :items="items" :search="{ autoComplete: true }" style="width: 200px;" />
     <Select :items="items" :search="{}" :show-path="true" v-model="selectValues"
         style="width: 200px;position: absolute;right: 10px; top: 20px;" />
+
     <Select :items="items" :search="{}" :show-path="true" v-model="selectValues"
         style="width: 200px;position: absolute;right: 50%; top: 50%;">
         <template v-slot="{ clear }: SelectSlotOptions">
             哈哈哈 <button @click="clear(true, true)">哈哈得到</button>
         </template>
     </Select>
+    <hr />
+    <Select :items="items" :show-path="true" :show-clear="true" v-model="selectValues"
+        style="width: 200px;position: absolute;left: 10px; bottom: 20px;" />
+    <Select :show-path="true" :show-clear="true" :multiple="true" :items="[
+        // { 'text': '1', clickable: true, children: [{ text: '1-1', clickable: true }] },
+        { 'text': '2', clickable: true, },
+        { 'text': '3', clickable: true, },
+        { 'text': '4', clickable: true, },
+    ]" style="width: 200px;position: absolute;left: 300px; bottom: 20px;" />
+    <Select :show-path="true" :show-clear="true" :multiple="false" :items="[
+        // { 'text': '1', clickable: true, children: [{ text: '1-1', clickable: true }] },
+        { 'text': '2', clickable: true, },
+        { 'text': '3', clickable: true, },
+        { 'text': '4', clickable: true, },
+    ]" style="width: 200px;position: absolute;left: 600px; bottom: 20px;" />
 </template>
 
 <script setup lang="ts">
