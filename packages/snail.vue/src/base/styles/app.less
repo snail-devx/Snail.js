@@ -52,6 +52,8 @@
             border: 1px solid #3292ea;
         }
 
+
+
         //  只读时的边框样式
         &:read-only:focus {
             border: 1px solid #DDDFED;
@@ -63,6 +65,27 @@
     input[type="checkbox"] {
         margin: 0;
         padding: 0;
+    }
+
+    //  数据类型输入框的上一个、下一个点击按钮
+    input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+        margin: 0;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    }
+
+    //  placeholder样式
+    input::placeholder,
+    textarea::placeholder,
+    div.placeholder,
+    span.placeholder {
+        color: #8a9099;
     }
 
     //  自定义滚动条样式

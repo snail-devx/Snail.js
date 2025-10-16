@@ -24,6 +24,19 @@ export type IconOptions = TitleOptions & {
     size?: number;
 
     /**
+     * 轮廓描边颜色
+     * - 配合 strokeWidth 使用，完成图标加粗效果等
+     * @see https://developer.mozilla.org/zh-CN/docs/Web/SVG/Reference/Attribute/stroke
+     */
+    stroke?: string;
+    /**
+     * 轮廓宽度
+     * - 配合 stroke 使用，完成图标加粗效果等
+     * @see https://developer.mozilla.org/zh-CN/docs/Web/SVG/Reference/Attribute/stroke-width
+     */
+    strokeWidth?: number;
+
+    /**
      * 图标绘制路径
      * - 等效 svg-path的d属性
      * - 仅在type为 custom 时生效
@@ -54,11 +67,13 @@ export type IconOptions = TitleOptions & {
  * - 指向类：
  * - - arrow        向右箭头
  * - 其他类：
+ * - - plus         加号
+ * - - subtract     减号
  * - - grip         紧握图标，垂直方向，一般用于拖动句柄
  * - - custom       自定义图标：此时IconOptions.draw属性传入绘制路径
  */
 export type IconType = "success" | "error" | "warn"
     | "close" | "trash" | "download" | "print" | "edit"
     | "arrow"
-    | "grip"
+    | "plus" | "subtract" | "grip"
     | "custom";

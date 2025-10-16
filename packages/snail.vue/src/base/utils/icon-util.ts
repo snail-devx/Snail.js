@@ -7,12 +7,12 @@ import { IconOptions, IconType } from "../models/icon-model";
 
 /**
  * 基于类型获取Svg图标绘制路径
- * @param type 图标类型
- * @param color 填充颜色，不传入则使用默认的
+ * @param iconType 图标类型
+ * @param draw 绘制路径；自定义时生效
  * @returns 图标路径
  */
-export function getSvgDraw(options: IconOptions): string[] {
-    switch (options.type) {
+export function getSvgDraw(iconType: IconType, draw: string[] | string): string[] {
+    switch (iconType) {
         //#region --------------------------------- 状态类 图标 ---------------------------------
         case "success":
             return [
@@ -66,6 +66,16 @@ export function getSvgDraw(options: IconOptions): string[] {
         //#endregion
 
         //#region --------------------------------- 其他类 ---------------------------------
+        //  加号
+        case "plus":
+            return [
+                "M 768 469.333 h -213.333 V 256 c 0 -25.6 -17.0667 -42.6667 -42.6667 -42.6667 s -42.6667 17.0667 -42.6667 42.6667 v 213.333 H 256 c -25.6 0 -42.6667 17.0667 -42.6667 42.6667 s 17.0667 42.6667 42.6667 42.6667 h 213.333 v 213.333 c 0 25.6 17.0667 42.6667 42.6667 42.6667 s 42.6667 -17.0667 42.6667 -42.6667 v -213.333 h 213.333 c 25.6 0 42.6667 -17.0667 42.6667 -42.6667 s -17.0667 -42.6667 -42.6667 -42.6667 Z",
+            ]
+        //  减号
+        case "subtract":
+            return [
+                "M768 554.666667H256c-25.6 0-42.666667-17.066667-42.666667-42.666667s17.066667-42.666667 42.666667-42.666667h512c25.6 0 42.666667 17.066667 42.666667 42.666667s-17.066667 42.666667-42.666667 42.666667z"
+            ];
         case "grip":
             return [
                 "M 384 256 m -42.6667 0 a 42.6667 42.6667 0 1 0 85.3333 0 a 42.6667 42.6667 0 1 0 -85.3333 0 Z",
@@ -80,14 +90,14 @@ export function getSvgDraw(options: IconOptions): string[] {
         //  自定义图标：报错
         case "custom":
             // mustString(options.draw, 'type is custom, draw');
-            return isArrayNotEmpty(options.draw)
-                ? options.draw as string[]
-                : isStringNotEmpty(options.draw)
-                    ? [options.draw as string]
+            return isArrayNotEmpty(draw)
+                ? draw as string[]
+                : isStringNotEmpty(draw)
+                    ? [draw as string]
                     : throwError("options.draw must be a non-empty string or string array") as any;
         //  默认不支持
         default:
-            throwError(`not support icon type: ${options.type}.`);
+            throwError(`not support icon type: ${iconType}.`);
             break;
         //#endregion
     }

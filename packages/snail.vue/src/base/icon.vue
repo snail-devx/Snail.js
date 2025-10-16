@@ -3,43 +3,29 @@
     2、采用svg方式实现，不使用字体图片，按需引入
 -->
 <template>
-    <svg class="snail-icon" viewBox="0 0 1024 1024" :width="props.size || 24" :height="props.size || 24" :class="type"
-        :style="styleRef" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
-        <title v-text="props.title || ''" />
-        <path v-for="draw in paths" :d="draw" :fill="colorRef" />
+    <svg class="snail-icon" viewBox="0 0 1024 1024" :class="type"
+        :style="rotate ? `transform: rotate(${rotate}deg);` : ''" :width="size || 24" :height="size || 24"
+        @mouseenter="isMouseEnterRef = true" @mouseleave="isMouseEnterRef = false">
+        <title v-text="title || ''" />
+        <path v-for="draw in getSvgDraw(type, draw)" :fill="isMouseEnterRef ? (hoverColor || color) : color"
+            :stroke="stroke" :stroke-width="strokeWidth" :d="draw" />
     </svg>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, shallowRef } from "vue";
+import { computed, ref, ShallowRef, shallowRef } from "vue";
 import { IconOptions } from "./models/icon-model";
 import { getSvgDraw } from "./utils/icon-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data、event
-const props = defineProps<IconOptions>();
-/** 图片路径信息 */
-const paths = getSvgDraw(props || {} as any);
-/** 图标颜色 */
-const colorRef = shallowRef<string>(props.color);
-/** 图标样式计算：暂时先支持旋转 */
-const styleRef = computed(() => props.rotate ? `transform: rotate(${props.rotate}deg);` : "");
+defineProps<IconOptions>();
+/** 是否数据进入了 */
+const isMouseEnterRef: ShallowRef<boolean> = shallowRef(false);
 //  2、可选配置选项
 defineOptions({ name: "Icon", inheritAttrs: true, });
 
 // *****************************************   👉  方法事件    *****************************************
-/**
- * 鼠标移入时
- */
-function onMouseEnter() {
-    colorRef.value = props.hoverColor || props.color;
-}
-/**
- * 鼠标移出时
- */
-function onMouseLeave() {
-    colorRef.value = props.color;
-}
 </script>
 <style lang="less">
 .snail-icon {

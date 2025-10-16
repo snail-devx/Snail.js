@@ -39,5 +39,11 @@
 		"scope": "html",
 		"description": "公共类样式：提示文本",
 		"body": "class=\"text-tips\"",
+	},
+	".placeholder":{
+		"prefix": ".placeholder",
+		"scope": "html",
+		"description": "placeholder,针对div、span元素，设置placeholder样式",
+		"body": "placeholder",
 	}
 }

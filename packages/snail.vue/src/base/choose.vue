@@ -132,15 +132,20 @@ function onItemClick(item: ChooseItemDetail, index: number) {
         //  美化样式
         >div.item-beautiful {
             flex-shrink: 0;
-            width: 16px;
-            height: 16px;
             overflow: hidden;
             //  flex 布局：display: flex，align-items、justify-content 都为center
             .flex-center();
 
             //  单选框样式
             &.radio {
+                width: 16px;
+                height: 16px;
                 border-radius: 50%;
+            }
+
+            &.checkbox {
+                width: 14px;
+                height: 14px;
             }
 
             &.item-unchecked {
