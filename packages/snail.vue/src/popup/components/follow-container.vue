@@ -52,9 +52,9 @@ function buildFollow() {
         return;
     }
     //  跟随宽度、高度，则强制和target尺寸保持一致；若需要跟随高度、宽度，则overflow做一下
-    console.group("%cstart run buildFollow:", "color:red");
+    // console.group("%cstart run buildFollow:", "color:red");
     const targetRect: DOMRectReadOnly = extOptions.target.getBoundingClientRect();
-    console.log("-- target:", targetRect, extOptions.target);
+    // console.log("-- target:", targetRect, extOptions.target);
     css.operate(rootDom.value, "add", {
         style: {
             width: options.followWidth ? `${targetRect.width}px` : "",
@@ -69,7 +69,7 @@ function buildFollow() {
         //  X轴方向跟随效果计算
         {
             const xResult: FollowElectResult = calcFollowX(options, targetRect, rootRect.width);
-            console.log("-- follow x:", xResult);
+            // console.log("-- follow x:", xResult);
             followStyle.left = `${xResult.start}px`;
             xResult.size != undefined && (followStyle.width = `${xResult.size}px`);
             followExt.followX.value = xResult.strategy;
@@ -77,7 +77,7 @@ function buildFollow() {
         //  X轴方向跟随效果计算
         {
             const yResult: FollowElectResult = calcFollowY(options, targetRect, rootRect.height);
-            console.log("-- follow y: ", yResult);
+            // console.log("-- follow y: ", yResult);
             followStyle.top = `${yResult.start}px`;
             yResult.size != undefined && (followStyle.height = `${yResult.size}px`);
             followExt.followY.value = yResult.strategy;
@@ -93,9 +93,9 @@ function buildFollow() {
         const rootRect = rootDom.value.getBoundingClientRect();
         Object.assign<ElementSize, ElementSize>(preSize, { width: rootRect.width, height: rootRect.height });
         rootDom.value.classList.remove("initial");
-        console.log("-- content rect: ", rootRect, rootDom.value);
+        // console.log("-- content rect: ", rootRect, rootDom.value);
     }
-    console.groupEnd();
+    // console.groupEnd();
 }
 
 /**
@@ -136,13 +136,15 @@ onMounted(() => {
                 && followExt.pinned.value != true
                 && closePopup(undefined)
             );
-            //  监听点击：非【跟随组件】中的元素点击时才触发时关闭；若钉住弹窗了，则不关闭
-            onEvent(window, "click", (event: MouseEvent) => options.closeOnMask
-                && rootDom.value != event.target
-                && rootDom.value.contains(event.target as HTMLElement) == false
-                && followExt.pinned.value != true
-                && closePopup(undefined)
-            );
+            //  监听点击：确保比子元素先捕获点击事件，否则可能在子元素被vue重新渲染更新后，判断 contains 会出问题
+            onEvent(window, "click", (event: MouseEvent) => {
+                //  非【跟随组件】中的元素点击时才触发时关闭；若钉住弹窗了，则不关闭；
+                options.closeOnMask
+                    && followExt.pinned.value != true
+                    && rootDom.value != event.target
+                    && rootDom.value.contains(event.target as HTMLElement) == false
+                    && closePopup(undefined)
+            });
             //  监听子元素变化：暂时不监听属性变化
             onMutation(rootDom.value, {
                 childList: true,/*      观察目标子节点的变化，是否有添加或者删除*/
@@ -165,9 +167,9 @@ onMounted(() => {
     display: inline-block;
     max-width: 100%;
     max-height: 100%;
-    //  动画效果 width, height ，不设置动画，否则会触发onSize事件，导致多次follow计算
+    //  动画效果 width, height 不设置动画，否则会触发onSize事件，导致多次follow计算
     transition-property: left, top;
-    transition-duration: 500ms;
+    transition-duration: 100ms;
     transition-timing-function: ease;
 
     //  初始化位置；避免一开始在0、0位置显示

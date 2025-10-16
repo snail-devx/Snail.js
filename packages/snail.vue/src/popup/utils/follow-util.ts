@@ -22,12 +22,13 @@ export function checkFollow(options: FollowOptions): string | undefined {
  * @returns 水平方向的跟随效果：left标记坐标位置，width标记组件新的宽度；undefined表示不设置，
  */
 export function calcFollowX(options: FollowOptions, target: DOMRectReadOnly, width: number): FollowElectResult {
-    /* 若target已经显示不全了，则不再显示follow */
     const space = isNumberNotNaN(options.spaceX) ? options.spaceX : 0;
     const spaceClient = isNumberNotNaN(options.spaceClient) ? options.spaceClient : 0;
+    /* 若target已经显示不全了，则不再显示follow；部分情况下，展示不全也需要展示出来，这里先忽略掉；后期通过配置约束溢出时是否显示
     if ((target.left < spaceClient) || (target.right + spaceClient > window.innerWidth)) {
         return { strategy: undefined, start: -width };
     }
+    */
     return electPosition(
         getFollowStrategy(options.followX) || ["start", "end", "after", "before", "center", "ratio"],
         target.left, target.right, width, window.innerWidth, space, spaceClient
@@ -41,12 +42,12 @@ export function calcFollowX(options: FollowOptions, target: DOMRectReadOnly, wid
  * @returns 水平方向的跟随效果：top、bottom标记坐标位置，height标记组件新的高度；undefined表示不设置，
  */
 export function calcFollowY(options: FollowOptions, target: DOMRectReadOnly, height: number): FollowElectResult {
-    /* 若target已经显示不全了，则不再显示follow */
     const space = isNumberNotNaN(options.spaceY) ? options.spaceY : 0;
     const spaceClient = isNumberNotNaN(options.spaceClient) ? options.spaceClient : 0;
+    /* 若target已经显示不全了，则不再显示follow；部分情况下，展示不全也需要展示出来，这里先忽略掉；后期通过配置约束溢出时是否显示
     if ((target.top < spaceClient) || (target.bottom + spaceClient > window.innerHeight)) {
         return { strategy: undefined, start: -height };
-    }
+    }*/
     return electPosition(
         getFollowStrategy(options.followY) || ["after", "before", "start", "end", "center", "ratio"],
         target.top, target.bottom, height, window.innerHeight, space, spaceClient
