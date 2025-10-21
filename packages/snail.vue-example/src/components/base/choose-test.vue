@@ -1,24 +1,46 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <div style="width: 400px;">
-        单选模式，复选项样式：
+    <div style="width: 400px;float: left;">
+        <h2>单选模式，复选项样式：</h2>
         <Choose :multi="false" :type="'checkbox'" :items="chooseItems" :readonly="false" style="width: 200px;"
             v-model="checked" @change="console.log" />
         <Choose :multi="false" :type="'checkbox'" :items="chooseItems" :readonly="true" style="width: 200px;"
             v-model="checked" />
-        单选模式，单选项样式：
+        <h2>单选模式，单选项样式：</h2>
         <Choose :multi="false" :type="'radio'" :items="chooseItems" :readonly="false" style="width: 200px;"
             @change="console.log" />
         <Choose :multi="false" :type="'radio'" :items="chooseItems" :readonly="true" style="width: 200px;"
             v-model="checked" />
-        复选模式，复选项样式：
+        <h2>复选模式，复选项样式：</h2>
         <Choose :multi="true" :type="'checkbox'" :items="chooseItems" :readonly="false" style="width: 200px;"
             @change="console.log" />
         <Choose :multi="true" :type="'checkbox'" :items="chooseItems" :readonly="true" style="width: 200px;" />
-        复选模式，单选项样式：
+        <h2>复选模式，单选项样式：</h2>
         <Choose :multi="true" :type="'radio'" :items="chooseItems" :readonly="false" style="width: 200px;"
             @change="console.log" />
         <Choose :multi="true" :type="'radio'" :items="chooseItems" :readonly="true" style="width: 200px;" />
+    </div>
+    <div style="width: 400px;float: left;">
+        <h2>单选模式，复选项样式：</h2>
+        <Choose :multi="false" :type="'checkbox'" :items="chooseItems" :readonly="false" :mode="'beautiful'"
+            style="width: 200px;" v-model="checked" @change="console.log" />
+        <Choose :multi="false" :type="'checkbox'" :items="chooseItems" :readonly="true" :mode="'beautiful'"
+            style="width: 200px;" v-model="checked" />
+        <h2>单选模式，单选项样式：</h2>
+        <Choose :multi="false" :type="'radio'" :items="chooseItems" :readonly="false" :mode="'beautiful'"
+            style="width: 200px;" @change="console.log" />
+        <Choose :multi="false" :type="'radio'" :items="chooseItems" :readonly="true" :mode="'beautiful'"
+            style="width: 200px;" v-model="checked" />
+        <h2>复选模式，复选项样式：</h2>
+        <Choose :multi="true" :type="'checkbox'" :items="chooseItems" :readonly="false" :mode="'beautiful'"
+            style="width: 200px;" @change="console.log" />
+        <Choose :multi="true" :type="'checkbox'" :items="chooseItems" :readonly="true" :mode="'beautiful'"
+            style="width: 200px;" />
+        <h2>复选模式，单选项样式：</h2>
+        <Choose :multi="true" :type="'radio'" :items="chooseItems" :readonly="false" :mode="'beautiful'"
+            style="width: 200px;" @change="console.log" />
+        <Choose :multi="true" :type="'radio'" :items="chooseItems" :readonly="true" :mode="'beautiful'"
+            style="width: 200px;" />
     </div>
 </template>
 

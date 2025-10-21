@@ -1,7 +1,9 @@
+import { TitleOptions } from "./base-model";
+
 /**
  * 按钮配置选项
  */
-export type ButtonOptions = {
+export type ButtonOptions = TitleOptions & {
     /**
      * 按钮尺寸
      * - max    ： 120 X 40

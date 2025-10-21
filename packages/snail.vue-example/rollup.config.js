@@ -13,7 +13,6 @@ import scriptPlugin from "snail.rollup-script";
 import stylePlugin, { MODULE_INJECT_LINK, STYLE_EXTEND_PATHS } from "snail.rollup-style";
 import urlPlugin, { URL_HANDLES } from "snail.rollup-url";
 import vuePlugin from "snail.rollup-vue"
-import { readdirSync, readSync, statSync } from "fs";
 
 /** 不使用如下方式获取dirName，会在末尾存在 "/"；但resolve等不会存在 "/"；会导致断言出问题
  * const __dirname = fileURLToPath(new URL('.', import.meta.url)); 

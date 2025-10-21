@@ -1,13 +1,15 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    Swtich 示例还没实现
+    <Switch />
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { components } from "../../core"
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
+const { Switch } = components;
 //  2、可选配置选项
 defineOptions({ name: "SwitchTest", inheritAttrs: true, });
 

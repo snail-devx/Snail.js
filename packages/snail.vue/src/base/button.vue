@@ -1,6 +1,6 @@
 <!-- 按钮组件：做一些常见按钮样式的封装 -->
 <template>
-    <div class="snail-button" :class="[size, type]">
+    <div class="snail-button" :class="[size, type]" :title="title">
         <slot>按钮</slot>
     </div>
 </template>
@@ -24,6 +24,7 @@ defineOptions({ name: "Button", inheritAttrs: true, });
     border-radius: 2px;
     white-space: nowrap;
     user-select: none;
+    overflow: hidden;
     // flex 布局：display: flex，align-items、justify-content 都为center
     .flex-center();
     display: inline-flex;
