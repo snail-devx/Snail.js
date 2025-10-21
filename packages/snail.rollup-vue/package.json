@@ -15,7 +15,7 @@
   "dependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/compiler-sfc": "^3.5.13",
-    "snail.core": ">=2.0.13",
+    "snail.core": ">=2.0.14",
     "snail.rollup": ">=1.2.9",
     "snail.rollup-script": ">=1.2.4",
     "snail.rollup-style": ">=1.2.8"
