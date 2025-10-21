@@ -4,11 +4,10 @@
 -->
 <template>
     <div class="snail-confirm">
-        <Header :use-to="'dialog'" :title="props.title || '提示'" @close="props.closePopup(false)" />
-        <div class="confirm-body" v-html="props.message || '请确认？'" />
-        <Footer align="right" :cancel-name="props.cancelName" :cancel-disabled="props.cancelDisabled"
-            :confirm-name="props.confirmName" :confirm-disabled="props.confirmDisabled"
-            @cancel="props.closePopup(false)" @confirm="props.closePopup(true)" />
+        <Header :use-to="'dialog'" :title="title || '提示'" @close="closePopup(false)" />
+        <div class="confirm-body" v-html="message || '请确认？'" />
+        <Footer align="right" :cancel-name="cancelName" :cancel-disabled="cancelDisabled" :confirm-name="confirmName"
+            :confirm-disabled="confirmDisabled" @cancel="closePopup(false)" @confirm="closePopup(true)" />
     </div>
 </template>
 
@@ -20,7 +19,7 @@ import Footer from "../../base/footer.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<ConfirmOptions & DialogHandle<boolean>>();
+defineProps<ConfirmOptions & DialogHandle<boolean>>();
 //  2、可选配置选项
 defineOptions({ name: "ConfirmContainer", inheritAttrs: true, });
 </script>

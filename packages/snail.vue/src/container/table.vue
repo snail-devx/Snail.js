@@ -3,8 +3,7 @@
     2、支持hearder插槽、默认为内容插槽
 -->
 <template>
-    <Scroll class="snail-table" :scroll-x="props.scrollX" :scroll-y="props.scrollY"
-        :class="{ 'start-border': props.border == true }">
+    <Scroll class="snail-table" :scroll-x="scrollX" :scroll-y="scrollY" :class="{ 'start-border': border == true }">
         <!-- 头部区域 -->
         <div class="table-header" :style="hStyleRef">
             <slot name="header" />

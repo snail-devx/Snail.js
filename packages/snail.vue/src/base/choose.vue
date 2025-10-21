@@ -4,14 +4,13 @@
     3、支持选项指定文本，宽度，边距等
 -->
 <template>
-    <div class="snail-choose" :class="props.readonly ? 'readonly' : ''">
+    <div class="snail-choose" :class="readonly ? 'readonly' : ''">
         <div v-for="(item, index) in chooseItemsRef" :key="item.key" class="choose-item"
-            :class="item.checked ? 'checked' : ''" :style="css.buildStyle(props.itemStyle)"
-            @click="onItemClick(item, index)">
-            <input v-if="mode == 'native'" :type="props.type" :checked="item.checked" />
+            :class="item.checked ? 'checked' : ''" :style="css.buildStyle(itemStyle)" @click="onItemClick(item, index)">
+            <input v-if="mode == 'native'" :type="type" :checked="item.checked" />
             <div v-else-if="mode == 'beautiful'" class="item-beautiful"
-                :class="[props.type, item.checked ? 'item-checked' : 'item-unchecked']">
-                <Icon v-if="item.checked" :type="'success'" :size="12" :color="props.readonly ? '#8a9099' : 'white'" />
+                :class="[type, item.checked ? 'item-checked' : 'item-unchecked']">
+                <Icon v-if="item.checked" :type="'success'" :size="12" :color="readonly ? '#8a9099' : 'white'" />
             </div>
             <span class="item-text" v-if="item.text" v-text="item.text" />
             <span class="item-des" v-if="item.description" v-text="item.description" />

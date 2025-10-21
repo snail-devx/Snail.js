@@ -4,14 +4,14 @@
     3、选中数据显示，支持插槽
 -->
 <template>
-    <div class="snail-select" :class="{ 'readonly': props.readonly }" @click="onClick()" ref="select">
-        <template v-if="props.items && props.items.length > 0">
+    <div class="snail-select" :class="{ 'readonly': readonly }" @click="onClick()" ref="select">
+        <template v-if="items && items.length > 0">
             <div v-if="selectedItemsRef.length > 0" class="select-result">
                 <slot :="slotOptions">
                     <div class="select-text" :title="selectedTextRef" v-text="selectedTextRef" />
                 </slot>
             </div>
-            <div v-else class="select-result text-tips" v-text="props.readonly ? '' : (props.placeholder || '请选择')" />
+            <div v-else class="select-result text-tips" v-text="readonly ? '' : (placeholder || '请选择')" />
             <Icon type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
         </template>
         <div v-else class="no-items text-tips">暂无可选项</div>

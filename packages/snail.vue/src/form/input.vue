@@ -5,16 +5,16 @@
     4、【后续支持】：最大最小值，如果是number则范围验证，如果是文本则是长度验证
  -->
 <template>
-    <div class="snail-input" :class="{ 'readonly': props.readonly }">
+    <div class="snail-input" :class="{ 'readonly': readonly }">
         <!-- 标题区域：有标题时，才展示 -->
-        <div class="input-title" :style="titleStyleRef" v-if="!!props.title">
-            <span class="text" v-text="props.title" />
-            <span class="required" v-text="'*'" v-if="props.readonly != true && props.required == true" />
+        <div class="input-title" :style="titleStyleRef" v-if="!!title">
+            <span class="text" v-text="title" />
+            <span class="required" v-text="'*'" v-if="readonly != true && required == true" />
         </div>
         <!-- 输入框区域：输入不做v-model绑定，只有验证通过后再绑定 -->
         <div class="input-body">
-            <input ref="input-el" :type="props.type || 'text'" :value="inputModel" :readonly="props.readonly == true"
-                :placeholder="props.placeholder" :title="inputModel" @change="onValueChange" @click="emits('click')" />
+            <input ref="input-el" :type="type || 'text'" :value="inputModel" :readonly="readonly == true"
+                :placeholder="placeholder" :title="inputModel" @change="onValueChange" @click="emits('click')" />
             <span class="validate" v-if="!!validateRef" :title="validateRef">
                 <Icon :type="'error'" :size="16" :color="'red'" />
             </span>

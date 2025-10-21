@@ -1,6 +1,6 @@
 <!-- 按钮组件：做一些常见按钮样式的封装 -->
 <template>
-    <div class="snail-button" :class="[props.size, props.type]">
+    <div class="snail-button" :class="[size, type]">
         <slot>按钮</slot>
     </div>
 </template>
@@ -10,7 +10,7 @@ import { ButtonOptions } from "./models/button-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<ButtonOptions>();
+defineProps<ButtonOptions>();
 //  2、可选配置选项
 defineOptions({ name: "Button", inheritAttrs: true, });
 </script>

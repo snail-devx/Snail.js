@@ -1,11 +1,11 @@
 <!-- 底部组件：默认固定确认、取消按钮；可通过插槽重新定制-->
 <template>
-    <footer class="snail-footer" :class="{ 'start-divider': props.divider }" v-bind:class="props.align || 'right'">
+    <footer class="snail-footer" :class="{ 'start-divider': divider }" v-bind:class="align || 'right'">
         <slot>
-            <Button v-if="props.cancelDisabled != true" :size="'max'" :type="'default'" @click="emits('cancel')"
-                v-text="props.cancelName || '取消'" />
-            <Button v-if="props.confirmDisabled != true" :size="'max'" :type="'primary'" @click="emits('confirm')"
-                v-text="props.confirmName || '确定'" />
+            <Button v-if="cancelDisabled != true" :size="'max'" :type="'default'" @click="emits('cancel')"
+                v-text="cancelName || '取消'" />
+            <Button v-if="confirmDisabled != true" :size="'max'" :type="'primary'" @click="emits('confirm')"
+                v-text="confirmName || '确定'" />
         </slot>
     </footer>
 </template>
@@ -16,7 +16,7 @@ import { FooterOptions, FooterEvents } from "./models/footer-model"
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<FooterOptions>();
+defineProps<FooterOptions>();
 const emits = defineEmits<FooterEvents>();
 //  2、可选配置选项
 defineOptions({ name: "Footer", inheritAttrs: true, });

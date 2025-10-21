@@ -8,9 +8,9 @@
         <!-- 折叠面板头部：支持插槽，并做默认实现 -->
         <div class="fold-header">
             <slot name="header">
-                <div class="title" v-text="props.title" />
-                <div class="subtitle" v-if="!!props.subtitle" v-text="props.subtitle" />
-                <div class="status" v-if="props.disabled != true">
+                <div class="title" v-text="title" />
+                <div class="subtitle" v-if="!!subtitle" v-text="subtitle" />
+                <div class="status" v-if="disabled != true">
                     <Icon :type="'arrow'" :title="statusModel == 'expand' ? '收起' : '展开'" @click="onStatusClick" />
                 </div>
             </slot>
@@ -32,7 +32,7 @@ import { useReactive } from "../base/reactive";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<FoldOptions>();
+defineProps<FoldOptions>();
 const emits = defineEmits<FoldEvents>();
 const { transition } = useAnimation();
 const { watcher } = useReactive();

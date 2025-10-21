@@ -5,10 +5,10 @@
 <template>
     <div class="snail-empty">
         <!-- 提醒图片 -->
-        <img :src="props.imageUrl || defaultImageBase64" />
+        <img :src="imageUrl || defaultImageBase64" />
         <!-- 提醒消息 -->
         <slot>
-            <div class="message" v-text="props.message || '无数据'" />
+            <div class="message" v-text="message || '无数据'" />
         </slot>
     </div>
 </template>

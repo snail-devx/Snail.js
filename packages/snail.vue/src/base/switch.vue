@@ -5,8 +5,7 @@
     4、【后续】支持指定 开启、关闭 状态的文字、颜色
 -->
 <template>
-    <div class="snail-switch" :class="[switchModel ? 'on' : 'off', props.readonly ? 'readonly' : '']"
-        @click="onSwitchChange">
+    <div class="snail-switch" :class="[switchModel ? 'on' : 'off', readonly ? 'readonly' : '']" @click="onSwitchChange">
         <div class="on" />
         <div class="off" />
         <div class="status" />

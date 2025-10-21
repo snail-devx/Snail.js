@@ -4,11 +4,11 @@
     3、中间区域自动伸缩，支持滚动
 -->
 <template>
-    <div class="snail-layout" :class="props.mode">
+    <div class="snail-layout" :class="mode">
         <div class="layout-start" v-if="$slots.start">
             <slot name="start" />
         </div>
-        <Scroll class="layout-body" :="props.scroll">
+        <Scroll class="layout-body" :="scroll">
             <slot />
         </Scroll>
         <div class="layout-end" v-if="$slots.end">
@@ -24,7 +24,7 @@ import Scroll from "./scroll.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<LayoutOptions>();
+defineProps<LayoutOptions>();
 
 //  2、组件交互变量、常量
 

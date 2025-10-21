@@ -5,10 +5,10 @@
 -->
 <template>
     <div class="snail-tree">
-        <Search v-if="props.search" :="props.search" @search="onSearch" />
+        <Search v-if="search" :="search" @search="onSearch" />
         <Scroll :scroll-y="true">
-            <TreeNode v-for="node in props.nodes || []" :key="context.getKey(node)" :node="node" :parent="undefined"
-                :level="1" :options="props.nodeOptions" :context="context" @click="onTreeNodeClick">
+            <TreeNode v-for="node in nodes || []" :key="context.getKey(node)" :node="node" :parent="undefined"
+                :level="1" :options="nodeOptions" :context="context" @click="onTreeNodeClick">
                 <template #="slotProps: TreeNodeSlotOptions<any>">
                     <slot :="slotProps" />
                 </template>

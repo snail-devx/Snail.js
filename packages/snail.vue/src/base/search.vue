@@ -1,8 +1,8 @@
 <!-- 搜索组件-->
 <template>
-    <div class="snail-search" :class="props.readonly ? 'readonly' : ''">
-        <input type="search" :placeholder="props.placeholder" :readonly="props.readonly == true"
-            v-model.trim="textModel" @keyup="onSearch($event)" />
+    <div class="snail-search" :class="readonly ? 'readonly' : ''">
+        <input type="search" :placeholder="placeholder" :readonly="readonly" v-model.trim="textModel"
+            @keyup="onSearch($event)" />
         <div>
             <Icon class="search-button" :type="'custom'" :draw="searchIon" :size="24" :color="'#707070'"
                 @click="onSearch(undefined)" />

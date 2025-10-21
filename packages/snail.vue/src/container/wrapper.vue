@@ -4,7 +4,7 @@
     3、对外提供：关闭事件、确认点击事件
 -->
 <template>
-    <div class="snail-wrapper" :class="props.inPopup ? 'in-popup' : 'in-normal'">
+    <div class="snail-wrapper" :class="inPopup ? 'in-popup' : 'in-normal'">
         <Header v-if="header && header.disabled != true" :="header || { useTo: 'dialog', title: '对话框' }"
             @close="emits('cancel')" />
         <Scroll class="wrapper-body" :="content || { scrollX: false, scrollY: false }">
@@ -24,7 +24,7 @@ import Scroll from "./scroll.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<WrapperOptions>();
+defineProps<WrapperOptions>();
 const emits = defineEmits<WrapperEvents>();
 
 //  2、组件交互变量、常量
