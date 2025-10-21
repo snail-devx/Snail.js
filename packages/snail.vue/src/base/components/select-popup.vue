@@ -43,11 +43,11 @@ const emits = defineEmits<SelectPopupEvents<any>>();
 const { follow } = usePopup();
 const { onTimeout } = useTimer();
 const { watcher } = useReactive();
-//  解构一些响应式变量，方便访问
+//      解构一些响应式变量，方便访问
 const { context, popupStatus, pinned, parentPinned } = props;
-/** 能够展示的【选择项】：需要【补丁】节点 */
+/**     能够展示的【选择项】：需要【补丁】节点 */
 const itemsRef = computed(() => (props.items || []).filter(item => context.isShow(item, true)));
-/** 弹窗所需的类样式信息 */
+/**     弹窗所需的类样式信息 */
 const classRef = computed(() => ({
     "snail-select-popup": true,
     /** 子【选择项】弹窗 */
@@ -57,25 +57,28 @@ const classRef = computed(() => ({
     /** 【选择项】中是否存在分组 */
     "has-group": itemsRef.value.find(node => node.type == "group") != undefined,
 }));
-/** 是否需要【清空】按钮：单选时，若一开始没有选中项，则不需要（点击时，会销毁弹窗，不用显示） */
+/**     当前弹窗时的鼠标状态 */
+var mouseStatus: "Enter" | "Leave" = "Leave";
+//  2、子弹窗相关变量
+/**     子【选择项】follow弹窗作用域 */
+var childFollowScope: IAsyncScope<SelectItem<any>[]> = undefined;
+/**     子【选择项】follow弹窗跟随的目标元素 */
+var childFollowTargetDom: HTMLElement = undefined;
+/**     子弹窗销毁的定时器；鼠标离开弹窗时，做延迟销毁；避免回到 此弹窗 的父【选择项】时，又重新打开此弹窗*/
+const childDestroyTimerRef: ShallowRef<IScope> = shallowRef(undefined);
+//  3、【清空已选】按钮相关变量
+/**     【清空】按钮是否点击了 */
+const clearButtonClickedRef: ShallowRef<boolean> = shallowRef(false);
+/**     是否需要【清空】按钮：单选时，若一开始没有选中项，则不需要（点击时，会销毁弹窗，不用显示） */
 const needClearButton = props.multiple == true
     ? props.level == 1
     : props.level == 1 && isStringNotEmpty(context.selectedText(false, props.showPath));
-/** 是否显示【清空】按钮：需要清空按钮、且配置了显示时；单选始终显示，多选根据是否有已选*/
+/**     是否显示【清空】按钮：需要清空按钮、且配置了显示时；单选始终显示，多选根据是否有已选(（若点击了清空按钮，则不用隐藏了，弹窗会销毁）*/
 const showClearButtonRef = computed(() => needClearButton && props.showClear && (props.multiple
-    ? context.selectedText(true, props.showPath)
+    ? clearButtonClickedRef.value || context.selectedText(true, props.showPath)
     : true)
 );
-/** 子弹窗销毁的定时器；鼠标离开弹窗时，做延迟销毁；避免回到 此弹窗 的父【选择项】时，又重新打开此弹窗*/
-const childDestroyTimerRef: ShallowRef<IScope> = shallowRef(undefined);
-//  2、临时变量
-/** 针对当前弹窗时的鼠标状态 */
-var mouseStatus: "Enter" | "Leave" = "Leave";
-/** 子【选择项】follow弹窗跟随的目标元素 */
-var childFollowTargetDom: HTMLElement = undefined;
-/** 子【选择项】follow弹窗作用域 */
-var childFollowScope: IAsyncScope<SelectItem<any>[]> = undefined;
-//  3、可选配置选项
+//  4、可选配置选项
 defineOptions({ name: "Select2Popup", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -218,6 +221,7 @@ function onClickSelectNode(node: SelectItem<any>, parent?: SelectItem<any>) {
  */
 function onClearAllClick() {
     emits("clear");
+    clearButtonClickedRef.value = true;
     props.closePopup([]);
 }
 

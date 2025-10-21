@@ -1,5 +1,5 @@
 import { ShallowRef } from "vue";
-import { PlaceholderOptions, ReadonlyOptions } from "./base-model";
+import { PlaceholderOptions, ReadonlyOptions, ValueOptions } from "./base-model";
 import { IScope } from "snail.core";
 import { HeightStyle } from "snail.view";
 import { SearchOptions } from "./search-model";
@@ -51,7 +51,7 @@ export type SelectBaseOptions<T> = {
 export type SelectBaseEvents<T> = {
     /**
      * 选中的【选择项】改变时
-     * - @param values 已选的【选择项】：单选时，为【选择项】路径（父->子）；其他情况为已选的【选择项】
+     * - @param values 已选的【选择项】，未选中则为空数组：单选时，为【选择项】路径（父->子）；其他情况为已选的【选择项】
      */
     change: [values: SelectItem<T>[]]
 }
@@ -69,8 +69,9 @@ export type SelectItem<T> = TreeNode<T, TreeNodeExtend & {
 
 /**
  * 选项菜单组件 配置选项
+ * - value 已选的【选择项】;单选时，为【选择项】路径（父->子）；其他情况为已选的【选择项】
  */
-export type SelectOptions<T> = ReadonlyOptions & PlaceholderOptions & SelectBaseOptions<T> & {
+export type SelectOptions<T> = ReadonlyOptions & PlaceholderOptions & SelectBaseOptions<T> & ValueOptions<SelectItem<T>[]> & {
     /** 父类<see cref="SelectBaseOptions"/>已有属性：
      *      items                   【选择项】集合
      *      search                  启用 【搜索】功能
@@ -79,13 +80,6 @@ export type SelectOptions<T> = ReadonlyOptions & PlaceholderOptions & SelectBase
      *      showPath                显示选项路径
      *      popupStyle              弹出的选项选择窗体样式
      */
-
-    /**
-     * 禁用【值的路径】
-     * - 仅在 multiple 不为 true 时生效
-     * - 为true时，则v-model绑定时为单个值而非数组
-     */
-    valuePathDisabled?: boolean;
 }
 
 /**

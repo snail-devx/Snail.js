@@ -1,31 +1,35 @@
 <!-- 组件介绍写到这里 -->
 <template>
     1111111111111111111111111111111111111111111
-    <Select :items="items" :search="{ autoComplete: true }" style="width: 200px;" />
-    <Select :items="items" :search="{}" :show-path="true" v-model="selectValues"
-        style="width: 200px;position: absolute;right: 10px; top: 20px;" />
-
-    <Select :items="items" :search="{}" :show-path="true" v-model="selectValues"
-        style="width: 200px;position: absolute;right: 50%; top: 50%;">
+    <Select style="width: 200px;" :search="{ autoComplete: true }" :items="items"
+        @change="values => selectValues = values" />
+    <Select style="width: 200px;position: absolute;right: 10px; top: 20px;" :search="{}" :show-path="true"
+        :items="items" @change="values => selectValues = values" />
+    <Select style="width: 200px;position: absolute;right: 50%; top: 50%;" :search="{}" :show-path="true" :items="items"
+        @change="values => selectValues = values">
         <template v-slot="{ clear }: SelectSlotOptions">
             哈哈哈 <button @click="clear(true, true)">哈哈得到</button>
         </template>
     </Select>
     <hr />
-    <Select :items="items" :show-path="true" :show-clear="true" v-model="selectValues"
-        style="width: 200px;position: absolute;left: 10px; bottom: 20px;" />
-    <Select :show-path="true" :show-clear="true" :multiple="true" :items="[
-        // { 'text': '1', clickable: true, children: [{ text: '1-1', clickable: true }] },
-        { 'text': '2', clickable: true, },
-        { 'text': '3', clickable: true, },
-        { 'text': '4', clickable: true, },
-    ]" style="width: 200px;position: absolute;left: 300px; bottom: 20px;" />
-    <Select :show-path="true" :show-clear="true" :multiple="false" :items="[
-        // { 'text': '1', clickable: true, children: [{ text: '1-1', clickable: true }] },
-        { 'text': '2', clickable: true, },
-        { 'text': '3', clickable: true, },
-        { 'text': '4', clickable: true, },
-    ]" style="width: 200px;position: absolute;left: 600px; bottom: 20px;" />
+    <div>{{ selectValues }}</div>
+    <hr />
+    <Select style="width: 200px;position: absolute;left: 10px; bottom: 20px;" :show-path="true" :show-clear="true"
+        :items="items" @change="values => selectValues = values" />
+    <Select style="width: 200px;position: absolute;left: 300px; bottom: 20px;" :show-path="true" :show-clear="true"
+        :multiple="true" :items="[
+            // { 'text': '1', clickable: true, children: [{ text: '1-1', clickable: true }] },
+            { 'text': '2', clickable: true, },
+            { 'text': '3', clickable: true, },
+            { 'text': '4', clickable: true, },
+        ]" @change="values => selectValues = values" />
+    <Select style="width: 200px;position: absolute;left: 600px; bottom: 20px;" :show-path="true" :show-clear="true"
+        :multiple="false" :items="[
+            // { 'text': '1', clickable: true, children: [{ text: '1-1', clickable: true }] },
+            { 'text': '2', clickable: true, },
+            { 'text': '3', clickable: true, },
+            { 'text': '4', clickable: true, },
+        ]" @change="values => selectValues = values" />
 </template>
 
 <script setup lang="ts">
@@ -33,6 +37,7 @@ import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
 import { components, SelectItem, SelectSlotOptions } from "../../core";
 
 // *****************************************   👉  组件定义    *****************************************
+const sleevalue: any = undefined;
 //  1、props、data
 const { Select } = components;
 const items: SelectItem<number>[] = [

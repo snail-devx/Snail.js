@@ -66,6 +66,17 @@ export type DisabledOptions = {
      */
     disabled?: boolean;
 }
+/**
+ * 值 配置选项
+ */
+export type ValueOptions<T> = {
+    /**
+     * 已有值
+     * - 用于渲染组件时，传入已有数据；
+     * - 具体传值规则，有组件自己决定
+     */
+    value?: T;
+}
 
 /**
  * 确认区域 配置选项
