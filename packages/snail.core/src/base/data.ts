@@ -350,4 +350,19 @@ export function moveFromArray<T>(array: T[], from: number, to: number): T[] {
     }
     return array;
 }
+/**
+ * 从数组取指定位置元素
+ * - 和 Array.prototype.at 方法类似；但多了类型判断
+ * @param array 数组对象；不为数组，则不取
+ * @param from 从哪个索引位置；负数表示从后往前取(-1表示最后一个元素，以此类推)
+ * @returns 取到的数组元素；无此元素则返回undefined
+ */
+export function getFromArray<T>(array: T[], from: number): T | undefined {
+    if (isArrayNotEmpty(array) == true) {
+        return from >= 0
+            ? array[from]
+            : array[array.length + from];
+    }
+    return undefined;
+}
 //#endregion
