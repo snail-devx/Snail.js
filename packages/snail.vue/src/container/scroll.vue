@@ -98,6 +98,18 @@ function refreshScrollInfo() {
     events.ybar && emits("ybar", ...events.ybar);
     events.top && emits("top");
     events.bottom && emits("bottom");
+    //  增加样式标记，减少外部适配：水平、垂直滚动条；水平位置、垂直位置等
+    if (rootDom.value) {
+        rootDom.value.classList.remove("x-bar", "y-bar", "left", "right", "top", "bottom");
+        const classes: string[] = [];
+        status.xbar && classes.push("x-bar");
+        status.ybar && classes.push("y-bar");
+        status.left && classes.push("left");
+        status.right && classes.push("right");
+        status.top && classes.push("top");
+        status.bottom && classes.push("bottom");
+        classes.length && rootDom.value.classList.add(...classes);
+    }
 }
 
 // *****************************************   👉  组件渲染    *****************************************
