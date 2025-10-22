@@ -60,8 +60,8 @@ export function useTimer(): ITimer & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manger = mountScope<ITimer>({ onTimeout, onInterval }, "ITimer");
+    const manager = mountScope<ITimer>({ onTimeout, onInterval }, "ITimer");
     const scopes: IScopes = useScopes();
-    manger.onDestroy(scopes.destroy);
-    return Object.freeze(manger);
+    manager.onDestroy(scopes.destroy);
+    return Object.freeze(manager);
 }
