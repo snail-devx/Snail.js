@@ -80,6 +80,13 @@ export type SelectOptions<T> = ReadonlyOptions & PlaceholderOptions & SelectBase
      *      showPath                显示选项路径
      *      popupStyle              弹出的选项选择窗体样式
      */
+
+    /**
+     * 选项分隔符
+     * - 单选有多级时的分割路径；默认为 /
+     * - 多选时分割多个选项；默认为 、
+     */
+    separator?: string;
 }
 
 /**

@@ -42,7 +42,7 @@ const selectedItemsRef: ShallowRef<SelectItem<any>[]> = shallowRef(Array.isArray
     : []
 );
 /** 【选项菜单】上下文 */
-const context: ISelectContext<any> = useSelectContext<any>(props.items, selectedItemsRef);
+const context: ISelectContext<any> = useSelectContext<any>(props.items, selectedItemsRef, props.separator);
 /** 选择的结果文本 */
 const selectedTextRef = computed(() => context.selectedText(props.multiple, props.showPath));
 /** 插槽配置选项 */

@@ -5,40 +5,40 @@
 -->
 <template>
     <div class="snail-choose" :class="readonly ? 'readonly' : ''">
-        <div v-for="(item, index) in chooseItemsRef" :key="item.key" class="choose-item"
-            :class="item.checked ? 'checked' : ''" :style="css.buildStyle(itemStyle)" @click="onItemClick(item, index)">
-            <input v-if="mode == 'native'" :type="type" :checked="item.checked" />
+        <div v-for="(node, index) in chooseItemsRef" :key="getKey(node.item)" class="choose-item"
+            :class="node.checked ? 'checked' : ''" :style="css.buildStyle(itemStyle)" @click="onItemClick(node, index)">
+            <input v-if="mode == 'native'" :type="type" :checked="node.checked" />
             <div v-else-if="mode == 'beautiful'" class="item-beautiful"
-                :class="[type, item.checked ? 'item-checked' : 'item-unchecked']">
-                <Icon v-if="item.checked" :type="'success'" :size="12" :color="readonly ? '#8a9099' : 'white'" />
+                :class="[type, node.checked ? 'item-checked' : 'item-unchecked']">
+                <Icon v-if="node.checked" :type="'success'" :size="12" :color="readonly ? '#8a9099' : 'white'" />
             </div>
-            <span class="item-text" v-if="item.text" v-text="item.text" />
-            <span class="item-des" v-if="item.description" v-text="item.description" />
+            <span class="item-text" v-if="node.item.text" v-text="node.item.text" />
+            <span class="item-des" v-if="node.item.description" v-text="node.item.description" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ComputedRef, nextTick } from "vue";
-import { newId, isArray } from "snail.core";
+import { newId, isArray, useKey } from "snail.core";
 import { css } from "snail.view";
 import { ChooseOptions, ChooseEvents, ChooseItem } from "./models/choose-model";
 import Icon from "./icon.vue";
 
 // *****************************************   👉  私有类型    *****************************************
 /**
- * 选择项详情
+ * 选择项节点
  * - 配合vue组件使用，外部忽略
  */
-type ChooseItemDetail = ChooseItem<any> & {
+type ChooseItemNode = {
+    /**
+     * 选项
+     */
+    item: ChooseItem<any>;
     /**
      * 是否选中
      */
     checked: boolean;
-    /**
-     * 分配的唯一key值
-     */
-    key: string;
 }
 
 // *****************************************   👉  组件定义    *****************************************
@@ -46,17 +46,17 @@ type ChooseItemDetail = ChooseItem<any> & {
 const props = defineProps<ChooseOptions<any>>();
 const emits = defineEmits<ChooseEvents<any>>();
 const { mode = "native" } = props;
+const { getKey } = useKey<ChooseItem<any>>();
 /**     双向绑定数据值：多选时，若传入的非数组，则强制转为空数组 */
 const valuesModel = defineModel<any | any[]>({});
 props.multi && isArray(valuesModel.value) == false && (valuesModel.value = []);
 /**     待选项目：进行响应式计算，model值改变时，同步更新选项状态*/
-const chooseItemsRef: ComputedRef<ChooseItemDetail[]> = computed(() => props.items.map(item => {
+const chooseItemsRef: ComputedRef<ChooseItemNode[]> = computed(() => props.items.map(item => {
     return {
-        ...item,
+        item: item,
         checked: props.multi == true
             ? (valuesModel.value as any[]).includes(item.value)
             : valuesModel.value == item.value,
-        key: newId(),
     }
 }));
 //  2、可选配置选项
@@ -66,22 +66,22 @@ defineOptions({ name: "Choose", inheritAttrs: true, });
 /**
  * 选项点击时
  */
-function onItemClick(item: ChooseItemDetail, index: number) {
+function onItemClick(node: ChooseItemNode, index: number) {
     if (props.readonly == true) {
         return;
     }
     //  更新选中状态
     //      多选模式：反选
     if (props.multi == true) {
-        item.checked = !item.checked;
-        valuesModel.value = chooseItemsRef.value.filter(item => item.checked).map(item => item.value);
+        node.checked = !node.checked;
+        valuesModel.value = chooseItemsRef.value.filter(item => item.checked).map(item => item.item.value);
     }
     //      单选模式：如果是只有一个的checkbox模式，则反选（即可取消选中）
     else {
-        const newChecked = props.type == "checkbox" && props.items.length == 1 ? !item.checked : true;
+        const newChecked = props.type == "checkbox" && props.items.length == 1 ? !node.checked : true;
         chooseItemsRef.value.forEach(item => item.checked = false);
-        item.checked = newChecked;
-        valuesModel.value = newChecked ? item.value : undefined;
+        node.checked = newChecked;
+        valuesModel.value = newChecked ? node.item.value : undefined;
     }
     //  延迟change事件；外部同时使用v-model和change事件时，valueModel.value修改不会立马生效
     nextTick(() => emits("change", valuesModel.value));
