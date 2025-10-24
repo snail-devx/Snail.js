@@ -41,10 +41,16 @@ export function useKey<T>(idFunc?: (data: T) => string): IKeyManager<T> & IScope
         checkScope(manager, "deleteKey: key manager destroyed.");
         keyCache.delete(data);
     }
+    /**
+     * 清空所有的key
+     */
+    function clear(): void {
+        keyCache.clear();
+    }
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IKeyManager<T>>({ getKey, deleteKey }, "IKeyManager");
+    const manager = mountScope<IKeyManager<T>>({ getKey, deleteKey, clear }, "IKeyManager");
     manager.onDestroy(() => keyCache.clear());
     return Object.freeze(manager);
 }

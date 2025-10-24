@@ -14,4 +14,8 @@ export interface IKeyManager<T> {
      * @param data 数据对象
      */
     deleteKey(data: T): void;
+    /**
+     * 清空所有的key
+     */
+    clear(): void;
 }
