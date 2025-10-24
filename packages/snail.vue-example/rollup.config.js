@@ -128,6 +128,8 @@ const components = builder.build([
         assets: [
             "libraries/vue.global.js",
             "libraries/sortable.js",
+            "libraries/zane-calendar.js",
+            "libraries/zane-calendar.css",
         ]
     },
     {

@@ -3,7 +3,7 @@
   "description": "依赖【snail】，基于vue封装常用UI组件",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.0.53",
+  "version": "1.0.54",
   "type": "module",
   "main": "dist/snail.vue.js",
   "module": "dist/snail.vue.js",
@@ -14,9 +14,10 @@
   },
   "dependencies": {
     "vue": "^3.5.14",
-    "snail.core": ">=2.0.15",
+    "snail.core": ">=2.0.16",
     "snail.view": ">=1.0.24",
-    "sortablejs": ">=1.15.6"
+    "sortablejs": ">=1.15.6",
+    "zane-calendar": "2.2.8"
   },
   "devDependencies": {
     "vue-tsc": "^2.2.10",
