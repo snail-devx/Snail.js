@@ -5,6 +5,7 @@ import minimist from "minimist";
 import { Builder } from "snail.rollup"
 import assetPlugin from "snail.rollup-asset"
 import scriptPlugin from "snail.rollup-script"
+import { copyFileSync } from "fs";
 
 /** 不使用如下方式获取dirName，会在末尾存在 "/"；但resolve等不会存在 "/"；会导致断言出问题
  * const __dirname = fileURLToPath(new URL('.', import.meta.url)); 
@@ -34,7 +35,15 @@ const options = {
 const builder = Builder.getBuilder(options, (component, context, options) => {
     return [
         assetPlugin(component, context, options),
-        scriptPlugin(component, context, options)
+        scriptPlugin(component, context, options),
+        //  代码片段 文件导出
+        {
+            name: "snail.view code-snippets",
+            buildEnd() {
+                copyFileSync(resolve(options.root, "app.code-snippets"), resolve(options.distRoot, "../app.code-snippets"));
+                copyFileSync(resolve(options.root, "mixins.code-snippets"), resolve(options.distRoot, "../mixins.code-snippets"));
+            }
+        }
     ];
 });
 /**
@@ -45,10 +54,8 @@ const rollupOptions = await builder.build([{
     name: "SnailView",
     format: "es",
     assets: [
-        //  动画库
-        "styles/animation.less",
-        //  混入规则样式
-        "styles/base-mixins.less",
+        "styles/app.less",
+        "styles/mixins.less",
     ]
 }]);
 //  增加 umd 格式输出文件

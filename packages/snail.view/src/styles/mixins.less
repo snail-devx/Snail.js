@@ -2,23 +2,7 @@
 //  命名规则: .样式信息（如w代表width）-属性（如fill表示填充）()
 //  混入集中的样式统一采用（）结尾，避免直接输出；仅作为【定义混入】，不直接参与less样式编译输出
 
-// *****************************************   👉  文本       *****************************************
-//  文本溢出时出省略号
-.text-ellipsis() {
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-//  提示文本
-.tip-text() {
-    font-weight: 400;
-    font-size: 14px;
-    color: #8A9099;
-}
-
-// *****************************************   👉  高宽定位    *****************************************
+// *****************************************   👉  尺寸定位    *****************************************
 //  高度、宽度100%填充满
 .wh-fill() {
     width: 100%;
@@ -30,19 +14,6 @@
     overflow: hidden;
     //  width:100%；height:100%
     .wh-fill();
-}
-
-//  left、top起始位置：left: 0; top: 0;
-.left-top-start() {
-    left: 0;
-    top: 0;
-}
-
-//  通过left、top进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)
-.left-top-center() {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
 }
 
 //  绝对定位，填充父元素，并定位到0,0位置
@@ -60,7 +31,27 @@
     overflow: hidden;
 }
 
-// *****************************************   👉  弹性盒子    *****************************************
+//  left、top起始位置：left: 0; top: 0;
+.left-top-start() {
+    left: 0;
+    top: 0;
+}
+
+//  通过left、top进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)
+.left-top-center() {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+// *****************************************   👉  flex 布局    *****************************************
+//  flex 布局，主轴和交叉轴居中
+.flex-center() {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 //  flex 布局，主轴居中
 .flex-main-center() {
     display: flex;
@@ -73,15 +64,8 @@
     align-items: center;
 }
 
-//  flex 布局，主轴和交叉轴居中
-.flex-center() {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-//  flex 布局，主轴和交叉轴居右
-.flex-right() {
+//  flex 布局，主轴和交叉轴end对齐
+.flex-end() {
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
@@ -91,4 +75,12 @@
 .flex-column() {
     display: flex;
     flex-direction: column;
+}
+
+// *****************************************   👉  文本输入渲染    *****************************************
+//  文本溢出时出省略号
+.ellipsis() {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

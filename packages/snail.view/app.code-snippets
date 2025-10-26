@@ -1,0 +1,116 @@
+//	配合snail库进行less混合代码提示使用的代码片段
+{
+	// *****************************************   👉  基础样式    *****************************************
+	".snail-app": {
+		"prefix": ".snail-app",
+		"scope": "html",
+		"description": "snail系列app实例类样式",
+		"body": "snail-app"
+	},
+	// *****************************************   👉  尺寸定位  *****************************************
+	".wh-fill": {
+		"prefix": ".wh-fill",
+		"scope": "html",
+		"description": "高度、宽度100%填充满",
+		"body": "wh-fill"
+	},
+	".absolute-start": {
+		"prefix": ".absolute-start",
+		"scope": "html",
+		"description": "绝对定位，left、top起始位置",
+		"body": "absolute-start"
+	},
+	".absolute-center": {
+		"prefix": ".absolute-center",
+		"scope": "html",
+		"description": "绝对定位，水平垂直居中显示",
+		"body": "absolute-center"
+	},
+	".hidden-xy": {
+		"prefix": ".hidden-xy",
+		"scope": "html",
+		"description": "水平垂直方向溢出隐藏",
+		"body": "hidden-xy"
+	},
+	".hidden-x": {
+		"prefix": ".hidden-x",
+		"scope": "html",
+		"description": "水平方向溢出隐藏",
+		"body": "hidden-x"
+	},
+	".hidden-y": {
+		"prefix": ".hidden-y",
+		"scope": "html",
+		"description": "垂直方向溢出隐藏",
+		"body": "hidden-y"
+	},
+	// *****************************************   👉  flex 布局       *****************************************
+	".flex-center": {
+		"prefix": ".flex-center",
+		"scope": "html",
+		"description": "flex 布局，主轴和交叉轴居中",
+		"body": "flex-center"
+	},
+	".flex-main-center": {
+		"prefix": ".flex-main-center",
+		"scope": "html",
+		"description": "flex 布局，主轴居中",
+		"body": "flex-main-center"
+	},
+	".flex-cross-center": {
+		"prefix": ".flex-cross-center",
+		"scope": "html",
+		"description": "flex 布局，交叉轴居中",
+		"body": "flex-cross-center"
+	},
+	".flex-end": {
+		"prefix": ".flex-end",
+		"scope": "html",
+		"description": "flex 布局，主轴和交叉轴end对齐",
+		"body": "flex-end"
+	},
+	".flex-column": {
+		"prefix": ".flex-column",
+		"scope": "html",
+		"description": "flex布局，列 为主轴",
+		"body": "flex-column"
+	},
+	// *****************************************   👉  文本输入渲染    *****************************************
+	".ellipsis": {
+		"prefix": ".ellipsis",
+		"scope": "html",
+		"description": "溢出显示省略号：外部确定width",
+		"body": "ellipsis"
+	},
+	".placeholder": {
+		"prefix": ".placeholder",
+		"scope": "html",
+		"description": "占位提示文本样式",
+		"body": "placeholder"
+	},
+	// *****************************************   👉  动画样式    *****************************************
+	".fade-in": {
+		"prefix": ".fade-in",
+		"scope": "html",
+		"description": "淡入动画",
+		"body": "fade-in"
+	},
+	".fade-out": {
+		"prefix": ".fade-out",
+		"scope": "html",
+		"description": "淡出动画",
+		"body": "fade-out"
+	},
+	".scale-in": {
+		"prefix": ".scale-in",
+		"scope": "html",
+		"description": "放大进入",
+		"body": "scale-in"
+	},
+	".scale-out": {
+		"prefix": ".scale-out",
+		"scope": "html",
+		"description": "缩小退出",
+		"body": "scale-out"
+	},
+}

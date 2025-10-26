@@ -1,0 +1,264 @@
+//  动画库；做一些基础动画效果，以 .snail-动画名-进入、移出 为规则
+
+@import "./mixins.less";
+
+// *****************************************   👉  默认样式    *****************************************
+.snail-app {
+    //  指定默认字体
+    font-family: "Microsoft YaHei", "微软雅黑", "Hiragino Sans GB", "tahoma", "arial", "simsun", "宋体", "sans-serif";
+
+    //  强制元素 box-sizing: border-box
+    &,
+    * {
+        box-sizing: border-box !important;
+    }
+
+    //  文本展示，默认14px
+    div,
+    span {
+        font-size: 14px;
+    }
+
+    //  滚动条样式
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+        border-radius: 12px;
+        background-color: transparent;
+    }
+
+    ::-webkit-scrollbar-button {
+        display: none !important;
+        height: 0;
+        width: 0;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background-color: rgba(180, 180, 180, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.85);
+    }
+
+    ::-webkit-scrollbar-track {
+        border-radius: 10px;
+        background-color: transparent;
+    }
+}
+
+// *****************************************   👉  尺寸定位       *****************************************
+.snail-app {
+
+    //  高度、宽度100%填充满
+    .wh-fill {
+        //  width:100%；height:100%
+        .wh-fill();
+    }
+
+    //  绝对定位：left、top起始位置：left: 0; top: 0;
+    .absolute-start {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    //  绝对定位，水平垂直居中显示：left:50% top:50%; transform: translate(-50%, -50%)
+    .absolute-center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    //  水平垂直方向溢出隐藏：overflow: hidden
+    .hidden-xy {
+        overflow: hidden;
+    }
+
+    //  水平方向溢出隐藏：overflow-x: hidden;
+    .hidden-x {
+        overflow-x: hidden;
+    }
+
+    //  垂直方向溢出隐藏：overflow-x: hidden;
+    .hidden-y {
+        overflow-y: hidden;
+    }
+}
+
+// *****************************************   👉  flex 布局       *****************************************
+.snail-app {
+
+    //  flex 布局，主轴和交叉轴居中
+    .flex-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    //  flex 布局，主轴居中
+    .flex-main-center {
+        display: flex;
+        justify-content: center;
+    }
+
+    //  flex 布局，交叉轴居中
+    .flex-cross-center {
+        display: flex;
+        align-items: center;
+    }
+
+    //  flex 布局，主轴和交叉轴end对齐
+    .flex-end {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+    }
+
+    //  flex布局，列 为主轴
+    .flex-column {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+// *****************************************   👉  文本输入渲染    *****************************************
+.snail-app {
+
+    //  input 输入框等，去掉默认的外边框；仅针对输入类型的，后续逐步扩充。checkbox、radio等先忽略
+    input[type="search"],
+    input[type="text"],
+    input[type="url"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"] {
+        outline: 0 !important;
+        appearance: none !important;
+        //  给个最小宽度，避免走默认导致部分宽度不够时撑开外部容器的情况
+        min-width: 10px;
+        margin: 0;
+        border: 1px solid #DDDFED;
+        border-radius: 4px;
+        padding: 0 10px;
+        //  字体颜色渲染
+        font: inherit;
+        font-weight: 400;
+        font-size: 14px;
+        color: #2E3033;
+        text-overflow: ellipsis;
+
+        //  搜索模式时的【清除】按钮
+        &::-webkit-search-cancel-button {
+            display: none;
+        }
+
+        &:focus {
+            border: 1px solid #3292ea;
+        }
+
+        //  只读时的边框样式
+        &:read-only:focus {
+            border: 1px solid #DDDFED;
+        }
+    }
+
+    //  input 选项类：取消边距等
+    input[type="radio"],
+    input[type="checkbox"] {
+        margin: 0;
+        padding: 0;
+    }
+
+    //  数据类型输入框的上一个、下一个点击按钮
+    input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+        margin: 0;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    }
+
+    //  文本溢出显示省略号：外部确定width
+    .ellipsis {
+        .ellipsis();
+    }
+
+    //  占位提示文本样式；加上 ellipsis 效果
+    input::placeholder,
+    textarea::placeholder,
+    .placeholder {
+        .ellipsis();
+        color: #8a9099;
+    }
+}
+
+// *****************************************   👉  动画样式    *****************************************
+.snail-app {
+
+    //  淡入动画
+    .fade-in {
+        opacity: 1;
+        animation: snail-fade-in 0.2s ease-in-out;
+
+        @keyframes snail-fade-in {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    }
+
+    //  淡出动画
+    .fade-out {
+        opacity: 0;
+        animation: snail-fade-out 0.2s ease-in-out;
+
+        @keyframes snail-fade-out {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+    }
+
+    //  放大进入
+    .scale-in {
+        scale: 1;
+        animation: snail-scale-in 0.2s ease-in-out;
+
+        @keyframes snail-scale-in {
+            0% {
+                scale: 0;
+            }
+
+            100% {
+                scale: 1;
+            }
+        }
+    }
+
+    //  缩小退出
+    .scale-out {
+        scale: 0;
+        animation: snail-scale-out 0.2s ease-in-out;
+
+        @keyframes snail-scale-out {
+            0% {
+                scale: 1;
+            }
+
+            100% {
+                scale: 0;
+            }
+        }
+    }
+}

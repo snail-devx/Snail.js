@@ -1,0 +1,124 @@
+//	配合snail库进行less混合代码提示使用的代码片段
+{
+	//	引入Mixins样式
+	"@import-mixins": {
+		"prefix": "@import-mixins",
+		"scope": "less",
+		"description": "引入Mixins样式",
+		"body": [
+			"//  引入Mixins样式",
+			"@import \"snail.view/dist/styles/mixins.less\";"
+		]
+	},
+	// *****************************************   👉  尺寸定位    *****************************************
+	"wh-fill": {
+		"prefix": ".wh-fill",
+		"scope": "less",
+		"description": "高度、宽度100%填充满",
+		"body": [
+			"//  width:100%；height:100%",
+			".wh-fill();"
+		]
+	},
+	"wh-fill-hidden": {
+		"prefix": ".wh-fill-hidden",
+		"scope": "less",
+		"description": "高度、宽度100%填充满，隐藏溢出的内容",
+		"body": [
+			"//  width:100%；height:100%；overflow: hidden",
+			".wh-fill-hidden();"
+		]
+	},
+	"absolute-fill": {
+		"prefix": ".absolute-fill",
+		"scope": "less",
+		"description": "绝对定位，填充父元素，并定位到0,0位置",
+		"body": [
+			"//  绝对定位，填充父元素，并定位到0,0位置",
+			".absolute-fill();"
+		]
+	},
+	"absolute-fill-hidden": {
+		"prefix": ".absolute-fill-hidden",
+		"scope": "less",
+		"description": "绝对定位，填充父元素，隐藏溢出的内容，并定位到0,0位置",
+		"body": [
+			"//  绝对定位，填充父元素，隐藏溢出的内容，并定位到0,0位置",
+			".absolute-fill-hidden();"
+		]
+	},
+	"left-top-start": {
+		"prefix": ".left-top-start",
+		"scope": "less",
+		"description": "let、top都在起点0、0位置，辅助 fixed、absolute定位",
+		"body": [
+			"//  left、 top起始位置：left: 0; top: 0",
+			".left-top-start();"
+		]
+	},
+	"left-top-center": {
+		"prefix": ".left-top-center",
+		"scope": "less",
+		"description": "通过left、 top进行居中展示(left:50% top:50%; transform: translate(-50%, -50%);)",
+		"body": [
+			"//  通过left、 top进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)",
+			".left-top-center();"
+		]
+	},
+	// *****************************************   👉  flex 布局    *****************************************
+	"flex-center": {
+		"prefix": ".flex-center",
+		"scope": "less",
+		"description": "flex 布局，主轴和交叉轴居中",
+		"body": [
+			"//  flex 布局：display: flex，align-items、justify-content 都为center",
+			".flex-center();"
+		]
+	},
+	"flex-main-center": {
+		"prefix": ".flex-main-center",
+		"scope": "less",
+		"description": "flex 布局，主轴居中",
+		"body": [
+			"//  flex 布局：display: flex，justify-content 为center",
+			".flex-main-center();"
+		]
+	},
+	"flex-cross-center": {
+		"prefix": ".flex-cross-center",
+		"scope": "less",
+		"description": "flex 布局，交叉轴居中",
+		"body": [
+			"//  flex 布局：display: flex，align-items 为center",
+			".flex-cross-center();"
+		]
+	},
+	"flex-end": {
+		"prefix": ".flex-end",
+		"scope": "less",
+		"description": "flex布局，主轴和交叉轴end对齐",
+		"body": [
+			"//  flex 布局：display: flex，align-items、justify-content 都为flex-end",
+			".flex-end();"
+		]
+	},
+	"flex-column": {
+		"prefix": ".flex-column",
+		"scope": "less",
+		"description": "flex布局，列为主轴",
+		"body": [
+			"//  flex布局，列 为主轴：display: flex，flex-direction: column;",
+			".flex-column();"
+		]
+	},
+	// *****************************************   👉  文本输入渲染    *****************************************
+	"ellipsis": {
+		"prefix": ".ellipsis",
+		"scope": "less",
+		"description": "文本溢出时出省略号（white-space: nowrap;overflow: hidden;text-overflow: ellipsis;）",
+		"body": [
+			"//  文本溢出时出省略号",
+			".ellipsis();",
+		],
+	},
+}
