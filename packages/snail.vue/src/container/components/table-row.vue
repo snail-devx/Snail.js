@@ -21,7 +21,7 @@ defineOptions({ name: "TableRow", inheritAttrs: true, });
 
 <style lang="less">
 // 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 
 //  行 默认填充满、内部元素垂直居中
 .table-row {

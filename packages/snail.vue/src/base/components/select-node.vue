@@ -7,7 +7,7 @@
 <template>
     <div class="select-node" :class="classRef" v-if="showRef" :title="item.text" ref="select-node"
         @mouseenter="emits('enter', rootDom, item)" @click="() => emits('click', item)">
-        <div class="item-text" v-text="item.text" />
+        <div class="item-text ellipsis" v-text="item.text" />
         <Icon v-if="item.type == 'group'" :type="'arrow'" :color="'#8a9099'" />
         <div class="select-status" v-else-if="multiple == true">
             <Icon type="success" color="white" :size="12" />
@@ -20,7 +20,6 @@
 
 <script setup lang="ts">
 import Icon from "../icon.vue";
-import { newId } from "snail.core";
 import { computed, useTemplateRef } from "vue";
 import { SelectItem, SelectNodeEvents, SelectNodeOptions } from "../models/select-model";
 
@@ -54,7 +53,7 @@ defineOptions({ name: "SelectNode", inheritAttrs: true, });
 
 <style lang="less">
 //  引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 
 //  【选择项】节点类样式，强制约束在【.snail-select】使用
 .snail-select-popup>div.select-node {
@@ -90,8 +89,6 @@ defineOptions({ name: "SelectNode", inheritAttrs: true, });
 
     >div.item-text {
         flex: 1;
-        //  文本溢出时出省略号
-        .text-ellipsis();
     }
 
     >svg.snail-icon {

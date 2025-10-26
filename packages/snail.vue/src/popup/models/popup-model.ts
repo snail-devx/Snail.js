@@ -14,9 +14,9 @@ import { ComponentBindOptions, ComponentOptions } from "../../container/models/c
 export type PopupOptions<Props = void, Model = void> = ComponentOptions & ComponentBindOptions<Props, Model> & {
     /**
      * 弹窗动画名
-     * - 不传则默认“snail-fade”
+     * - 不传则默认“fade”
      * - 动画规则：打开弹窗时，为 [transition]-in ；关闭弹窗时，为[transition]-out
-     * - - 传入 "snail-scale"，则打开弹窗为 "snail-scale-in"；关闭弹窗时为 "snail-scale-out"
+     * - - 传入 "scale"，则打开弹窗为 "scale-in"；关闭弹窗时为 "scale-out"
      */
     transition?: string;
     /**

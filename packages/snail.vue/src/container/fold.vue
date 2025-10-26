@@ -8,8 +8,8 @@
         <!-- 折叠面板头部：支持插槽，并做默认实现 -->
         <div class="fold-header">
             <slot name="header">
-                <div class="title" v-text="title" />
-                <div class="subtitle" v-if="!!subtitle" v-text="subtitle" />
+                <div class="title ellipsis" v-text="title" />
+                <div class="subtitle ellipsis" v-if="!!subtitle" v-text="subtitle" />
                 <div class="status" v-if="disabled != true">
                     <Icon :type="'arrow'" :title="statusModel == 'expand' ? '收起' : '展开'" @click="onStatusClick" />
                 </div>
@@ -92,7 +92,7 @@ function onStatusClick() {
 
 <style lang="less">
 // 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 
 .snail-fold {
     flex-shrink: 0;
@@ -115,13 +115,6 @@ function onStatusClick() {
             background-color: rgb(44, 151, 251);
         }
 
-        //  标题、副标题
-        >.title,
-        >.subtitle {
-            // 文本溢出时出省略号
-            .text-ellipsis();
-        }
-
         >.title {
             padding-left: 20px;
             font-weight: bold;
@@ -136,8 +129,8 @@ function onStatusClick() {
         //  状态图标：默认【收起】指示，增加动画效果
         >div.status {
             flex: 1;
-            // flex 布局：display: flex，align-items、justify-content 都为right
-            .flex-right();
+            //  flex 布局：display: flex，align-items、justify-content 都为flex-end
+            .flex-end();
 
             //  展开、收起状态图标
             >svg.snail-icon {

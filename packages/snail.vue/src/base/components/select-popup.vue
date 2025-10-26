@@ -6,8 +6,9 @@
     5、搜索框需要搜索时，对外发送事件，由【../select.vue】完成搜索处理，并更新选项数据
 -->
 <template>
-    <div :class="classRef" :style="popupStyle" @mouseenter="onEnterPopup" @mouseleave="onLeavePopup">
-        <template v-if="classRef['child-popup'] && classRef['text-tips']">
+    <div class="snail-select-popup" :class="classRef" :style="popupStyle" @mouseenter="onEnterPopup"
+        @mouseleave="onLeavePopup">
+        <template v-if="classRef['child-popup'] && classRef['placeholder']">
             暂无选项
         </template>
         <template v-else>
@@ -49,11 +50,10 @@ const { context, popupStatus, pinned, parentPinned } = props;
 const itemsRef = computed(() => (props.items || []).filter(item => context.isShow(item, true)));
 /**     弹窗所需的类样式信息 */
 const classRef = computed(() => ({
-    "snail-select-popup": true,
     /** 子【选择项】弹窗 */
     'child-popup': props.level > 1,
     /** 无【选择项】的文本提示区域 */
-    'text-tips': itemsRef.value.length == 0,
+    'placeholder': itemsRef.value.length == 0,
     /** 【选择项】中是否存在分组 */
     "has-group": itemsRef.value.find(node => node.type == "group") != undefined,
 }));
@@ -240,7 +240,7 @@ watcher(popupStatus, newValue => newValue == "closed" && childFollowScope && chi
 
 <style lang="less">
 // 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 
 .snail-select-popup {
     max-height: 90%;
@@ -290,7 +290,7 @@ watcher(popupStatus, newValue => newValue == "closed" && childFollowScope && chi
     padding-bottom: 6px;
 
     //  无可用选项
-    &.text-tips {
+    &.placeholder {
         padding: 0 12px;
         width: 100px !important;
         justify-content: center;

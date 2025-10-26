@@ -28,7 +28,7 @@ defineOptions({ name: "Empty", inheritAttrs: true, });
 
 <style lang="less">
 // 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 
 .snail-empty {
     //  给个最小高度

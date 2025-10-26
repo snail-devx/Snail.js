@@ -27,23 +27,10 @@
 			"",
 			"<style lang=\"less\">",
 			"// 引入基础Mixins样式",
-			"@import \"snail.view/dist/styles/base-mixins.less\";",
+			"@import \"snail.view/dist/styles/mixins.less\";",
 			"",
 			"</style>"
 		],
 		"description": "Vue组件模板代码"
 	},
-	// *****************************************   👉  公共类样式    *****************************************
-	".text-tips": {
-		"prefix": "text-tips",
-		"scope": "html",
-		"description": "公共类样式：提示文本",
-		"body": "class=\"text-tips\"",
-	},
-	".placeholder":{
-		"prefix": ".placeholder",
-		"scope": "html",
-		"description": "placeholder,针对div、span元素，设置placeholder样式",
-		"body": "placeholder",
-	}
 }

@@ -29,7 +29,7 @@ defineOptions({ name: "Header", inheritAttrs: true, });
 
 <style lang="less">
 // 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 
 .snail-header {
     flex-shrink: 0;
@@ -44,8 +44,8 @@ defineOptions({ name: "Header", inheritAttrs: true, });
         line-height: 48px;
         flex: 1;
         padding: 0 30px;
-        // 文本溢出时出省略号
-        .text-ellipsis();
+        //  文本溢出时出省略号
+        .ellipsis();
     }
 }
 

@@ -52,7 +52,7 @@ onMounted(() => onMouseEvent(true));
 
 <style lang="less">
 // 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 
 .snail-toast {
     position: fixed;

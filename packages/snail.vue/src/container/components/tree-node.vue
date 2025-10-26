@@ -15,8 +15,8 @@
                 <Icon v-if="showChildrenRef" :class="statusRef" :type="'custom'" :size="24" :color="'#8a8099'"
                     :draw="'M 298.667 426.667 l 213.333 256 l 213.333 -256 Z'" @click="toggleFold" />
             </div>
-            <div class="node-text" :title="node.text" v-text="node.text" />
-            <div class="node-slot">
+            <div class="node-text ellipsis" :title="node.text" v-text="node.text" />
+            <div class="node-slot ellipsis">
                 <slot :="slotOptions" />
             </div>
         </template>
@@ -149,15 +149,15 @@ onMounted(() => {
 
 <style lang="less">
 // 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 
 //  节点自身
 .snail-tree-node {
     width: 100%;
+    height: 40px;
     //  flex 布局：display: flex，align-items 为center
     .flex-cross-center();
     flex-wrap: nowrap;
-    height: 40px;
 
     &:hover {
         background-color: #f8f9fa;
@@ -185,14 +185,6 @@ onMounted(() => {
                 transform: rotate(-90deg);
             }
         }
-    }
-
-    //  节点文本、插槽区域：文本溢出隐藏
-    >.node-text,
-    >.node-slot {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
     }
 
     >.node-text {

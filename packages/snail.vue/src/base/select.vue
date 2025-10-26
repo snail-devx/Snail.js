@@ -4,17 +4,21 @@
     3、选中数据显示，支持插槽
 -->
 <template>
-    <div class="snail-select" :class="{ 'readonly': readonly }" @click="onClick()" ref="select">
-        <template v-if="items && items.length > 0">
-            <div v-if="selectedItemsRef.length > 0" class="select-result">
+    <div class="snail-select" :class="{ 'readonly': readonly, 'empty': !(items && items.length) }" @click="onClick()"
+        ref="select">
+        <!-- 有选项可选时的模板 -->
+        <template v-if="items && items.length">
+            <div v-if="selectedItemsRef.length" class="select-result">
                 <slot :="slotOptions">
-                    <div class="select-text" :title="selectedTextRef" v-text="selectedTextRef" />
+                    <div class="select-text ellipsis" :title="selectedTextRef" v-text="selectedTextRef" />
                 </slot>
             </div>
-            <div v-else class="select-result text-tips" v-text="readonly ? '' : (placeholder || '请选择')" />
-            <Icon type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
+            <div v-else class="placeholder" v-text="readonly ? '' : (placeholder || '请选择')" />
+            <!-- 下拉选择图标，非只读时才显示 -->
+            <Icon v-if="readonly != true" type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
         </template>
-        <div v-else class="no-items text-tips">暂无可选项</div>
+        <!-- 无可选项时，直接给出提示 -->
+        <div v-else class="placeholder">暂无可选项</div>
     </div>
 </template>
 
@@ -192,7 +196,7 @@ onAppCreated((app, type) => {
 
 <style lang="less">
 // 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 
 .snail-select {
     background-color: white;
@@ -200,27 +204,34 @@ onAppCreated((app, type) => {
     height: 32px;
     border: 1px solid #dddfed;
     border-radius: 4px;
-    cursor: pointer;
     color: #2e3033;
+
+    //  有选项非只读时，显示可点击手型效果
+    &:not(.readonly, .empty) {
+        cursor: pointer;
+    }
+
     //  flex 布局：display: flex，align-items 为center
     .flex-cross-center();
 
     //  已选结果区域
     >div.select-result {
-        height: 30px;
         flex: 1;
-        overflow: hidden;
         padding: 0 10px 0 6px;
+        height: 30px;
+        overflow: hidden;
         //  flex 布局：display: flex，align-items 为center
         .flex-cross-center();
         flex-wrap: nowrap;
-
-        >div.select-text {
-            //  文本溢出时出省略号
-            .text-ellipsis();
-        }
     }
 
+    //  未选选项时的提示效果
+    >div.placeholder {
+        flex: 1;
+        padding: 0 10px 0 6px;
+    }
+
+    //  下拉选择标记图标
     >svg.snail-icon {
         flex-shrink: 0;
         margin-right: 4px;
@@ -228,22 +239,12 @@ onAppCreated((app, type) => {
 
     //  无数据提醒
     >div.no-items {
-        width: 100%;
-        height: 100%;
+        flex: 1;
         padding: 0 8px;
-        cursor: text;
-        //  flex 布局：display: flex，align-items 为center
-        .flex-cross-center();
     }
 }
 
 // *****************************************   👉  特殊样式适配    *****************************************
 //  只读样式适配
-.snail-select.readonly {
-    cursor: auto;
-
-    >svg.snail-icon {
-        display: none;
-    }
-}
+.snail-select.readonly {}
 </style>

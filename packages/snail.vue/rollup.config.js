@@ -10,7 +10,7 @@ import scriptPlugin from "snail.rollup-script";
 import stylePlugin, { MODULE_INJECT_LINK } from "snail.rollup-style";
 import vuePlugin from "snail.rollup-vue"
 import { STYLE_EXTEND_PATHS } from "snail.rollup-style";
-import { renameSync, rmdir, rmdirSync, rmSync } from "fs";
+import { copyFileSync, renameSync, rmdir, rmdirSync, rmSync } from "fs";
 
 /** 不使用如下方式获取dirName，会在末尾存在 "/"；但resolve等不会存在 "/"；会导致断言出问题
  * const __dirname = fileURLToPath(new URL('.', import.meta.url)); 
@@ -61,18 +61,25 @@ const builder = Builder.getBuilder(options, (component, context, options) => {
         scriptPlugin(component, context, options),
         stylePlugin(component, context, options),
         vuePlugin(component, context, options),
-        //  构建完成后的处理
+        //  代码片段 文件导出
         {
-            name: "snail.vue-build",
+            name: "snail.vue code-snippets",
             buildEnd() {
-                const root = options.distRoot;
-                //  将输出到 其他目录下的 css文件，合并到根目录下的 styles 目录下
-                renameSync(resolve(root, "./base/styles/app.css"), resolve(root, "./styles/app.css"));
-                //  移除目录，逐步异步，非空报错，避免上述处理遗留文件
-                rmdirSync(resolve(root, "./base/styles"));
-                rmdirSync(resolve(root, "./base"));
+                copyFileSync(resolve(options.root, "vue.code-snippets"), resolve(options.distRoot, "../vue.code-snippets"));
             }
         }
+        //  构建完成后的处理
+        // {
+        //     name: "snail.vue-build",
+        //     buildEnd() {
+        //         const root = options.distRoot;
+        //         //  将输出到 其他目录下的 css文件，合并到根目录下的 styles 目录下
+        //         renameSync(resolve(root, "./base/styles/app.css"), resolve(root, "./styles/app.css"));
+        //         //  移除目录，逐步异步，非空报错，避免上述处理遗留文件
+        //         rmdirSync(resolve(root, "./base/styles"));
+        //         rmdirSync(resolve(root, "./base"));
+        //     }
+        // }
     ];
 });
 

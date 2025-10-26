@@ -3,7 +3,7 @@
     2、这里的header、main、footer 保持不变，弹窗算一个独立页面
 -->
 <template>
-    <div class="snail-confirm">
+    <div class="snail-confirm flex-column">
         <Header :use-to="'dialog'" :title="title || '提示'" @close="closePopup(false)" />
         <div class="confirm-body" v-html="message || '请确认？'" />
         <Footer align="right" :cancel-name="cancelName" :cancel-disabled="cancelDisabled" :confirm-name="confirmName"
@@ -32,8 +32,6 @@ defineOptions({ name: "ConfirmContainer", inheritAttrs: true, });
     border-radius: 4px;
     background-color: white;
     color: #2e2f33;
-    display: flex;
-    flex-direction: column;
 
     >div.confirm-body {
         flex: 1;

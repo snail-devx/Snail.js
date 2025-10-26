@@ -47,7 +47,7 @@ export function openPopup<Options extends PopupOptions, ExtOptions extends Recor
         options: options,
         extOptions: extOptions,
         zIndex: options.zIndex || DEFAULT_ZINDEX,
-        popupTransition: shallowRef<string>(`${options.transition || "snail-fade"}-in`),
+        popupTransition: shallowRef<string>(`${options.transition || "fade"}-in`),
     });
     {
         const app = createApp(container, descriptor);
@@ -72,7 +72,7 @@ export function destroyPopup<T>(descriptor: PopupDescriptor<PopupOptions, any>, 
         task.resolve(undefined);
     }
     //  强制将动画值设置为【关闭】
-    popupTransition.value = `${options.transition || "snail-fade"}-out`;
+    popupTransition.value = `${options.transition || "fade"}-out`;
     //  销毁app实例：销毁时做一下延迟，实现销毁动画
     const app = POPUPMAPS.get(popupId);
     if (app != undefined) {

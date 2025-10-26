@@ -79,7 +79,7 @@ onBeforeUnmount(() => sortInstance && sortInstance.destroy());
 
 <style lang="less">
 // 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 
 //  拖动元素：随着鼠标移动，脱离文档流了
 .snail-sort-drag {
