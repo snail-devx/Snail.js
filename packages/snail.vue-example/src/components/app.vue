@@ -126,7 +126,7 @@ onMounted(() => {
 
 <style lang="less">
 // 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 
 .app {
     //  width:100%；height:100%；overflow: hidden

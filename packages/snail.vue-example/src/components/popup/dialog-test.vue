@@ -28,7 +28,7 @@ function onOpenClick() {
         component: DialogContent,
         closeOnEscape: true,
         closeOnMask: true,
-        // transition: "snail-scale",
+        // transition: "scale",
         props: {
             //  接收自定义事件
             onCustomEvent(data: number) {

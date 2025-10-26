@@ -1,7 +1,7 @@
 <!-- 组件介绍写到这里 -->
 <template>
     1111111111111111111111111111111111111111111
-    <Select style="width: 200px;" :search="{ autoComplete: true }" :items="items"
+    <Select style="width: 200px;" :search="{ autoComplete: true }" :items="items" :readonly="true"
         @change="values => selectValues = values" />
     <Select style="width: 200px;position: absolute;right: 10px; top: 20px;" :search="{}" :show-path="true"
         :items="items" @change="values => selectValues = values" />
@@ -10,6 +10,9 @@
         <template v-slot="{ clear }: SelectSlotOptions">
             哈哈哈 <button @click="clear(true, true)">哈哈得到</button>
         </template>
+    </Select>
+    <Select style="width: 200px;position: absolute;right: 50%; top: 70%;" :search="{}" :show-path="true" :items="[]"
+        @change="values => selectValues = values">
     </Select>
     <hr />
     <div>{{ selectValues }}</div>
@@ -133,5 +136,5 @@ onDeactivated(() => console.log("onDeactivated"));
 
 <style lang="less">
 // 引入基础Mixins样式
-@import "snail.view/dist/styles/base-mixins.less";
+@import "snail.view/dist/styles/mixins.less";
 </style>

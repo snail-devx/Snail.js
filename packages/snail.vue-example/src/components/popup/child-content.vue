@@ -33,7 +33,7 @@ defineOptions({ name: "DialogContentTest", inheritAttrs: true, });
 // 👉 方法+事件
 function open() {
     popup.dialog<any, Record<string, any>, boolean>({
-        // transition: "snail-scale",
+        // transition: "scale",
         component: DialogContentTest,
         props: {
             xxx: 111,

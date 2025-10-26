@@ -1,6 +1,6 @@
 {
   "name": "snail.vue-example",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "keywords": [],
   "description": "snail.vue 库的示例测试代码；不直接引用snail.vue库，使用时直接引入源码方便即时编译",
   "author": "snail_dev@163.com",
