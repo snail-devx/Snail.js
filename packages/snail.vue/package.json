@@ -3,7 +3,7 @@
   "description": "依赖【snail】，基于vue封装常用UI组件",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "type": "module",
   "main": "dist/snail.vue.js",
   "module": "dist/snail.vue.js",

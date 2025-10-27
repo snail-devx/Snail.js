@@ -14,6 +14,7 @@ import { useReactive, components, TreeOptions, TreeNodeModel, TreeNodeSlotOption
 //  👉 基础组件：
 import BaseTest from "./base/base-test.vue";
 import ButtonTest from "./base/button-test.vue";
+import DatepickerTest from "./base/datepicker-test.vue";
 import ChooseTest from "./base/choose-test.vue";
 import HeaderFooterTest from "./base/header-footer-test.vue";
 import IconTest from "./base/icon-test.vue";
@@ -65,6 +66,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "基础测试组件", data: BaseTest, clickable: true, searchable: true, },
                 { text: "Button 按钮组件", data: ButtonTest, clickable: true, searchable: true, },
                 { text: "Choose 选择组件", data: ChooseTest, clickable: true, searchable: true, },
+                { text: "Datepicker 日期选择器", data: DatepickerTest, clickable: true, searchable: true },
                 { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, searchable: true, },
                 { text: "Icon 图标组件", data: IconTest, clickable: true, searchable: true, },
                 { text: "Search 搜索组件", data: SearchTest, clickable: true, searchable: true, },
@@ -120,7 +122,7 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 }
 
 onMounted(() => {
-    onTreeNodeClick(treeOptions.nodes[0].children[0], undefined);
+    onTreeNodeClick(treeOptions.nodes[0].children[3], undefined);
 });
 </script>
 
