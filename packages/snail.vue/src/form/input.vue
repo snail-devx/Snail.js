@@ -60,7 +60,7 @@ console.warn("Input:还没实现 验证相关逻辑")
 </script>
 
 <style lang="less">
-// 引入基础Mixins样式
+// 引入Mixins样式
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-input {

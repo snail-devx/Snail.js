@@ -239,7 +239,7 @@ watcher(popupStatus, newValue => newValue == "closed" && childFollowScope && chi
 </script>
 
 <style lang="less">
-// 引入基础Mixins样式
+// 引入Mixins样式
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-select-popup {

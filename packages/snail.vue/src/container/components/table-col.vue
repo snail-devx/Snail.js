@@ -20,7 +20,7 @@ defineOptions({ name: "TableCol", inheritAttrs: true, });
 </script>
 
 <style lang="less">
-// 引入基础Mixins样式
+// 引入Mixins样式
 @import "snail.view/dist/styles/mixins.less";
 
 //  列 高度100%，内部元素垂直居中，内部文本默认不换行
