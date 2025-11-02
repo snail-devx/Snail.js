@@ -186,9 +186,12 @@
         .ellipsis();
     }
 
-    //  占位提示文本样式；加上 ellipsis 效果
+    //  文本提示文字颜色
+    textarea::placeholder {
+        color: #8a9099;
+    }
+
     input::placeholder,
-    textarea::placeholder,
     .placeholder {
         .ellipsis();
         color: #8a9099;
