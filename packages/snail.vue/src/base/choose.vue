@@ -4,14 +4,16 @@
     3、支持选项指定文本，宽度，边距等
 -->
 <template>
-    <div class="snail-choose" :class="readonly ? 'readonly' : ''">
+    <div class="snail-choose" :class="[type, mode, layout, readonly ? 'readonly' : '']">
         <div v-for="(node, index) in chooseItemsRef" :key="getKey(node.item)" class="choose-item"
-            :class="node.checked ? 'checked' : ''" :style="css.buildStyle(itemStyle)" @click="onItemClick(node, index)">
-            <input v-if="mode == 'native'" :type="type" :checked="node.checked" />
-            <div v-else-if="mode == 'beautiful'" class="item-beautiful"
-                :class="[type, node.checked ? 'item-checked' : 'item-unchecked']">
-                <Icon v-if="node.checked" :type="'success'" :size="12" :color="readonly ? '#8a9099' : 'white'" />
+            :class="node.selected ? 'selected' : ''" :style="css.buildStyle(itemStyle)" :title="node.item.text"
+            @click="onItemClick(node, index)">
+            <!-- 选项样式：radio、checkbox -->
+            <input v-if="mode == 'native'" :type="type" :checked="node.selected" />
+            <div v-else-if="mode == 'beautiful'" class="status" :class="[node.selected ? 'selected' : '']">
+                <Icon v-if="node.selected" type="success" :size="12" :color="readonly ? '#8a9099' : 'white'" />
             </div>
+            <!-- 选项文本,选项描述信息 -->
             <span class="item-text" v-if="node.item.text" v-text="node.item.text" />
             <span class="item-des" v-if="node.item.description" v-text="node.item.description" />
         </div>
@@ -38,27 +40,25 @@ type ChooseItemNode = {
     /**
      * 是否选中
      */
-    checked: boolean;
+    selected: boolean;
 }
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<ChooseOptions<any>>();
 const emits = defineEmits<ChooseEvents<any>>();
-const { mode = "native" } = props;
+const { mode = "native", type = "radio", layout = "horizontal" } = props;
 const { getKey } = useKey<ChooseItem<any>>();
 /**     双向绑定数据值：多选时，若传入的非数组，则强制转为空数组 */
 const valuesModel = defineModel<any | any[]>({});
 props.multi && isArray(valuesModel.value) == false && (valuesModel.value = []);
 /**     待选项目：进行响应式计算，model值改变时，同步更新选项状态*/
-const chooseItemsRef: ComputedRef<ChooseItemNode[]> = computed(() => props.items.map(item => {
-    return {
-        item: item,
-        checked: props.multi == true
-            ? (valuesModel.value as any[]).includes(item.value)
-            : valuesModel.value == item.value,
-    }
-}));
+const chooseItemsRef: ComputedRef<ChooseItemNode[]> = computed(() => props.items.map(item => ({
+    item: item,
+    selected: props.multi == true
+        ? (valuesModel.value as any[]).includes(item.value)
+        : valuesModel.value == item.value,
+}) as ChooseItemNode));
 //  2、可选配置选项
 defineOptions({ name: "Choose", inheritAttrs: true, });
 
@@ -73,15 +73,15 @@ function onItemClick(node: ChooseItemNode, index: number) {
     //  更新选中状态
     //      多选模式：反选
     if (props.multi == true) {
-        node.checked = !node.checked;
-        valuesModel.value = chooseItemsRef.value.filter(item => item.checked).map(item => item.item.value);
+        node.selected = !node.selected;
+        valuesModel.value = chooseItemsRef.value.filter(item => item.selected).map(item => item.item.value);
     }
     //      单选模式：如果是只有一个的checkbox模式，则反选（即可取消选中）
     else {
-        const newChecked = props.type == "checkbox" && props.items.length == 1 ? !node.checked : true;
-        chooseItemsRef.value.forEach(item => item.checked = false);
-        node.checked = newChecked;
-        valuesModel.value = newChecked ? node.item.value : undefined;
+        const newSelected = type == "checkbox" && props.items.length == 1 ? !node.selected : true;
+        chooseItemsRef.value.forEach(item => item.selected = false);
+        node.selected = newSelected;
+        valuesModel.value = newSelected ? node.item.value : undefined;
     }
     //  延迟change事件；外部同时使用v-model和change事件时，valueModel.value修改不会立马生效
     nextTick(() => emits("change", valuesModel.value));
@@ -93,22 +93,34 @@ function onItemClick(node: ChooseItemNode, index: number) {
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-choose {
-    overflow-x: hidden;
-    //  flex 布局：display: flex，align-items 为center
-    .flex-cross-center();
-    flex-wrap: wrap;
 
+    //  选项样式
     >div.choose-item {
         position: relative;
         flex-shrink: 0;
-        cursor: pointer;
-        margin: 0 8px;
         user-select: none;
         //  flex 布局：display: flex，align-items 为center
         .flex-cross-center();
 
-        &:first-child {
-            margin-left: 0;
+        //  非只读时，鼠标样式
+        &:not(.readonly) {
+            cursor: pointer;
+        }
+
+        //  原生模式时，使用input
+        >input::checkmark {
+            background-color: #2196F3;
+            /* 修改为你想要的背景色 */
+            border-color: #2196F3;
+        }
+
+        //  选项文本、选项描述信息
+        >span {
+            margin-left: 4px;
+
+            &.item-des {
+                color: #8a9099;
+            }
         }
 
         //  使用伪类遮住选项和文本，由全局控制点击事件
@@ -120,71 +132,74 @@ function onItemClick(node: ChooseItemNode, index: number) {
             //  width:100%；height:100%；overflow: hidden
             .wh-fill-hidden();
         }
+    }
+}
 
-        //  原生模式时，使用input
-        >input::checkmark {
-            background-color: #2196F3;
-            /* 修改为你想要的背景色 */
-            border-color: #2196F3;
-        }
+//  选项水平布局
+&.snail-choose.horizontal {
+    overflow-x: hidden;
+    //  flex 布局：display: flex，align-items 为center
+    .flex-cross-center();
+    flex-wrap: wrap;
 
-        //  美化样式
-        >div.item-beautiful {
-            flex-shrink: 0;
-            overflow: hidden;
-            //  flex 布局：display: flex，align-items、justify-content 都为center
-            .flex-center();
+    >div.choose-item {
+        margin: 0 8px;
 
-            //  单选框样式
-            &.radio {
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
-            }
-
-            &.checkbox {
-                width: 14px;
-                height: 14px;
-            }
-
-            &.item-unchecked {
-                border: solid 1px #8a9099;
-            }
-
-            // 选中样式
-            &.item-checked {
-                border: solid 1px #4c9aff;
-                background-color: #4c9aff;
-            }
-        }
-
-        >span {
-            margin-left: 4px;
-
-            &.item-des {
-                color: #8a9099;
-            }
+        &:first-child {
+            margin-left: 0;
         }
     }
 }
 
-// *****************************************   👉  特殊样式适配    *****************************************
-//  只读时的样式适配
-.snail-choose.readonly {
-    >div.choose-item {
-        cursor: initial;
+//  选项垂直布局
+&.snail-choose.vertical {
+    //  flex布局，列 为主轴：display: flex，flex-direction: column;
+    .flex-column();
+    justify-content: center;
+}
 
-        //  美化样式时：选中状态背景、边框色处理
-        >div.item-beautiful {
+//  美化模式下 选项适配：仅需要适配 status 选项状态效果
+.snail-choose.beautiful {
+    >.choose-item>.status {
+        flex-shrink: 0;
+        overflow: hidden;
+        //  flex 布局：display: flex，align-items、justify-content 都为center
+        .flex-center();
 
-            &.item-unchecked {
-                opacity: 0.5;
-            }
+        // 选中样式
+        &.selected {
+            border: solid 1px #4c9aff;
+            background-color: #4c9aff;
+        }
 
-            &.item-checked {
-                background-color: #d5d7db;
-                border-color: #d5d7db;
-            }
+        // 未选中样式
+        &:not(.selected) {
+            border: solid 1px #8a9099;
+        }
+    }
+
+    //  美化模式下 单选选项 效果适配
+    &.radio>.choose-item>.status {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+    }
+
+    //  美化模式下 复选选项 效果适配
+    &.checkbox>.choose-item>.status {
+        width: 14px;
+        height: 14px;
+    }
+
+    //  只读样式适配
+    &.readonly>.choose-item>.status {
+        &.selected {
+            background-color: #d5d7db;
+            border-color: #d5d7db;
+        }
+
+        &:not(.selected) {
+            opacity: 0.5;
         }
     }
 }

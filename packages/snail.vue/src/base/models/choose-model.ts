@@ -20,13 +20,21 @@ export type ChooseOptions<T> = ReadonlyOptions & {
      * - radio:     单选框样式
      * - checkbox:  多选框样式
      */
-    type: "checkbox" | "radio";
+    type: "radio" | "checkbox";
     /**
      * 显示模式
      * - native     原生默认，浏览器自己渲染；不同浏览器效果不一致
      * - beautiful  美化模式，不同浏览器下效果通义
      */
     mode?: "native" | "beautiful";
+    /**
+     * 选项布局
+     * - 默认值：horizontal
+     * - 可选值：
+     * - - horizontal 水平布局；所有选项一行
+     * - - vertical   垂直布局；每个选项一行
+     */
+    layout?: "horizontal" | "vertical";
 
     /**
      * 待选项目

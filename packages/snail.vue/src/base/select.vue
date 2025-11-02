@@ -199,20 +199,23 @@ onAppCreated((app, type) => {
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-select {
-    background-color: white;
     width: 100%;
     height: 32px;
     border: 1px solid #dddfed;
     border-radius: 4px;
     color: #2e3033;
+    //  flex 布局：display: flex，align-items 为center
+    .flex-cross-center();
+
+    //  只读时不显示背景颜色，直接透明
+    &:not(.readonly) {
+        background-color: white;
+    }
 
     //  有选项非只读时，显示可点击手型效果
     &:not(.readonly, .empty) {
         cursor: pointer;
     }
-
-    //  flex 布局：display: flex，align-items 为center
-    .flex-cross-center();
 
     //  已选结果区域
     >div.select-result {
@@ -243,8 +246,4 @@ onAppCreated((app, type) => {
         padding: 0 8px;
     }
 }
-
-// *****************************************   👉  特殊样式适配    *****************************************
-//  只读样式适配
-.snail-select.readonly {}
 </style>
