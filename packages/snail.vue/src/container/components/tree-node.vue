@@ -133,8 +133,10 @@ watcher(isHoveredRef, (newValue) => {
     newValue && treeNodeDom.value.classList.add("hovered");
 });
 watcher(() => context.isActived(node), (newValue: boolean) => {
-    treeNodeDom.value.classList.remove("actived");
-    newValue && treeNodeDom.value.classList.add("actived");
+    if (treeNodeDom.value) {
+        treeNodeDom.value.classList.remove("actived");
+        newValue && treeNodeDom.value.classList.add("actived");
+    }
 });
 //  2、生命周期响应
 onMounted(() => {
