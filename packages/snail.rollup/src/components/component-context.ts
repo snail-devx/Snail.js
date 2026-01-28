@@ -54,7 +54,9 @@ export function getContext(component: ComponentOptions, options: BuilderOptions)
                 type = "net";
             }
             else if (importer == undefined || source[0] == ".") {
-                source = importer == undefined ? source : resolve(dirname(importer), source);
+                source = importer == undefined
+                    ? source
+                    : resolve(dirname(importer), source);
                 throwIfFalse(
                     isAbsolute(source),
                     `analysis source's physical path failed in src mode. ${fixedError}.`

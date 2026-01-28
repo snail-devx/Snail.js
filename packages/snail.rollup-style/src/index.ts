@@ -46,16 +46,19 @@ export default function stylePlugin(component: ComponentOptions, context: ICompo
                 return;
             }
             context.traceModule(PLUGINNAME, "style", module);
+            //  构建样式的url时，不添加版本，外部根据需要自行进行版本管理
             switch (module.type) {
                 case "net": {
-                    return buildUrlResolve(module.id, true);
+                    // return buildUrlResolve(module.id, true);
+                    return buildUrlResolve(module.id, false);
                 }
                 case "src": {
                     context.mustInSrcRoot(module, source, importer);
                     let { dist, url } = context.buildPath(module.id);
                     dist = context.forceExt(dist, ".css");
                     url = context.forceExt(url, ".css");
-                    const ret = buildUrlResolve(url, true);
+                    // const ret = buildUrlResolve(url, true);
+                    const ret = buildUrlResolve(url, false);
                     if (context.isChild(component.root, module.id) === true) {
                         const key = ret.id.toLowerCase();
                         transformMap.set(key, { src: module.id, dist: dist });

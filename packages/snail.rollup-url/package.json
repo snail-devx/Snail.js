@@ -3,7 +3,7 @@
   "description": "配合【snail.rollup】使用的插件，支持使用过程中，将import文件转换成url返回",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -13,7 +13,7 @@
     "types": "tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
   },
   "dependencies": {
-    "snail.core": ">=2.0.16",
-    "snail.rollup": ">=1.2.9"
+    "snail.core": ">=2.0.17",
+    "snail.rollup": ">=1.2.10"
   }
 }
