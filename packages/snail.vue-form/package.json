@@ -1,0 +1,34 @@
+{
+  "name": "snail.vue-form",
+  "description": "基于vue封装的表单相关组件",
+  "author": "snail_dev@163.com",
+  "license": "MIT",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/form.js",
+  "module": "dist/form.js",
+  "types": "dist/form.d.ts",
+  "scripts": {
+    "build": "rollup -c ./rollup.config.js",
+    "types": "vue-tsc -p ./tsconfig.dts.json --declarationDir ./dist/_types"
+  },
+  "dependencies": {
+    "vue": "^3.5.14",
+    "snail.core": ">=2.0.17",
+    "snail.view": ">=2.0.2",
+    "snail.vue": ">=2.0.5",
+    "sortablejs": ">=1.15.6",
+    "zane-calendar": "2.2.8"
+  },
+  "devDependencies": {
+    "vue-tsc": "^2.2.10",
+    "snail.rollup": ">=1.2.10",
+    "snail.rollup-asset": ">=1.2.2",
+    "snail.rollup-html": ">=1.2.4",
+    "snail.rollup-url": ">=1.2.3",
+    "snail.rollup-inject": ">=1.2.2",
+    "snail.rollup-script": ">=1.2.5",
+    "snail.rollup-style": ">=1.2.9",
+    "snail.rollup-vue": ">=1.2.5"
+  }
+}
