@@ -4,7 +4,6 @@
 
 import { ShallowRef } from "vue";
 import { PopupHandle, PopupOptions, PopupStatusOptions } from "./popup-model";
-import { ComponentBindOptions } from "../../container/models/component-model";
 
 /**
  * 跟随弹窗 配置选项

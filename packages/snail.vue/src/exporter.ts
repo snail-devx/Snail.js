@@ -16,6 +16,7 @@ export * from "./base/models/date-model";
 export * from "./base/models/footer-model";
 export * from "./base/models/header-model";
 export * from "./base/models/icon-model";
+export * from "./base/models/input-model"
 export * from "./base/models/reactive-model";
 export * from "./base/models/search-model";
 export * from "./base/models/select-model";
@@ -28,6 +29,7 @@ import DatePicker from "./base/datepicker.vue";
 import Footer from "./base/footer.vue";
 import Header from "./base/header.vue";
 import Icon from "./base/icon.vue";
+import Input from "./base/input.vue";
 import Search from "./base/search.vue";
 import Select from "./base/select.vue";
 import Switch from "./base/switch.vue";
@@ -61,13 +63,6 @@ import Wrapper from "./container/wrapper.vue";
 //  方法导出
 export * from "./container/utils/component-util";
 
-// *****************************************   👉  form 相关导出    ****************************************
-//  类型导出
-export * from "./form/models/input-model"
-//  组件导出：赋值给 components
-import Input from "./form/input.vue";
-//  方法导出
-
 // *****************************************   👉  popup 相关导出    ****************************************
 //  类型在【./popup/manager】中导出了
 //  组件导出：赋值给 components
@@ -95,4 +90,4 @@ export const components = {
     Input,
     //  prompt 下的组件
     DragVerify, Empty, Loading
-}
+};

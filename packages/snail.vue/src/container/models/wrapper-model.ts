@@ -1,8 +1,7 @@
 import { DisabledOptions, ReadonlyOptions } from "../../base/models/base-model";
 import { HeaderOptions } from "../../base/models/header-model";
 import { FooterEvents, FooterOptions } from "../../base/models/footer-model";
-import { ScrollEvents, ScrollOptions } from "./scroll-model";
-import { PopupHandle } from "../../exporter";
+import { ScrollOptions } from "./scroll-model";
 
 /**
  * 包裹组件 相关实体
