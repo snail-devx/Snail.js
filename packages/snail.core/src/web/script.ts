@@ -4,7 +4,7 @@
  * - 不支持cmd中使用require方法，核心为异步方式加载js，require为同步方式，强制报错
  */
 
-import { isArray, isArrayNotEmpty, isObject, isStringNotEmpty, hasOwnProperty, extract } from "../base/data";
+import { isArray, isArrayNotEmpty, isObject, isStringNotEmpty, hasOwnProperty, extract, isFunction } from "../base/data";
 import { mustString, tidyString, } from "../base/data";
 import { getMessage, throwIfNullOrUndefined, throwIfTrue } from "../base/error";
 import { version } from "./version";
@@ -48,10 +48,12 @@ export function useScript(options?: Partial<ScriptOptions>): IScriptManager & IS
                 sf = formScriptUrl(file, undefined, defaultOrign);
             }
             else {
-                //  exports有值时，不用格式化，后面load时直接返回exports
+                //  exports/load有值时，不用格式化，后面load时直接返回exports；否则基于url构建脚本注册信息
                 sf = file.exports !== undefined
-                    ? Object.assign({}, file)
-                    : formScriptUrl(file.url, undefined, defaultOrign);
+                    ? Object.assign({}, file, { load: undefined, url: undefined })
+                    : isFunction(file.load) == true
+                        ? Object.assign({}, file, { exports: undefined, url: undefined })
+                        : formScriptUrl(file.url, undefined, defaultOrign);
                 sf.id = tidyString(file.id) || sf.id;
             }
             mustString(sf.id, "sf.id");
@@ -105,7 +107,7 @@ export function useScript(options?: Partial<ScriptOptions>): IScriptManager & IS
         isArray(loadOptions.ids) || (loadOptions.ids = []);
         //  1、查找脚本：若不存在，则尝试全局中加载，否则就地全新注册
         let { script: file, hash } = getScriptFile(id, loadOptions.refer);
-        if (file === undefined) {
+        if (file == undefined) {
             if (manager !== script && script.has(id, loadOptions.refer) == true) {
                 return script.load(id, loadOptions);
             }
@@ -113,7 +115,7 @@ export function useScript(options?: Partial<ScriptOptions>): IScriptManager & IS
             SCRIPTS[file.id] = file;
         }
         //  2、构建脚本加载任务：若存在exports值，则直接复用返回；否则构建http加载loadTask
-        if (file.exports !== undefined) {
+        if (file.exports != undefined) {
             return drillScriptByHash(file.exports, hash);
         }
         //      判断死循环
@@ -121,12 +123,15 @@ export function useScript(options?: Partial<ScriptOptions>): IScriptManager & IS
             const message = getMessage(loadOptions.ids.concat(file.id), `dead loop load script[${file.id}].`);
             return Promise.reject(message);
         }
-        //      构建脚本加载任务：复用已有加载任务
+        //      构建脚本加载任务：复用已有加载任务；支持脚本的自定义load方法
         try {
             let loadTask: Promise<T> = LOADTASKMAP[file.id];
-            if (loadTask === undefined) {
-                const fileUrl: string = (options.version || SCRIPT_CONFIG.version || version).formart(file.url);
-                loadTask = buildScriptByUrl(manager, fileUrl, { ids: [...loadOptions.ids, file.id], refer: file.url });
+            if (loadTask == undefined) {
+                file.load && (loadTask = file.load());
+                if (loadTask == undefined) {
+                    const fileUrl: string = (options.version || SCRIPT_CONFIG.version || version).formart(file.url);
+                    loadTask = buildScriptByUrl(manager, fileUrl, { ids: [...loadOptions.ids, file.id], refer: file.url });
+                }
                 LOADTASKMAP[file.id] = loadTask;
             }
             const exports = await loadTask;

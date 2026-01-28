@@ -83,9 +83,16 @@ export type ScriptFile = {
     /**
      * 脚本导出模块
      * - 可在register时传入，即可避免load时重复加载
-     * - 为undefined时，基于url动态获取脚本解析exports对象
+     * - 为undefined时，基于load动态获取脚本解析exports对象
      */
     exports?: object | undefined;
+    /**
+     * 自定义的脚本加载
+     * - 可在register时传入，进行脚本的自定义加载
+     * - 为undefined时，基于url动态加载脚本
+     * @returns 脚本加载任务
+     */
+    load?: () => Promise<any>;
 }
 
 /**

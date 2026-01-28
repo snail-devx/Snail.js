@@ -50,7 +50,8 @@ export function formScriptUrl(file: string, referUrl: string, defaultOrign: stri
      *      - referUrl 相对路径时，无效，spa应用下，相对谁？
      */
     //  推导构建脚本文件的baseUrl信息
-    let scriptUrl: URL = undefined; {
+    let scriptUrl: URL = undefined;
+    {
         mustString(file, "file");
         referUrl = tidyString(referUrl);
         defaultOrign = tidyString(defaultOrign) || location.origin;
