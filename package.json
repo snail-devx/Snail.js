@@ -7,7 +7,7 @@
   "type": "module",
   "main": "index.js",
   "types": "dist/index.d.ts",
-  "packageManager": "pnpm@8.10.5",
+  "packageManager": "pnpm@10.20.0",
   "private": true,
   "scripts": {
     "init": "pnpm install --no-link",
@@ -16,11 +16,13 @@
     "build core": "node scripts/build.js                snail.core",
     "build view": "node scripts/build.js                snail.view",
     "build vue": "node scripts/build.js                 snail.vue",
+    "build form": "node scripts/build.js                snail.vue-form",
     "build rollup": "node scripts/build.js              snail.rollup",
     "build rollup-*": "node scripts/build.js            snail.rollup--*",
     "release core": "node scripts/release.js            snail.core            --typings   --environment NODE_ENV:production",
     "release view": "node scripts/release.js            snail.view            --typings   --environment NODE_ENV:production",
     "release vue": "node scripts/release.js             snail.vue             --typings   --environment NODE_ENV:production",
+    "release form": "node scripts/build.js              snail.vue-form        --typings   --environment NODE_ENV:production",
     "release rollup": "node scripts/release.js          snail.rollup          --typings   --environment NODE_ENV:production",
     "release rollup-html": "node scripts/release.js     snail.rollup-html     --typings   --environment NODE_ENV:production",
     "release rollup-inject": "node scripts/release.js   snail.rollup-inject   --typings   --environment NODE_ENV:production",
@@ -51,5 +53,9 @@
   },
   "peerDependencies": {
     "typescript": ">=5.8.2"
+  },
+  "engines": {
+    "node": "20.5",
+    "pnpm": "10.20"
   }
 }
