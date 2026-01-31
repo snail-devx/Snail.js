@@ -4,7 +4,7 @@
  *  2、style 内联样式管理
  *  3、【后续支持】直接构建style标签
  */
-import { isArrayNotEmpty, isObject, isStringNotEmpty } from "snail.core";
+import { extract, isArrayNotEmpty, isObject, isStringNotEmpty } from "snail.core";
 import { AllStyle, CSS, CSSDescriptor, ICSSManager } from "../models/css-model";
 
 // 把自己的类型共享出去
@@ -67,74 +67,26 @@ function useCSS(): ICSSManager {
      */
     function buildStyle(options: AllStyle): Record<string, string> {
         const style: CSSStyleDeclaration = Object.create(null);
-        if (!!!options) {
-            return style as any;
-        }
-        //  后续考虑直接遍历Key，然后做setProperty赋值
-
-        //  1、基础样式：颜色、对齐、布局（弹性盒子）
-        {
+        if (!!options) {
+            const tmpFunc = (key: string) => options[key] != undefined && (style[key] = String(options[key]));
             //  BaseStyle
-            options.color != undefined && (style.color = options.color);
-            options.backgroundColor != undefined && (style.backgroundColor = options.backgroundColor);
-            options.textAlign != undefined && (style.textAlign = options.textAlign);
-            options.verticalAlign != undefined && (style.verticalAlign = options.verticalAlign);
+            ["color", "backgroundColor", "textAlign", "textAlign", "verticalAlign",].forEach(tmpFunc);
             //  FlextBox
-            options.justifyContent != undefined && (style.justifyContent = options.justifyContent);
-            options.alignItems != undefined && (style.alignItems = options.alignItems);
-            options.flex != undefined && (style.flex = options.flex);
-            options.flexBasis != undefined && (style.flexBasis = options.flexBasis);
-            options.flexGrow > 0 != undefined && (style.flexGrow = String(options.flexGrow));
-            options.flexShrink > 0 != undefined && (style.flexShrink = String(options.flexShrink));
-            options.order > 0 != undefined && (style.order = String(options.order));
-            options.alignSelf != undefined && (style.alignSelf = options.alignSelf);
-            //  PositionStyle
-            options.left != undefined && (style.left = options.left);
-            options.right != undefined && (style.right = options.right);
-            options.top != undefined && (style.top = options.top);
-            options.bottom != undefined && (style.bottom = options.bottom);
+            ["justifyContent", "alignItems", "flex", "flexBasis", "flexGrow", "flexShrink", "order", "alignSelf"].forEach(tmpFunc);
+            //  PositionStyle 
+            ["left", "right", "top", "bottom",].forEach(tmpFunc);
             //  OverflowStyle
-            options.overflow != undefined && (style.overflow = options.overflow);
-            options.overflowX != undefined && (style.overflowX = options.overflowX);
-            options.overflowY != undefined && (style.overflowY = options.overflowY);
-        }
-        //  2、高、宽、边框、边距
-        {
+            ["overflow", "overflowX", "overflowY",].forEach(tmpFunc);
             //  width、height
-            options.width != undefined && (style.width = options.width);
-            options.minWidth != undefined && (style.minWidth = options.minWidth);
-            options.maxWidth != undefined && (style.maxWidth = options.maxWidth);
-            options.height != undefined && (style.height = options.height);
-            options.minHeight != undefined && (style.minHeight = options.minHeight);
-            options.maxHeight != undefined && (style.maxHeight = options.maxHeight);
-            //  外边距
-            options.margin != undefined && (style.margin = options.margin);
-            options.marginTop != undefined && (style.marginTop = options.marginTop);
-            options.marginRight != undefined && (style.marginRight = options.marginRight);
-            options.marginBottom != undefined && (style.marginBottom = options.marginBottom);
-            options.marginLeft != undefined && (style.marginLeft = options.marginLeft);
-            //  边框
-            options.borderRadius != undefined && (style.borderRadius = options.borderRadius);
-            options.border != undefined && (style.border = options.border);
-            options.borderTop != undefined && (style.borderTop = options.borderTop);
-            options.borderRight != undefined && (style.borderRight = options.borderRight);
-            options.borderBottom != undefined && (style.borderBottom = options.borderBottom);
-            options.borderLeft != undefined && (style.borderLeft = options.borderLeft);
-            //  内边距
-            options.padding != undefined && (style.padding = options.padding);
-            options.paddingTop != undefined && (style.paddingTop = options.paddingTop);
-            options.paddingRight != undefined && (style.paddingRight = options.paddingRight);
-            options.paddingBottom != undefined && (style.paddingBottom = options.paddingBottom);
-            options.paddingLeft != undefined && (style.paddingLeft = options.paddingLeft);
-        }
-        //  3、动画样式
-        {
+            ["width", "minWidth", "maxWidth", "height", "minHeight", "maxHeight",].forEach(tmpFunc);
+            //  外边距、边框、内边距
+            ["margin", "marginTop", "marginRight", "marginBottom", "marginLeft",].forEach(tmpFunc);
+            ["borderRadius", "border", "borderTop", "borderRight", "borderBottom", "borderLeft",].forEach(tmpFunc);
+            ["padding", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft",].forEach(tmpFunc);
             //  过渡动画：transition
-            options.transition != undefined && (style.transition = options.transition);
-            options.transitionProperty != undefined && (style.transitionProperty = options.transitionProperty);
-            options.transitionDuration != undefined && (style.transitionDuration = options.transitionDuration);
-            options.transitionDelay != undefined && (style.transitionDelay = options.transitionDelay);
-            options.transitionTimingFunction != undefined && (style.transitionTimingFunction = options.transitionTimingFunction);
+            ["transition", "transitionProperty", "transitionDuration", "transitionDelay", "transitionTimingFunction",].forEach(tmpFunc);
+            // [].forEach(tmpFunc);
+            // [].forEach(tmpFunc);
         }
         return style as any;
     }
