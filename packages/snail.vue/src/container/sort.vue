@@ -5,8 +5,8 @@
 
 <script setup lang="ts">
 import { onMounted, getCurrentInstance, onUnmounted, onBeforeUnmount, nextTick, shallowRef } from "vue";
-import { SortEvents, SortOptions } from "./models/sort-model";
-import { IScope, newId, script, useTimer } from "snail.core";
+import { SortEvents, SortOptions, SortGroupOptions, SortEvent } from "./models/sort-model";
+import { IScope, isObject, isStringNotEmpty, newId, script, useTimer } from "snail.core";
 import { useReactive } from "../base/reactive";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -38,8 +38,16 @@ function buildSortable() {
     //  可用时，才构建
     if (props.disabled != true && MODULE_Sortable != undefined) {
         sortPanel.classList.add("sortable");
+        //  构建分组配置选项
+        const group: SortGroupOptions = { name: undefined, pull: true, put: true };
+        isStringNotEmpty(props.group)
+            ? (group.name = props.group as string)
+            : isObject(props.group) && Object.assign(group, props.group);
+        group.name || (group.name = newId());
+        //  构建排序对象
         sortInstance = new MODULE_Sortable(sortPanel, {
-            group: props.group || newId(),
+            group: group,
+            sort: props.sortDisabled != true,
             draggable: props.draggable,
             dragClass: props.dragClass || "snail-sort-drag",
             ghostClass: props.ghostClass || "snail-sort-ghost",
@@ -51,14 +59,14 @@ function buildSortable() {
             forceFallback: true,
             fallbackTolerance: 2,
             //  事件监听
-            //      顺序发生变化时，通知外面
-            onUpdate(evt) {
-                emits("update", evt.oldIndex, evt.newIndex);
-            }
+            onStart: (evt: SortEvent) => emits("start", evt),
+            onAdd: (evt: SortEvent) => emits("add", evt),
+            onRemove: (evt: SortEvent) => emits("remove", evt),
+            onEnd: (evt: SortEvent) => emits("add", evt),
+            onUpdate: (evt: SortEvent) => emits("update", evt.oldIndex, evt.newIndex),
         });
     }
 }
-
 // *****************************************   👉  组件渲染    *****************************************
 onMounted(async () => {
     const instance = getCurrentInstance();
