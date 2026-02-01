@@ -1,3 +1,6 @@
+import { ReadonlyOptions } from "snail.vue";
+import { ControlOptions } from "./control-model";
+import { Ref, ShallowRef } from "vue";
 
 /**
  * 字段配置选项
@@ -25,7 +28,7 @@ export type FieldOptions<Settings extends Record<string, any>> = Partial<FieldSt
      *  1、FieldStatusOptions
      *      required        是否必填
      *      readonly        是否只读
-     *      visible         是否显示
+     *      hidden          是否显示
      */
 
     /**
@@ -67,11 +70,28 @@ export type FieldStatusOptions = {
     disabled?: boolean;
      */
     /**
-     * 是否可见
-     * - 默认为true；显式指定为false时，字段不可见
+     * 是否隐藏
+     * - 默认为false；显式指定为true时，字段不可见
+     * - 初期想用visible/show，但作Vue组件属性时，bool类型不传值会自动默认false，和初衷不符
      */
-    visible: boolean;
+    hidden: boolean;
 }
+
+/**
+ * 字段在容器中的位置信息
+ */
+export type FieldLocation = {
+    /**
+     * 父级字段Id
+     */
+    readonly parentFieldId: string;
+    /**
+      * 行索引位置
+      * - 当字段位于可重复容器（如动态表格、列表）中时，表示其所在行索引
+      * - 默认为 0（单实例字段）
+      */
+    readonly rowIndex?: number;
+};
 
 /**
  * 字段相关动作配置选项
@@ -88,7 +108,7 @@ export type FieldActionOptions = Partial<FieldLocation> & {
      * - "render"：渲染字段
      * - "validate"：验证字段
      * - "value": 修改字段值
-     * - "status": 修改字段状态（required/readonly/visible）
+     * - "status": 修改字段状态（required/readonly/hidden）
      */
     readonly action: "render" | "validate" | "value" | "status";
     /**
@@ -104,51 +124,96 @@ export type FieldActionOptions = Partial<FieldLocation> & {
      *      rowIndex        行索引位置
      */
 }
+
 /**
- * 字段位置信息
+ * 字段渲染配置选项
+ * - 约束渲染一个字段需要的相关信息
  */
-export type FieldLocation = {
+export type FieldRenderOptions<Settings> = {
     /**
-     * 父级字段Id
+     * 要渲染的字段
      */
-    readonly parentFieldId: string;
+    readonly field: FieldOptions<Settings>;
     /**
-      * 行索引位置
-      * - 当字段位于可重复容器（如动态表格、列表）中时，表示其所在行索引
-      * - 默认为 0（单实例字段）
-      */
-    readonly rowIndex?: number;
+     * 字段容器上下文
+     */
+    readonly context: IFieldContainerContext;
+}
+
+/**
+ * 接口：字段句柄
+ * - 用于进行字段操作，如取值、验证、渲染等等、、、
+ * - 由字段的具体渲染控件对外暴露
+ */
+export interface IFieldHandle {
+    /**
+     * 验证字段
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns true 验证成功，否则报错失败原因
+     */
+    validate(traces: ReadonlyArray<FieldActionOptions>): Promise<boolean>;
+    /**
+     * 获取字段值
+     * - 成功时 resolve；失败时 reject 并携带错误信息，如字段验证不通过
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns 当前字段值
+     */
+    getValue<T>(traces?: ReadonlyArray<FieldActionOptions>): Promise<T>;
+    /**
+     * 设置指定字段值
+     * - 成功时 resolve；失败时 reject 并携带错误信息，如传入值验证不通过
+     * @param value 新的字段值
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns true 设置成功，否则报错失败原因
+     */
+    setValue<T>(value: T, traces?: ReadonlyArray<FieldActionOptions>): Promise<boolean>;
+    /**
+     * 获取字段状态
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns 字段状态
+     */
+    getStatus(traces?: ReadonlyArray<FieldActionOptions>): FieldStatusOptions;
+    /**
+     * 设置字段状态
+     * @param status 新的状态字段
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns true 设置成功，否则报错失败原因
+     */
+    setStatus(status: Partial<FieldStatusOptions>, traces?: ReadonlyArray<FieldActionOptions>): Promise<boolean>;
 };
 
 /**
  * 字段事件
+ * - 由字段的具体渲染控件对外通知字段容器
  */
 export type FieldEvents = {
     /**
      * 字段渲染完成
-     * @param field 当前渲染完成的字段
-     * @param event 事件详细信息（父级字段、追踪信息）
+     * @param handle 字段句柄
      */
-    rendered: [field: FieldOptions<any>, event: FieldChangeEvent<void>];
+    rendered: [handle: IFieldHandle];
     /**
-     * 字段值变更事件
+     * 字段值变更
      * - 在用户交互或程序赋值导致字段值变化后触发（新旧值不同）
-     * @param field 变更值的字段
-     * @param event 事件详细信息（新旧值、父级字段、追踪信息）
+     * @param newValue 新的字段值
+     * @param oldValue 旧的字段值
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
      */
-    valueChange: [field: FieldOptions<any>, event: FieldChangeEvent<any>];
+    valueChange: [newValue: any, oldValue: any, traces?: ReadonlyArray<FieldActionOptions>];
     /**
-     * 状态变化事件
-     * - 当字段的 required/readonly/visible 状态发生变化时触发
+     * 状态变化
+     * - 当字段的 required/readonly/hidden 状态发生变化时触发
      * - 典型用途：动态控制 UI 显隐、校验规则更新
-     * @param field 改变值的字段
-     * @param event 事件详细信息（新旧状态、父级字段、追踪信息）
+     * @param newStatus 新的字段状态
+     * @param oldStatus 旧的字段状态
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
      */
-    statusChange: [field: FieldOptions<any>, event: FieldChangeEvent<FieldStatusOptions>];
+    statusChange: [newStatus: FieldStatusOptions, oldStatus: FieldStatusOptions, traces?: ReadonlyArray<FieldActionOptions>];
 }
 /**
  * 字段改变事件对象
  * - 约束字段父级信息；附带追踪信息
+ * - 给表单渲染器使用
  * - 字段值、状态等改变时，传递新旧变化
  */
 export type FieldChangeEvent<T> = (T extends (void | never | null | undefined) ? {} : {
@@ -173,14 +238,296 @@ export type FieldChangeEvent<T> = (T extends (void | never | null | undefined) ?
     readonly traces: ReadonlyArray<FieldActionOptions>;
 }
 
+//#region ************************************* 字段容器相关数据结构 *************************************
 /**
- * 字段管理器
- * - 负责进行字段管理，桥接表单-字段之间的通信等
+ * 接口：字段全局上下文
+ * - 从顶级容器到子容器，到字段之间共用一个上下文对象
+ * - 约束容器-字段之间的共享信息，通用方法、、、
  */
-export interface IFieldManager {
-    //  注册句柄：从而获取字段信息、操作字段、设置字段值
-    //  进行字段事件触发
-    //      字段渲染完成、字段值改变事件、字段状态变化事件、、、
-    //  对外构建 表单句柄
-    //      将表单中和字段相关的句柄，迁移到这里
+export interface IFieldGlobalContext {
+    /**
+     * 全局标记值
+     * - 如一个表单下，可能存在多个字段容器，此时所有字段容器共享一个全局标记值，用于实现字段在容器间拖拽
+     */
+    readonly global: string;
+    /**
+     * 是否处于只读状态
+     */
+    readonly readonly: boolean;
+    /**
+     * 使用模式
+     * - runtime: 正常运行时（默认值），用户可编辑、提交
+     * - design: 设计时，所有字段只读不可编辑，显示【复制】、【删除】等操作控件，点击字段激活字段配置
+     * - preview: 静态预览，所有字段强制只读，隐藏操作控件（如删除/移动按钮）
+     */
+    readonly mode: "runtime" | "design" | "preview";
+
+    /**
+     * 布局方式
+     * - form：表单布局(默认值)
+     * - table: 表格布局
+     */
+    readonly layout: "form" | "table";
+    /**
+     * 容器栅格列数
+     * - layout 为 form 时生效；约束每行最多显示几个字段，一个字段一列
+     * - 默认值 2；即一行最多可渲染两个字段
+     * - 单个字段可通过 width 属性占用多列;渲染时，对字段进行流式布局渲染；
+     * - 不建议值特别大
+     */
+    readonly columns: 1 | 2 | 3 | 4;
+    /**
+     * 新建字段的默认栅格列跨度
+     * - layout 为 form 时生效
+     * - 表示字段在表单中默认占用的列数（基于 columns 栅格系统）
+     * - 取值范围：1 ～ columns（例如 columns=4 时，建议 1～4）
+     * - 若未指定，column/2
+     */
+    readonly defaultFieldSpan: number;
+
+    /**
+     * 字段容器钩子
+     */
+    readonly hook: Partial<FieldContainerHook>;
+    /**
+     * 支持使用的控件集合
+     */
+    readonly controls: ReadonlyArray<ControlOptions>;
+    /**
+     * 基于控件类型，获取控件对象
+     * @param type 控件类型
+     */
+    getControl(type: string): ControlOptions | undefined;
 }
+/**
+ * 字段容器上下文
+ * - 每个容器独享自己的下文；管理容器下的字段相关信息
+ */
+export interface IFieldContainerContext {
+    /**
+     * 容器id
+     */
+    readonly containerId: string;
+    /**
+     * 容器是否只读；若顶级容器只读，则自身强制只读
+     */
+    readonly readonly: boolean;
+    /**
+     * 容器的父级字段
+     * - 在group等容器类字段时，此值为group字段自身
+     */
+    readonly parent?: FieldOptions<any>;
+    /**
+     * 已有的字段集合
+     * - 在group等容器类字段时，此值为group字段的子字段
+     */
+    readonly fields: Array<FieldOptions<any>>;
+
+    /**
+     * 构建字段
+     * - 全新添加字段、当前容器复制字段时
+     * - 内部需要执行容器hook判断是否可添加处理
+     * @param type 新字段的类型，全新添加时生效
+     * @param originField 原始字段，复制字段时传入作为模板使用
+     * @returns 新的字段对象
+     */
+    buildField(type: string, originField?: FieldOptions<any>): FieldOptions<any>;
+    /**
+     * 获取字段值
+     * @param fieldId 字段id
+     * @param defaultValue 若无字段值，则以此值构建字段
+     * @returns 字段值ref响应对象
+     */
+    getValue<Value>(fieldId: string, defaultValue: Value): ShallowRef<Value>;
+    /**
+     * 获取字段状态
+     * @param fieldId 字段Id
+     * @returns 字段状态ref响应对象
+     */
+    getStatus(fieldId: string): Ref<FieldStatusOptions>;
+}
+
+/**
+ * 字段容器配置选项
+ */
+export type FieldContainerOptions = ReadonlyOptions & {
+    /**
+     * 容器id
+     * - 用于日志、埋点、多表单区分
+     * - 不传入，则内部自动分配
+     */
+    readonly id?: string;
+    /**
+     * 容器名称
+     * - 用于日志、埋点、多表单区分
+     */
+    readonly name?: string;
+
+    /**
+     * 表单支持的控件描述符集合
+     * - 用于将字段类型（如 'text', 'select'）映射到对应的渲染组件
+     * - 不传入，则使用内置 DEFAULT_ControlRegistery 仓库注册组件
+     */
+    readonly controls?: ReadonlyArray<ControlOptions>;
+    /**
+     * 已有的字段配置列表
+     * - 定义表单中需要渲染的字段及其初始值、规则等
+     */
+    readonly fields?: FieldOptions<any>[];
+
+    /**
+     * 表单字段值
+     * - key为字段id，value为具体的字段值
+     * - 设计时忽略，运行时渲染时生效
+     */
+    readonly values?: Readonly<Record<string, any>>;
+}
+
+/**
+ * 字段容器钩子函数
+ * - 用于在设计时干预字段操作（添加、复制、移除、移动等）
+ * - 返回 false 表示阻止操作；返回 true / undefined / void 表示允许操作
+ */
+export type FieldContainerHook = {
+    /**
+     * 添加字段时
+     * @param field 要添加的字段，可修改字段属性，如调整字段id等等
+     * @param parent 所属父级字段信息，无则表示为顶级字段
+     * @returns false 阻止添加；其余值允许
+     */
+    addField(field: FieldOptions<any>, parent?: FieldOptions<any>): boolean | undefined;
+    /**
+    * 复制字段时
+    * @param field 要复制的字段
+     * @param parent 所属父级字段信息，无则表示为顶级字段
+    * @returns false 阻止复制；其余值允许复制，然后执行添加字段逻辑
+    */
+    copyField(field: FieldOptions<any>, parent?: FieldOptions<any>): boolean | undefined;
+    /**
+     * 移除字段
+     * @param field 要删除的字段
+     * @param parent 所属父级字段信息，无则表示为顶级字段
+     * @returns false 阻止删除；其余值允许
+     */
+    removeField(field: FieldOptions<any>, parent?: FieldOptions<any>): boolean | undefined;
+    /**
+     * 移动字段时
+     * - 支持在容器间移动（如从顶级移入容器，或容器间迁移）
+     * @param field 要移动的字段
+     * @param from 原父级字段信息，无则表示为顶级字段
+     * @param to 新的父级字段信息，无则表示为顶级字段
+     * @returns false 阻止移动；其余值允许移动
+     */
+    moveField(field: FieldOptions<any>, from: FieldOptions<any> | undefined, to: FieldOptions<any> | undefined): boolean | undefined;
+}
+
+/**
+ * 接口：字段容器 句柄
+ * - 一个字段容器中，可包含多个字段
+ * - 主要约束运行时渲染相关句柄
+ */
+export interface IFieldContainerHandle {
+    /**
+     * 验证所有字段
+     * - 成功时 resolve；失败时 reject 并携带错误信息，如传入值验证不通过
+     * @returns true 验证成功，否则报错失败原因
+     */
+    validates(): Promise<boolean>;
+    /**
+     * 获取所有字段值
+     * - 成功时 resolve；失败时 reject 并携带错误信息，如验证失败信息
+     * @returns 字段值，key为字段id，value为对应的字段值
+     */
+    getValues(): Promise<Record<string, any>>;
+
+    /**
+     * 验证指定字段
+     * - 成功时 resolve；失败时 reject 并携带错误信息，如字段验证不通过
+     * @param fieldId  字段id
+     * @param location 字段所在位置（在父级容器中的位置），不传则为顶级字段
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns true 验证成功，否则报错失败原因
+     */
+    validate(fieldId: string, location?: FieldLocation, traces?: ReadonlyArray<FieldActionOptions>): Promise<boolean>;
+    /**
+     * 获取指定字段值
+     * - 成功时 resolve；失败时 reject 并携带错误信息，如字段验证不通过
+     * @param fieldId 字段id
+     * @param location 字段所在位置（在父级容器中的位置），不传则为顶级字段
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns 当前字段值
+     */
+    getValue<T>(fieldId: string, location?: FieldLocation, traces?: ReadonlyArray<FieldActionOptions>): Promise<T>;
+    /**
+     * 设置指定字段值
+     * - 成功时 resolve；失败时 reject 并携带错误信息，如传入值验证不通过
+     * @param fieldId 字段id
+     * @param value 新的字段值
+     * @param location 字段所在位置（在父级容器中的位置），不传则为顶级字段
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns true 设置成功，否则报错失败原因
+     */
+    setValue<T>(fieldId: string, value: T, location?: FieldLocation, traces?: ReadonlyArray<FieldActionOptions>): Promise<boolean>;
+    /**
+     * 获取字段状态
+     * @param fieldId  字段id
+     * @param location 字段所在位置（在父级容器中的位置），不传则为顶级字段
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns 字段状态
+     */
+    getStatus(fieldId: string, location?: FieldLocation, traces?: ReadonlyArray<FieldActionOptions>): FieldStatusOptions;
+    /**
+     * 设置字段状态
+     * @param fieldId  字段id
+     * @param status 新的状态字段
+     * @param location 字段所在位置（在父级容器中的位置），不传则为顶级字段
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns true 设置成功，否则报错失败原因
+     */
+    setStatus(fieldId: string, status: Partial<FieldStatusOptions>, location?: FieldLocation, traces?: ReadonlyArray<FieldActionOptions>): Promise<boolean>;
+    /**
+     * 刷新字段
+     * - 使用最新的字段配置重建 DOM 或虚拟节点，直接使用v-if做一下重新渲染
+     * - 成功时 resolve；失败时 reject 并携带错误信息
+     * @param field 完整字段配置
+     * @param location 字段所在位置（在父级容器中的位置），不传则为顶级字段
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns true 设置成功，否则报错失败原因
+     */
+    refresh(field: FieldOptions<any>, location?: FieldLocation, traces?: ReadonlyArray<FieldActionOptions>): Promise<boolean>;
+}
+/**
+ * 字段容器事件
+ * - 主要约束运行时渲染相关事件
+ */
+export type FieldContainerEvents = {
+    /**
+     * 表单渲染完成
+     * - 所有显示字段渲染完成
+     * @param handle 表单渲染器句柄
+     */
+    rendered: [handle: IFieldContainerHandle];
+
+    /**
+     * 字段渲染完成
+     * @param field 当前渲染完成的字段
+     * @param event 事件详细信息（父级字段、追踪信息）
+     */
+    fieldRendered: [field: FieldOptions<any>, event: FieldChangeEvent<void>];
+    /**
+     * 字段值变更事件
+     * - 在用户交互或程序赋值导致字段值变化后触发（新旧值不同）
+     * @param field 变更值的字段
+     * @param event 事件详细信息（新旧值、父级字段、追踪信息）
+     */
+    fieldValueChange: [field: FieldOptions<any>, event: FieldChangeEvent<any>];
+    /**
+     * 状态变化事件
+     * - 当字段的 required/readonly/hidden 状态发生变化时触发
+     * - 典型用途：动态控制 UI 显隐、校验规则更新
+     * @param field 改变值的字段
+     * @param event 事件详细信息（新旧状态、父级字段、追踪信息）
+     */
+    fieldStatusChange: [field: FieldOptions<any>, event: FieldChangeEvent<FieldStatusOptions>];
+}
+//#endregion

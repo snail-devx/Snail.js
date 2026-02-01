@@ -46,7 +46,7 @@ const options = {
         { id: "sortablejs", name: "Sortable" },
         { id: "snail.core", name: "Snail" },
         { id: "snail.view", name: "SnailView" },
-        { id: "snail.vuew", name: "SnailVue" },
+        { id: "snail.vue", name: "SnailVue" },
     ]
 };
 /**

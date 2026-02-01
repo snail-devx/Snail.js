@@ -19,8 +19,8 @@ import Radio from "./components/controls/radio.vue";
 import Text from "./components/controls/text.vue";
 import Textarea from "./components/controls/textarea.vue";
 //      表单相关组件
-import FormDesigner from "./components/designer.vue";
-import FormRenderer from "./components/renderer.vue";
+import FormDesigner from "./components/form-designer.vue";
+import FormRenderer from "./components/form-renderer.vue";
 
 export const components = {
     //  表单控件导出，方便复用

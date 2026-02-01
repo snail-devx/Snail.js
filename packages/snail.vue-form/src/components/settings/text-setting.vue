@@ -1,6 +1,6 @@
 <!-- 文本 控件设置 -->
 <template>
-
+    <div>text-setting</div>
 </template>
 
 <script setup lang="ts">
