@@ -1,5 +1,6 @@
 //#region ************************************* 表单通用数据结构 ***********************************
 
+import { ControlOptions } from "./control-model";
 import { FieldContainerOptions, FieldContainerEvents, FieldLocation, FieldOptions, FieldStatusOptions, FieldContainerHook } from "./field-model";
 
 //#region ************************************* 表单设计器数据结构 *************************************
@@ -7,6 +8,12 @@ import { FieldContainerOptions, FieldContainerEvents, FieldLocation, FieldOption
  * 表单设计时配置选项
  */
 export type FormDesignOptions = Omit<FieldContainerOptions, "values"> & {
+    /**
+     * 表单支持的控件描述符集合
+     * - 用于将字段类型（如 'text', 'select'）映射到对应的渲染组件
+     * - 不传入，则使用内置 DEFAULT_ControlRegistery 仓库注册组件
+     */
+    readonly controls?: ReadonlyArray<ControlOptions>;
     /**
      * 容器栅格列数
      * - layout 为 form 时生效；约束每行最多显示几个字段，一个字段一列
@@ -83,10 +90,11 @@ export interface IFormDesignHandle {
  */
 export type FormRenderOptions = FieldContainerOptions & {
     /**
-     * 表单字段值
-     * - key为字段id，value为具体的字段值
+     * 表单支持的控件描述符集合
+     * - 用于将字段类型（如 'text', 'select'）映射到对应的渲染组件
+     * - 不传入，则使用内置 DEFAULT_ControlRegistery 仓库注册组件
      */
-    readonly values?: Readonly<Record<string, any>>;
+    readonly controls?: ReadonlyArray<ControlOptions>;
 
     /**
      * 表单栅格列数
@@ -106,5 +114,5 @@ export type FormRenderOptions = FieldContainerOptions & {
 /**
  * 表单渲染器事件
  */
-export type FormRenderEvents = FieldContainerEvents;
+export type FormRenderEvents = Omit<FieldContainerEvents, "settingChange">;
 //#endregion

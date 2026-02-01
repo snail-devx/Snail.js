@@ -5,18 +5,18 @@
 <template>
     <div class="snail-form-fields" :class="[`tc-${global.columns}`, global.mode,]">
         <!-- 这个key使用字段id可能有问题，后续再考虑优化，特别是运行时的时候；设计时构建 复制、删除 按钮 -->
-        <Sort draggable=".field-item" :changer="context.fields.length" :group="global.global"
-            :disabled="global.readonly" @add="onDragAddField" @update="onUpdateSort">
-            <div v-for="(field, index) in context.fields" class="field-item" :class="`fw-${getFieldWidth(field)}`"
+        <Sort draggable=".field-item" :changer="fields.length" :group="global.global" :disabled="global.readonly"
+            @add="onDragAddField" @update="container.moveField">
+            <div v-for="(field, index) in fields" class="field-item" :class="`fw-${getFieldWidth(field)}`"
                 :key="field.id" @click="console.log('click')">
                 <!-- <div class="field-component">{{ field.title }}</div> -->
-                <Dynamic class="field-body" :key="field.id" :="buildFieldRenderComponent(field)" />
+                <Dynamic class="field-body" :key="field.id" :="buildFieldRenderOptions(field)" />
                 <!-- 设计时的盖板：显示复制、删除 -->
                 <div class="field-cover" v-if="global.mode == 'design'" @click="onActiveField(field, index)">
                     <Icon type="plus" color="#aeb6c2" hover-color="#279bf1" title="复制"
-                        @click="onCopyField(field, index)" />
+                        @click="isButtonClickInCover = true, container.copyField(field, index)" />
                     <Icon type="trash" color="#aeb6c2" hover-color="#279bf1" title="删除"
-                        @click="onDeleteField(field, index)" />
+                        @click="isButtonClickInCover = true, container.deleteField(field, index)" />
                 </div>
             </div>
         </Sort>
@@ -24,24 +24,30 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, shallowRef, } from "vue";
-import { isStringNotEmpty, moveFromArray, removeFromArray } from "snail.core";
-import { ComponentBindOptions, ComponentOptions, components, EventsType, PropsType, SortEvent } from "snail.vue";
-import { ControlOptions } from "../../models/control-model";
-import { FieldActionOptions, FieldContainerEvents, FieldContainerOptions, FieldEvents, FieldOptions, FieldRenderOptions, FieldStatusOptions, IFieldContainerContext, IFieldHandle } from "../../models/field-model";
-import { FormDesignEvents, FormRenderOptions } from "../../models/form-model";
-import { INJECTKEY_GlobalContext, useContainerContext } from "./field-share";
+import { computed, inject, } from "vue";
+import { isStringNotEmpty, } from "snail.core";
+import { components, SortEvent } from "snail.vue";
+import { FieldContainerEvents, FieldContainerOptions, FieldOptions, } from "../../models/field-model";
+import { } from "../../models/form-model";
+import { INJECTKEY_GlobalContext, useFieldContainer } from "./field-share";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const { context, } = defineProps<{ context: IFieldContainerContext }>();
-const emits = defineEmits<FieldContainerEvents>();
+const _ = defineProps<FieldContainerOptions>();
 const { Sort, Icon, Dynamic } = components;
-/**   字段全局上下文 */
+const _emits = defineEmits<FieldContainerEvents>();
+/**     字段全局上下文 */
 const global = inject(INJECTKEY_GlobalContext);
-/**    字段句柄：只有渲染完成的字段才有字段句柄，可以用来判断容器是否渲染完成了 */
-const fieldHandleMap: Map<string, IFieldHandle> = new Map();
+/**     字段容器对象；负责接管字段容器组件部分逻辑，减少vue组件中的非渲染代码 */
+const container = useFieldContainer(global, {
+    ..._,
+    //  在父级字段中的索引位置，可能会实时变化，这里做一下监听计算
+    rowIndex: computed(() => _.rowIndex || 0).value,
+}, _emits);
+const { fields, buildFieldRenderOptions, } = container;
 //  2、组件交互变量、常量
+/**     是否时字段Cover内的按钮点击了；实现cover内部按钮点击时，不激活字段 */
+let isButtonClickInCover: boolean;
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -51,64 +57,6 @@ const fieldHandleMap: Map<string, IFieldHandle> = new Map();
 function getFieldWidth(field: FieldOptions<any>): number {
     const width = field.width || global.defaultFieldSpan;
     return Math.max(1, Math.min(width, global.columns));
-}
-/**
- * 构建字段渲染组件
- * - 用哪个字段渲染，传递哪些属性、监听哪些事件、、、
- * @param field 
- */
-function buildFieldRenderComponent(field: FieldOptions<any>)
-    : ComponentOptions & Pick<ComponentBindOptions<FieldRenderOptions<any, any>>, "props"> & EventsType<FieldEvents> {
-    //  测试，可以直接修改此值，下面会做自动响应，因为都是代理之后的value对象值
-    // const value = context.getValue(field.id, undefined);
-    // setInterval(() => value.value = String(new Date().getTime()), 1000);
-    // const status = context.getStatus(field.id);
-    // setInterval(() => status.value.required = new Date().getMilliseconds() % 2 == 0, 1000);
-
-    return {
-        //  ------------------------------ 组件相关信息
-        ...global.getControl(field.type).component,
-        //  ------------------------------ 绑定传递属性
-        props: {
-            field: field,
-            value: context.getValue(field.id, undefined).value,
-            status: context.getStatus(field.id).value,
-        },
-        // ------------------------------ 监听事件
-        /**
-         * 字段渲染完成
-         * @param handle 字段句柄
-         */
-        onRendered(handle: IFieldHandle) {
-            fieldHandleMap.set(field.id, handle);
-            // 看看容器是否渲染完成了，没渲染完成则判断一下，然后触发容器的渲染完成事件
-            debugger;
-        },
-        /**
-         * 字段值变更
-         * - 在用户交互或程序赋值导致字段值变化后触发（新旧值不同）
-         * @param newValue 新的字段值
-         * @param oldValue 旧的字段值
-         * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
-         */
-        onValueChange(newValue: any, oldValue: any, traces?: ReadonlyArray<FieldActionOptions>) {
-            debugger;
-            // 把新的值更新给上下文的value
-        },
-        /**
-         * 状态变化
-         * - 当字段的 required/readonly/hidden 状态发生变化时触发
-         * - 典型用途：动态控制 UI 显隐、校验规则更新
-         * @param newStatus 新的字段状态
-         * @param oldStatus 旧的字段状态
-         * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
-         */
-        onStatusChange(newStatus: FieldStatusOptions, oldStatus: FieldStatusOptions, traces?: ReadonlyArray<FieldActionOptions>) {
-            //  若为字段显影状态变化，在运行时的时候，需要重新计算 容器中字段布局、、、
-            debugger;
-            //  把新的状态更新给给字段上下文
-        },
-    }
 }
 
 //#region ----- 设计时相关事件、方法
@@ -130,55 +78,14 @@ function onDragAddField(evt: SortEvent) {
         let type: string = evt.item.getAttribute("data-type");
         let success: boolean;
         let field: FieldOptions<any>;
-        //  是否需要添加
-        //      全新添加字段：钩子函数判断是否能够添加
+        //  全新添加
         if (isStringNotEmpty(type) == true) {
-            field = context.buildField(type);
-            global.hook.addField && (success = global.hook.addField(field, context.parent));
+            container.addField(type, evt.newIndex);
         }
-        //      从其他字段容器移动过来的字段
+        //  从其他字段容器移动过来的字段；先判断是否能够删除，若能删除再添加，添加成功再从移除
         else {
             alert("移动添加还没实现呢");
         }
-        //  添加字段，然后发送字段改变事件
-        if (success !== false) {
-            context.fields.splice(evt.newIndex, 0, field);
-            //  发送字段改变事件
-        }
-    }
-}
-/**
- * 调整字段顺序
- * @param oldIndex 
- * @param newIndex 
- */
-function onUpdateSort(oldIndex: number, newIndex: number) {
-    moveFromArray(context.fields, oldIndex, newIndex);
-    //  发送字段改变事件
-}
-/**
- * 复制字段
- * @param field 源字段
- * @param index 源字段索引位置
- */
-function onCopyField(field: FieldOptions<any>, index: number) {
-    let need = global.hook.copyField ? global.hook.copyField(field, context.parent) : undefined;
-    if (need !== false) {
-        field = context.buildField(field.type, field);
-        context.fields.splice(index + 1, 0, field);
-        //  发送字段改变事件
-    }
-}
-/**
- * 删除字段
- * @param index 字段位置
- */
-function onDeleteField(field: FieldOptions<any>, index: number) {
-    let need = global.hook.removeField ? global.hook.removeField(field, context.parent) : undefined;
-    if (need !== false) {
-        context.fields.splice(index, 1);
-        //  发送字段改变事件；移除字段句柄
-        fieldHandleMap.delete(field.id);
     }
 }
 /**
@@ -187,6 +94,11 @@ function onDeleteField(field: FieldOptions<any>, index: number) {
  * @param index 
  */
 function onActiveField(field: FieldOptions<any>, index: number) {
+    // 避免内部按钮点击触发时的冒泡
+    if (isButtonClickInCover == true) {
+        isButtonClickInCover = false;
+        return;
+    }
     //  发送字段激活事件
     alert("准备激活字段，进入字段设置");
 }
@@ -197,7 +109,6 @@ function onActiveField(field: FieldOptions<any>, index: number) {
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
-
 </script>
 
 <style lang="less">

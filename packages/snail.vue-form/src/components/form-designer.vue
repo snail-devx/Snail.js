@@ -7,21 +7,20 @@
         <!-- 左侧控件列表区域 -->
         <FormControls v-if="global.readonly != true" @click="onControlItemClick" />
         <!-- 中间字段容器区域 -->
-        <FormFields :context="container" />
+        <FormFields :readonly="readonly" :fields="fields" @rendered="handle => containerHandle = handle" />
         <!-- 右侧字段配置区域 -->
         <div class="setting-panel">字段设置</div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { provide, Ref, ref, ShallowRef, shallowRef, } from "vue";
-import { components, SortEvent } from "snail.vue";
-import { ControlOptions } from "../models/control-model";
-import { FieldOptions, IFieldContainerContext, IFieldGlobalContext } from "../models/field-model";
+import { provide, } from "vue";
+import { components } from "snail.vue";
+import { IFieldContainerHandle, IFieldGlobalContext } from "../models/field-model";
 import { FormDesignEvents, FormDesignOptions } from "../models/form-model";
 import FormControls from "./common/form-controls.vue";
 import FormFields from "./common/form-fields.vue";
-import { INJECTKEY_GlobalContext, useContainerContext, useGlobalContext } from "./common/field-share";
+import { INJECTKEY_GlobalContext, useGlobalContext } from "./common/field-share";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -37,10 +36,8 @@ const global: IFieldGlobalContext = useGlobalContext({
     layout: "form"
 });
 provide(INJECTKEY_GlobalContext, global);
-/**     字段容器上下文；构建后注册到全局上下文上，用于进行数据共享使用 */
-const container: IFieldContainerContext = useContainerContext(global, {
-    ..._,
-}, undefined);
+/**     字段容器操作句柄 */
+let containerHandle: IFieldContainerHandle = undefined;
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -48,12 +45,12 @@ const container: IFieldContainerContext = useContainerContext(global, {
  * @param type 控件类型
  */
 function onControlItemClick(type: string) {
-    const field: FieldOptions<any> = container.buildField(type);
-    let need: boolean = global.hook.addField ? global.hook.addField(field) : undefined;
-    if (need !== false) {
-        container.fields.push(field);
-        //  发送值改变事件
+    if (containerHandle == undefined) {
+        alert("表单正在渲染中，请稍后...");
+        return;
     }
+    //  这里取巧，仅构建type属性值，其他的内部会做处理
+    containerHandle.addField({ type: type } as any);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
