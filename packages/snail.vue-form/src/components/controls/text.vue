@@ -1,26 +1,24 @@
 <!-- 文本 输入框，单行输入-->
 <template>
-    <FieldWrapper class="text" :title="field.title" :description="field.description" :required="statusRef.required"
+    <FieldWrapper class="text" :title="field.title" :description="field.description" :required="status.required"
         :error="errorRef">
-        <input type="text" v-model.trim="valueRef" :placeholder="field.placeholder" :readonly="statusRef.readonly"
+        <input type="text" :value="value" :placeholder="field.placeholder" :readonly="status.readonly"
             @change="onTextChange" />
     </FieldWrapper>
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, Ref, ref, ShallowRef, shallowRef, } from "vue";
+import { nextTick, onMounted, Ref, ref, ShallowRef, shallowRef, toRaw, } from "vue";
 import { FieldActionOptions, FieldEvents, FieldRenderOptions, FieldStatusOptions, IFieldHandle } from "../../models/field-model";
 import FieldWrapper from "../common/field-wrapper.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const { context, field } = defineProps<FieldRenderOptions<any>>();
+const { value, status, field } = defineProps<FieldRenderOptions<any, string>>();
 const emits = defineEmits<FieldEvents>();
 //  2、组件交互变量、常量
 // const { valueRef, statusRef } = context.analysisField<any, string>(field.id);
-const valueRef = context.getValue(field.id, "");
-const statusRef = context.getStatus(field.id);
-const oldText: string = valueRef.value;
+const oldText: string = toRaw(value);
 /**     需要展示的错误信息：如验证失败信息 */
 const errorRef = shallowRef<string>();
 
@@ -62,7 +60,7 @@ function validate(traces: ReadonlyArray<FieldActionOptions>): Promise<boolean> {
  */
 function getValue(traces?: ReadonlyArray<FieldActionOptions>): Promise<string> {
     //  验证一下，验证成功再返回
-    return Promise.resolve(valueRef.value);
+    return Promise.resolve(value);
 }
 /**
  * 设置指定字段值
@@ -73,7 +71,6 @@ function getValue(traces?: ReadonlyArray<FieldActionOptions>): Promise<string> {
  */
 function setValue(value: string, traces?: ReadonlyArray<FieldActionOptions>): Promise<boolean> {
     //  设置字段值后，判断是否验证成功，判断是否变化，发送对应事件处理
-    valueRef.value = value;
     return Promise.resolve(true);
 }
 /**
@@ -82,7 +79,7 @@ function setValue(value: string, traces?: ReadonlyArray<FieldActionOptions>): Pr
  * @returns 字段状态
  */
 function getStatus(traces?: ReadonlyArray<FieldActionOptions>): FieldStatusOptions {
-    return { ...statusRef.value, };
+    return { ...status, };
 }
 /**
  * 设置字段状态

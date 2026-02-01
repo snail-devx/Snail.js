@@ -129,15 +129,19 @@ export type FieldActionOptions = Partial<FieldLocation> & {
  * 字段渲染配置选项
  * - 约束渲染一个字段需要的相关信息
  */
-export type FieldRenderOptions<Settings> = {
+export type FieldRenderOptions<Settings, Value> = {
     /**
      * 要渲染的字段
      */
     readonly field: FieldOptions<Settings>;
     /**
-     * 字段容器上下文
+     * 字段状态，响应式对象
      */
-    readonly context: IFieldContainerContext;
+    readonly status: FieldStatusOptions;
+    /**
+     * 字段值，响应式对象
+     */
+    readonly value: Value;
 }
 
 /**
@@ -316,7 +320,12 @@ export interface IFieldContainerContext {
      * 容器的父级字段
      * - 在group等容器类字段时，此值为group字段自身
      */
-    readonly parent?: FieldOptions<any>;
+    readonly parent: FieldOptions<any> | undefined;
+    /**
+     * 字段容器句柄
+     * - 用于外部取字段值、验证等相关操作、、、
+     */
+    readonly handle: IFieldContainerHandle;
     /**
      * 已有的字段集合
      * - 在group等容器类字段时，此值为group字段的子字段

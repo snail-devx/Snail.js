@@ -30,7 +30,7 @@ function wrapComponent(component: Component): Readonly<ComponentOptions> {
 /** 默认控件数组 */
 const defaultControls: ControlOptions[] = [
     { type: "Text", name: "文本框", component: wrapComponent(Text), settingComponent: wrapComponent(TextSetting) },
-    { type: "Textare", name: "多行文本框", component: wrapComponent(Textarea), settingComponent: undefined },
+    //{ type: "Textare", name: "多行文本框", component: wrapComponent(Textarea), settingComponent: undefined },
 ];
 
 /**

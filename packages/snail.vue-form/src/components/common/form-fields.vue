@@ -10,8 +10,7 @@
             <div v-for="(field, index) in context.fields" class="field-item" :class="`fw-${getFieldWidth(field)}`"
                 :key="field.id" @click="console.log('click')">
                 <!-- <div class="field-component">{{ field.title }}</div> -->
-                <Dynamic class="field-body" :key="field.id" :="global.getControl(field.type).component"
-                    :props="buildFieldRenderOptions(field, index)" v-bind="monitorFieldEvents(field)"></Dynamic>
+                <Dynamic class="field-body" :key="field.id" :="buildFieldRenderComponent(field)" />
                 <!-- 设计时的盖板：显示复制、删除 -->
                 <div class="field-cover" v-if="global.mode == 'design'" @click="onActiveField(field, index)">
                     <Icon type="plus" color="#aeb6c2" hover-color="#279bf1" title="复制"
@@ -27,18 +26,21 @@
 <script setup lang="ts">
 import { inject, ref, shallowRef, } from "vue";
 import { isStringNotEmpty, moveFromArray, removeFromArray } from "snail.core";
-import { components, EventsType, SortEvent } from "snail.vue";
+import { ComponentBindOptions, ComponentOptions, components, EventsType, PropsType, SortEvent } from "snail.vue";
 import { ControlOptions } from "../../models/control-model";
-import { FieldContainerOptions, FieldEvents, FieldOptions, FieldRenderOptions, IFieldContainerContext, IFieldHandle } from "../../models/field-model";
+import { FieldActionOptions, FieldContainerEvents, FieldContainerOptions, FieldEvents, FieldOptions, FieldRenderOptions, FieldStatusOptions, IFieldContainerContext, IFieldHandle } from "../../models/field-model";
 import { FormDesignEvents, FormRenderOptions } from "../../models/form-model";
 import { INJECTKEY_GlobalContext, useContainerContext } from "./field-share";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const { context, } = defineProps<{ context: IFieldContainerContext }>();
+const emits = defineEmits<FieldContainerEvents>();
 const { Sort, Icon, Dynamic } = components;
 /**   字段全局上下文 */
 const global = inject(INJECTKEY_GlobalContext);
+/**    字段句柄：只有渲染完成的字段才有字段句柄，可以用来判断容器是否渲染完成了 */
+const fieldHandleMap: Map<string, IFieldHandle> = new Map();
 //  2、组件交互变量、常量
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -51,39 +53,62 @@ function getFieldWidth(field: FieldOptions<any>): number {
     return Math.max(1, Math.min(width, global.columns));
 }
 /**
- * 构建字段渲染配置选项
+ * 构建字段渲染组件
+ * - 用哪个字段渲染，传递哪些属性、监听哪些事件、、、
  * @param field 
- * @param index 
  */
-function buildFieldRenderOptions(field: FieldOptions<any>, index: number): FieldRenderOptions<any> {
-    return {
-        field: field,
-        context: context,
-    };
-}
-/**
- * 监听字段事件
- * @param field 
- * @returns 返回要监听的事件对象 
- */
-function monitorFieldEvents(field: FieldOptions<any>): EventsType<FieldEvents> {
-    return {
-        onRendered(handle: IFieldHandle) {
-            debugger;
-        }
-    }
-}
+function buildFieldRenderComponent(field: FieldOptions<any>)
+    : ComponentOptions & Pick<ComponentBindOptions<FieldRenderOptions<any, any>>, "props"> & EventsType<FieldEvents> {
+    //  测试，可以直接修改此值，下面会做自动响应，因为都是代理之后的value对象值
+    // const value = context.getValue(field.id, undefined);
+    // setInterval(() => value.value = String(new Date().getTime()), 1000);
+    // const status = context.getStatus(field.id);
+    // setInterval(() => status.value.required = new Date().getMilliseconds() % 2 == 0, 1000);
 
-/**
- * 字段渲染完成
- * @param field 
- * @param index 
- * @param handle 
- */
-function onFieldRendered(field: FieldOptions<any>, index: number, handle: IFieldHandle) {
-    //  渲染完成后，触发判断，字段是否真的全渲染完了、、、、，若全部渲染玩了，则触发容器的渲染完成事件
-    //  把句柄存储起来，方便后续做操作
-    console.log(handle);
+    return {
+        //  ------------------------------ 组件相关信息
+        ...global.getControl(field.type).component,
+        //  ------------------------------ 绑定传递属性
+        props: {
+            field: field,
+            value: context.getValue(field.id, undefined).value,
+            status: context.getStatus(field.id).value,
+        },
+        // ------------------------------ 监听事件
+        /**
+         * 字段渲染完成
+         * @param handle 字段句柄
+         */
+        onRendered(handle: IFieldHandle) {
+            fieldHandleMap.set(field.id, handle);
+            // 看看容器是否渲染完成了，没渲染完成则判断一下，然后触发容器的渲染完成事件
+            debugger;
+        },
+        /**
+         * 字段值变更
+         * - 在用户交互或程序赋值导致字段值变化后触发（新旧值不同）
+         * @param newValue 新的字段值
+         * @param oldValue 旧的字段值
+         * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+         */
+        onValueChange(newValue: any, oldValue: any, traces?: ReadonlyArray<FieldActionOptions>) {
+            debugger;
+            // 把新的值更新给上下文的value
+        },
+        /**
+         * 状态变化
+         * - 当字段的 required/readonly/hidden 状态发生变化时触发
+         * - 典型用途：动态控制 UI 显隐、校验规则更新
+         * @param newStatus 新的字段状态
+         * @param oldStatus 旧的字段状态
+         * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+         */
+        onStatusChange(newStatus: FieldStatusOptions, oldStatus: FieldStatusOptions, traces?: ReadonlyArray<FieldActionOptions>) {
+            //  若为字段显影状态变化，在运行时的时候，需要重新计算 容器中字段布局、、、
+            debugger;
+            //  把新的状态更新给给字段上下文
+        },
+    }
 }
 
 //#region ----- 设计时相关事件、方法
@@ -152,7 +177,8 @@ function onDeleteField(field: FieldOptions<any>, index: number) {
     let need = global.hook.removeField ? global.hook.removeField(field, context.parent) : undefined;
     if (need !== false) {
         context.fields.splice(index, 1);
-        //  发送字段改变事件
+        //  发送字段改变事件；移除字段句柄
+        fieldHandleMap.delete(field.id);
     }
 }
 /**
@@ -164,8 +190,9 @@ function onActiveField(field: FieldOptions<any>, index: number) {
     //  发送字段激活事件
     alert("准备激活字段，进入字段设置");
 }
-
 //#endregion
+
+// *****************************************   👉  接口实现    ****************************************
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
