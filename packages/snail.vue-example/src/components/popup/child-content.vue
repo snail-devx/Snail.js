@@ -11,7 +11,8 @@
 </template>
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components, DialogHandle, FollowHandle, PopupHandle, usePopup, useTimer } from "../../core"
+import { useTimer } from "snail.core";
+import { components, DialogHandle, FollowHandle, PopupHandle, usePopup } from "snail.vue";
 const { } = components;
 import DialogContentTest from "./child-content.vue";
 

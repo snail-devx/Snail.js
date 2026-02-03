@@ -11,7 +11,7 @@
 </template>
 <script setup lang="ts">
 import { Component, shallowRef } from "vue"
-import { components } from "../../core"
+import { components } from "snail.vue"
 const { Dynamic, Loading } = components;
 
 const showLoading = true;

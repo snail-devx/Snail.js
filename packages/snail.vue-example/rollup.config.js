@@ -32,11 +32,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     //  style：使用snail.core的style模块进行动态css注册，替还 snail.rollup-style默认的addLink方法
     removeDynamicModule(MODULE_INJECT_LINK);
     registerDynamicModule(MODULE_INJECT_LINK, `
-        // import { link } from "snail.view";
-        //  example 示例项目下，dev 模式时 snail.view会被识别为公共库，这里不做import，强制写死Snail.link
-        export default href =>setTimeout(function(){
-            Snail.link.register(href);
-        });;
+        import { link } from "snail.view";
+        //  加载css时做一下延迟；不进行立马加载，避免某些情况下样式未生效的问题
+        // export default href => link.register(href);
+        export default href => setTimeout(link.register,0,href);
     `);
 }
 
@@ -50,10 +49,7 @@ const options = {
     distRoot: resolve(__dirname, "dist"),
     siteRoot: resolve(__dirname, "dist"),
     commonLib: [
-        //  三个包，合并到 libraries/snail.ts 
         { id: "snail.core", name: "Snail" },
-        { id: "snail.view", name: "Snail" },
-        { id: "snail.vue", name: "Snail" },
         //  sortablejs
         { id: "sortablejs", },
         //  vue
@@ -73,6 +69,22 @@ const coreUrl = forceExt(buildNetPath(options, buildDist(options, "core.ts")), "
  */
 const builder = Builder.getBuilder(options, (component, context, options) => {
     return [
+        //  对特定npm包进行重新替换，直接引入本项目src中源码，从而实现改了实时编译，不用发包后重新引用
+        {
+            name: "test-replace-package",
+            resolveId(source, importer) {
+                switch (source) {
+                    // case "snail.core":
+                    case "snail.view":
+                        return { id: resolve(options.srcRoot, "libraries/snail.view.ts") }
+                    case "snail.vue":
+                        return { id: resolve(options.srcRoot, "libraries/snail.vue.ts") }
+                    case "snail.vue-form":
+                        return { id: resolve(options.srcRoot, "libraries/snail.vue-form.ts") }
+                }
+            }
+        },
+
         injectPlugin(component, context, options),
         urlPlugin(component, context, options),
         assetPlugin(component, context, options),
@@ -123,14 +135,22 @@ const components = builder.build([
         format: "iife",
         name: "Snail",
         //  这三个库合并到 snail.ts中，一并打包
-        disableCommonLib: ["snail.core", "snail.view", "snail.vue"],
+        disableCommonLib: ["snail.core"],
         //  将三方库同步输出
         assets: [
             "libraries/vue.global.js",
             "libraries/sortable.js",
             "libraries/zane-calendar.js",
             "libraries/zane-calendar.css",
-        ]
+        ],
+        //  组件初始化，把自己注册为脚本，避免依赖组件重复加载
+        init(component, options, context) {
+            const codes = [
+                `exports.script.register({ id: "${component.name}", exports });`,
+                `exports.script.register({ id: "${component.url.toLowerCase()}", exports });`,
+            ];
+            component.outro = codes.join("\r\n");
+        }
     },
     {
         src: "components/container/dynamic-url-test.ts",

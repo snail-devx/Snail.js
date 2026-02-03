@@ -287,6 +287,9 @@ importers:
       snail.view:
         specifier: '>=2.0.2'
         version: 2.0.2(typescript@5.9.3)
+      snail.vue:
+        specifier: '>=2.0.5'
+        version: 2.0.5(typescript@5.9.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -370,8 +373,8 @@ importers:
         specifier: '>=2.0.2'
         version: 2.0.2(typescript@5.9.3)
       snail.vue:
-        specifier: '>=2.0.5'
-        version: 2.0.5(typescript@5.9.3)
+        specifier: '>=2.0.6'
+        version: 2.0.6(typescript@5.9.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -2386,6 +2389,9 @@ packages:
 
   snail.vue@2.0.5:
     resolution: {integrity: sha512-05VbVk/iN1CBP4MwDk1jE1oXWRcVrEWW3W9v3v2ioReefYhOKRqpGJnXgSLl46qlvvkPq3f+t+8tT7RGFdQRAA==}
+
+  snail.vue@2.0.6:
+    resolution: {integrity: sha512-AAKG+qG8y1xJi487dNVMMGooXyOJ8q0Sy1iu/1BpYrktqTwBewcgOlG5rR17nqRf1hE40ng/DMFBW3pkB9Te9A==}
 
   sortablejs@1.15.6:
     resolution: {integrity: sha512-aNfiuwMEpfBM/CN6LY0ibyhxPfPbyFeBTYJKCvzkJ2GkUpazIt3H+QIPAMHwqQ7tMKaHz1Qj+rJJCqljnf4p3A==}
@@ -4881,6 +4887,16 @@ snapshots:
       - typescript
 
   snail.vue@2.0.5(typescript@5.9.3):
+    dependencies:
+      snail.core: 2.0.17(typescript@5.9.3)
+      snail.view: 2.0.2(typescript@5.9.3)
+      sortablejs: 1.15.6
+      vue: 3.5.24(typescript@5.9.3)
+      zane-calendar: 2.2.8
+    transitivePeerDependencies:
+      - typescript
+
+  snail.vue@2.0.6(typescript@5.9.3):
     dependencies:
       snail.core: 2.0.17(typescript@5.9.3)
       snail.view: 2.0.2(typescript@5.9.3)

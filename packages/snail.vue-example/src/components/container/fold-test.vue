@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components } from "../../core"
+import { components } from "snail.vue"
 const { Fold } = components;
 
 // *****************************************   👉  组件定义    *****************************************

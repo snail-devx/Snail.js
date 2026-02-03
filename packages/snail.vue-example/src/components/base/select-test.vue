@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components, SelectItem, SelectSlotOptions } from "../../core";
+import { components, SelectItem, SelectSlotOptions } from "snail.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 const sleevalue: any = undefined;

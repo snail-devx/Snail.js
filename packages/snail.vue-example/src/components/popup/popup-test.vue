@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { IPopupManager, usePopup } from "../../core"
+import { IPopupManager, usePopup } from "snail.vue"
 import DialogChildContent from "./child-content.vue";
 
 

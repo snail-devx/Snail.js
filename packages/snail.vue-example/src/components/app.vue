@@ -8,7 +8,7 @@
 </template>
 <script setup lang="ts">
 import { Component, onMounted, shallowRef } from "vue";
-import { useReactive, components, TreeOptions, TreeNodeModel, TreeNodeSlotOptions } from "../core";
+import { useReactive, components, TreeOptions, TreeNodeModel, TreeNodeSlotOptions } from "snail.vue";
 
 //#region *******************************   👉  组件定义    *****************************************
 //  👉 基础组件：
@@ -18,6 +18,7 @@ import DatepickerTest from "./base/datepicker-test.vue";
 import ChooseTest from "./base/choose-test.vue";
 import HeaderFooterTest from "./base/header-footer-test.vue";
 import IconTest from "./base/icon-test.vue";
+import InputTest from "./base/input-test.vue";
 import SearchTest from "./base/search-test.vue";
 import SelectTest from "./base/select-test.vue";
 import SwitchTest from "./base/switch-test.vue";
@@ -28,7 +29,8 @@ import ScrollTest from "./container/scroll-test.vue";
 import TableTest from "./container/table-test.vue";
 import TreeTest from "./container/tree-test.vue";
 //  👉 表单组件
-import InputTest from "./form/input-test.vue";
+import DesignerTest from "./form/designer-test.vue";
+import RendererTest from "./form/renderer-test.vue";
 //  👉 弹窗组件
 import DialogTest from "./popup/dialog-test.vue";
 import FollowTest from "./popup/follow-test.vue";
@@ -69,6 +71,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Datepicker 日期选择器", data: DatepickerTest, clickable: true, searchable: true },
                 { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, searchable: true, },
                 { text: "Icon 图标组件", data: IconTest, clickable: true, searchable: true, },
+                { text: "Input 输入框组件", data: InputTest, clickable: true, searchable: true, },
                 { text: "Search 搜索组件", data: SearchTest, clickable: true, searchable: true, },
                 { text: "Select 选项菜单组件", data: SelectTest, clickable: true, searchable: true, },
                 { text: "Switch 开关组件", data: SwitchTest, clickable: true, searchable: true, },
@@ -87,7 +90,8 @@ const treeOptions: TreeOptions<Component> = {
         {
             text: "表单组件",
             children: [
-                { text: "Input 输入框组件", data: InputTest, clickable: true, searchable: true, },
+                { text: "Designer 设计器", data: DesignerTest, clickable: true, searchable: true, },
+                { text: "Renderer 渲染器", data: RendererTest, clickable: true, searchable: true, },
             ]
         },
         {
@@ -122,7 +126,7 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 }
 
 onMounted(() => {
-    onTreeNodeClick(treeOptions.nodes[0].children[3], undefined);
+    onTreeNodeClick(treeOptions.nodes[2].children[1], undefined);
 });
 </script>
 
@@ -143,10 +147,6 @@ onMounted(() => {
         width: 210px;
         border-right: 1px solid gray;
         flex-shrink: 0;
-
-        .node-panel>.node {
-            height: 30px;
-        }
     }
 
     >.container {

@@ -1,7 +1,7 @@
 <!-- 组件介绍写到这里 -->
 <template>
     <Tree style="width: 100%;height: 100%;" :="treeOptions" @click="console.log">
-        <template #default="{ node, toggleFold }">
+        <template #default="{ node, toggle }">
             <div>插： {{ node.text }}</div>
         </template>
     </Tree>
@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components, TreeOptions } from "../../core"
+import { components, TreeOptions } from "snail.vue"
 const { Tree } = components;
 
 // *****************************************   👉  组件定义    *****************************************
