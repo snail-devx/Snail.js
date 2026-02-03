@@ -22,6 +22,21 @@ export type ComponentOptions = {
      */
     url?: string;
 }
+
+/**
+ * 提取组件的props类型
+ * - 有效的 Props 类型：extends Record<string, any>
+ * - 有效类型则返回 Props 自身；否则无效，为undefined
+ */
+export type PropsType<Props> = Props extends Record<string, any> ? Props : undefined;
+/**
+ * 事件发射器类型
+ * - 将【组件中组件】转换为vue的 defineEmits 类型
+ * - 用于将组件的事件发射器包裹传递到其他组件、class中使用
+ */
+export type EmitterType<Events extends Record<string, any[]>> = {
+    <K extends keyof Events>(event: K, ...payload: Events[K]): any;
+};
 /**
  * 提取【组件事件】类型
  * - 将【组件事件】中的key首字母小写，追加上on前缀；key对应的value为监听函数参数
@@ -35,13 +50,6 @@ export type EventsType<Events> = Events extends Record<string, unknown[]>
             [key in keyof Events as `on${Capitalize<string & key>}`]?: (...args: Events[key]) => void
         })
     : never;
-/**
- * 提取组件的props类型
- * - 有效的 Props 类型：extends Record<string, any>
- * - 有效类型则返回 Props 自身；否则无效，为undefined
- */
-export type PropsType<Props> = Props extends Record<string, any> ? Props : undefined;
-
 /**
  * 组件绑定 配置选项
  * - Props、Events、Model 为可选泛型，分别约束 props、events、model 属性
