@@ -2,10 +2,11 @@
 <template>
     <div class="snail-form-controls">
         <!-- 搜索组件 -->
-        <Search placeholder="请输入控件名称搜索" @search="text => searchTextRef = text" />
+        <Search placeholder="请输入控件名称搜索" :auto-complete="true" @search="text => searchTextRef = text" />
         <!-- 控件列表：暂时不做分组，后期再考虑，符合搜索值的控件才显示出来 -->
         <Scroll :scroll-y="true" class="control-list">
-            <Sort draggable=".control-item" changer="1" :disabled="global.readonly" :sortDisabled="true"
+            <Empty v-if="hasControls != true" message="无可用控件" />
+            <Sort v-else draggable=".control-item" changer="1" :disabled="global.readonly" :sortDisabled="true"
                 :group="{ name: global.global, pull: 'clone', put: false }" @remove="onControlItemRemove"
                 @end="evt => console.log('end', evt)">
                 <div v-for="control in global.controls" class="control-item" :key="control.type"
@@ -19,22 +20,27 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, ShallowRef, shallowRef, } from "vue";
-import { isStringNotEmpty, moveFromArray, removeFromArray } from "snail.core";
+import { computed, inject, ref, shallowRef, ShallowRef } from "vue";
+import { isArrayNotEmpty, isStringNotEmpty } from "snail.core";
 import { components, SortEvent } from "snail.vue";
-import { ControlOptions } from "../../models/control-model";
-import { FieldContainerOptions, IFieldContainerContext } from "../../models/field-model";
-import { FormDesignEvents, FormRenderOptions } from "../../models/form-model";
-import { INJECTKEY_GlobalContext, useContainerContext } from "./field-share";
+import { } from "../../models/field-container";
+import { INJECTKEY_GlobalContext } from "./field-common";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const emits = defineEmits<{ click: [type: string] }>();
-const { Scroll, Search, Sort } = components;
+const { Scroll, Search, Sort, Empty } = components;
 /**   字段全局上下文 */
 const global = inject(INJECTKEY_GlobalContext);
 /**     搜索文本 */
-const searchTextRef: ShallowRef<string> = ref();
+const searchTextRef: ShallowRef<string> = shallowRef();
+/**     是否有可用控件*/
+const hasControls = computed(() => isArrayNotEmpty(global.controls) == true
+    ? isStringNotEmpty(searchTextRef.value)
+        ? global.controls.find(control => control.name.indexOf(searchTextRef.value) != -1) != undefined
+        : true
+    : false
+);
 //  2、组件交互变量、常量
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -58,7 +64,6 @@ function onControlItemRemove(evt: SortEvent) {
 
 .snail-form-controls {
     position: relative;
-    border-right: 1px solid #e1e2e3;
     flex-shrink: 0;
     //  flex布局，列 为主轴：display: flex，flex-direction: column;
     .flex-column();
@@ -90,6 +95,7 @@ function onControlItemRemove(evt: SortEvent) {
             &.snail-sort-drag,
             &.snail-sort-ghost {
                 border-color: #ed9239;
+                border-radius: 0 !important;
             }
 
             //  避免从其他容器拖拽回来时，产生动画效果

@@ -16,9 +16,9 @@ export type ControlOptions = {
     /**
      * 控件渲染组件
      */
-    component: ComponentOptions;
+    renderComponent: ComponentOptions;
     /**
-     * 控件配置的渲染组件
+     * 控件配置的组件
      * - 用于设计时激活字段时，显示此字段的自定义配置项
      * - 无配置时，则无法进行字段自定义配置；若字段无需自定义配置，则忽略此属性
      */
@@ -41,3 +41,20 @@ export type ControlOptions = {
      */
     icon?: string | string[];
 }
+
+//#region ************************************* 文本类控件的Settings *************************************
+/**
+ * 文本控件的Settings数据解构
+ * - 作为 `./field-base.ts`中的`FieldOptions<T>`泛型
+ */
+export type TextControlSettings = {
+    /**
+     * 最小长度
+     */
+    minLength?: number;
+    /**
+     * 最大长度
+     */
+    maxLength?: number
+}
+//#endregion
