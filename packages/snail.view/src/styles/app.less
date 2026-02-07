@@ -124,13 +124,14 @@
 // *****************************************   👉  文本输入渲染    *****************************************
 .snail-app {
 
-    //  input 输入框等，去掉默认的外边框；仅针对输入类型的，后续逐步扩充。checkbox、radio等先忽略
+    //  输入框等，去掉默认的外边框；仅针对输入类型的，后续逐步扩充。checkbox、radio等先忽略
     input[type="search"],
     input[type="text"],
     input[type="url"],
     input[type="email"],
     input[type="password"],
-    input[type="number"] {
+    input[type="number"],
+    textarea {
         outline: 0 !important;
         appearance: none !important;
         //  给个最小宽度，避免走默认导致部分宽度不够时撑开外部容器的情况
@@ -161,7 +162,12 @@
         }
     }
 
-    //  input 选项类：取消边距等
+    textarea {
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    //  选项类：取消边距等
     input[type="radio"],
     input[type="checkbox"] {
         margin: 0;
@@ -187,11 +193,8 @@
     }
 
     //  文本提示文字颜色
-    textarea::placeholder {
-        color: #8a9099;
-    }
-
     input::placeholder,
+    textarea::placeholder,
     .placeholder {
         .ellipsis();
         color: #8a9099;

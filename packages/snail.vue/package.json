@@ -15,7 +15,7 @@
   "dependencies": {
     "vue": "^3.5.14",
     "snail.core": ">=2.0.18",
-    "snail.view": ">=2.0.2",
+    "snail.view": ">=2.0.3",
     "sortablejs": ">=1.15.6",
     "zane-calendar": "2.2.8"
   },
