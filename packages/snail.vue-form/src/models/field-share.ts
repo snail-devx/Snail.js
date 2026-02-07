@@ -8,6 +8,7 @@ import { ControlOptions } from "./control-model";
 import { FieldContainerHook, FieldContainerLocation, IFieldContainerHandle } from "./field-container";
 import { FieldOptions } from "./field-base";
 import { ReadonlyOptions } from "snail.vue";
+import { IFieldSettingHandle } from "./field-setting";
 
 /**
  * 接口：字段全局共享上下文
@@ -91,52 +92,4 @@ export interface IFieldGlobalContext {
      * - 用于激活、取消激活字段设置面板、、、
      */
     readonly fieldSetting: IFieldSettingHandle;
-}
-
-/**
- * 字段设置句柄
- * - 用于激活、关闭、字段设置面板
- */
-export interface IFieldSettingHandle {
-    /**
-     * 获取当前激活状态唯一标记
-     * - 用于唯一标记激活面板
-     */
-    getActiveKey(): string;
-    /**
-     * 获取激活字段信息
-     * @requires 字段对象，字段所属容器对象
-     */
-    getactiveField(): { field: FieldOptions<any>, container: FieldContainerLocation } | undefined;
-    /**
-     * 是否是激活字段
-     * @param field 字段
-     * @param container 字段所属容器，顶级字段是容器传undefined
-     * @returns true为激活字段
-     */
-    isActiveField(field: FieldOptions<any>, container: FieldContainerLocation | undefined): boolean;
-    /**
-     * 激活字段，打开此字段的设置面板
-     * @param field 字段
-     * @param container 字段所属容器，顶级字段是容器传undefined
-     */
-    activateField(field: FieldOptions<any>, container: FieldContainerLocation | undefined);
-    /**
-     * 取消激活字段
-     */
-    deactivateField();
-}
-/**
- * 字段设置配置选项
- * - 在其他位置不合适，放到这里
- */
-export type FieldSettingOptions<Settings> = Required<ReadonlyOptions> & {
-    /**
-     * 字段信息
-     */
-    field: FieldOptions<Settings>;
-    /**
-     * 字段所属容器
-     */
-    container: IFieldContainerHandle;
 }

@@ -1,15 +1,20 @@
 <!-- 表单设计器测试 -->
 <template>
-    <FormDesigner :fields="testFields" :readonly="false" :columns="4" :controls="undefined" :default-span="2" />
+    <FormDesigner :fields="testFields" :readonly="false" :columns="4" :controls="undefined" :default-span="2"
+        @rendered="hd => (console.log(hd), handle = hd)" @change="console.log" />
+    <div class="formdesigner-test-buttons">
+        <button @click="async () => console.log(await handle.getFields())">获取表单配置</button>
+    </div>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, } from "vue";
-import { components, FieldOptions } from "../../libraries/snail.vue-form";
+import { components, FieldOptions, IFormDesignerHandle } from "../../libraries/snail.vue-form";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const { FormDesigner } = components;
+let handle: IFormDesignerHandle;
 
 //  2、组件交互变量、常量
 // 测试时
@@ -18,7 +23,11 @@ const testFields: FieldOptions<any>[] = [
         "type": "Text",
         "id": "1770087123812",
         "title": "文本框",
-        "width": 2
+        "width": 2,
+        readonly: false,
+        hidden: false,
+        placeholder: "",
+        description: "",
     },
     {
         "type": "Text",
@@ -33,7 +42,7 @@ const testFields: FieldOptions<any>[] = [
         "width": 2
     },
     {
-        "type": "Text",
+        "type": "TextArea",
         "id": "1770087127027",
         "title": "文本框(3)",
         "width": 2
@@ -52,4 +61,16 @@ const testFields: FieldOptions<any>[] = [
 <style lang="less">
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
+
+.snail-form-designer {
+    height: 90% !important;
+    border: 1px solid #e0e1e2;
+    margin-bottom: 10px;
+}
+
+.formdesigner-test-buttons {
+    >button {
+        margin-right: 20px;
+    }
+}
 </style>

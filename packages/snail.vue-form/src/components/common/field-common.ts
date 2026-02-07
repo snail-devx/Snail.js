@@ -9,7 +9,8 @@ import { EmitterType, EventsType } from "snail.vue";
 import { ControlOptions } from "../../models/control-model";
 import { FieldActionOptions, FieldChangeEvent, FieldEvents, FieldLocation, FieldOptions, FieldStatusOptions, IFieldHandle, } from "../../models/field-base";
 import { IFieldContainer, FieldContainerEvents, IFieldContainerHandle, FieldContainerOptions, FieldContainerLocation } from "../../models/field-container";
-import { IFieldGlobalContext, IFieldSettingHandle } from "../../models/field-share";
+import { IFieldSettingHandle } from "../../models/field-setting";
+import { IFieldGlobalContext } from "../../models/field-share";
 
 //#region ************************************* IFieldGlobalContext：全局上下文 *************************************
 /**
@@ -365,6 +366,7 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
                 index == undefined && (index = fieldsRef.value.length + 1);
                 fieldsRef.value.splice(index, 0, markRaw(field));
                 emitter("configChange", getFields());
+                // setTimeout(global.fieldSetting.activateField, 100, field, location);
                 global.fieldSetting.activateField(field, location);
             }
             return need !== false;

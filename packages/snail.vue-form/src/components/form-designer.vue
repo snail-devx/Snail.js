@@ -28,7 +28,7 @@ import { useFormHandle } from "./common/form-common";
 import { DEFAULT_ControlRegistery } from "../utils/control-registery";
 import FormControls from "./common/form-controls.vue";
 import FormFields from "./common/form-fields.vue";
-import { FieldSettingOptions } from "../models/field-share";
+import { FieldSettingOptions } from "../models/field-setting";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

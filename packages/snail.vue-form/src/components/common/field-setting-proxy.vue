@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { inject, ref, shallowRef, } from "vue";
-import { FieldSettingOptions } from "../../models/field-share";
+import { FieldSettingOptions } from "../../models/field-setting";
 import { INJECTKEY_GlobalContext } from "./field-common";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -60,22 +60,19 @@ const { name, type } = global.getControl(field.type);
 
         >.item-title,
         >.item-detail {
-            min-height: 30px;
-            color: #606266;
+            min-height: 32px;
             display: flex;
+            align-items: center;
         }
 
         >.item-title {
-            align-items: flex-start;
-            line-height: 30px;
             width: 80px;
-            font-size: 14px;
+            flex-shrink: 0;
+            color: #606266;
         }
 
         >.item-detail {
-            align-items: center;
             flex: 1;
-            font-size: 13px;
 
             &.right {
                 justify-content: flex-end;
@@ -94,6 +91,19 @@ const { name, type } = global.getControl(field.type);
             height: 80px;
         }
 
+        .snail-select {
+            >.select-result {
+                padding-left: 10px;
+            }
+        }
+
+    }
+
+    //  一个配置多行时
+    .setting-item.multiple {
+        >.item-title {
+            align-self: flex-start;
+        }
     }
 
     //  分割线
