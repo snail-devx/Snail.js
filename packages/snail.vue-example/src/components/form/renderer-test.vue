@@ -45,10 +45,11 @@ const testFields: FieldOptions<TextControlSettings>[] = [
         }
     },
     {
-        "type": "Text",
+        "type": "TextArea",
         "id": "177008712702711",
         "title": "文本框(4) ~10",
         "width": 2,
+        value: "顶顶顶，多行",
         settings: {
             maxLength: 10,
         }

@@ -277,25 +277,33 @@ export type FieldProxyRenderOptions = FieldRenderOptions<any, any> & {
     readonly emitter: EmitterType<Pick<FieldEvents, "statusChange" | "valueChange">>;
 
     /**
-     * 取值方法
-     * - 传入后，代理组件内部响应 IFieledHandle.getValue 时，调用此方法
-     * - 不传入，代理组件内部响应 IFieledHandle.getValue 时，直接从`value`取值
-     * @param validate 是否进行值验证
-     * @returns 取值成功返回具体值，若失败
+     * 获取字段配置
+     * - 设计时，验证字段配置是否正确，不正确则返回失败；其他模式，直接返回字段无需任何验证
+     * - 传入后，代理组件内部响应 IFieledHandle.getField 时，调用此方法
+     * - 不传入，代理组件内部响应 IFieledHandle.getField 时，直接从`value`取值
+     * @returns 取值成功返回具体值，若失败则将错误信息写入error中
      */
-    readonly getValue?: <T>(validate: boolean) => Promise<T>;
+    readonly getField?: () => Promise<FieldOptions<any>>;
+    /**
+     * 取值方法
+     * - 运行时，返回字段实际值；其他模式，返回字段配置的默认值
+     * - 代理组件内部响应 IFieledHandle.getValue 时，调用此方法
+     * @param validate 是否进行值验证
+     * @returns 取值成功返回具体值，若失败则将错误信息写入error中
+     */
+    readonly getValue: <T>(validate: boolean) => Promise<T>;
     /**
      * 设置字段值
      * - 代理组件内部响应 IFieledHandle.setValue 时，调用此方法
      * - 此方法内部的改变，不用触发`valueChagne`事件，交给`IFieldHandle`句柄处理，这样才能保留追踪链路
-     * @returns 操作结果；`.success`操作是否成功：true则设置成功；false则`.reason`失败原因；`change`表示值是否改变
+     * @returns 操作结果；`.success`操作是否成功：true则设置成功；false则将错误信息写入error中；`change`表示值是否改变
      */
-    readonly setValue: (value: any) => Promise<RunResult & { change: boolean }>;
-    /**
-     * 字段的自定义验证方法
-     * - 设计时验证字段是否有效，配置是否完整
-     * - 运行时验证字段值是否有效
-     * @returns true验证通过；false验证失败，error更新错误原因
-     */
-    readonly validate: () => Promise<boolean>;
+    readonly setValue: (value: any) => Promise<{ success: boolean, change: boolean }>;
+    // /**
+    //  * 字段的自定义验证方法
+    //  * - 设计时验证字段是否有效，配置是否完整
+    //  * - 运行时验证字段值是否有效
+    //  * @returns true验证通过；false验证失败，error更新错误原因
+    //  */
+    // readonly validate: () => Promise<boolean>;
 }

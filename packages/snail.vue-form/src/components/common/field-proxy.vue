@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { computed, inject, onMounted, Ref, ref, toRaw, } from "vue";
-import { isBoolean, RunResult } from "snail.core";
+import { isBoolean, isStringNotEmpty, RunResult } from "snail.core";
 import { FieldActionOptions, FieldOptions, FieldProxyRenderOptions, FieldStatusOptions, IFieldHandle } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, canRunAction, newTraces } from "./field-common";
 
@@ -47,38 +47,35 @@ const hiddenRef = computed<boolean>(() => global.mode == "runtime" && statusRef.
 /**     字段操作句柄：已冻结 */
 const handle: IFieldHandle = Object.freeze<IFieldHandle>({
     async getField(): Promise<RunResult<FieldOptions<any>>> {
-        /** 设计时，验证字段配置是否正确，不正确则返回失败；其他模式，直接返回字段无需任何验证 */
-        let bValue = global.mode == "design" ? await _.validate() : true;
-        return bValue
-            ? { success: true, data: toRaw(field) }
-            : { success: false, reason: _.error };
+        const field = _.getField ? await _.getField() : _.field;
+        return isStringNotEmpty(_.error)
+            ? { success: false, reason: _.error }
+            : { success: true, data: toRaw(field) };
     },
-
     async getValue<T>(validate: boolean, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult<T>> {
-        /** 运行时，返回字段实际值；其他模式，返回字段配置的默认值； */
         let result: RunResult<any> = canRunAction(_, "get-value", traces);
         if (result.success == true) {
-            let bValue = validate == true ? await _.validate() : true;
-            result = bValue
-                ? { success: true, data: toRaw(_.value) }
-                : { success: false, reason: _.error };
+            const value = _.getValue ? await _.getValue(validate) : _.value;
+            result = isStringNotEmpty(_.error)
+                ? { success: false, reason: _.error }
+                : { success: true, data: toRaw(value) };
         }
         return result;
     },
     async setValue<T>(value: T, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult> {
-        /*  设置字段值，并判断是否变化，发送对应事件处理    */
+        /*  设置字段值，并判断是否变化，发送对应事件处理；备份旧值，进行深拷贝，避免引用类型数据被修改   */
         let result: RunResult = canRunAction(_, "set-value", traces);
         if (result.success == true) {
-            const oldValue = toRaw(_.value);
-            let setResult = await _.setValue(value);
-            if (setResult.success == false) {
-                setResult.reason = _.error;
-            }
-            else if (setResult.change == true) {
+            const oldValue = _.value == undefined ? undefined : JSON.parse(JSON.stringify(_.value));
+            const setResult = await _.setValue(value);
+            if (setResult.change == true) {
                 traces = newTraces(_, "set-value", "code", traces);
                 setTimeout(() => emitter("valueChange", toRaw(_.value), oldValue, traces));
             }
-            result = setResult;
+            result = setResult.success
+                ? { success: true }
+                : { success: false, reason: _.error };
+
         }
         return result;
     },

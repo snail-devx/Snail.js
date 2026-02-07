@@ -39,48 +39,55 @@ let oldText: string;
 /**     字段操作句柄：字段渲染完成后，由【field-proxy】组件的`rendered`事件传递出来 */
 let handle: IFieldHandle = undefined;
 /**     字段代理对象部分实现，已冻结 */
-const proxy = Object.freeze<Pick<FieldProxyRenderOptions, "titleDisabled" | "emitter" | "setValue" | "validate">>({
+const proxy = Object.freeze<Pick<FieldProxyRenderOptions, "titleDisabled" | "emitter" | "getValue" | "setValue">>({
     titleDisabled: false,
     emitter: emits,
-    async setValue(value: string) {
+    getValue(validate: boolean): Promise<any> {
+        const success: boolean = validate ? validateValue() : true;
+        return Promise.resolve(success ? valueRef.value : undefined);
+    },
+    setValue(value: string): Promise<{ success: boolean, change: boolean }> {
         /** 值有变化，才操作，无变化直接成功即可 */
         value = getValueString(value);
         if (value == valueRef.value) {
-            return { success: true, change: false };
+            return Promise.resolve({ success: true, change: false })
         }
+        //  更新字段值，并进行字段值验证
         valueRef.value = value;
-        oldText = valueRef.value;
-        return await proxy.validate()
+        oldText = value;
+        return Promise.resolve(validateValue()
             ? { success: true, change: true }
-            : { success: false, change: false };
-    },
-    validate() {
-        /* 设计时验证字段的配置完整性；运行时验证字段的必填、文本长度、、、；其他情况不验证 */
-        if (global.mode == "runtime") {
-            let { success, reason } = validateText(valueRef.value, handle.getStatus().data, field.settings);
-            errorRef.value = reason;
-            return Promise.resolve(success);
-        }
-        if (global.mode == "design") {
-            throw new Error("还没实现字段设计时完整性验证");
-        }
-        errorRef.value = "";
-        return Promise.resolve(true);
+            : { success: false, change: false }
+        );
     }
 });
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
+ * 验证字段值
+ * @returns true验证通过；false验证失败，error更新错误原因
+ */
+function validateValue(): boolean {
+    /* 设计时验证字段的配置完整性；运行时验证字段的必填、文本长度、、、；其他情况不验证 */
+    if (global.mode == "runtime") {
+        let { success, reason } = validateText(valueRef.value, handle.getStatus().data, field.settings);
+        errorRef.value = reason;
+        return success;
+    }
+    return true;
+}
+
+/**
  * 文本改变时
  */
-async function onTextChange() {
+function onTextChange() {
     if (oldText == valueRef.value) {
         return;
     }
     //  暂存值，进行验证，验证通过后发送【valueChange】事件
     let oldValue = oldText, newValue = valueRef.value;
     oldText = newValue;
-    if (await proxy.validate() == true) {
+    if (validateValue() == true) {
         const traces = newTraces(_, "value-change", "manual");
         emits("valueChange", newValue, oldValue, traces);
     }
@@ -103,8 +110,6 @@ if (global.mode == "runtime") {
 @import "snail.view/dist/styles/mixins.less";
 
 .field-proxy.text {
-    overflow-y: visible;
-
     >.field-detail {
         >input {
             color: #555;
@@ -115,7 +120,6 @@ if (global.mode == "runtime") {
         >textarea {
             color: #555;
             min-height: 50px;
-            overflow-y: visible;
             width: 100%;
         }
     }
