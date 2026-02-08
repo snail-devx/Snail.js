@@ -123,6 +123,10 @@ function onItemClick(node: ChooseItemNode, index: number) {
             }
         }
 
+        >.item-text {
+            color: #2e3033;
+        }
+
         //  使用伪类遮住选项和文本，由全局控制点击事件
         &::after {
             position: absolute;
@@ -174,7 +178,7 @@ function onItemClick(node: ChooseItemNode, index: number) {
 
         // 未选中样式
         &:not(.selected) {
-            border: solid 1px #8a9099;
+            border: solid 1px #dcdfe6;
         }
     }
 
