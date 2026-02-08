@@ -24,10 +24,10 @@ const testFields: FieldOptions<any>[] = [
         "id": "1770087123812",
         "title": "文本框",
         "width": 2,
-        readonly: false,
-        hidden: false,
-        placeholder: "",
-        description: "",
+        "readonly": false,
+        "hidden": false,
+        "placeholder": "",
+        "description": ""
     },
     {
         "type": "Text",
@@ -39,15 +39,60 @@ const testFields: FieldOptions<any>[] = [
         "type": "Text",
         "id": "1770087126216",
         "title": "文本框(2)",
-        "width": 2
+        "width": 2,
+        "settings": {}
     },
     {
         "type": "TextArea",
         "id": "1770087127027",
         "title": "文本框(3)",
         "width": 2
+    },
+    {
+        "type": "Checkbox",
+        "id": "1770544423261",
+        "title": "复选框",
+        "width": 2,
+        value: [{ id: "111-2", text: "dhd的皇帝皇后-2" }],
+        settings: {
+            codeEnabled: true,
+            options: [
+                { id: "111-1", text: "dhd的皇帝皇后-1" },
+                { id: "111-2", text: "dhd的皇帝皇后-2" },
+                { id: "111-3", text: "dhd的皇帝皇后-3" },
+                { id: "111-4", text: "dhd的皇帝皇后-4" },
+            ]
+        }
+    },
+    {
+        "type": "Radio",
+        "id": "1770544427165",
+        "title": "单选框",
+        "width": 2,
+        settings: {
+            options: [
+                { id: "111-1", text: "dhd的皇帝皇后-1" },
+                { id: "111-2", text: "dhd的皇帝皇后-2" },
+                { id: "111-3", text: "dhd的皇帝皇后-3" },
+                { id: "111-4", text: "dhd的皇帝皇后-4" },
+            ]
+        }
+    },
+    {
+        "type": "RComboboxo",
+        "id": "1770544428598",
+        "title": "下拉框",
+        "width": 2,
+        settings: {
+            options: [
+                { id: "111-1", text: "dhd的皇帝皇后-1" },
+                { id: "111-2", text: "dhd的皇帝皇后-2" },
+                { id: "111-3", text: "dhd的皇帝皇后-3" },
+                { id: "111-4", text: "dhd的皇帝皇后-4" },
+            ]
+        }
     }
-]
+];
 
 
 // *****************************************   👉  方法+事件    ****************************************

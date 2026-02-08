@@ -263,7 +263,7 @@ export type FieldProxyRenderOptions = FieldRenderOptions<any, any> & {
      * - 传入响应式对象，方便代理组件内实时展示错误消息
      * - 如验证失败的消息，输入值不符合规范、、、
      */
-    readonly error: string;
+    readonly error?: string;
 
     /**
      * 是否禁用标题

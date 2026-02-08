@@ -4,7 +4,7 @@
 -->
 <template>
     <div class="setting-item">
-        <div class="item-title" v-text="'标题'" />
+        <div class="item-title" v-text="'字段名称'" />
         <div class="item-detail" v-if="readonly" v-text="field.title" />
         <input class="item-detail" v-else type="text" v-model.trim="valueRef" />
         <p class="item-error ellipsis" v-if="errorRef" v-text="errorRef" />

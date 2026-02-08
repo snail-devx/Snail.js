@@ -42,9 +42,9 @@ export type ControlOptions = {
     icon?: string | string[];
 }
 
-//#region ************************************* 文本类控件的Settings *************************************
+//#region ************************************* 类控件的Settings *************************************
 /**
- * 文本控件的Settings数据解构
+ * 文本类控件的Settings数据结构
  * - 作为 `./field-base.ts`中的`FieldOptions<T>`泛型
  */
 export type TextControlSettings = {
@@ -57,4 +57,57 @@ export type TextControlSettings = {
      */
     maxLength?: number
 }
+
+/**
+ * 选项类控件的Settings数据结构
+ * - 支持单选、复选、下拉组合框
+ */
+export type OptionControlSettings = {
+    /**
+     * 启用【编码】功能
+     * - 为true时，可为每个选项自定义编码，更符合业务逻辑
+     */
+    codeEnabled?: boolean;
+    /**
+     * 启用【颜色】功能
+     * - 为true时，选项显示文本颜色，可为每个选项自定义颜色
+     */
+    colorEnabled?: boolean;
+    /**
+     * 启用【搜索】功能
+     * - 为true时，选项可本地搜索，仅【下拉组合框】生效
+     */
+    searchEnabled?: boolean;
+
+    /**
+     * 选项列表
+     */
+    options?: OptionControlValueItem[];
+
+}
+/**
+ * 选项类控件的选项数据结构
+ */
+export type OptionControlValueItem = {
+    /**
+     * 选项id，自动生成
+     */
+    id: string;
+    /**
+     * 选项文本
+     */
+    text: string;
+
+    /**
+     * 选项编码
+     * - 启用【编码】功能时生效
+     */
+    code?: string;
+    /**
+     * 选项文本颜色
+     * - 启用【颜色】功能时生效
+     */
+    color?: string;
+}
 //#endregion
+

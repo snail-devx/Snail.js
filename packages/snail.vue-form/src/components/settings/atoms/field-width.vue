@@ -4,7 +4,7 @@
 -->
 <template>
     <div class="setting-item field-width">
-        <div class="item-title" v-text="'宽度'" />
+        <div class="item-title" v-text="'组件宽度'" />
         <Select class="item-detail" :readonly="readonly" :multiple="false" :items="widthSelectItems" :value="[valueRef]"
             @change="onWidthSelectChange" />
     </div>

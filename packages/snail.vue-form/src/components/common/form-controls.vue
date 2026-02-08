@@ -80,10 +80,14 @@ function onControlItemRemove(evt: SortEvent) {
         padding: 10px;
         flex: 1;
         display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
 
         >.control-item {
             width: 50%;
             height: 30px;
+            color: #2e3033;
+            flex-shrink: 0;
             line-height: 30px;
             border: 1px dashed transparent;
             cursor: move;

@@ -8,11 +8,10 @@
         <div class="item-title" v-text="title" />
         <div class="item-detail" v-if="readonly" v-text="valueRef" />
         <template v-else>
-            <input class="item-detail" v-if="multiple != true" type="text" v-model.trim="valueRef" :title="valueRef" />
+            <input class="item-detail" v-if="multiple != true" type="text" :title="valueRef" />
             <textarea class="item-detail" v-else v-model.trim="valueRef" :title="valueRef" />
             <p class="item-error ellipsis" v-if="error" v-text="error" />
         </template>
-
     </div>
 </template>
 

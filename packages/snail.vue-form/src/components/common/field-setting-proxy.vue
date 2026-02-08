@@ -3,11 +3,11 @@
     <div class="field-setting-proxy">
         <!-- 字段类型配置、、、 -->
         <div class="setting-item divider">
-            <div class="item-title">ID</div>
+            <div class="item-title">字段ID</div>
             <div class="item-detail placeholder" v-text="field.id" />
         </div>
         <div class="setting-item divider">
-            <div class="item-title">类型</div>
+            <div class="item-title">控件类型</div>
             <div class="item-detail placeholder" v-text="`${name}(${type})`" />
         </div>
         <div class="setting-divider" />
@@ -97,6 +97,11 @@ const { name, type } = global.getControl(field.type);
             }
         }
 
+        .snail-choose {
+            >.choose-item {
+                margin-right: 0;
+            }
+        }
     }
 
     //  一个配置多行时

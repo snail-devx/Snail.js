@@ -7,7 +7,11 @@
     <FieldSettingProxy :="_">
         <FieldTitle :="_" />
         <FieldWidth :="_" />
-        <FieldLikeText :readonly="readonly" title="默认值" :value="field.value" :multiple="field.type == 'TextArea'"
+        <FieldLikeText :readonly="readonly" title="提示信息" :value="field.placeholder" :multiple="false"
+            @change="value => (field.placeholder = value, refresh(field.id, field))" />
+        <FieldLikeText :readonly="readonly" title="字段说明" :value="field.description" :multiple="false"
+            @change="value => (field.description = value, refresh(field.id, field))" />
+        <FieldLikeText :readonly="readonly" title="字段默认值" :value="field.value" :multiple="field.type == 'TextArea'"
             @change="value => (field.value = value, refresh(field.id, field))" />
         <div class="setting-divider" />
         <FieldLikeBoolean :readonly="readonly" title="必填" :value="field.required"
@@ -21,11 +25,6 @@
             @change="value => (field.settings.minLength = value, refresh(field.id, field))" />
         <FieldLikeNumber :readonly="readonly" title="最大长度" :precision="0" :value="field.settings.maxLength"
             @change="value => (field.settings.maxLength = value, refresh(field.id, field))" />
-        <div class="setting-divider" />
-        <FieldLikeText :readonly="readonly" title="提示信息" :value="field.placeholder" :multiple="false"
-            @change="value => (field.placeholder = value, refresh(field.id, field))" />
-        <FieldLikeText :readonly="readonly" title="字段说明" :value="field.description" :multiple="false"
-            @change="value => (field.description = value, refresh(field.id, field))" />
     </FieldSettingProxy>
 </template>
 
