@@ -31,19 +31,15 @@
                 <Sort :disabled="readonly" :changer="optionItems.length" draggable=".option-item" handle=".option-move"
                     @update="onItemSort">
                     <div class="option-item" v-for="item in optionItems" :key="item.id">
-                        <!-- 只读模式时 -->
-                        <template v-if="readonly">
-                            还没实现【只读】时的渲染
-                        </template>
-                        <!-- 非只读模式时 -->
-                        <template v-else>
-                            <Choose :type="'checkbox'" :mode="'beautiful'" :multi="false"
-                                :items="[{ text: '', value: true }]" v-model="item.selected"
-                                @change="value => onItemSelectedChange(item, value)" />
-                            <input type="text" placeholder="文本" v-model.trim="item.text" :title="item.text"
-                                @change="syncFieldSetting" />
-                            <input type="text" placeholder="编码" v-model.trim="item.code" :title="item.code"
-                                v-if="codeEnabledRef" @change="syncFieldSetting" />
+                        <Choose :readonly="readonly" :type="'checkbox'" :mode="'beautiful'" :multi="false"
+                            :items="[{ text: '', value: true }]" v-model="item.selected"
+                            @change="value => onItemSelectedChange(item, value)" />
+                        <input type="text" :placeholder="readonly ? '' : '文本'" :readonly="readonly" :title="item.text"
+                            v-model.trim="item.text" @change="syncFieldSetting" />
+                        <input type="text" :placeholder="readonly ? '' : '编码'" :readonly="readonly" :title="item.code"
+                            v-model.trim="item.code" v-if="codeEnabledRef" @change="syncFieldSetting" />
+                        <!-- 非只读模式时显示操作按钮 -->
+                        <template v-if="readonly != true">
                             <Icon :type="'grip'" :size="20" class="option-move" />
                             <Icon :type="'trash'" :size="20" @click="onDeleteItem" />
                         </template>
@@ -216,8 +212,9 @@ if (isArrayNotEmpty(field.settings.options)) {
             }
 
             >input {
+                flex: 1;
                 height: 30px;
-                margin-left: 10px;
+                margin-left: 5px;
             }
 
             >.snail-icon.option-move {

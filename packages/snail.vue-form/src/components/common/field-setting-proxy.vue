@@ -91,9 +91,24 @@ const { name, type } = global.getControl(field.type);
             height: 80px;
         }
 
+        input[readonly] {
+            border: none;
+            padding-left: 0;
+            pointer-events: none;
+        }
+
         .snail-select {
             >.select-result {
                 padding-left: 10px;
+            }
+
+            //  只读时的特定样式处理
+            &.readonly {
+                border: none;
+
+                >.select-result {
+                    padding-left: 0;
+                }
             }
         }
 

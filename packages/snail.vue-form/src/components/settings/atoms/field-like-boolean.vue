@@ -6,7 +6,7 @@
     <div class="setting-item">
         <div class="item-title" v-text="title" />
         <div class="item-detail right">
-            <Switch :readonlyr="readonly" v-model="valueRef" @change="value => emits('change', value)" />
+            <Switch :readonly="readonly" v-model="valueRef" @change="value => emits('change', value)" />
         </div>
     </div>
 </template>

@@ -24,6 +24,7 @@ const testFields: FieldOptions<any>[] = [
         "id": "1770087123812",
         "title": "文本框",
         "width": 2,
+        required: true,
         "readonly": false,
         "hidden": false,
         "placeholder": "",
@@ -53,7 +54,7 @@ const testFields: FieldOptions<any>[] = [
         "id": "1770544423261",
         "title": "复选框",
         "width": 2,
-        value: [{ id: "111-2", text: "dhd的皇帝皇后-2" }],
+        value: [{ id: "111-2", text: "dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2" }],
         settings: {
             codeEnabled: true,
             options: [
@@ -71,7 +72,7 @@ const testFields: FieldOptions<any>[] = [
         "width": 2,
         settings: {
             options: [
-                { id: "111-1", text: "dhd的皇帝皇后-1" },
+                { id: "111-1", text: "dhd的皇帝皇后-1dhd的皇帝皇后-2dhd的皇帝皇后-2" },
                 { id: "111-2", text: "dhd的皇帝皇后-2" },
                 { id: "111-3", text: "dhd的皇帝皇后-3" },
                 { id: "111-4", text: "dhd的皇帝皇后-4" },
