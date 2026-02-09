@@ -1,7 +1,7 @@
 <!-- 表单渲染器测试 -->
 <template>
     <FormRenderer :columns="4" :controls="undefined" :readonly="false" :fields="testFields" :values="values"
-        mode="runtime" @rendered="hd => (handle = hd, console.log(hd))" @field-rendered="console.log"
+        mode="runtime" @rendered="hd => (handle = hd, console.log('rendered', hd))" @field-rendered="console.log"
         @value-change="console.log" @status-change="console.log" />
     <div class="formrenderer-test-buttons">
         <button @click="getValues">获取表单值</button>
@@ -14,7 +14,10 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, } from "vue";
-import { components, FieldOptions, IFieldContainerHandle, IFormDesignerHandle, IFormRenderHandle, TextControlSettings } from "../../libraries/snail.vue-form";
+import {
+    components, FieldOptions, IFieldContainerHandle, IFormDesignerHandle, IFormRenderHandle,
+    OptionControlSettings, TextControlSettings
+} from "../../libraries/snail.vue-form";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -24,51 +27,134 @@ let hidden: boolean = false;
 
 //  2、组件交互变量、常量
 // 测试时
-const testFields: FieldOptions<TextControlSettings>[] = [
+const testFields: FieldOptions<TextControlSettings | OptionControlSettings>[] = [
     {
         "type": "Text",
-        "id": "17700871262161",
-        "title": "文本框(2) 2~10",
-        "width": 3,
-        settings: {
-            minLength: 2,
-            maxLength: 10,
-        }
+        "id": "1770087123812",
+        "title": "文本框",
+        "width": 2,
+        "required": true,
+        "readonly": false,
+        "hidden": false,
+        "placeholder": "",
+        "description": ""
     },
     {
         "type": "Text",
-        "id": "17700871270271",
-        "title": "文本框(3) 2~",
+        "id": "1770087124425",
+        "title": "文本框(1)",
+        "width": 2
+    },
+    {
+        "type": "Text",
+        "id": "1770087126216",
+        "title": "文本框(2)",
         "width": 2,
-        settings: {
-            minLength: 2,
-        }
+        "settings": {}
     },
     {
         "type": "TextArea",
-        "id": "177008712702711",
-        "title": "文本框(4) ~10",
+        "id": "1770087127027",
+        "title": "文本框(3)",
+        "width": 2
+    },
+    {
+        "type": "Checkbox",
+        "id": "1770544423261",
+        "title": "复选框",
         "width": 2,
-        value: "顶顶顶，多行",
-        settings: {
-            maxLength: 10,
+        "value": [
+            {
+                "id": "111-2",
+                "text": "dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2"
+            }
+        ],
+        "settings": {
+            "codeEnabled": true,
+            "options": [
+                {
+                    "id": "111-1",
+                    "text": "dhd的皇帝皇后-1"
+                },
+                {
+                    "id": "111-1-1",
+                    "text": "dhd的皇帝皇后-1-1"
+                },
+                {
+                    "id": "111-1-2",
+                    "text": "dhd的皇帝皇后-1-2"
+                },
+                {
+                    "id": "111-2",
+                    "text": "dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-3",
+                    "text": "dhd的皇帝皇后-3"
+                },
+                {
+                    "id": "111-4",
+                    "text": "dhd的皇帝皇后-4"
+                }
+            ]
         }
     },
     {
-        "type": "Text",
-        "id": "177008712702712",
-        "title": "文本框(5) ",
+        "type": "Radio",
+        "id": "1770544427165",
+        "title": "单选框",
         "width": 2,
-        hidden: true,
+        "settings": {
+            "layout": "vertical",
+            "options": [
+                {
+                    "id": "111-1",
+                    "text": "dhd的皇帝皇后-1dhd的皇帝皇后-2dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-2",
+                    "text": "dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-3",
+                    "text": "dhd的皇帝皇后-3"
+                },
+                {
+                    "id": "111-4",
+                    "text": "dhd的皇帝皇后-4"
+                }
+            ]
+        }
     },
     {
-        "type": "Text",
-        "id": "177008712702713",
-        "title": "文本框(6) 必填",
-        "width": 3,
-        required: true,
+        "type": "Combobox",
+        "id": "1770544428598",
+        "title": "下拉框",
+        "width": 2,
+        "settings": {
+            "options": [
+                {
+                    "id": "111-1",
+                    "text": "dhd的皇帝皇后-1"
+                },
+                {
+                    "id": "111-2",
+                    "text": "dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-3",
+                    "text": "dhd的皇帝皇后-3"
+                },
+                {
+                    "id": "111-4",
+                    "text": "dhd的皇帝皇后-4"
+                }
+            ],
+            "searchEnabled": true
+        },
+        "required": true
     }
-]
+];
 const values = {
     "17700871262161": "单行文本框测试"
 }
@@ -82,6 +168,26 @@ async function getFieldValue() {
 }
 async function setFieldValue() {
     console.log(await handle.setValue('17700871262161', new Date().getTime()));
+    //  复选框 
+    console.log(await handle.setValue('1770544423261', [{
+        "id": "111-3",
+        "text": "dhd的皇帝皇后-3"
+    },
+    {
+        "id": "111-4",
+        "text": "dhd的皇帝皇后-4"
+    }]));
+    //  单选框
+    console.log(await handle.setValue('1770544427165', [{
+        "id": "111-2",
+        "text": "dhd的皇帝皇后-2"
+    }]));
+    //  下拉框
+    console.log(await handle.setValue('1770544428598', [{
+        "id": "111-4",
+        "text": "dhd的皇帝皇后-2"
+    }]));
+
 }
 function getFieldStatus() {
     console.log(handle.getStatus("17700871270271"));

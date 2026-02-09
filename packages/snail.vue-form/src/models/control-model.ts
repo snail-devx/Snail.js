@@ -1,4 +1,4 @@
-import { ComponentOptions } from "snail.vue";
+import { ChooseOptions, ComponentOptions } from "snail.vue";
 
 /**
  * 表单控件配置选项
@@ -78,6 +78,11 @@ export type OptionControlSettings = {
      * - 为true时，选项可本地搜索，仅【下拉组合框】生效
      */
     searchEnabled?: boolean;
+    /**
+     * 选项布局
+     * - 仅【单选】、【复选框】生效
+     */
+    layout?: ChooseOptions<any>["layout"];
 
     /**
      * 选项列表

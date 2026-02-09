@@ -122,7 +122,6 @@ function refresh() {
         input[readonly] {
             border: none;
             padding-left: 0;
-            pointer-events: none;
         }
 
         .snail-select {

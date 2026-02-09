@@ -1,6 +1,6 @@
 <!-- 表单设计器测试 -->
 <template>
-    <FormDesigner :fields="testFields" :readonly="false" :columns="4" :controls="undefined" :default-span="2"
+    <FormDesigner :fields="testFields" :readonly="true" :columns="4" :controls="undefined" :default-span="2"
         @rendered="hd => (console.log(hd), handle = hd)" @change="console.log" />
     <div class="formdesigner-test-buttons">
         <button @click="async () => console.log(await handle.getFields())">获取表单配置</button>
@@ -58,7 +58,7 @@ const testFields: FieldOptions<any>[] = [
         settings: {
             codeEnabled: true,
             options: [
-                { id: "111-1", text: "dhd的皇帝皇后-1" },
+                { id: "111-1", text: "dhd的皇帝皇后-1", code: "dddddddddd" },
                 { id: "111-2", text: "dhd的皇帝皇后-2" },
                 { id: "111-3", text: "dhd的皇帝皇后-3" },
                 { id: "111-4", text: "dhd的皇帝皇后-4" },

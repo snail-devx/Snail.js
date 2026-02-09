@@ -18,10 +18,19 @@
             @change="value => proxy.update('readonly', false, value)" />
         <FieldLikeBoolean title="隐藏" :readonly="readonly" :value="field.hidden"
             @change="value => proxy.update('hidden', false, value)" />
-        <!-- 选项配置、默认值配置合并到独立一节中 -->
         <div class="setting-divider" />
+        <!-- 选项布局和搜索功能；根据控件类型不同配置 -->
         <FieldLikeBoolean title="选项搜索" :readonly="readonly" :value="field.settings.searchEnabled"
             v-if="field.type == 'Combobox'" @change="value => proxy.update('searchEnabled', true, value)" />
+        <div class="setting-item" v-else>
+            <div class="item-title">选项布局</div>
+            <div class="item-detail right">
+                <Choose :readonly="readonly" :type="'checkbox'" :mode="'beautiful'" :multi="false"
+                    :items="[{ text: '水平', value: 'horizontal' }, { text: '垂直', value: 'vertical' }]"
+                    v-model="layoutRef" @change="value => proxy.update('layout', true, value)" />
+            </div>
+        </div>
+        <!-- 选项配置、默认值配置合并到独立一节中 -->
         <div class="setting-item">
             <div class="item-title">选项配置</div>
             <div class="item-detail right">
@@ -57,17 +66,16 @@
 </template>
 
 <script setup lang="ts">
+import { isArrayNotEmpty, moveFromArray } from "snail.core";
 import { Ref, ref, shallowRef, ShallowRef, useTemplateRef } from "vue";
-import { ChooseItem, components, useReactive } from "snail.vue";
-import { OptionControlSettings, OptionControlValueItem, TextControlSettings } from "../../models/control-model";
+import { components } from "snail.vue";
+import { OptionControlSettings, OptionControlValueItem } from "../../models/control-model";
 import { FieldSettingOptions } from "../../models/field-setting";
 import FieldSettingProxy from "../common/field-setting-proxy.vue";
 import FieldTitle from "./atoms/field-title.vue";
 import FieldWidth from "./atoms/field-width.vue";
-import FieldLikeNumber from "./atoms/field-like-number.vue";
 import FieldLikeText from "./atoms/field-like-text.vue";
 import FieldLikeBoolean from "./atoms/field-like-boolean.vue";
-import { isArrayNotEmpty, isStringNotEmpty, moveFromArray } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -79,6 +87,8 @@ const { field, readonly } = _;
 field.settings || (field.settings = {});
 /**     是否是多选 */
 const isMultiple: boolean = field.type == "Checkbox";
+/**      选项布局：仅单选和多选有值，下拉组合框无值 */
+const layoutRef: ShallowRef = shallowRef(field.settings.layout || "horizontal");
 /**     code、color 停启用配置项 */
 const valueRef2CodeColor: ShallowRef<string[]> = shallowRef([]);
 /**     是否启用选项编码 */
@@ -214,8 +224,20 @@ if (isArrayNotEmpty(field.settings.options)) {
 
             >input {
                 flex: 1;
-                height: 30px;
+                height: 28px;
                 margin-left: 5px;
+            }
+
+            //  只读时，组装这样的格式“ 选项文本 | 编码 ”
+            >input[readonly] {
+                padding-right: 0;
+
+                &:nth-child(n+3) {
+                    border-radius: 0;
+                    height: 20px;
+                    padding-left: 10px;
+                    border-left: 1px solid #dddfed;
+                }
             }
 
             >.snail-icon.option-move {

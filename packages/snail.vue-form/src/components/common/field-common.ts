@@ -295,8 +295,8 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
              */
             function onRendered(handle: IFieldHandle) {
                 fieldHandleMap.set(field.id, handle);
-                tryTriggerRenderEvent();
                 emitter("fieldRendered", field, buildFieldChangeEvent());
+                tryTriggerRenderEvent();
             };
             /**
              * 字段值变更
@@ -365,8 +365,7 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
             if (need !== false) {
                 index == undefined && (index = fieldsRef.value.length + 1);
                 fieldsRef.value.splice(index, 0, markRaw(field));
-                emitter("configChange", getFields());
-                // setTimeout(global.fieldSetting.activateField, 100, field, location);
+                triggerConfigChangeEvent();
                 global.fieldSetting.activateField(field, location);
             }
             return need !== false;
@@ -408,7 +407,7 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
             if (need !== false) {
                 field = buildField(field.type, field);
                 fieldsRef.value.splice(index + 1, 0, markRaw(field));
-                allFieldRendered && emitter("configChange", getFields());
+                triggerConfigChangeEvent();
                 global.fieldSetting.activateField(field, location);
             }
             return need !== false;
@@ -424,7 +423,7 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
             /*  移动字段后，发送字段改变事件；*/
             throwIfFalse(global.mode == "design", "only in design mode can move field");
             moveFromArray(container.fields, oldIndex, newIndex);
-            allFieldRendered && emitter("configChange", getFields());
+            triggerConfigChangeEvent();
             return true;
         },
     }, "useFieldContainer"));

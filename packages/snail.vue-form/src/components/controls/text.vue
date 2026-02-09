@@ -3,8 +3,8 @@
     2、往代理组件传递参数时，直接使用上层属性，不中转，避免破坏响应式
  -->
 <template>
-    <FieldProxy class="text" :readonly="readonly" :parent-field-id="parentFieldId" :row-index="rowIndex" :field="field"
-        :value="valueRef" :error="errorRef" :="proxy" @rendered="hd => { handle = hd, emits('rendered', hd) }">
+    <FieldProxy :readonly="readonly" :parent-field-id="parentFieldId" :row-index="rowIndex" :field="field"
+        :value="valueRef" :error="errorRef" :="proxy" @rendered="hd => emits('rendered', handle = hd)">
         <template #="{ required, readonly, hidden }">
             <input v-if="field.type == 'Text'" type="text" :readonly="readonly" v-model="valueRef"
                 :placeholder="field.placeholder" @change="onTextChange" />
@@ -108,20 +108,4 @@ if (global.mode == "runtime") {
 <style lang="less">
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
-
-.field-proxy.text {
-    >.field-detail {
-        >input {
-            color: #555;
-            height: 34px;
-            width: 100%;
-        }
-
-        >textarea {
-            color: #555;
-            min-height: 50px;
-            width: 100%;
-        }
-    }
-}
 </style>

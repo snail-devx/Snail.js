@@ -6,7 +6,8 @@
         这里双向绑定 valueModel ，仅是为了配合实现IFieldHandle功能，不对value做任何加工处理
 -->
 <template>
-    <div class="field-proxy" :class="{ readonly: readonlyRef, hidden: hiddenRef }">
+    <div class="field-proxy" :class="field.type.toLowerCase()"
+        v-bind:class="{ readonly: readonlyRef, hidden: hiddenRef }">
         <div class="field-title" v-if="titleDisabled != true">
             {{ field.title }}
             <span v-if="requiredRef">*</span>
@@ -20,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, onMounted, Ref, ref, toRaw, } from "vue";
+import { computed, inject, onMounted, Ref, ref, toRaw, nextTick } from "vue";
 import { isBoolean, isStringNotEmpty, RunResult } from "snail.core";
 import { FieldActionOptions, FieldOptions, FieldProxyRenderOptions, FieldStatusOptions, IFieldHandle } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, canRunAction, newTraces } from "./field-common";
@@ -115,7 +116,9 @@ const handle: IFieldHandle = Object.freeze<IFieldHandle>({
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应：组件挂载后，触发【rendered】事件，通知外部做挂接
-onMounted(() => emits("rendered", handle));
+onMounted(() => {
+    nextTick(() => emits("rendered", handle));
+});
 </script>
 
 <style lang="less">
@@ -145,6 +148,7 @@ onMounted(() => emits("rendered", handle));
     // 字段详情，追加上 字段描述和验证相关信息
     >.field-detail {
         flex: 1;
+        overflow-x: hidden;
         padding: 4px 10px;
 
         >p.desc,
@@ -157,6 +161,19 @@ onMounted(() => emits("rendered", handle));
 
         >p.error {
             color: #f74b4b;
+        }
+    }
+
+    //  字段详情中特定控件的强制样式
+    >.field-detail {
+        input {
+            height: 34px;
+            width: 100%;
+        }
+
+        textarea {
+            min-height: 50px;
+            width: 100%;
         }
     }
 }
