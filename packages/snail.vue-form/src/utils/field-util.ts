@@ -1,12 +1,13 @@
 /**
- * 控件助手方法
+ * 字段助手方法
  * - 提供一下控件的通用方法，如文本必填、长度验证，数值的最大值、最小值，小数位数、、、
  * - 将一些非ui代码提取到这里，减少vue组件中的代码量，让其专注ui交互
  */
 
 import { isStringNotEmpty, RunResult } from "snail.core";
 import { TextControlSettings } from "../models/control-model";
-import { FieldStatusOptions } from "../models/field-base";
+import { FieldOptions, FieldStatusOptions } from "../models/field-base";
+import { IFieldContainerHandle } from "../models/field-container";
 
 /**
  * 处理值字符串：确保始终为string，且不是undefined、、、

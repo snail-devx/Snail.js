@@ -80,7 +80,7 @@ const testFields: FieldOptions<any>[] = [
         }
     },
     {
-        "type": "RComboboxo",
+        "type": "Combobox",
         "id": "1770544428598",
         "title": "下拉框",
         "width": 2,

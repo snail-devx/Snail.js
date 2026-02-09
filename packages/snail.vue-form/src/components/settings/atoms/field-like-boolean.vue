@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, ShallowRef, shallowRef, } from "vue";
+import { ref, ShallowRef, } from "vue";
 import { FieldPropertySettingOptions } from "../../../models/field-setting";
 import { ChangeEvents, components } from "snail.vue";
 

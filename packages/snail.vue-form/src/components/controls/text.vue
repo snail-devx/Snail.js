@@ -20,7 +20,7 @@ import { inject, onMounted, ShallowRef, shallowRef, watch, } from "vue";
 import { TextControlSettings } from "../../models/control-model";
 import { FieldEvents, FieldProxyRenderOptions, FieldRenderOptions, IFieldHandle, } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, newTraces } from "../common/field-common";
-import { getValueString, validateText } from "../../utils/control-util";
+import { getValueString, validateText } from "../../utils/field-util";
 import FieldProxy from "../common/field-proxy.vue";
 
 // *****************************************   👉  组件定义    *****************************************

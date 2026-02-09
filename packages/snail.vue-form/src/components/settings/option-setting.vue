@@ -1,25 +1,27 @@
 <!-- 选项类控件的设置：（Radio）、多选（Checkbox）、下拉组合（Combobox，C#叫法，更适合） 
     1、无placeholder 配置，只有字段说明
     2、单选、多选可配置选项样式：选项、按钮模式
+    3、选项文本不是实时刷新到字段，那样刷新次数太多了，先使用change方式
+        但这样有点问题，需要field-setting-proxy中getField时在特定情况下取不到最新的，后期再优化
 
 -->
 <template>
-    <FieldSettingProxy :="_">
+    <FieldSettingProxy :="_" ref="setting-proxy">
         <FieldTitle :="_" />
         <FieldWidth :="_" />
-        <!-- <FieldLikeText :readonly="readonly" title="提示信息" :value="field.placeholder" :multiple="false"
-            @change="value => (field.placeholder = value, refresh(field.id, field))" /> -->
-        <FieldLikeText :readonly="readonly" title="字段说明" :value="field.description" :multiple="false"
-            @change="value => (field.description = value, refresh(field.id, field))" />
+        <FieldLikeText title="字段说明" :readonly="readonly" :value="field.description" :multiple="false"
+            @change="value => proxy.update('description', false, value)" />
         <div class="setting-divider" />
-        <FieldLikeBoolean :readonly="readonly" title="必填" :value="field.required"
-            @change="value => (field.required = value, refresh(field.id, field))" />
-        <FieldLikeBoolean :readonly="readonly" title="只读" :value="field.readonly"
-            @change="value => (field.readonly = value, refresh(field.id, field))" />
-        <FieldLikeBoolean :readonly="readonly" title="隐藏" :value="field.hidden"
-            @change="value => (field.hidden = value, refresh(field.id, field))" />
+        <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
+            @change="value => proxy.update('required', false, value)" />
+        <FieldLikeBoolean title="只读" :readonly="readonly" :value="field.readonly"
+            @change="value => proxy.update('readonly', false, value)" />
+        <FieldLikeBoolean title="隐藏" :readonly="readonly" :value="field.hidden"
+            @change="value => proxy.update('hidden', false, value)" />
         <!-- 选项配置、默认值配置合并到独立一节中 -->
         <div class="setting-divider" />
+        <FieldLikeBoolean title="选项搜索" :readonly="readonly" :value="field.settings.searchEnabled"
+            v-if="field.type == 'Combobox'" @change="value => proxy.update('searchEnabled', true, value)" />
         <div class="setting-item">
             <div class="item-title">选项配置</div>
             <div class="item-detail right">
@@ -55,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref, shallowRef, ShallowRef } from "vue";
+import { Ref, ref, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import { ChooseItem, components, useReactive } from "snail.vue";
 import { OptionControlSettings, OptionControlValueItem, TextControlSettings } from "../../models/control-model";
 import { FieldSettingOptions } from "../../models/field-setting";
@@ -65,15 +67,14 @@ import FieldWidth from "./atoms/field-width.vue";
 import FieldLikeNumber from "./atoms/field-like-number.vue";
 import FieldLikeText from "./atoms/field-like-text.vue";
 import FieldLikeBoolean from "./atoms/field-like-boolean.vue";
-import { isArrayNotEmpty, moveFromArray } from "snail.core";
+import { isArrayNotEmpty, isStringNotEmpty, moveFromArray } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const _ = defineProps<FieldSettingOptions<OptionControlSettings>>();
+const proxy = useTemplateRef("setting-proxy");
 const { Choose, Sort, Icon, Button } = components;
-const { watcher } = useReactive();
-const { field, readonly, container } = _;
-const { refresh } = container;
+const { field, readonly } = _;
 //  2、组件交互变量、常量
 field.settings || (field.settings = {});
 /**     是否是多选 */
@@ -95,7 +96,7 @@ function syncFieldSetting() {
     //  编码、颜色是否启用
     field.settings.codeEnabled = codeEnabledRef.value;
     field.settings.colorEnabled = colorEnabledRef.value;
-    //  遍历选项，构建选项和默认值
+    //  遍历选项，构建选项和默认值：
     const values: OptionControlValueItem[] = [];
     field.settings.options = optionItems.value.map<OptionControlValueItem>(item => {
         const newItem: OptionControlValueItem = { id: item.id, text: item.text, code: item.code, color: item.color };
@@ -104,7 +105,7 @@ function syncFieldSetting() {
     });
     field.value = values;
     //  构建完成，刷新字段
-    container.refresh(field.id, field);
+    proxy.value.refresh();
 }
 
 /**

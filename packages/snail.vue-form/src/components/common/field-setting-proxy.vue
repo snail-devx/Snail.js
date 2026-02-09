@@ -23,14 +23,42 @@ import { INJECTKEY_GlobalContext } from "./field-common";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const { field } = defineProps<FieldSettingOptions<any>>();
+const { field, container } = defineProps<FieldSettingOptions<any>>();
+const emits = defineEmits<{ redn }>();
 const global = inject(INJECTKEY_GlobalContext);
 const { name, type } = global.getControl(field.type);
 
 //  2、组件交互变量、常量
-
+defineExpose({ update, refresh });
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 更新字段设置项
+ * - 更新完成后，同步刷新字段
+ * @param key 设置项key
+ * @param keyInSettings key是否是在field.settings中，false时，则是`field`的直属苏还行
+ * @param value 设置项值
+ */
+function update(key: string, keyInSettings: boolean, value: any) {
+    /** 设置项值，为undefined时，则删除此设置项 */
+    if (value == undefined) {
+        keyInSettings
+            ? delete field.settings[key]
+            : delete field[key];
+    }
+    else {
+        keyInSettings
+            ? field.settings[key] = value
+            : field[key] = value;
+    }
+    refresh();
+}
+/**
+ * 刷新字段
+ */
+function refresh() {
+    container.refresh(field.id, field);
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听

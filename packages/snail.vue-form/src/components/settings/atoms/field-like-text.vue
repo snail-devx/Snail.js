@@ -8,17 +8,16 @@
         <div class="item-title" v-text="title" />
         <div class="item-detail" v-if="readonly" v-text="valueRef" />
         <template v-else>
-            <input class="item-detail" v-if="multiple != true" type="text" :title="valueRef" />
-            <textarea class="item-detail" v-else v-model.trim="valueRef" :title="valueRef" />
+            <input class="item-detail" v-if="multiple != true" type="text" :title="valueRef" v-model.trim="valueRef" />
+            <textarea class="item-detail" v-else :title="valueRef" v-model.trim="valueRef" />
             <p class="item-error ellipsis" v-if="error" v-text="error" />
         </template>
     </div>
 </template>
 
 <script setup lang="ts">
-import { isStringNotEmpty } from "snail.core";
-import { ref, ShallowRef, shallowRef, } from "vue";
-import { ChangeEvents, ReadonlyOptions, useReactive } from "snail.vue";
+import { ShallowRef, shallowRef, } from "vue";
+import { ChangeEvents, useReactive } from "snail.vue";
 import { FieldTextPropertySettingOptions } from "../../../models/field-setting";
 
 // *****************************************   👉  组件定义    *****************************************

@@ -20,6 +20,7 @@ export type FieldSettingOptions<Settings> = Required<ReadonlyOptions> & {
      */
     container: IFieldContainerHandle;
 }
+
 /**
  * 字段设置句柄
  * - 用于激活、关闭、字段设置面板
@@ -53,7 +54,6 @@ export interface IFieldSettingHandle {
      */
     deactivateField();
 }
-
 
 //#region ************************************* 字段属性设置相关配置选项 *************************************
 /**
