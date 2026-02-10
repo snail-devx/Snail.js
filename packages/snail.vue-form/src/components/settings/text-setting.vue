@@ -11,9 +11,9 @@
         <FieldLikeText title="默认值" :readonly="readonly" :value="field.value" :multiple="field.type == 'TextArea'"
             @change="value => proxy.update('value', false, value)" />
         <FieldLikeNumber title="最小长度" :readonly="readonly" :precision="0" :value="field.settings.minLength"
-            @change="value => proxy.update('minLength', true, value)" />
+            :abs-value="true" @change="value => proxy.update('minLength', true, value)" />
         <FieldLikeNumber title="最大长度" :readonly="readonly" :precision="0" :value="field.settings.maxLength"
-            @change="value => proxy.update('maxLength', true, value)" />
+            :abs-value="true" @change="value => proxy.update('maxLength', true, value)" />
         <div class="setting-divider" />
         <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
             @change="value => proxy.update('required', false, value)" />

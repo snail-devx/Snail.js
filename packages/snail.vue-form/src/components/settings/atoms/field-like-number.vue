@@ -7,13 +7,13 @@
   <div class="setting-item">
     <div class="item-title" v-text="title" />
     <div class="item-detail" v-if="readonly" v-text="value" />
-    <input class="item-detail" v-else type="number" v-model.trim="valueRef" />
+    <input class="item-detail" v-else type="number" v-model.number="valueRef" />
     <p class="item-error ellipsis" v-text="error" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, } from "vue";
+import { nextTick, ref, shallowRef, } from "vue";
 import { ChangeEvents, ReadonlyOptions, useReactive } from "snail.vue";
 import { FieldNumberPropertySettingOptions } from "../../../models/field-setting";
 
@@ -39,12 +39,20 @@ _.readonly || watcher(valueRef, (newValue, oldValue) => {
     hasDealValueChange = false;
     return;
   }
+  // @ts-ignore
+  newValue === "" && (newValue = undefined);
+  //  值非空时，进行小数位数和绝对值处理
   if (newValue != undefined && precision >= 0) {
     const tmpValue: string = newValue.toFixed(precision);
     newValue = precision == 0 ? parseInt(tmpValue) : parseFloat(tmpValue);
+    _.absValue == true && (newValue = Math.abs(newValue));
     isNaN(newValue) && (newValue = undefined);
   }
-  valueRef.value != newValue && (valueRef.value = newValue);
+  //  处理后发送值改变事件；若值和原始新值不一致时，同步更新
+  if (valueRef.value != newValue) {
+    hasDealValueChange = true;
+    valueRef.value = newValue;
+  }
   emits("change", newValue);
 });
 //  2、生命周期响应

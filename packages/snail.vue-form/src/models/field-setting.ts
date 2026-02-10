@@ -70,6 +70,10 @@ export type FieldPropertySettingOptions<Value> = Required<ReadonlyOptions> & {
      */
     value: Value;
     /**
+     * 是否使用绝对值，负数时，转为绝对值
+     */
+    absValue?: boolean;
+    /**
      * 异常信息
      * - 外部ref传入，进行实时渲染
      */

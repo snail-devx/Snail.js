@@ -65,11 +65,18 @@ export type NumericControlSettings = {
     /**
      * 最小值
      */
-    min?: number;
+    minValue?: number;
     /**
      * 最大值
      */
-    max?: number
+    maxValue?: number;
+
+    /**
+     * 精度，保留几位小数
+     * - 要求0、正整数,输入小数则强制整数
+     * - 负数、不传入则不处理
+     */
+    precision?: number
 }
 
 /**

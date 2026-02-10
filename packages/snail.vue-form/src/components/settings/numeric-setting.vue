@@ -1,14 +1,20 @@
 <!-- 数字类控件的设置：金额-Money，百分比-Percent，数值-Number
-    
-
 -->
 <template>
     <FieldSettingProxy :="_" ref="setting-proxy">
         <FieldTitle :="_" />
         <FieldWidth :="_" />
+        <!-- 字段值相关配置:默认值、最大值、最小值、小数位数、前后缀、、、、-->
         <div class="setting-divider" />
         <FieldLikeNumber title="默认值" :readonly="readonly" :value="field.value"
             @change="value => proxy.update('value', false, value)" />
+        <FieldLikeNumber title="最小值" :readonly="readonly" :value="field.settings.minValue"
+            @change="value => proxy.update('minValue', true, value)" />
+        <FieldLikeNumber title="最大值" :readonly="readonly" :value="field.settings.maxValue"
+            @change="value => proxy.update('maxValue', true, value)" />
+        <FieldLikeNumber title="小数位数" :readonly="readonly" :value="field.settings.precision" :abs-value="true"
+            @change="value => proxy.update('precision', true, value)" />
+        <!-- 其他配置项目 -->
         <div class="setting-divider" />
         <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
             @change="value => proxy.update('required', false, value)" />
