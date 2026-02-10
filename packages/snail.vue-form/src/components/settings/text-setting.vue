@@ -7,26 +7,23 @@
     <FieldSettingProxy :="_" ref="setting-proxy">
         <FieldTitle :="_" />
         <FieldWidth :="_" />
+        <FieldLikeText title="提示信息" :readonly="readonly" :value="field.placeholder" :multiple="false"
+            @change="value => proxy.update('placeholder', false, value)" />
+        <FieldLikeText title="字段说明" :readonly="readonly" :value="field.description" :multiple="false"
+            @change="value => proxy.update('description', false, value)" />
         <div class="setting-divider" />
+        <FieldLikeBoolean title="只读" :readonly="readonly" :value="field.readonly"
+            @change="value => proxy.update('readonly', false, value)" />
+        <FieldLikeBoolean title="隐藏" :readonly="readonly" :value="field.hidden"
+            @change="value => proxy.update('hidden', false, value)" />
+        <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
+            @change="value => proxy.update('required', false, value)" />
         <FieldLikeText title="默认值" :readonly="readonly" :value="field.value" :multiple="field.type == 'TextArea'"
             @change="value => proxy.update('value', false, value)" />
         <FieldLikeNumber title="最小长度" :readonly="readonly" :precision="0" :value="field.settings.minLength"
             :abs-value="true" @change="value => proxy.update('minLength', true, value)" />
         <FieldLikeNumber title="最大长度" :readonly="readonly" :precision="0" :value="field.settings.maxLength"
             :abs-value="true" @change="value => proxy.update('maxLength', true, value)" />
-        <div class="setting-divider" />
-        <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
-            @change="value => proxy.update('required', false, value)" />
-        <FieldLikeBoolean title="只读" :readonly="readonly" :value="field.readonly"
-            @change="value => proxy.update('readonly', false, value)" />
-        <FieldLikeBoolean title="隐藏" :readonly="readonly" :value="field.hidden"
-            @change="value => proxy.update('hidden', false, value)" />
-
-        <div class="setting-divider" />
-        <FieldLikeText title="提示信息" :readonly="readonly" :value="field.placeholder" :multiple="false"
-            @change="value => proxy.update('placeholder', false, value)" />
-        <FieldLikeText title="字段说明" :readonly="readonly" :value="field.description" :multiple="false"
-            @change="value => proxy.update('description', false, value)" />
     </FieldSettingProxy>
 </template>
 

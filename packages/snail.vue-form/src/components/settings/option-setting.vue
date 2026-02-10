@@ -9,6 +9,15 @@
     <FieldSettingProxy :="_" ref="setting-proxy">
         <FieldTitle :="_" />
         <FieldWidth :="_" />
+        <FieldLikeText title="字段说明" :readonly="readonly" :value="field.description" :multiple="false"
+            @change="value => proxy.update('description', false, value)" />
+        <div class="setting-divider" />
+        <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
+            @change="value => proxy.update('required', false, value)" />
+        <FieldLikeBoolean title="只读" :readonly="readonly" :value="field.readonly"
+            @change="value => proxy.update('readonly', false, value)" />
+        <FieldLikeBoolean title="隐藏" :readonly="readonly" :value="field.hidden"
+            @change="value => proxy.update('hidden', false, value)" />
         <div class="setting-divider" />
         <!-- 选项布局和搜索功能；根据控件类型不同配置 -->
         <FieldLikeBoolean title="选项搜索" :readonly="readonly" :value="field.settings.searchEnabled"
@@ -53,16 +62,6 @@
                 <Button :type="'link'" :size="'small'" v-text="'重置选项'" @click="onResetItems" />
             </div>
         </div>
-        <div class="setting-divider" />
-        <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
-            @change="value => proxy.update('required', false, value)" />
-        <FieldLikeBoolean title="只读" :readonly="readonly" :value="field.readonly"
-            @change="value => proxy.update('readonly', false, value)" />
-        <FieldLikeBoolean title="隐藏" :readonly="readonly" :value="field.hidden"
-            @change="value => proxy.update('hidden', false, value)" />
-        <div class="setting-divider" />
-        <FieldLikeText title="字段说明" :readonly="readonly" :value="field.description" :multiple="false"
-            @change="value => proxy.update('description', false, value)" />
     </FieldSettingProxy>
 </template>
 

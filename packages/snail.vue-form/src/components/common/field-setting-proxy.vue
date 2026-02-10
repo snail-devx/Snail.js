@@ -99,6 +99,13 @@ function refresh() {
             color: #606266;
         }
 
+        >.item-title.question {
+            cursor: help;
+            text-decoration: underline;
+            text-decoration-style: dashed;
+            text-underline-offset: 4px;
+        }
+
         >.item-detail {
             flex: 1;
 

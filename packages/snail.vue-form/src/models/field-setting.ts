@@ -2,7 +2,7 @@
  * 字段设置相关配置选项
  */
 
-import { ReadonlyOptions } from "snail.vue";
+import { PlaceholderOptions, ReadonlyOptions } from "snail.vue";
 import { FieldOptions } from "./field-base";
 import { FieldContainerLocation, IFieldContainerHandle } from "./field-container";
 
@@ -60,7 +60,7 @@ export interface IFieldSettingHandle {
  * 指定属性设置的配置选项
  * - 作为属性设置的基类存在
  */
-export type FieldPropertySettingOptions<Value> = Required<ReadonlyOptions> & {
+export type FieldPropertySettingOptions<Value> = Required<ReadonlyOptions> & PlaceholderOptions & {
     /**
      * 属性标题
      */
@@ -70,14 +70,16 @@ export type FieldPropertySettingOptions<Value> = Required<ReadonlyOptions> & {
      */
     value: Value;
     /**
-     * 是否使用绝对值，负数时，转为绝对值
-     */
-    absValue?: boolean;
-    /**
      * 异常信息
      * - 外部ref传入，进行实时渲染
      */
     error?: string;
+
+    /**
+     * 属性说明
+     * - 若配置了，则会在属性标题显示区域展示出来
+     */
+    help?: string;
 }
 
 /**
@@ -87,17 +89,21 @@ export type FieldTextPropertySettingOptions = FieldPropertySettingOptions<string
     /**
      * 是否为多行文本
      */
-    multiple: boolean;
+    multiple?: boolean;
 }
 /**
  * 字段数值类属性设置的配置选项
  */
 export type FieldNumberPropertySettingOptions = FieldPropertySettingOptions<number> & {
     /**
+     * 是否使用绝对值，负数时，转为绝对值
+     */
+    absValue?: boolean;
+    /**
      * 精度，保留几位小数
      * - 要求0、正整数,输入小数则强制整数
      * - 负数、不传入则不处理
      */
-    precision?: number
+    precision?: number;
 }
 //#endregion

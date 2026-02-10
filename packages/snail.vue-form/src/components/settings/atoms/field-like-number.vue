@@ -5,14 +5,16 @@
 -->
 <template>
   <div class="setting-item">
-    <div class="item-title" v-text="title" />
+    <div class="item-title" :class="{ question: isStringNotEmpty(help) }" :title="help" v-text="title" />
     <div class="item-detail" v-if="readonly" v-text="value" />
-    <input class="item-detail" v-else type="number" v-model.number="valueRef" />
+    <input class="item-detail" v-else type="number" :placeholder="readonly ? '' : placeholder"
+      v-model.number="valueRef" />
     <p class="item-error ellipsis" v-text="error" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { isStringNotEmpty } from "snail.core";
 import { nextTick, ref, shallowRef, } from "vue";
 import { ChangeEvents, ReadonlyOptions, useReactive } from "snail.vue";
 import { FieldNumberPropertySettingOptions } from "../../../models/field-setting";
@@ -39,7 +41,7 @@ _.readonly || watcher(valueRef, (newValue, oldValue) => {
     hasDealValueChange = false;
     return;
   }
-  // @ts-ignore
+  // @ts-ignore 输入无效值时，设置为undefined
   newValue === "" && (newValue = undefined);
   //  值非空时，进行小数位数和绝对值处理
   if (newValue != undefined && precision >= 0) {

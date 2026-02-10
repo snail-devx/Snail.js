@@ -61,7 +61,7 @@ export type TextControlSettings = {
 /**
  * 数字类控件的Settings数据结构
  */
-export type NumericControlSettings = {
+export type NumberControlSettings = {
     /**
      * 最小值
      */
@@ -76,7 +76,49 @@ export type NumericControlSettings = {
      * - 要求0、正整数,输入小数则强制整数
      * - 负数、不传入则不处理
      */
-    precision?: number
+    precision?: number;
+    /**
+     * 是否使用千分位
+     * - 格式化输入数字，自动千分位格式
+     * - disabled 禁用千分位功能
+     * - inline  内联千分位功能
+     * - below  下拉千分位功能
+     */
+    thousands?: "disabled" | "inline" | "below";
+    /**
+     * 是否启用数值大写
+     * - 为true时，转成中文大写值
+     * - 如金额时，自动转为壹仟壹佰壹拾壹元叁角叁分
+     * - 小数点后面只处理两位（角分）；剩余不处理
+     */
+    upper?: boolean;
+
+    /**
+     * 前缀字符串
+     * - 如金额时，可配置前缀 ￥
+     */
+    prefix?: string;
+    /**
+     * 后缀字符串
+     * - 如金额时，可配置后缀 元/美元、、
+     */
+    suffix?: string;
+
+    /**
+     * 数值控制器
+     * - 便捷加减调整数值的控制按钮
+     * - deisable 时禁用
+     * - default 默认模式，左侧 — 右侧 +
+     * - right   右侧模式，+ - 都在右侧
+     */
+    controls?: "disabled" | "default" | "right";
+    /**
+     * 数值步长值
+     * - `controls` 未禁用时生效
+     * - 每次+、- 的步长值
+     */
+    step?: number;
+
 }
 
 /**

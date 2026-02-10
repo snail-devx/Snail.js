@@ -16,6 +16,7 @@
 import { ref, shallowRef, } from "vue";
 import {
     components, FieldOptions, IFieldContainerHandle, IFormDesignerHandle, IFormRenderHandle,
+    NumberControlSettings,
     OptionControlSettings, TextControlSettings
 } from "../../libraries/snail.vue-form";
 
@@ -27,7 +28,7 @@ let hidden: boolean = false;
 
 //  2、组件交互变量、常量
 // 测试时
-const testFields: FieldOptions<TextControlSettings | OptionControlSettings>[] = [
+const testFields: FieldOptions<TextControlSettings | OptionControlSettings | NumberControlSettings>[] = [
     {
         "type": "Text",
         "id": "1770087123812",
@@ -130,7 +131,7 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings>[] = 
         "type": "Combobox",
         "id": "1770544428598",
         "title": "下拉框",
-        "width": 2,
+        "width": 3,
         "settings": {
             "options": [
                 {
@@ -153,6 +154,29 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings>[] = 
             "searchEnabled": true
         },
         "required": true
+    },
+
+    {
+        "type": "Number",
+        "id": "1770715672053",
+        "title": "数值",
+        "width": 3,
+        "settings": {
+            controls: "default",
+            suffix: "万元",
+            prefix: "￥",
+        }
+    },
+    {
+        "type": "Number",
+        "id": "1770715672054",
+        "title": "数值2",
+        "width": 2,
+        "settings": {
+            controls: "right",
+            suffix: "元",
+            prefix: "￥",
+        }
     }
 ];
 const values = {

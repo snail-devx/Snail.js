@@ -4,7 +4,7 @@
 -->
 <template>
     <div class="setting-item">
-        <div class="item-title" v-text="title" />
+        <div class="item-title" :class="{ question: isStringNotEmpty(help) }" :title="help" v-text="title" />
         <div class="item-detail right">
             <Switch :readonly="readonly" v-model="valueRef" @change="value => emits('change', value)" />
         </div>
@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import { isStringNotEmpty } from "snail.core";
 import { ref, ShallowRef, } from "vue";
 import { FieldPropertySettingOptions } from "../../../models/field-setting";
 import { ChangeEvents, components } from "snail.vue";

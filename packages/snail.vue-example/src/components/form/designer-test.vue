@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, } from "vue";
-import { components, FieldOptions, IFormDesignerHandle } from "../../libraries/snail.vue-form";
+import { components, FieldOptions, IFormDesignerHandle, NumberControlSettings, OptionControlSettings, TextControlSettings } from "../../libraries/snail.vue-form";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -18,7 +18,7 @@ let handle: IFormDesignerHandle;
 
 //  2、组件交互变量、常量
 // 测试时
-const testFields: FieldOptions<any>[] = [
+const testFields: FieldOptions<TextControlSettings | OptionControlSettings | NumberControlSettings>[] = [
     {
         "type": "Text",
         "id": "1770087123812",
@@ -140,7 +140,18 @@ const testFields: FieldOptions<any>[] = [
         "id": "1770715672053",
         "title": "数值",
         "width": 2,
-        "settings": {}
+        "settings": {
+            controls: "default",
+        }
+    },
+    {
+        "type": "Number",
+        "id": "1770715672054",
+        "title": "数值2",
+        "width": 2,
+        "settings": {
+            controls: "right",
+        }
     }
 ];
 
