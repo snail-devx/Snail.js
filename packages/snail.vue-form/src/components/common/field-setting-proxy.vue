@@ -10,7 +10,7 @@
             <div class="item-title">控件类型</div>
             <div class="item-detail placeholder" v-text="`${name}(${type})`" />
         </div>
-        <div class="setting-divider" />
+        <!-- <div class="setting-divider" /> -->
         <!-- 插槽，进行字段详细配置 -->
         <slot />
     </div>

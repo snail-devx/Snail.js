@@ -1,6 +1,6 @@
 <!-- 表单设计器测试 -->
 <template>
-    <FormDesigner :fields="testFields" :readonly="true" :columns="4" :controls="undefined" :default-span="2"
+    <FormDesigner :fields="testFields" :readonly="false" :columns="4" :controls="undefined" :default-span="2"
         @rendered="hd => (console.log(hd), handle = hd)" @change="console.log" />
     <div class="formdesigner-test-buttons">
         <button @click="async () => console.log(await handle.getFields())">获取表单配置</button>
@@ -24,7 +24,7 @@ const testFields: FieldOptions<any>[] = [
         "id": "1770087123812",
         "title": "文本框",
         "width": 2,
-        required: true,
+        "required": true,
         "readonly": false,
         "hidden": false,
         "placeholder": "",
@@ -54,14 +54,32 @@ const testFields: FieldOptions<any>[] = [
         "id": "1770544423261",
         "title": "复选框",
         "width": 2,
-        value: [{ id: "111-2", text: "dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2" }],
-        settings: {
-            codeEnabled: true,
-            options: [
-                { id: "111-1", text: "dhd的皇帝皇后-1", code: "dddddddddd" },
-                { id: "111-2", text: "dhd的皇帝皇后-2" },
-                { id: "111-3", text: "dhd的皇帝皇后-3" },
-                { id: "111-4", text: "dhd的皇帝皇后-4" },
+        "value": [
+            {
+                "id": "111-2",
+                "text": "dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2"
+            }
+        ],
+        "settings": {
+            "codeEnabled": true,
+            "options": [
+                {
+                    "id": "111-1",
+                    "text": "dhd的皇帝皇后-1",
+                    "code": "dddddddddd"
+                },
+                {
+                    "id": "111-2",
+                    "text": "dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-3",
+                    "text": "dhd的皇帝皇后-3"
+                },
+                {
+                    "id": "111-4",
+                    "text": "dhd的皇帝皇后-4"
+                }
             ]
         }
     },
@@ -70,12 +88,24 @@ const testFields: FieldOptions<any>[] = [
         "id": "1770544427165",
         "title": "单选框",
         "width": 2,
-        settings: {
-            options: [
-                { id: "111-1", text: "dhd的皇帝皇后-1dhd的皇帝皇后-2dhd的皇帝皇后-2" },
-                { id: "111-2", text: "dhd的皇帝皇后-2" },
-                { id: "111-3", text: "dhd的皇帝皇后-3" },
-                { id: "111-4", text: "dhd的皇帝皇后-4" },
+        "settings": {
+            "options": [
+                {
+                    "id": "111-1",
+                    "text": "dhd的皇帝皇后-1dhd的皇帝皇后-2dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-2",
+                    "text": "dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-3",
+                    "text": "dhd的皇帝皇后-3"
+                },
+                {
+                    "id": "111-4",
+                    "text": "dhd的皇帝皇后-4"
+                }
             ]
         }
     },
@@ -84,14 +114,33 @@ const testFields: FieldOptions<any>[] = [
         "id": "1770544428598",
         "title": "下拉框",
         "width": 2,
-        settings: {
-            options: [
-                { id: "111-1", text: "dhd的皇帝皇后-1" },
-                { id: "111-2", text: "dhd的皇帝皇后-2" },
-                { id: "111-3", text: "dhd的皇帝皇后-3" },
-                { id: "111-4", text: "dhd的皇帝皇后-4" },
+        "settings": {
+            "options": [
+                {
+                    "id": "111-1",
+                    "text": "dhd的皇帝皇后-1"
+                },
+                {
+                    "id": "111-2",
+                    "text": "dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-3",
+                    "text": "dhd的皇帝皇后-3"
+                },
+                {
+                    "id": "111-4",
+                    "text": "dhd的皇帝皇后-4"
+                }
             ]
         }
+    },
+    {
+        "type": "Number",
+        "id": "1770715672053",
+        "title": "数值",
+        "width": 2,
+        "settings": {}
     }
 ];
 

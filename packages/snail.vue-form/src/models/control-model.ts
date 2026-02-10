@@ -59,6 +59,20 @@ export type TextControlSettings = {
 }
 
 /**
+ * 数字类控件的Settings数据结构
+ */
+export type NumericControlSettings = {
+    /**
+     * 最小值
+     */
+    min?: number;
+    /**
+     * 最大值
+     */
+    max?: number
+}
+
+/**
  * 选项类控件的Settings数据结构
  * - 支持单选、复选、下拉组合框
  */

@@ -1,19 +1,14 @@
-<!-- 文本 控件设置：Text、Textarea
-    1、支持标题、必填、最大长度、最小长度
-    2、支持描述、提示语配置
-    3、后期支持控件显示大小 ：size（小-small、中-medium、大-large）
- -->
+<!-- 数字类控件的设置：金额-Money，百分比-Percent，数值-Number
+    
+
+-->
 <template>
     <FieldSettingProxy :="_" ref="setting-proxy">
         <FieldTitle :="_" />
         <FieldWidth :="_" />
         <div class="setting-divider" />
-        <FieldLikeText title="默认值" :readonly="readonly" :value="field.value" :multiple="field.type == 'TextArea'"
+        <FieldLikeNumber title="默认值" :readonly="readonly" :value="field.value"
             @change="value => proxy.update('value', false, value)" />
-        <FieldLikeNumber title="最小长度" :readonly="readonly" :precision="0" :value="field.settings.minLength"
-            @change="value => proxy.update('minLength', true, value)" />
-        <FieldLikeNumber title="最大长度" :readonly="readonly" :precision="0" :value="field.settings.maxLength"
-            @change="value => proxy.update('maxLength', true, value)" />
         <div class="setting-divider" />
         <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
             @change="value => proxy.update('required', false, value)" />
@@ -21,7 +16,6 @@
             @change="value => proxy.update('readonly', false, value)" />
         <FieldLikeBoolean title="隐藏" :readonly="readonly" :value="field.hidden"
             @change="value => proxy.update('hidden', false, value)" />
-
         <div class="setting-divider" />
         <FieldLikeText title="提示信息" :readonly="readonly" :value="field.placeholder" :multiple="false"
             @change="value => proxy.update('placeholder', false, value)" />
@@ -31,20 +25,23 @@
 </template>
 
 <script setup lang="ts">
-import { useTemplateRef } from "vue";
-import { TextControlSettings } from "../../models/control-model";
+import { isArrayNotEmpty, moveFromArray } from "snail.core";
+import { Ref, ref, shallowRef, ShallowRef, useTemplateRef } from "vue";
+import { components } from "snail.vue";
+import { NumericControlSettings, } from "../../models/control-model";
 import { FieldSettingOptions } from "../../models/field-setting";
 import FieldSettingProxy from "../common/field-setting-proxy.vue";
 import FieldTitle from "./atoms/field-title.vue";
 import FieldWidth from "./atoms/field-width.vue";
-import FieldLikeNumber from "./atoms/field-like-number.vue";
 import FieldLikeText from "./atoms/field-like-text.vue";
 import FieldLikeBoolean from "./atoms/field-like-boolean.vue";
+import FieldLikeNumber from "./atoms/field-like-number.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const _ = defineProps<FieldSettingOptions<TextControlSettings>>();
+const _ = defineProps<FieldSettingOptions<NumericControlSettings>>();
 const proxy = useTemplateRef("setting-proxy");
+const { Choose, Sort, Icon, Button } = components;
 const { field, readonly } = _;
 //  2、组件交互变量、常量
 field.settings || (field.settings = {});
@@ -60,4 +57,6 @@ field.settings || (field.settings = {});
 <style lang="less">
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
+
+.field-setting-proxy>.setting-item {}
 </style>

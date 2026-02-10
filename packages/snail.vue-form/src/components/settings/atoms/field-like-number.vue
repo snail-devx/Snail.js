@@ -24,6 +24,10 @@ const emits = defineEmits<ChangeEvents<number>>();
 const { watcher } = useReactive();
 //  2、组件交互变量、常量
 const valueRef = shallowRef(_.value);
+const precision: number = _.precision >= 0
+  ? parseInt(String(_.precision))
+  : -1;
+let hasDealValueChange: boolean = false;
 
 // *****************************************   👉  方法+事件    ****************************************
 
@@ -31,12 +35,17 @@ const valueRef = shallowRef(_.value);
 //  1、数据初始化、变化监听
 //    监听值变化，小数点位置
 _.readonly || watcher(valueRef, (newValue, oldValue) => {
-  const precision = _.precision >= 0 ? _.precision : 0;
-  newValue = Math.trunc(newValue * 10 ^ precision) / 10 ^ precision;
-  isNaN(newValue) && (newValue = undefined);
-  valueRef.value == newValue
-    ? emits("change", newValue)
-    : (valueRef.value = newValue);
+  if (hasDealValueChange == true) {
+    hasDealValueChange = false;
+    return;
+  }
+  if (newValue != undefined && precision >= 0) {
+    const tmpValue: string = newValue.toFixed(precision);
+    newValue = precision == 0 ? parseInt(tmpValue) : parseFloat(tmpValue);
+    isNaN(newValue) && (newValue = undefined);
+  }
+  valueRef.value != newValue && (valueRef.value = newValue);
+  emits("change", newValue);
 });
 //  2、生命周期响应
 </script>
