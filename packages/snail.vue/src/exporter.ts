@@ -17,6 +17,7 @@ export * from "./base/models/footer-model";
 export * from "./base/models/header-model";
 export * from "./base/models/icon-model";
 export * from "./base/models/input-model"
+export * from "./base/models/number-model"
 export * from "./base/models/reactive-model";
 export * from "./base/models/search-model";
 export * from "./base/models/select-model";
@@ -30,6 +31,7 @@ import Footer from "./base/footer.vue";
 import Header from "./base/header.vue";
 import Icon from "./base/icon.vue";
 import Input from "./base/input.vue";
+import Number from "./base/number.vue";
 import Search from "./base/search.vue";
 import Select from "./base/select.vue";
 import Switch from "./base/switch.vue";
@@ -83,11 +85,9 @@ import Loading from "./prompt/loading.vue";
 // *****************************************   👉  组件合并导出    ****************************************
 export const components = {
     //  base下的组件
-    Button, Choose, DatePicker, Footer, Header, Icon, Search, Select, Switch,
+    Button, Choose, DatePicker, Footer, Header, Icon, Input, Number, Search, Select, Switch,
     //  container 下的组件
     Dynamic, Fold, Layout, Scroll, Sort, Table, TableRow, TableCol, Tree, Wrapper,
-    //  form 下的组件
-    Input,
     //  prompt 下的组件
     DragVerify, Empty, Loading
 };

@@ -165,6 +165,7 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
             controls: "default",
             suffix: "万元",
             prefix: "￥",
+            thousands: "inline"
         }
     },
     {
