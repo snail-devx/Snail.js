@@ -32,15 +32,16 @@
     </div>
     <div class="number-suffix placeholder" v-if="hasSuffix" v-text="suffix" />
     <!-- 数据的工具助手区域；强制换行：大写、千位符、、、 -->
-    <div class="number-util ellipsis" v-if="upper" :title="upperTextRef">大写：{{ upperTextRef }}</div>
-    <div class="number-util ellipsis" v-if="thousands == 'below'" :title="thousandsTextRef">千分位：{{ thousandsTextRef }}
-    </div>
+    <div class="number-util ellipsis" v-if="upper && isStringNotEmpty(upperTextRef)" :title="upperTextRef"
+      v-text="`大写：${upperTextRef}`" />
+    <div class="number-util ellipsis" v-if="thousands == 'below' && isStringNotEmpty(thousandsTextRef)"
+      :title="thousandsTextRef" v-text="`千分位：${thousandsTextRef}`" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { isStringNotEmpty } from "snail.core";
-import { nextTick, ref, ShallowRef, shallowRef, useTemplateRef, } from "vue";
+import { nextTick, ShallowRef, shallowRef, useTemplateRef, } from "vue";
 import { NumberEvents, NumberFormatResult, NumberOptions } from "./models/number-model";
 import Icon from "./icon.vue";
 import { useReactive } from "./reactive";
@@ -111,7 +112,6 @@ function formatInput(text: string, isEnd: boolean, onInValid?: () => void, onRes
   //  格式化文本，实时更新到v-model
   const result = format(text, isEnd);
   latestNumber = result.number;
-  console.log(latestNumber);
   //  1、值无效，则执行回调处理；若无数值，则取消大写和千分位
   if (result.valid != true) {
     onInValid && onInValid();

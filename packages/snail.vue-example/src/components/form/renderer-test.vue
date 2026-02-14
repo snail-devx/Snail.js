@@ -161,6 +161,7 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
         "id": "1770715672053",
         "title": "数值-最大值1w clamp",
         "width": 3,
+        required: true,
         "settings": {
             maxValue: 10000,
             clamp: "clamp",

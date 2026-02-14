@@ -6,16 +6,15 @@
     <FieldProxy :readonly="readonly" :parent-field-id="parentFieldId" :row-index="rowIndex" :field="field"
         :value="valueRef" :error="errorRef" :="proxy" @rendered="hd => emits('rendered', handle = hd)">
         <Number #="{ required, readonly, hidden }" :readonly="readonly" :placeholder="field.placeholder"
-            :="field.settings" v-model="valueRef" @below-min="console.log('低于最小值')" @exceed-max="console.log('高于最大值')"
-            @change="console.log" />
+            :="field.settings" v-model="valueRef" @change="onNumberChange" />
     </FieldProxy>
 </template>
 
 <script setup lang="ts">
 import { isNumberNotNaN, } from "snail.core";
-import { inject, onMounted, ShallowRef, shallowRef, watch, } from "vue";
-import { ChooseItem, components, SelectItem, SelectOptions } from "snail.vue";
-import { NumberControlSettings, OptionControlSettings, OptionControlValueItem } from "../../models/control-model";
+import { inject, ShallowRef, shallowRef, } from "vue";
+import { components, useReactive } from "snail.vue";
+import { NumberControlSettings } from "../../models/control-model";
 import { FieldEvents, FieldProxyRenderOptions, FieldRenderOptions, IFieldHandle, } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, newTraces } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
@@ -23,7 +22,8 @@ import FieldProxy from "../common/field-proxy.vue";
 //  1、props、event、model、components
 const _ = defineProps<FieldRenderOptions<NumberControlSettings, number>>();
 const emits = defineEmits<FieldEvents>();
-const { Icon, Number } = components;
+const { watcher } = useReactive();
+const { Number } = components;
 const global = inject(INJECTKEY_GlobalContext);
 const { field } = _;
 //  2、组件交互变量、常量
@@ -42,16 +42,47 @@ const proxy = Object.freeze<Pick<FieldProxyRenderOptions, "titleDisabled" | "emi
     getValue(validate: boolean): Promise<any> {
         throw new Error("");
     },
-    setValue(values: OptionControlValueItem[]): Promise<{ success: boolean, change: boolean }> {
+    setValue(values: number): Promise<{ success: boolean, change: boolean }> {
         throw new Error("");
     },
 });
-
-
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 验证指定数值
+ * @param number 
+ */
+function doValidate(number: number) {
+    errorRef.value = "";
+    if (handle.getStatus().data.required == true) {
+        if (number == undefined) {
+            errorRef.value = "不可为空";
+            return;
+        }
+    }
+    if (isNumberNotNaN(field.settings.minValue) && field.settings.minValue > number) {
+        errorRef.value = `不能小于最小值(${field.settings.minValue})`;
+        return;
+    }
+    if (isNumberNotNaN(field.settings.maxValue) && field.settings.maxValue < number) {
+        errorRef.value = `不能大于最大值(${field.settings.maxValue})`;
+        return;
+    }
+}
+
+/**
+ * 数值改变时
+ * @param newValue 
+ */
+function onNumberChange(newValue: number, oldValue: number) {
+    console.log("数值改变了---", newValue, oldValue)
+}
+
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
+watcher(valueRef, (newValue, oldValue) => {
+    newValue != oldValue && setTimeout(doValidate, 0, newValue);
+});
 //  2、生命周期响应
 
 </script>
