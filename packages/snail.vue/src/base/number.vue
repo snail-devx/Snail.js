@@ -11,7 +11,7 @@
     <div class="input-panel" :class="controls">
       <input type="text" ref="input" :inputmode="precision > 0 ? 'decimal' : 'numeric'"
         :placeholder="readonly ? '' : placeholder" :title="displayValueRef" v-model="displayValueRef"
-        @focus="needBackSection = true" @paste="needBackSection = false" @blur="onBlur" />
+        @focus="needBackSection = true" @paste="needBackSection = false" @blur="formatOnEnd(true)" />
       <!-- 步长控制按钮:不同样式,做不同按钮效果,采用不同模块实现 -->
       <template v-if="controls == 'default'">
         <div class="controls default subtract" @click="onStepClick(false)">
@@ -75,9 +75,9 @@ const thousandsTextRef: ShallowRef<string> = shallowRef();
 /**   大写后的值 */
 const upperTextRef: ShallowRef<string> = shallowRef();
 /**   原始数值，没发送change事件前的值，发送change事件后，以最新值覆盖过来，用于判断当前输入值是否改变了*/
-let originNumber: number;
+let originNumber: number = valueModel.value;
 /**   最新数值，随着输入实时更新 */
-let latestNumber: number;
+let latestNumber: number = valueModel.value;
 /**   是否需要备份光标位置 */
 let needBackSection: boolean;
 /**   忽略当前值变化 */
@@ -152,7 +152,7 @@ function validateRange(): void {
  * @returns 光标还原方法
  */
 function bakSectionStart(): { restore: (offset: number) => void } {
-  const inputSectionStart = inputDom.value.selectionStart;
+  const inputSectionStart = inputDom.value ? inputDom.value.selectionStart : null;
   return {
     restore(offset: number) {
       inputSectionStart != null && needBackSection && nextTick(() => {
@@ -162,23 +162,12 @@ function bakSectionStart(): { restore: (offset: number) => void } {
     }
   }
 }
-/**
- * 尝试发送change事件
- * - 判定值是否改变了，改变了则触发事件
- */
-function TrySendChangeEvent() {
-  valueModel.value = latestNumber;
-  if (originNumber != latestNumber) {
-    const oldValue = originNumber;
-    originNumber = latestNumber;
-    emits("change", originNumber, oldValue);
-  }
-}
 
 /**
- * 输入框失去焦点时
+ * 输入完成后格式化数值
+ * @param triggerChangeEvent 是否触发值改变事件
  */
-function onBlur() {
+function formatOnEnd(triggerChangeEvent: boolean) {
   /** 检测阈值；格式化值显示，并尝试触发值改变事件；这里仅作收尾工作，所有的值变化逻辑，都在 `watcher(displayValueRef,` 中处理了*/
   needBackSection = false;
   validateRange();
@@ -186,24 +175,32 @@ function onBlur() {
     latestNumber = undefined;
     resetDisplayValue("");
   });
-  TrySendChangeEvent();
+  //  将值同步到v-model，并更新原始值，根据需要触发change事件
+  valueModel.value = latestNumber;
+  const hasChange: boolean = originNumber != latestNumber;
+  const oldValue = originNumber;
+  originNumber = latestNumber;
+  hasChange && triggerChangeEvent && emits("change", originNumber, oldValue);
 }
+
 /**
  * 点击步长控制按钮
  * @param isPlus true为+，false为-
  */
 function onStepClick(isPlus: boolean) {
   latestNumber = calcByStep(latestNumber, isPlus);
-  onBlur();
+  formatOnEnd(true);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
+//    若存在原始值，则先进行一下格式化
+originNumber !== undefined && formatOnEnd(false);
 //    监听v-model值变化，实时反馈给上下文：作为外部修改值的同步，不做change触发
 watcher(valueModel, (newValue, oldValue) => {
   if (newValue !== latestNumber) {
     latestNumber = newValue;
-    formatInput(String(newValue), true, () => resetDisplayValue(""));;
+    formatOnEnd(false);
   }
 });
 //    监听显示值的变化，将无效字符强制剔除掉

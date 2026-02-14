@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { isNumberNotNaN, RunResult, } from "snail.core";
-import { nextTick, ShallowRef, shallowRef, } from "vue";
+import { nextTick, onMounted, ShallowRef, shallowRef, } from "vue";
 import { components, useReactive } from "snail.vue";
 import { NumberControlSettings } from "../../models/control-model";
 import { FieldEvents, FieldProxyRenderOptions, FieldRenderOptions, IFieldHandle, } from "../../models/field-base";
@@ -96,14 +96,12 @@ function onNumberChange(newValue: number, oldValue: number) {
     }
 }
 
-
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 watcher(valueRef, (newValue, oldValue) => {
     newValue != oldValue && setTimeout(doValidate, 0, newValue);
 });
 //  2、生命周期响应
-
 </script>
 
 <style lang="less">

@@ -51,7 +51,7 @@ const handle: IFieldHandle = Object.freeze<IFieldHandle>({
         const field = _.getField ? await _.getField() : _.field;
         return isStringNotEmpty(_.error)
             ? { success: false, reason: _.error }
-            : { success: true, data: toRaw(field) };
+            : { success: true, data: getCopy(field) };
     },
     async getValue<T>(validate: boolean, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult<T>> {
         let result: RunResult<any> = canRunAction(_, "get-value", traces);
@@ -64,6 +64,7 @@ const handle: IFieldHandle = Object.freeze<IFieldHandle>({
                     ? { success: false, reason: _.error }
                     : { success: true, data: _.value };
             }
+            result.data = getCopy(result.data);
         }
         return result;
     },
@@ -71,11 +72,11 @@ const handle: IFieldHandle = Object.freeze<IFieldHandle>({
         /*  设置字段值，并判断是否变化，发送对应事件处理；备份旧值，进行深拷贝，避免引用类型数据被修改   */
         let result: RunResult = canRunAction(_, "set-value", traces);
         if (result.success == true) {
-            const oldValue = _.value == undefined ? undefined : JSON.parse(JSON.stringify(_.value));
+            const oldValue = getCopy(_.value);
             const setResult = await _.setValue(value);
             if (setResult.change == true) {
                 traces = newTraces(_, "set-value", "code", traces);
-                setTimeout(() => emitter("valueChange", toRaw(_.value), oldValue, traces));
+                setTimeout(() => emitter("valueChange", getCopy(_.value), oldValue, traces));
             }
             result = setResult.success
                 ? { success: true }
@@ -116,6 +117,16 @@ const handle: IFieldHandle = Object.freeze<IFieldHandle>({
     }
 });
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 获取data的副本
+ * - 避免响应式和引用类型传递出去
+ * @param data 
+ */
+function getCopy(data: any) {
+    return typeof data == "object"
+        ? JSON.parse(JSON.stringify(data))
+        : toRaw(data);
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
