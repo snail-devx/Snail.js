@@ -56,15 +56,25 @@ export function useFormatter(options: NumberBaseOptions): INumberFormatter & ISc
                 text: ""
             });
         }
-        //  这里处理精度 toFixed 采用的时银行家算法，不合适，后期再琢磨一下；不久就小数全部舍去
+        /** 转成数值 超过最大精度范围强制无效
+         *      只有在 -253 + 1 到 253 - 1 范围内（闭区间）的整数才能在不丢失精度的情况下被表示
+         *      可通过 Number.MIN_SAFE_INTEGER 和 Number.MAX_SAFE_INTEGER 获得
+         *      详细参照：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number#number_%E7%BC%96%E7%A0%81
+         *  这里处理精度 toFixed 采用的时银行家算法，不合适，后期再琢磨一下；不久就小数全部舍去
+         */
         isEnd && formatter.precision >= 0 && (text = parseFloat(text).toFixed(formatter.precision));
+        const number: number = isNegative ? -parseFloat(text) : parseFloat(text)
+        const error: string = 9007199254740991 < number || number < -9007199254740991
+            ? "超过Number的最大精度范围"
+            : undefined;
+        //  有效数值，构建格式化结果：整理小数位数和方法系数
         const [integerPart, decimalPart] = text.split(".");
         const multiplier = dealMultiplier(integerPart, decimalPart);
-
         return Object.freeze<NumberFormatResult>({
             valid: true,
-            number: isNegative ? -parseFloat(text) : parseFloat(text),
+            number: number,
             text: isNegative ? `-${text}` : text,
+            error: error,
             isNegative: isNegative,
             isDecimal: decimalPart !== undefined,
             integerPart: integerPart,

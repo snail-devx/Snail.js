@@ -43,9 +43,9 @@
 import { isStringNotEmpty } from "snail.core";
 import { nextTick, ShallowRef, shallowRef, useTemplateRef, } from "vue";
 import { NumberEvents, NumberFormatResult, NumberOptions } from "./models/number-model";
-import Icon from "./icon.vue";
 import { useReactive } from "./reactive";
 import { useFormatter } from "./components/number-formatter";
+import Icon from "./icon.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -109,8 +109,12 @@ function resetDisplayValue(newValue: string): boolean {
  * @param onResetDisplay 回调：需要重置文本输入框显示值时，如格式化千分位、、、、
  */
 function formatInput(text: string, isEnd: boolean, onInValid?: () => void, onResetDisplay?: () => void): NumberFormatResult {
-  //  格式化文本，实时更新到v-model
+  //  格式化文本，若发生错误，则发送事件通知外面，先不做任何处理，等待重新输入修正
   const result = format(text, isEnd);
+  if (result.error) {
+    emits("error", result.error);
+    return;
+  }
   latestNumber = result.number;
   //  1、值无效，则执行回调处理；若无数值，则取消大写和千分位
   if (result.valid != true) {
@@ -178,7 +182,10 @@ function onBlur() {
   /** 检测阈值；格式化值显示，并尝试触发值改变事件；这里仅作收尾工作，所有的值变化逻辑，都在 `watcher(displayValueRef,` 中处理了*/
   needBackSection = false;
   validateRange();
-  formatInput(String(latestNumber), true, () => resetDisplayValue(""));
+  formatInput(String(latestNumber), true, () => {
+    latestNumber = undefined;
+    resetDisplayValue("");
+  });
   TrySendChangeEvent();
 }
 /**
@@ -207,6 +214,7 @@ function onStepClick(isPlus: boolean) {
     ignoreCurValueChange || formatInput(newValue, false,
       //  输入值无效时，修改为旧值，然后重新定位光标
       () => {
+        latestNumber = valueModel.value;
         resetDisplayValue(oldValue);
         bak.restore(oldValue.length - newValue.length);
       },

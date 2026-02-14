@@ -6,7 +6,7 @@
     <FieldProxy :readonly="readonly" :parent-field-id="parentFieldId" :row-index="rowIndex" :field="field"
         :value="valueRef" :error="errorRef" :="proxy" @rendered="hd => emits('rendered', handle = hd)">
         <Number #="{ required, readonly, hidden }" :readonly="readonly" :placeholder="field.placeholder"
-            :="field.settings" v-model="valueRef" @change="onNumberChange" />
+            :="field.settings" v-model="valueRef" @error="error => errorRef = error" @change="onNumberChange" />
     </FieldProxy>
 </template>
 

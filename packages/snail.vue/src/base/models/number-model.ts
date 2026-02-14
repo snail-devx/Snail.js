@@ -154,6 +154,11 @@ export type NumberFormatResult = {
      * - 若需要在行内显示 千分位 格式文本，需要单独处理
      */
     readonly text: string;
+    /**
+     * 格式化数值时发生的错误
+     * - 输入数值有效，但是格式化时发生错误了
+     */
+    readonly error?: string;
 
     /**
      * 是否是负数
@@ -192,6 +197,13 @@ export type NumberFormatResult = {
  * 数值组件的事件选项
  */
 export type NumberEvents = ChangeEvents<number> & {
+    /**
+     * 数值发生错误时
+     * - 若超过最大的精度范围
+     * - 其他未知异常等
+     * @param reason 错误原因
+     */
+    error: [reason: string];
     /**
      * 小于最小值
      * @param value 当前值
