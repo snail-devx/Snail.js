@@ -64,7 +64,7 @@ export function useFormatter(options: NumberBaseOptions): INumberFormatter & ISc
         return Object.freeze<NumberFormatResult>({
             valid: true,
             number: isNegative ? -parseFloat(text) : parseFloat(text),
-            text: text,
+            text: isNegative ? `-${text}` : text,
             isNegative: isNegative,
             isDecimal: decimalPart !== undefined,
             integerPart: integerPart,
