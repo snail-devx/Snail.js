@@ -38,7 +38,7 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
         "readonly": false,
         "hidden": false,
         "placeholder": "",
-        "description": ""
+        "description": "ddddd顶顶顶"
     },
     {
         "type": "Text",
@@ -159,24 +159,33 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
     {
         "type": "Number",
         "id": "1770715672053",
-        "title": "数值",
+        "title": "数值-最大值1w clamp",
         "width": 3,
         "settings": {
+            maxValue: 10000,
+            clamp: "clamp",
             controls: "default",
             suffix: "万元",
             prefix: "￥",
-            thousands: "inline"
+            precision: 3,
+            thousands: "inline",
+            upper: true,
         }
     },
     {
         "type": "Number",
         "id": "1770715672054",
-        "title": "数值2",
+        "title": "数值2-最小值10 keep",
         "width": 2,
         "settings": {
+            minValue: 10,
+            clamp: "keep",
             controls: "right",
+            step: 100,
             suffix: "元",
             prefix: "￥",
+            thousands: "below",
+            upper: true,
         }
     }
 ];

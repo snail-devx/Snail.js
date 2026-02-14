@@ -6,7 +6,8 @@
     <FieldProxy :readonly="readonly" :parent-field-id="parentFieldId" :row-index="rowIndex" :field="field"
         :value="valueRef" :error="errorRef" :="proxy" @rendered="hd => emits('rendered', handle = hd)">
         <Number #="{ required, readonly, hidden }" :readonly="readonly" :placeholder="field.placeholder"
-            :="field.settings" :clamp-mode="'keep'" v-model="valueRef" />
+            :="field.settings" v-model="valueRef" @below-min="console.log('低于最小值')" @exceed-max="console.log('高于最大值')"
+            @change="console.log" />
     </FieldProxy>
 </template>
 

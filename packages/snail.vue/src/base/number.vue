@@ -8,41 +8,43 @@
   <div class="snail-number" :class="{ 'has-prefix': hasPrefix, 'has-suffix': hasSuffix }">
     <!-- 前缀、输入框、后缀区域 -->
     <div class="number-prefix placeholder" v-if="hasPrefix" v-text="prefix" />
-    <div class="input-panel" :class="controlsMode">
+    <div class="input-panel" :class="controls">
       <input type="text" ref="input" :inputmode="precision > 0 ? 'decimal' : 'numeric'"
-        :placeholder="readonly ? '' : placeholder" v-model="displayValueRef" @input="onInput" @blur="onBlur" />
+        :placeholder="readonly ? '' : placeholder" :title="displayValueRef" v-model="displayValueRef"
+        @focus="needBackSection = true" @paste="needBackSection = false" @blur="onBlur" />
       <!-- 步长控制按钮:不同样式,做不同按钮效果,采用不同模块实现 -->
-      <template v-if="controlsMode == 'default'">
-        <div class="controls default subtract">
+      <template v-if="controls == 'default'">
+        <div class="controls default subtract" @click="onStepClick(false)">
           <Icon :type="'subtract'" :size="20" />
         </div>
-        <div class="controls default plus">
+        <div class="controls default plus" @click="onStepClick(true)">
           <Icon :type="'plus'" :size="20" />
         </div>
       </template>
-      <template v-else-if="controlsMode == 'right'">
-        <div class="controls right subtract">
+      <template v-else-if="controls == 'right'">
+        <div class="controls right plus" @click="onStepClick(true)">
           <Icon :type="'arrow'" :size="20" :rotate="270" />
         </div>
-        <div class="controls right plus">
+        <div class="controls right subtract" @click="onStepClick(false)">
           <Icon :type="'arrow'" :size="20" :rotate="90" />
         </div>
       </template>
     </div>
     <div class="number-suffix placeholder" v-if="hasSuffix" v-text="suffix" />
     <!-- 数据的工具助手区域；强制换行：大写、千位符、、、 -->
-    <div class="number-util placeholder">千分位</div>
-    <div class="number-util placeholder">《》</div>
+    <div class="number-util ellipsis" v-if="upper" :title="upperTextRef">大写：{{ upperTextRef }}</div>
+    <div class="number-util ellipsis" v-if="thousands == 'below'" :title="thousandsTextRef">千分位：{{ thousandsTextRef }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { isStringNotEmpty } from "snail.core";
 import { nextTick, ref, ShallowRef, shallowRef, useTemplateRef, } from "vue";
-import { NumberEvents, NumberOptions } from "./models/number-model";
-import { ChangeEvents } from "./models/base-event";
+import { NumberEvents, NumberFormatResult, NumberOptions } from "./models/number-model";
 import Icon from "./icon.vue";
 import { useReactive } from "./reactive";
+import { useFormatter } from "./components/number-formatter";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -51,151 +53,169 @@ const emits = defineEmits<NumberEvents>();
 const valueModel = defineModel<number>();
 const inputDom = useTemplateRef("input");
 const { watcher } = useReactive();
+const formatter = useFormatter(_);
 //  2、组件交互变量、常量
+const { readonly, prefix, suffix, } = _;
+const {
+  precision, upper, thousands,
+  format, checkThreshold, buildUpper, buildThousands, calcByStep
+} = formatter;
 /**   是否有数值前缀 */
-const hasPrefix: boolean = isStringNotEmpty(_.prefix);
+const hasPrefix: boolean = isStringNotEmpty(prefix);
 /**   是否有数值后缀 */
-const hasSuffix: boolean = isStringNotEmpty(_.suffix);
-/**   千分位模式 */
-const thousandsMode = _.thousands || "disabled";
-/**   步长控制模式 */
-const controlsMode: NumberOptions["controls"] = _.readonly == true ? "disabled" : (_.controls || "disabled");
-/**   步长值：强制整数，默认1 */
-const stepValue: number = _.step > 1 ? parseInt(String(_.step)) : 1;
-/**   精度值；强制整数，undefined时表示不处理精度 */
-const precisionValue: number | undefined = _.precision >= 0 ? parseInt(String(_.precision)) : undefined;
+const hasSuffix: boolean = isStringNotEmpty(suffix);
+/**   数值控制器：只读时禁用控制器功能 */
+const controls: NumberOptions["controls"] = readonly == true ? "disabled" : (_.controls || "disabled");
 //  3、文本框的数值渲染相关
-/**    旧的数值，和latestNumber配合完成change事件判断*/
-let oldNumber: number;
-/*** 最新的数值 */
-let latestNumber: number;
-/**  数值的展示值：经过千分位的处理的值*/
+/**   数值的展示值：经过千分位的处理的值*/
 const displayValueRef: ShallowRef<string> = shallowRef();
-/** 忽略当前值变化 */
-let ignoreCurValueChange: boolean = false;
+/**   千分位处理后的值 */
+const thousandsTextRef: ShallowRef<string> = shallowRef();
+/**   大写后的值 */
+const upperTextRef: ShallowRef<string> = shallowRef();
+/**   原始数值，没发送change事件前的值，发送change事件后，以最新值覆盖过来，用于判断当前输入值是否改变了*/
+let originNumber: number;
+/**   最新数值，随着输入实时更新 */
+let latestNumber: number;
+/**   是否需要备份光标位置 */
+let needBackSection: boolean;
+/**   忽略当前值变化 */
+let ignoreCurValueChange: boolean;
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
- * 是否是有效的数值
- * - 自动去除千分位后、转换成数值
- * - 自动处理精度值
- * @param value 
- * @param dealPrecision 是否处理精度
- * @returns success 为true则是有效数字，number表示符合格式的数值；若输入仅 - 号时，succees为true，但number无值 
+ * 重置数值的显示值
+ * - 自动进行 ignoreCurValueChange 管理，避免重复循坏触发
+ * @param newValue 
+ * @returns 设置是否成功，新值和现有值不等，则返回true
  */
-function isValidNumber(value: string, dealPrecision: boolean): { success: boolean, number?: number } {
-  if (isStringNotEmpty(value) == false) {
-    return { success: false }
+function resetDisplayValue(newValue: string): boolean {
+  if (displayValueRef.value !== newValue) {
+    ignoreCurValueChange = true;
+    displayValueRef.value = newValue;
+    setTimeout(() => ignoreCurValueChange = false, 0);
+    return true;
   }
-  value = value.replace(/,/g, '');
-  if (value.length == 0) {
-    return { success: false }
+  return false;
+}
+/**
+ * 格式化输入文本
+ * - 格式化千分符和转大写
+ * - 行内千分符时，自动更新渲染到文本框中
+ * @param text 输入框文本值
+ * @param isEnd 是否是输入结束时，为true时，将处理数值精度等
+ * @param onInValid 回调：输入文本无效，不是合法数值时
+ * @param onResetDisplay 回调：需要重置文本输入框显示值时，如格式化千分位、、、、
+ */
+function formatInput(text: string, isEnd: boolean, onInValid?: () => void, onResetDisplay?: () => void): NumberFormatResult {
+  //  格式化文本，实时更新到v-model
+  const result = format(text, isEnd);
+  latestNumber = result.number;
+  console.log(latestNumber);
+  //  1、值无效，则执行回调处理；若无数值，则取消大写和千分位
+  if (result.valid != true) {
+    onInValid && onInValid();
   }
-  //  判断是否是负数；若仅为 “-”，则返回succees，但是value不给值
-  const isNegativeNumber = value.startsWith('-');
-  isNegativeNumber && (value = value.substring(1));
-  if (value.length == 0) {
-    return { success: true, };
+  //  2、值有效，但无数值时，特定情况下，如开始输入时，仅输入了 "-"，此时重置大写、千分位等
+  else if (result.number === undefined || isNaN(result.number) == true) {
+    upperTextRef.value = "";
+    thousandsTextRef.value = "";
   }
-  //  验证剩下的是否数值 数字.数字
-  if (/^(?:[1-9]\d*|0)(?:\.\d*)?$/.test(value) == false) {
-    return { success: false };
-  }
-  //    是否是以 . 结尾，此时说明还没有输入完成，不用转值
-  if (value.endsWith('.') == true) {
-    return { success: true };
-  }
-  //  处理小数位数
-  let number: number;
-  if (dealPrecision == true && precisionValue >= 0) {
-    number = precisionValue == 0
-      ? parseInt(value)
-      : parseFloat(parseFloat(value).toFixed(precisionValue))
-  }
+  //  3、值有效，且有number值时，进行格式化处理，得到大写值和千分位值（千分位仅处理整数部分）
   else {
-    number = parseFloat(value);
+    upperTextRef.value = buildUpper(result);
+    thousandsTextRef.value = buildThousands(result);
+    thousands == "inline"
+      ? resetDisplayValue(thousandsTextRef.value) && onResetDisplay && onResetDisplay()
+      : resetDisplayValue(result.text) && onResetDisplay && onResetDisplay();
   }
-  isNegativeNumber && (number = -number);
-  return { success: true, number: number };
+
+  return result;
 }
 /**
- * 格式化数值
- * - 处理千分符号、转大写值
- * @param number 
+ * 验证数值范围
+ * - 基于 latestNumber 进行最大值、最小值验证
+ * - 并将 latestNumber 更新成最新值
  */
-function formatNumber(number: number): { thousandsText?: string, upperText?: string } | undefined {
-  if (thousandsMode == "disabled") {
-    return;
-  }
-  /**
-   * 对数值进行千分位处理，先截取整数部分和小数部分，对整数部分转转千分符；然后再拼接小数部分
-   *  对整数部分添加千分位（核心正则）；来自 https://metaso.cn/
-   *    /\B(?=(\d{3})+(?!\d))/g
-   *    1、\B 匹配非单词边界（确保不会在数字开头添加逗号）
-   *    2、(?=(\d{3})+(?!\d)) 向前查找，确保后面紧跟着的是 3 的倍数个数字且后面不是数字
-   */
-  const [integerPart, decimalPart] = String(number).split(".");
-  const thousandsText = decimalPart != undefined
-    ? `${integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${decimalPart}`
-    : integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-  return { thousandsText }
+function validateRange(): void {
+  const check = checkThreshold(latestNumber);
+  check.belowMin == true && emits("belowMin", latestNumber, formatter.minValue);
+  check.exceedMax == true && emits("exceedMax", latestNumber, formatter.maxValue);
+  latestNumber = check.number;
 }
-
 /**
- * 文本框输入时
- * @param evt 
+ * 备份输入框光标位置
+ * @returns 光标还原方法
  */
-function onInput(evt: InputEvent) {
+function bakSectionStart(): { restore: (offset: number) => void } {
+  const inputSectionStart = inputDom.value.selectionStart;
+  return {
+    restore(offset: number) {
+      inputSectionStart != null && needBackSection && nextTick(() => {
+        const newPosition = inputSectionStart + (offset == undefined ? 0 : offset);
+        inputDom.value.setSelectionRange(newPosition, newPosition)
+      });
+    }
+  }
 }
+/**
+ * 尝试发送change事件
+ * - 判定值是否改变了，改变了则触发事件
+ */
+function TrySendChangeEvent() {
+  valueModel.value = latestNumber;
+  if (originNumber != latestNumber) {
+    const oldValue = originNumber;
+    originNumber = latestNumber;
+    emits("change", originNumber, oldValue);
+  }
+}
+
 /**
  * 输入框失去焦点时
- * @param evt 
  */
-function onBlur(evt: FocusEvent) {
-  //  判定原始值是否改变，改变了则发送事件处理
-
-  //  取值，进行小数位数处理，千分位处理
-  console.log(evt)
+function onBlur() {
+  /** 检测阈值；格式化值显示，并尝试触发值改变事件；这里仅作收尾工作，所有的值变化逻辑，都在 `watcher(displayValueRef,` 中处理了*/
+  needBackSection = false;
+  validateRange();
+  formatInput(String(latestNumber), true, () => resetDisplayValue(""));
+  TrySendChangeEvent();
+}
+/**
+ * 点击步长控制按钮
+ * @param isPlus true为+，false为-
+ */
+function onStepClick(isPlus: boolean) {
+  latestNumber = calcByStep(latestNumber, isPlus);
+  onBlur();
 }
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
-//    监听显示值的变化，将无效字符强制剔除掉
-_.readonly || watcher(displayValueRef, (newValue, oldValue) => {
-  if (ignoreCurValueChange == true) {
-    ignoreCurValueChange = false;
-    return;
-  }
-  //  空值时，清空所有
-  if (isStringNotEmpty(newValue) == false) {
-    latestNumber = undefined;
-    return;
-  }
-
-  // 记录光标位置，进行数值有效性验证和格式化处理
-  const inputSectionStart = inputDom.value.selectionStart;
-  const result = isValidNumber(newValue, false);
-  if (result.success == false) {
-    ignoreCurValueChange = true;
-    displayValueRef.value = oldValue;
-    return;
-  }
-  //  进行千分位处理，实时刷新，并聚焦光标位置
-  if (result.number != undefined) {
-    latestNumber = result.number;
-
-    const format = formatNumber(result.number);
-    if (format && format.thousandsText != undefined) {
-      if (format.thousandsText != displayValueRef.value) {
-        ignoreCurValueChange = true;
-        displayValueRef.value = format.thousandsText;
-        inputSectionStart && nextTick(() => inputDom.value.setSelectionRange(inputSectionStart, inputSectionStart))
-      }
-    }
-  }
-
-});
+{
+  //  监听v-model值变化，实时反馈给上下文
+  watcher(valueModel, (newValue, oldValue) => {
+    // console.log("valueModel", newValue, oldValue);
+    // console.log("valueModel", ignoreCurValueChange);
+    console.log("还没实现外部值变化时，实时更新到number组件中");
+  });
+  //  监听显示值的变化，将无效字符强制剔除掉
+  watcher(displayValueRef, (newValue, oldValue) => {
+    //  格式化数值做展示：备份光标位置，方便例外情况还原
+    const bak = bakSectionStart();
+    oldValue == undefined && (oldValue = "");
+    ignoreCurValueChange || formatInput(newValue, false,
+      //  输入值无效时，修改为旧值，然后重新定位光标
+      () => {
+        resetDisplayValue(oldValue);
+        bak.restore(oldValue.length - newValue.length);
+      },
+      //  重新设置了文本显示值时，重新定位光标位置
+      () => bak.restore(displayValueRef.value.length - newValue.length)
+    );
+    valueModel.value = latestNumber;
+  });
+}
 //  2、生命周期响应
 </script>
 
@@ -257,6 +277,7 @@ _.readonly || watcher(displayValueRef, (newValue, oldValue) => {
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
 
       >svg.snail-icon {
         fill: #8a9099;
@@ -292,12 +313,12 @@ _.readonly || watcher(displayValueRef, (newValue, oldValue) => {
         height: calc(50% - 1px);
         border-left: 1px solid #dddfed;
 
-        &.subtract {
+        &.plus {
           top: 1px;
           border-top-right-radius: 4px;
         }
 
-        &.plus {
+        &.subtract {
           top: 50%;
           border-top: 1px solid #dddfed;
           border-bottom-right-radius: 4px;
@@ -337,5 +358,8 @@ _.readonly || watcher(displayValueRef, (newValue, oldValue) => {
 .snail-number>.number-util {
   width: 100%;
   flex-shrink: 0;
+  font-size: 12px;
+  line-height: 20px;
+  color: #aaa;
 }
 </style>
