@@ -159,11 +159,11 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
     {
         "type": "Number",
         "id": "1770715672053",
-        "title": "数值-最大值1w clamp",
+        "title": "数值-最大值10w clamp",
         "width": 3,
         required: true,
         "settings": {
-            maxValue: 10000,
+            maxValue: 100000,
             clamp: "clamp",
             controls: "default",
             suffix: "万元",
@@ -171,6 +171,7 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
             precision: 3,
             thousands: "inline",
             upper: true,
+            formatMultiplier: 10000
         }
     },
     {
@@ -185,6 +186,20 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
             step: 100,
             suffix: "元",
             prefix: "￥",
+            thousands: "below",
+            upper: true,
+        }
+    },
+    {
+        "type": "Number",
+        "id": "1770715672054",
+        "title": "数值2-最小值10 keep",
+        "width": 2,
+        "settings": {
+            minValue: 10,
+            clamp: "keep",
+            controls: "right",
+            step: 100,
             thousands: "below",
             upper: true,
         }

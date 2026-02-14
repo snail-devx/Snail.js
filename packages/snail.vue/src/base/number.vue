@@ -32,10 +32,9 @@
     </div>
     <div class="number-suffix placeholder" v-if="hasSuffix" v-text="suffix" />
     <!-- 数据的工具助手区域；强制换行：大写、千位符、、、 -->
-    <div class="number-util ellipsis" v-if="upper && isStringNotEmpty(upperTextRef)" :title="upperTextRef"
-      v-text="`大写：${upperTextRef}`" />
-    <div class="number-util ellipsis" v-if="thousands == 'below' && isStringNotEmpty(thousandsTextRef)"
-      :title="thousandsTextRef" v-text="`千分位：${thousandsTextRef}`" />
+    <div class="number-util ellipsis" v-if="upper" :title="upperTextRef" v-text="`大写：${upperTextRef || ''}`" />
+    <div class="number-util ellipsis" v-if="thousands == 'below'" :title="thousandsTextRef"
+      v-text="`千分位：${thousandsTextRef || ''}`" />
   </div>
 </template>
 
@@ -271,6 +270,8 @@ watcher(displayValueRef, (newValue, oldValue) => {
     flex: 1;
     position: relative;
     overflow: hidden;
+    //  给个小宽度示意一下，避免无前后缀时，此区域直接flex：1搞成0了
+    min-width: 10px;
 
     //  控制器相关
     >.controls {
