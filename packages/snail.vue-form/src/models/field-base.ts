@@ -291,7 +291,7 @@ export type FieldProxyRenderOptions = FieldRenderOptions<any, any> & {
      * @param validate 是否进行值验证
      * @returns 取值成功返回具体值，若失败则将错误信息写入error中
      */
-    readonly getValue: <T>(validate: boolean) => Promise<T>;
+    readonly getValue: <T>(validate: boolean) => Promise<RunResult<T>>;
     /**
      * 设置字段值
      * - 代理组件内部响应 IFieledHandle.setValue 时，调用此方法

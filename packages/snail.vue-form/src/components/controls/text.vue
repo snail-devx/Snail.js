@@ -16,12 +16,13 @@
 </template>
 
 <script setup lang="ts">
-import { inject, onMounted, ShallowRef, shallowRef, watch, } from "vue";
+import { inject, nextTick, onMounted, ShallowRef, shallowRef, watch, } from "vue";
 import { TextControlSettings } from "../../models/control-model";
 import { FieldEvents, FieldProxyRenderOptions, FieldRenderOptions, IFieldHandle, } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, newTraces } from "../common/field-common";
 import { getValueString, validateText } from "../../utils/field-util";
 import FieldProxy from "../common/field-proxy.vue";
+import { RunResult } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -42,9 +43,12 @@ let handle: IFieldHandle = undefined;
 const proxy = Object.freeze<Pick<FieldProxyRenderOptions, "titleDisabled" | "emitter" | "getValue" | "setValue">>({
     titleDisabled: false,
     emitter: emits,
-    getValue(validate: boolean): Promise<any> {
+    getValue(validate: boolean): Promise<RunResult<any>> {
         const success: boolean = validate ? validateValue() : true;
-        return Promise.resolve(success ? valueRef.value : undefined);
+        const rt: RunResult<any> = success
+            ? { success: true, data: valueRef.value }
+            : { success: false, reason: errorRef.value };
+        return Promise.resolve(rt);
     },
     setValue(value: string): Promise<{ success: boolean, change: boolean }> {
         /** 值有变化，才操作，无变化直接成功即可 */

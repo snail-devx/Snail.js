@@ -26,7 +26,7 @@ import { OptionControlSettings, OptionControlValueItem } from "../../models/cont
 import { FieldEvents, FieldProxyRenderOptions, FieldRenderOptions, IFieldHandle, } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, newTraces } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
-import { isArrayNotEmpty, isStringNotEmpty, newId } from "snail.core";
+import { isArrayNotEmpty, isStringNotEmpty, newId, RunResult } from "snail.core";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const _ = defineProps<FieldRenderOptions<OptionControlSettings, OptionControlValueItem[]>>();
@@ -56,9 +56,12 @@ const keyRef: ShallowRef<string> = shallowRef(newId());
 const proxy = Object.freeze<Pick<FieldProxyRenderOptions, "titleDisabled" | "emitter" | "getValue" | "setValue">>({
     titleDisabled: false,
     emitter: emits,
-    getValue(validate: boolean): Promise<any> {
+    getValue(validate: boolean): Promise<RunResult<any>> {
         const success: boolean = validate ? validateSelected() : true;
-        return Promise.resolve(success ? valueRef.value : undefined);
+        const rt: RunResult<any> = success
+            ? { success: true, data: valueRef.value }
+            : { success: false, reason: errorRef.value };
+        return Promise.resolve(rt);
     },
     setValue(values: OptionControlValueItem[]): Promise<{ success: boolean, change: boolean }> {
         //  提取已选values值，判断是否有变化

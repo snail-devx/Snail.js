@@ -202,9 +202,11 @@ function onStepClick(isPlus: boolean) {
 {
   //  监听v-model值变化，实时反馈给上下文
   watcher(valueModel, (newValue, oldValue) => {
-    // console.log("valueModel", newValue, oldValue);
-    // console.log("valueModel", ignoreCurValueChange);
-    console.log("还没实现外部值变化时，实时更新到number组件中");
+    if (newValue !== latestNumber) {
+      latestNumber = newValue;
+      //  作为结束输入，格式化输入并渲染；但外部修改值的同步，不做change触发
+      formatInput(String(newValue), true, () => resetDisplayValue(""));;
+    }
   });
   //  监听显示值的变化，将无效字符强制剔除掉
   watcher(displayValueRef, (newValue, oldValue) => {

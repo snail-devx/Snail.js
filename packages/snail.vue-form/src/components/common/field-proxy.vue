@@ -56,10 +56,14 @@ const handle: IFieldHandle = Object.freeze<IFieldHandle>({
     async getValue<T>(validate: boolean, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult<T>> {
         let result: RunResult<any> = canRunAction(_, "get-value", traces);
         if (result.success == true) {
-            const value = _.getValue ? await _.getValue(validate) : _.value;
-            result = isStringNotEmpty(_.error)
-                ? { success: false, reason: _.error }
-                : { success: true, data: toRaw(value) };
+            if (_.getValue) {
+                result = await _.getValue<any>(validate);
+            }
+            else {
+                result = validate == true && isStringNotEmpty(_.error)
+                    ? { success: false, reason: _.error }
+                    : { success: true, data: _.value };
+            }
         }
         return result;
     },

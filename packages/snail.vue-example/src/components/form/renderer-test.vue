@@ -191,7 +191,7 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
     }
 ];
 const values = {
-    "17700871262161": "单行文本框测试"
+    "1770087123812": "单行文本框测试"
 }
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -199,10 +199,13 @@ async function getValues() {
     console.log(await handle.getValues(true));
 }
 async function getFieldValue() {
-    console.log(await handle.getValue('17700871262161', true))
+    console.log(await handle.getValue('1770087123812', true))
+    console.log(await handle.getValue('1770715672053', true))
+    console.log(await handle.getValue('1770715672054', false))
+    console.log(await handle.getValue('1770715672054', true))
 }
 async function setFieldValue() {
-    console.log(await handle.setValue('17700871262161', new Date().getTime()));
+    console.log(await handle.setValue('1770087123812', new Date().getTime()));
     //  复选框 
     console.log(await handle.setValue('1770544423261', [{
         "id": "111-3",
@@ -222,6 +225,8 @@ async function setFieldValue() {
         "id": "111-4",
         "text": "dhd的皇帝皇后-2"
     }]));
+    //  数值
+    console.log(await handle.setValue("1770715672054", 1234));
 
 }
 function getFieldStatus() {
