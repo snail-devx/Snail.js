@@ -199,33 +199,30 @@ function onStepClick(isPlus: boolean) {
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
-{
-  //  监听v-model值变化，实时反馈给上下文
-  watcher(valueModel, (newValue, oldValue) => {
-    if (newValue !== latestNumber) {
-      latestNumber = newValue;
-      //  作为结束输入，格式化输入并渲染；但外部修改值的同步，不做change触发
-      formatInput(String(newValue), true, () => resetDisplayValue(""));;
-    }
-  });
-  //  监听显示值的变化，将无效字符强制剔除掉
-  watcher(displayValueRef, (newValue, oldValue) => {
-    //  格式化数值做展示：备份光标位置，方便例外情况还原
-    const bak = bakSectionStart();
-    oldValue == undefined && (oldValue = "");
-    ignoreCurValueChange || formatInput(newValue, false,
-      //  输入值无效时，修改为旧值，然后重新定位光标
-      () => {
-        latestNumber = valueModel.value;
-        resetDisplayValue(oldValue);
-        bak.restore(oldValue.length - newValue.length);
-      },
-      //  重新设置了文本显示值时，重新定位光标位置
-      () => bak.restore(displayValueRef.value.length - newValue.length)
-    );
-    valueModel.value = latestNumber;
-  });
-}
+//    监听v-model值变化，实时反馈给上下文：作为外部修改值的同步，不做change触发
+watcher(valueModel, (newValue, oldValue) => {
+  if (newValue !== latestNumber) {
+    latestNumber = newValue;
+    formatInput(String(newValue), true, () => resetDisplayValue(""));;
+  }
+});
+//    监听显示值的变化，将无效字符强制剔除掉
+watcher(displayValueRef, (newValue, oldValue) => {
+  //  格式化数值做展示：备份光标位置，方便例外情况还原
+  const bak = bakSectionStart();
+  oldValue == undefined && (oldValue = "");
+  ignoreCurValueChange || formatInput(newValue, false,
+    //  输入值无效时，修改为旧值，然后重新定位光标
+    () => {
+      latestNumber = valueModel.value;
+      resetDisplayValue(oldValue);
+      bak.restore(oldValue.length - newValue.length);
+    },
+    //  重新设置了文本显示值时，重新定位光标位置
+    () => bak.restore(displayValueRef.value.length - newValue.length)
+  );
+  valueModel.value = latestNumber;
+});
 //  2、生命周期响应
 </script>
 
