@@ -47,7 +47,7 @@
         <FieldLikeBoolean title="金额大写" :readonly="readonly" :value="field.settings.upper" :help="propertyHelps.upper"
             @change="value => (upperRef = value, proxy.update('upper', true, value))" />
         <div class="setting-item">
-            <div class="item-title" v-text="'千分位'" :class="'question'" :title="propertyHelps.thousands" />
+            <div class="item-title" v-text="'千分位符号'" :class="'question'" :title="propertyHelps.thousands" />
             <div class="item-detail right">
                 <Choose :readonly="readonly" :type="'checkbox'" :mode="'beautiful'" :multi="false"
                     :items="[{ text: '禁用', value: 'disabled' }, { text: '默认', value: 'below' }, { text: '行内', value: 'inline' }]"
@@ -108,9 +108,9 @@ const propertyHelps = Object.freeze({
         "3.行内：在输入框中直接格式化显示"
     ].join("\n"),
     formatMultiplier: [
-        "数值格式化时，对数值进行放大处理（值*倍数）",
-        "1.转大写、千分位（仅【默认】）时生效",
-        "2.用途说明：金额后缀位【万元】时，输入1表示1万，大写时则为“壹万元整”，而不是“壹元整”"
+        "格式化（金额大写/默认千分位）前先放大数值。可选值：",
+        "1.禁用：不进行放大处理",
+        "2.万倍：数值*10000后再进行格式化",
     ].join("\n")
 });
 
