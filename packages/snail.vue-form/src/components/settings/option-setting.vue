@@ -35,7 +35,7 @@
             <div class="item-title">选项配置</div>
             <div class="item-detail right">
                 <Choose :readonly="readonly" :type="'checkbox'" :mode="'beautiful'" :multi="true"
-                    :items="[{ text: '编码', value: 'code' }, { text: '颜色', value: 'color' }]"
+                    :items="[{ text: '编码', value: 'code' },/*{ text: '颜色', value: 'color' }*/]"
                     v-model="valueRef2CodeColor" @change="onCodeColorChange" />
             </div>
             <div class="option-items">
