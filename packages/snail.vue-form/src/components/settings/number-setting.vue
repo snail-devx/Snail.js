@@ -33,11 +33,11 @@
                     v-model="controlsRef" @change="value => proxy.update('controls', true, value)" />
             </div>
         </div>
-        <FieldLikeNumber v-show="controlsRef != 'disabled'" title="步长值" :readonly="readonly"
-            :value="field.settings.step" :precision="0" :abs-value="true" :help="propertyHelps.step"
-            placeholder="仅支持正整数" @change="value => proxy.update('step', true, value)" />
-        <FieldLikeNumber title="精度" :readonly="readonly" :value="field.settings.precision" :abs-value="true"
-            placeholder="保留几位小数" @change="value => proxy.update('precision', true, value)" />
+        <FieldLikeNumber v-show="controlsRef != 'disabled'" placeholder="仅支持正整数" title="步长值" :readonly="readonly"
+            :min-value="1" :precision="0" :help="propertyHelps.step" :value="field.settings.step"
+            @change="value => proxy.update('step', true, value)" />
+        <FieldLikeNumber title="精度" placeholder="保留几位小数" :readonly="readonly" :min-value="1" :precision="0"
+            :value="field.settings.precision" @change="value => proxy.update('precision', true, value)" />
         <FieldLikeText title="前缀" :readonly="readonly" :value="field.settings.prefix" placeholder="金额时，可配置前缀为 ￥"
             @change="value => proxy.update('prefix', true, value)" />
         <FieldLikeText title="后缀" :readonly="readonly" :value="field.settings.suffix" placeholder="金额时，可配置后缀为 元"

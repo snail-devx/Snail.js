@@ -126,6 +126,10 @@ function refresh() {
             height: 80px;
         }
 
+        input {
+            height: 32px !important;
+        }
+
         input[readonly] {
             border: none;
             padding-left: 0;

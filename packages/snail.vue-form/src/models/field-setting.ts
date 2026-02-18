@@ -96,9 +96,14 @@ export type FieldTextPropertySettingOptions = FieldPropertySettingOptions<string
  */
 export type FieldNumberPropertySettingOptions = FieldPropertySettingOptions<number> & {
     /**
-     * 是否使用绝对值，负数时，转为绝对值
+     * 最小数值
      */
-    absValue?: boolean;
+    minValue?: number;
+    /**
+     * 最大数值
+     */
+    maxValue?: number;
+
     /**
      * 精度，保留几位小数
      * - 要求0、正整数,输入小数则强制整数

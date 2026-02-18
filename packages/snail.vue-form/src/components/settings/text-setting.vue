@@ -20,10 +20,10 @@
             @change="value => proxy.update('required', false, value)" />
         <FieldLikeText title="默认值" :readonly="readonly" :value="field.value" :multiple="field.type == 'TextArea'"
             @change="value => proxy.update('value', false, value)" />
-        <FieldLikeNumber title="最小长度" :readonly="readonly" :precision="0" :value="field.settings.minLength"
-            :abs-value="true" @change="value => proxy.update('minLength', true, value)" />
-        <FieldLikeNumber title="最大长度" :readonly="readonly" :precision="0" :value="field.settings.maxLength"
-            :abs-value="true" @change="value => proxy.update('maxLength', true, value)" />
+        <FieldLikeNumber title="最小长度" :readonly="readonly" :min-value="1" :precision="0"
+            :value="field.settings.minLength" @change="value => proxy.update('minLength', true, value)" />
+        <FieldLikeNumber title="最大长度" :readonly="readonly" :min-value="1" :precision="0"
+            :value="field.settings.maxLength" @change="value => proxy.update('maxLength', true, value)" />
     </FieldSettingProxy>
 </template>
 
@@ -37,6 +37,7 @@ import FieldWidth from "./atoms/field-width.vue";
 import FieldLikeNumber from "./atoms/field-like-number.vue";
 import FieldLikeText from "./atoms/field-like-text.vue";
 import FieldLikeBoolean from "./atoms/field-like-boolean.vue";
+
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

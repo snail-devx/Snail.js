@@ -19,9 +19,9 @@
                 <div class="field-cover" v-if="global.mode == 'design'"
                     :class="{ 'active': global.fieldSetting.isActiveField(field, location) }"
                     @click="onActiveField(field, index)">
-                    <Icon type="plus" color="#aeb6c2" hover-color="#279bf1" title="复制"
+                    <Icon v-if="readonly != true" type="plus" color="#aeb6c2" hover-color="#279bf1" title="复制"
                         @click="isButtonClickInCover = true, container.copyField(field, index)" />
-                    <Icon type="trash" color="#aeb6c2" hover-color="#279bf1" title="删除"
+                    <Icon v-if="readonly != true" type="trash" color="#aeb6c2" hover-color="#279bf1" title="删除"
                         @click="isButtonClickInCover = true, container.deleteField(field, index)" />
                 </div>
             </div>
@@ -308,8 +308,19 @@ onUnmounted(scope.destroy);
             //  绝对定位，填充父元素，隐藏溢出的内容，并定位到0,0位置
             .absolute-fill-hidden();
 
+            >.snail-icon {
+                display: none;
+            }
+
             >.snail-icon.trash {
                 margin-top: 2px;
+            }
+        }
+
+        //  鼠标移入时，显示操作按钮
+        &>.field-cover:hover {
+            >.snail-icon {
+                display: block;
             }
         }
 

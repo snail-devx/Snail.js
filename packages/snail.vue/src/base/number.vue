@@ -273,6 +273,11 @@ watcher(displayValueRef, (newValue, oldValue) => {
     //  给个小宽度示意一下，避免无前后缀时，此区域直接flex：1搞成0了
     min-width: 10px;
 
+    >input {
+      height: 34px;
+      width: 100%;
+    }
+
     //  控制器相关
     >.controls {
       user-select: none;
