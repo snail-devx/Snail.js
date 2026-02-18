@@ -12,6 +12,7 @@ export * from "./base/event"
 export * from "./base/function"
 export * from "./base/hook"
 export * from "./base/key"
+// export * from "./base/number"  先不对外开放，还没实现好、、、
 export * from "./base/promise"
 // export * from "./base/queue"
 export * from "./base/scope"
