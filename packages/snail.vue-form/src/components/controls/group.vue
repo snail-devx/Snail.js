@@ -12,13 +12,13 @@
 import { RunResult } from "snail.core";
 import { inject, ref, ShallowRef, shallowRef, } from "vue";
 import { FieldEvents, FieldProxyRenderOptions, FieldRenderOptions, IFieldHandle } from "../../models/field-base";
-import { TextControlSettings } from "../../models/control-model";
+import { GroupControlSettings, GroupControlValue } from "../../models/control-model";
 import { INJECTKEY_GlobalContext } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const _ = defineProps<FieldRenderOptions<TextControlSettings, string>>();
+const _ = defineProps<FieldRenderOptions<GroupControlSettings, GroupControlValue>>();
 const emits = defineEmits<FieldEvents>();
 const global = inject(INJECTKEY_GlobalContext);
 const { field } = _;

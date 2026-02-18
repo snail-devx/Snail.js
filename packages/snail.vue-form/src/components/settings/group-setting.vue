@@ -6,11 +6,11 @@
 <script setup lang="ts">
 import { ref, shallowRef, useTemplateRef, } from "vue";
 import { FieldSettingOptions } from "../../models/field-setting";
-import { TextControlSettings } from "../../models/control-model";
+import { GroupControlSettings } from "../../models/control-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const _ = defineProps<FieldSettingOptions<TextControlSettings>>();
+const _ = defineProps<FieldSettingOptions<GroupControlSettings>>();
 const proxy = useTemplateRef("setting-proxy");
 const { field, readonly } = _;
 

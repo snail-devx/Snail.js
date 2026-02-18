@@ -147,5 +147,19 @@ export type OptionControlValueItem = {
      */
     color?: string;
 }
+
+/**
+ * 分组控件的Settings数据结构
+ */
+export type GroupControlSettings = {
+
+}
+
+/**
+ * 分组控件的Value值数据结构
+ */
+export type GroupControlValue = {
+
+}
 //#endregion
 
