@@ -360,6 +360,15 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
         addField(type: string, index?: number, originField?: FieldOptions<any>): boolean {
             /** 构建一个全新字段，执行钩子函数，添加后发送改变事件 */
             throwIfFalse(global.mode == "design", "only in design mode can add field");
+            //  当前容器是否是子容器
+            if (location.parentFieldId != undefined) {
+                const extend = global.getControl(type).extend;
+                if (extend && extend.childDisabled == true) {
+                    alert("此控件不能在子容器中添加");
+                    return false;
+                }
+            }
+            //  构建全新字段，并执行钩子函数
             const field = buildField(type, originField);
             let need = global.hook.removeField ? global.hook.addField(field, options.parent) : undefined;
             if (need !== false) {
@@ -403,6 +412,13 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
         copyField(field: FieldOptions<any>, index: number): boolean {
             /*  执行钩子函数，复制字段后，发送字段改变事件；*/
             throwIfFalse(global.mode == "design", "only in design mode can copy field");
+            //  判断是否允许存在多个此控件实例
+            const extend = global.getControl(field.type).extend;
+            if (extend && extend.multipleDisabled == true) {
+                alert("此控件不允许存在多个实例");
+                return false;
+            }
+            //  执行钩子函数，判定是否可以复制；并构建新字段
             let need = global.hook.copyField ? global.hook.copyField(field, options.parent) : undefined;
             if (need !== false) {
                 field = buildField(field.type, field);
@@ -486,10 +502,14 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
     function buildField(type: string, originField?: FieldOptions<any>): FieldOptions<any> {
         //  构建一个全新字段：
         const field: FieldOptions<any> = originField ? JSON.parse(JSON.stringify(originField)) : Object.create(null);
+        const extend = global.getControl(type).extend;
         field.type || (field.type = type);
         field.id || (field.id = String(new Date().getTime()));
         field.title || (field.title = global.getControl(type).name);
-        field.width || (field.width = global.defaultSpan);
+        field.width || (field.width = extend && extend.width != undefined
+            ? extend.width
+            : global.defaultSpan
+        );
         //  判断字段id是否重复、判断字段title是否有值，是否重复
         if (fieldsRef.value.length > 0) {
             const idMap: Record<string, boolean> = Object.create(null);

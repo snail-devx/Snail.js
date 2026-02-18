@@ -40,6 +40,34 @@ export type ControlOptions = {
      * - 不传入则采用默认图标
      */
     icon?: string | string[];
+
+    /**
+     * 控件扩展配置选项
+     */
+    extend?: ControlExtendOptions;
+}
+/**
+ * 控件扩展选项
+ */
+export type ControlExtendOptions = {
+    /**
+     * 控件默认宽度
+     * - 设计时新建字段时，自动赋予的宽度值
+     */
+    width?: number;
+
+    /**
+     * 禁止作为子控件使用
+     * - true 时，无法在子容器中添加此控件；只能在顶级表单中使用
+     * - 若 group 控件，不允许再在group控件中使用
+     */
+    childDisabled?: boolean;
+    /**
+     * 禁止存在多个控件实例
+     * - true 时，同一个容器中只能存在一个此类型的控件；无法添加多个此类型的字段
+     * - 满足某些特定控件的业务需求，只允许在整个容器中存在一次
+     */
+    multipleDisabled?: boolean;
 }
 
 //#region ************************************* 类控件的Settings *************************************
