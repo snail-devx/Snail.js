@@ -4,7 +4,7 @@
 -->
 <template>
     <FieldProxy :type="field.type" :title="field.title" :description="field.description"
-        :="{ manager: manager, error: errorRef }">
+        :="{ manager: manager, error: getError() }">
         <!-- 下拉组合框 -->
         <Select v-if="field.type == 'Combobox'" :readonly="readonly" :multiple="false" :="buildSelectItemsAndValue()"
             @change="items => onChooseChange(items && items.length == 1 ? [items[0].id] : [])" />
@@ -19,7 +19,7 @@
 import { inject, onMounted, ShallowRef, shallowRef, watch, } from "vue";
 import { ChooseItem, components, SelectItem, SelectOptions } from "snail.vue";
 import { OptionControlSettings, OptionControlValueItem } from "../../models/control-model";
-import { FieldEvents, FieldRenderOptions, IFieldHandle, IFieldManager, } from "../../models/field-base";
+import { FieldEvents, FieldRenderOptions, FieldValueSetResult, IFieldHandle, IFieldManager, } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, newTraces, useField } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
 import { isArrayNotEmpty, isStringNotEmpty, newId, RunResult } from "snail.core";
@@ -35,10 +35,10 @@ const manager: IFieldManager = useField(global, props, {
         const success: boolean = validate ? validateSelected() : true;
         const rt: RunResult<any> = success
             ? { success: true, data: valueRef.value }
-            : { success: false, reason: errorRef.value };
+            : { success: false, reason: getError() };
         return Promise.resolve(rt);
     },
-    setValue(values: OptionControlValueItem[]): Promise<{ success: boolean, change: boolean }> {
+    setValue(values: OptionControlValueItem[]): Promise<FieldValueSetResult> {
         //  提取已选values值，判断是否有变化
         values || (values = []);
         let change: boolean = valueIdsRef.value.length != values.length;
@@ -51,20 +51,19 @@ const manager: IFieldManager = useField(global, props, {
         }
         //  返回操作结果；有变化则重新构建选项，并验证选项数据
         if (change == false) {
-            return Promise.resolve({ success: true, change: false });
+            return Promise.resolve({ success: true, change: false, value: values });
         }
         buildSelectedOptions(values, true);
         return Promise.resolve(validateSelected()
-            ? { success: true, change }
-            : { success: false, change: false }
+            ? { success: true, change, value: valueRef.value }
+            : { success: false, change: false, value: undefined }
         );
     },
 });
+const { handle, getError, updateError } = manager;
 //  2、组件交互变量、常量
 /**     已选选择项：field-proxy需要 */
 const valueRef = shallowRef<OptionControlValueItem[]>();
-/**     字段错误信息：如字段值验证失败、、、 */
-const errorRef: ShallowRef<string> = shallowRef("");
 /**     是否是多选 */
 const isMultiple: boolean = props.field.type == "Checkbox";
 //  3、选项相关
@@ -103,10 +102,11 @@ function buildSelectedOptions(values: OptionControlValueItem[], refresh: boolean
  * 验证已选选项；主要验证必选
  */
 function validateSelected(): boolean {
-    errorRef.value = manager.handle.getStatus().data.required && valueIdsRef.value.length == 0
+    const error = handle.getStatus().data.required && valueIdsRef.value.length == 0
         ? "请至少选择一项!"
         : undefined;
-    return errorRef.value == undefined;
+    updateError(error);
+    return error == undefined;
 }
 
 /**
@@ -177,7 +177,7 @@ if (props.field.settings && isArrayNotEmpty(props.field.settings.options) == tru
 //      初始化已选值
 buildSelectedOptions(props.value || props.field.value, false)
 //  2、生命周期响应
-onMounted(() => emits("rendered", manager.handle));
+onMounted(() => emits("rendered", handle));
 </script>
 
 <style lang="less">

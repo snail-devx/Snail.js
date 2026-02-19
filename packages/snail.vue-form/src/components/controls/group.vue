@@ -4,14 +4,14 @@
 -->
 <template>
     <FieldProxy :type="field.type" :title="null" :description="field.description"
-        :="{ manager: manager, error: errorRef }">
+        :="{ manager: manager, error: getError() }">
     </FieldProxy>
 </template>
 
 <script setup lang="ts">
 import { RunResult } from "snail.core";
 import { inject, onMounted, ref, ShallowRef, shallowRef, } from "vue";
-import { FieldEvents, FieldRenderOptions, IFieldHandle, IFieldManager } from "../../models/field-base";
+import { FieldEvents, FieldRenderOptions, FieldValueSetResult, IFieldHandle, IFieldManager } from "../../models/field-base";
 import { GroupControlSettings, GroupControlValue } from "../../models/control-model";
 import { INJECTKEY_GlobalContext, useField } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
@@ -34,7 +34,7 @@ const manager: IFieldManager = useField(global, props, {
         // return Promise.resolve(rt);
         throw new Error("group control does not support getValue");
     },
-    setValue(value: string): Promise<{ success: boolean, change: boolean }> {
+    setValue(value: string): Promise<FieldValueSetResult> {
         /** 值有变化，才操作，无变化直接成功即可 */
         // value = getValueString(value);
         // if (value == valueRef.value) {
@@ -50,11 +50,10 @@ const manager: IFieldManager = useField(global, props, {
         throw new Error("group control does not support setValue");
     }
 });
+const { handle, getError, updateError } = manager;
 //  2、组件交互变量、常量
 /**     字段值 */
 const valueRef: ShallowRef<any> = shallowRef("");
-/**     字段错误信息：如字段值验证失败、、、 */
-const errorRef: ShallowRef<string> = shallowRef("");
 /**     字段管理器 */
 
 //  3、分组实例值相关
@@ -69,7 +68,7 @@ const groupValuesRef: ShallowRef<Array<Record<string, any>>> = shallowRef(undefi
 global.mode == "design" && (groupValuesRef.value = [Object.create(null)]);
 
 //  2、生命周期响应
-onMounted(() => emits("rendered", manager.handle));
+onMounted(() => emits("rendered", handle));
 </script>
 
 <style lang="less">

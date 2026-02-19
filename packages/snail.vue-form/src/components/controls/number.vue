@@ -4,9 +4,9 @@
 -->
 <template>
     <FieldProxy :type="field.type" :title="field.title" :description="field.description"
-        :="{ manager: manager, error: errorRef }">
+        :="{ manager: manager, error: getError() }">
         <Number :readonly="readonly" :placeholder="field.placeholder" :="field.settings" v-model="valueRef"
-            @error="error => errorRef = error" @change="onNumberChange" />
+            @error="updateError" @change="onNumberChange" />
     </FieldProxy>
 </template>
 
@@ -15,7 +15,7 @@ import { isNumberNotNaN, RunResult, } from "snail.core";
 import { inject, nextTick, onMounted, ShallowRef, shallowRef, } from "vue";
 import { components, useReactive } from "snail.vue";
 import { NumberControlSettings } from "../../models/control-model";
-import { FieldEvents, FieldRenderOptions, IFieldHandle, IFieldManager, } from "../../models/field-base";
+import { FieldEvents, FieldRenderOptions, FieldValueSetResult, IFieldHandle, IFieldManager, } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, newTraces, useField } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
 
@@ -34,22 +34,21 @@ const manager: IFieldManager = useField(global, props, {
         const success: boolean = validate ? doValidate(valueRef.value) : true;
         return success
             ? { success: true, data: valueRef.value }
-            : { success: false, reason: errorRef.value };
+            : { success: false, reason: getError() };
     },
-    async setValue(value: number): Promise<{ success: boolean, change: boolean }> {
+    async setValue(value: number): Promise<FieldValueSetResult> {
         const oldNumber = valueRef.value;
         valueRef.value = value;
         await nextTick();
         return doValidate(valueRef.value)
-            ? { success: true, change: oldNumber != valueRef.value }
-            : { success: false, change: false };
+            ? { success: true, change: oldNumber != valueRef.value, value: valueRef.value }
+            : { success: false, change: false, value: undefined };
     },
 });
+const { handle, getError, updateError } = manager;
 //  2、组件交互变量、常量
 /**     已选选择项：field-proxy需要 */
 const valueRef = shallowRef<number>(isNumberNotNaN(props.value) ? props.value : props.field.value);
-/**     字段错误信息：如字段值验证失败、、、 */
-const errorRef: ShallowRef<string> = shallowRef("");
 //  3、选项相关
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -59,23 +58,23 @@ const errorRef: ShallowRef<string> = shallowRef("");
  * @returns 验证通过返回true，否则false
  */
 function doValidate(number: number): boolean {
-    errorRef.value = "";
-    if (manager.handle.getStatus().data.required == true) {
+    updateError(undefined);
+    if (handle.getStatus().data.required == true) {
         if (number == undefined) {
-            errorRef.value = "不可为空";
+            updateError("不可为空");
             return false;
         }
     }
     if (isNumberNotNaN(props.field.settings.minValue) && props.field.settings.minValue > number) {
-        errorRef.value = `不能小于最小值(${props.field.settings.minValue})`;
+        updateError(`不能小于最小值(${props.field.settings.minValue})`);
         return false;
     }
     if (isNumberNotNaN(props.field.settings.maxValue) && props.field.settings.maxValue < number) {
-        errorRef.value = `不能大于最大值(${props.field.settings.maxValue})`;
+        updateError(`不能大于最大值(${props.field.settings.maxValue})`);
         return false;
     }
     if (9007199254740991 < number || number < -9007199254740991) {
-        errorRef.value = "超过Number的最大精度范围";
+        updateError("超过Number的最大精度范围");
         return false;
     }
 
@@ -99,7 +98,7 @@ watcher(valueRef, (newValue, oldValue) => {
     newValue != oldValue && setTimeout(doValidate, 0, newValue);
 });
 //  2、生命周期响应
-onMounted(() => emits("rendered", manager.handle));
+onMounted(() => emits("rendered", handle));
 </script>
 
 <style lang="less">

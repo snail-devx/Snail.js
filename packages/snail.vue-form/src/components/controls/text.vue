@@ -4,7 +4,7 @@
  -->
 <template>
     <FieldProxy :type="field.type" :title="field.title" :description="field.description"
-        :="{ manager: manager, error: errorRef }">
+        :="{ manager: manager, error: getError() }">
         <input v-if="field.type == 'Text'" type="text" :readonly="readonly" v-model="valueRef"
             :placeholder="field.placeholder" @change="onTextChange" />
         <textarea v-else-if="field.type == 'TextArea'" v-model="valueRef" :readonly="readonly"
@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { inject, nextTick, onMounted, ShallowRef, shallowRef, watch, } from "vue";
 import { TextControlSettings } from "../../models/control-model";
-import { FieldEvents, FieldRenderOptions, IFieldHandle, IFieldManager, } from "../../models/field-base";
+import { FieldEvents, FieldRenderOptions, FieldValueSetResult, IFieldHandle, IFieldManager, } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, newTraces, useField } from "../common/field-common";
 import { getValueString, validateText } from "../../utils/field-util";
 import FieldProxy from "../common/field-proxy.vue";
@@ -33,29 +33,28 @@ const manager: IFieldManager = useField(global, props, {
         const success: boolean = validate ? validateValue() : true;
         const rt: RunResult<any> = success
             ? { success: true, data: valueRef.value }
-            : { success: false, reason: errorRef.value };
+            : { success: false, reason: getError() };
         return Promise.resolve(rt);
     },
-    setValue(value: string): Promise<{ success: boolean, change: boolean }> {
+    setValue(value: string): Promise<FieldValueSetResult> {
         /** 值有变化，才操作，无变化直接成功即可 */
         value = getValueString(value);
         if (value == valueRef.value) {
-            return Promise.resolve({ success: true, change: false })
+            return Promise.resolve({ success: true, change: false, value: undefined })
         }
         //  更新字段值，并进行字段值验证
         valueRef.value = value;
         oldText = value;
         return Promise.resolve(validateValue()
-            ? { success: true, change: true }
-            : { success: false, change: false }
+            ? { success: true, change: true, value: valueRef.value }
+            : { success: false, change: false, value: undefined }
         );
     }
 });
+const { handle, getError, updateError } = manager;
 //  2、组件交互变量、常量
 /**     字段值 */
 const valueRef: ShallowRef<any> = shallowRef("");
-/**     字段错误信息：如字段值验证失败、、、 */
-const errorRef: ShallowRef<string> = shallowRef("");
 /**     旧的文本值，手工改变时，发送事件时传递旧值 */
 let oldText: string;
 
@@ -67,8 +66,8 @@ let oldText: string;
 function validateValue(): boolean {
     /* 设计时验证字段的配置完整性；运行时验证字段的必填、文本长度、、、；其他情况不验证 */
     if (global.mode == "runtime") {
-        let { success, reason } = validateText(valueRef.value, manager.handle.getStatus().data, props.field.settings);
-        errorRef.value = reason;
+        let { success, reason } = validateText(valueRef.value, handle.getStatus().data, props.field.settings);
+        updateError(reason);
         return success;
     }
     return true;
@@ -99,7 +98,7 @@ if (global.mode == "runtime") {
     oldText = valueRef.value;
 }
 //  2、生命周期响应
-onMounted(() => emits("rendered", manager.handle));
+onMounted(() => emits("rendered", handle));
 </script>
 
 <style lang="less">

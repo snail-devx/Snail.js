@@ -3,11 +3,11 @@
  * - 字段、字段容器相关的基础上下文、句柄等信息管理、接口实现
  * - 抽取.vue组件中相关实现出来，减少.vue组件中非界面相关逻辑代码
  */
-import { isArrayNotEmpty, IScope, isNumberNotNaN, mountScope, moveFromArray, newId, RunResult, throwIfFalse, throwIfNullOrUndefined, useScope } from "snail.core";
+import { isArrayNotEmpty, isBoolean, IScope, isNumberNotNaN, isStringNotEmpty, mountScope, moveFromArray, mustFunction, newId, RunResult, throwIfFalse, throwIfNullOrUndefined, useScope } from "snail.core";
 import { InjectionKey, markRaw, ref, Ref, shallowRef, ShallowRef, toRaw } from "vue";
 import { EmitterType, EventsType } from "snail.vue";
 import { ControlOptions } from "../../models/control-model";
-import { FieldActionOptions, FieldChangeEvent, FieldEvents, FieldLocation, FieldOptions, FieldRenderOptions, FieldRenderProxyOptions, FieldStatusOptions, FieldManagerOptions, IFieldHandle, IFieldManager, } from "../../models/field-base";
+import { FieldActionOptions, FieldChangeEvent, FieldEvents, FieldOptions, FieldRenderOptions, FieldStatusOptions, FieldManagerOptions, IFieldHandle, IFieldManager, FieldValueSetResult, } from "../../models/field-base";
 import { IFieldContainer, FieldContainerEvents, IFieldContainerHandle, FieldContainerOptions, FieldContainerLocation } from "../../models/field-container";
 import { IFieldSettingHandle } from "../../models/field-setting";
 import { IFieldGlobalContext } from "../../models/field-share";
@@ -23,6 +23,8 @@ export const INJECTKEY_GlobalContext = Symbol() as InjectionKey<IFieldGlobalCont
  */
 export function useGlobalContext(options: FieldContainerOptions & Pick<IFieldGlobalContext, "mode" | "layout" | "layout" | "columns" | "defaultSpan" | "hook" | "controls">)
     : IFieldGlobalContext & IScope {
+    /** 总列数，1-4，后期考虑扩大 */
+    const columns: number = Math.max(1, Math.min(options.columns || 4, 4))
 
     //#region ************************************* 验证和变量定义，配合进行字段信息维护 *************************************
     throwIfNullOrUndefined(options, "options");
@@ -86,29 +88,24 @@ export function useGlobalContext(options: FieldContainerOptions & Pick<IFieldGlo
     //#endregion
 
     //  构建上下文，并冻结
-    {
+    return Object.freeze(mountScope<IFieldGlobalContext>({
+        global: newId(),
+        readonly: options.readonly == true,
+        mode: options.mode || "runtime",
 
-        const columns: number = Math.max(1, Math.min(options.columns || 4, 4))
-        const context = mountScope<IFieldGlobalContext>({
-            global: newId(),
-            readonly: options.readonly == true,
-            mode: options.mode || "runtime",
+        layout: options.layout || "form",
+        columns: columns as any,
+        defaultSpan: Math.max(1, Math.min(columns, parseInt(String(options.defaultSpan || columns / 2)))),
 
-            layout: options.layout || "form",
-            columns: columns as any,
-            defaultSpan: Math.max(1, Math.min(columns, parseInt(String(options.defaultSpan || columns / 2)))),
+        hook: options.hook || Object.create({}),
+        controls: controls,
+        getControl: type => controlMap[type],
 
-            hook: options.hook || Object.create({}),
-            controls: controls,
-            getControl: type => controlMap[type],
+        registerContainer,
+        getContainer,
 
-            registerContainer,
-            getContainer,
-
-            fieldSetting: useFieldSetting({ getContainer }),
-        }, "useFieldContainerContext");
-        return Object.freeze(context);
-    }
+        fieldSetting: useFieldSetting({ getContainer }),
+    }, "useFieldContainerContext"));
 }
 //#endregion
 
@@ -166,14 +163,13 @@ function useFieldSetting(gloabl: Pick<IFieldGlobalContext, "getContainer">): IFi
  */
 export function useField(global: IFieldGlobalContext, props: FieldRenderOptions<any, any>, options: FieldManagerOptions): IFieldManager & IScope {
     //  基础验证初始化工作
-    {
-        throwIfNullOrUndefined(options, "options")
-        throwIfNullOrUndefined(props, "props")
-        throwIfNullOrUndefined(props.field, "props.field")
-        props.field.settings || (props.field.settings = {});
-    }
+    throwIfNullOrUndefined(options, "options")
+    throwIfNullOrUndefined(props, "props")
+    throwIfNullOrUndefined(props.field, "props.field")
+    mustFunction(options.getValue, "options.getValue");
+    mustFunction(options.setValue, "options.setValue");
+    props.field.settings || (props.field.settings = {});
     const { emitter } = options;
-
     /** 字段的错误信息：如运行时的值验证错误信息 */
     const errorRef: ShallowRef<string> = ref(undefined);
     /** 字段状态信息 */
@@ -186,32 +182,95 @@ export function useField(global: IFieldGlobalContext, props: FieldRenderOptions<
     //#region ************************************* IFieldHandle：接口实现 *************************************
     /** 字段操作句柄 */
     const handle: IFieldHandle = Object.freeze<IFieldHandle>({
-        getField(): Promise<RunResult<FieldOptions<any>>> {
-            throw new Error("Not Implemented");
+        async getField(): Promise<RunResult<FieldOptions<any>>> {
+            const field = options.getField ? await options.getField() : props.field;
+            return isStringNotEmpty(errorRef.value)
+                ? { success: false, reason: errorRef.value }
+                : { success: true, data: getCopy(field) };
         },
 
-        getValue<T>(validate: boolean, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult<T>> {
-            throw new Error("Not Implemented");
+        async getValue<T>(validate: boolean, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult<T>> {
+            let result: RunResult<any> = canRunAction(props, "get-value", traces);
+            if (result.success == true) {
+                result = await options.getValue<any>(validate);
+                result.data = getCopy(result.data);
+            }
+            return result;
         },
-        setValue<T>(value: T, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult> {
-            throw new Error("Not Implemented");
+        async setValue<T>(value: T, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult> {
+            /*  设置字段值，并判断是否变化，发送对应事件处理；备份旧值，进行深拷贝，避免引用类型数据被修改   */
+            let result: RunResult = canRunAction(props, "set-value", traces);
+            if (result.success == true) {
+                const oldValue = getCopy(await options.getValue(false));
+                const setResult: FieldValueSetResult = await options.setValue(value);
+                if (setResult.change == true) {
+                    traces = newTraces(props, "set-value", "code", traces);
+                    setTimeout(() => emitter("valueChange", getCopy(setResult.value), oldValue, traces));
+                }
+                result = setResult.success
+                    ? { success: true }
+                    : { success: false, reason: errorRef.value };
+
+            }
+            return result;
         },
         getStatus(traces?: ReadonlyArray<FieldActionOptions>): RunResult<FieldStatusOptions> {
-            throw new Error("Not Implemented");
+            /*还需要验证是否死循环了、、；仅获取状态，直接返回的，死循坏验证先忽略*/
+            return {
+                success: true, data: {
+                    required: manager.isReqired(),
+                    readonly: manager.isReqired(),
+                    hidden: manager.isHidden()
+                }
+            };
         },
         setStatus(status: Partial<FieldStatusOptions>, traces?: ReadonlyArray<FieldActionOptions>): RunResult {
-            throw new Error("Not Implemented");
+            let result: RunResult = canRunAction(props, "set-status", traces);
+            if (result.success == true && status) {
+                //  备份旧的状态，更新新的备份
+                const oldStataus = handle.getStatus().data;
+                isBoolean(status.required) && (statusRef.value.required = status.required == true);
+                isBoolean(status.readonly) && (statusRef.value.readonly = status.readonly == true);
+                isBoolean(status.hidden) && (statusRef.value.hidden = status.hidden == true);
+                //  判断是否有变化，有变化触发状态改变事件
+                const newStatus = handle.getStatus().data;
+                const bValue = newStatus.hidden != oldStataus.hidden
+                    || newStatus.readonly != oldStataus.readonly
+                    || newStatus.required != oldStataus.required;
+                if (bValue == true) {
+                    traces = newTraces(props, "set-status", "code", traces);
+                    setTimeout(() => emitter("statusChange", newStatus, oldStataus, traces));
+                }
+            }
+            return result;
         }
     });
     //#endregion
 
-    return Object.freeze(mountScope<IFieldManager>({
+    //#region *************************************内部辅助方法，配合进行字段管理使用 *****************************************
+    /**
+     * 获取data的副本
+     * - 避免响应式和引用类型传递出去
+     * @param data 
+     */
+    function getCopy(data: any) {
+        return typeof data == "object"
+            ? JSON.parse(JSON.stringify(data))
+            : toRaw(data);
+    }
+    //#endregion
+
+    const manager = Object.freeze(mountScope<IFieldManager>({
         emitter, handle,
+        //  字段错误信息管理
+        getError: () => errorRef.value,
+        updateError: error => errorRef.value = error,
         //  状态管理实现
         isReqired: () => statusRef.value.required == true,
         isReadonly: () => global.readonly == true || props.readonly == true || statusRef.value.readonly == true,
         isHidden: () => global.mode == "runtime" && statusRef.value.hidden == true,
     }, "IFieldManager"));
+    return manager;
 
 }
 //#endregion
