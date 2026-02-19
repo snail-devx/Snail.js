@@ -8,6 +8,7 @@ import { ref, shallowRef, } from "vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
+defineOptions({ inheritAttrs: false });
 
 //  2、组件交互变量、常量
 

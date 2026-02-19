@@ -7,7 +7,7 @@ import { isArrayNotEmpty, IScope, isNumberNotNaN, mountScope, moveFromArray, new
 import { InjectionKey, markRaw, ref, Ref, shallowRef, ShallowRef, toRaw } from "vue";
 import { EmitterType, EventsType } from "snail.vue";
 import { ControlOptions } from "../../models/control-model";
-import { FieldActionOptions, FieldChangeEvent, FieldEvents, FieldLocation, FieldOptions, FieldStatusOptions, IFieldHandle, } from "../../models/field-base";
+import { FieldActionOptions, FieldChangeEvent, FieldEvents, FieldLocation, FieldOptions, FieldRenderOptions, FieldRenderProxyOptions, FieldStatusOptions, FieldManagerOptions, IFieldHandle, IFieldManager, } from "../../models/field-base";
 import { IFieldContainer, FieldContainerEvents, IFieldContainerHandle, FieldContainerOptions, FieldContainerLocation } from "../../models/field-container";
 import { IFieldSettingHandle } from "../../models/field-setting";
 import { IFieldGlobalContext } from "../../models/field-share";
@@ -155,8 +155,68 @@ function useFieldSetting(gloabl: Pick<IFieldGlobalContext, "getContainer">): IFi
 }
 //#endregion
 
+//#region ************************************* IFieldManager：字段句柄接口 *************************************
+/**
+ * 使用【字段】
+ * - 将字段的通用逻辑封装起来
+ * @param global 全局配置上下文
+ * @param props 字段渲染的属性配置
+ * @param options 字段管理器配置选项
+ * @returns 字段管理器实例+作用域
+ */
+export function useField(global: IFieldGlobalContext, props: FieldRenderOptions<any, any>, options: FieldManagerOptions): IFieldManager & IScope {
+    //  基础验证初始化工作
+    {
+        throwIfNullOrUndefined(options, "options")
+        throwIfNullOrUndefined(props, "props")
+        throwIfNullOrUndefined(props.field, "props.field")
+        props.field.settings || (props.field.settings = {});
+    }
+    const { emitter } = options;
 
-//#region ************************************* IFieldContainerContext：容器上下文 *************************************
+    /** 字段的错误信息：如运行时的值验证错误信息 */
+    const errorRef: ShallowRef<string> = ref(undefined);
+    /** 字段状态信息 */
+    const statusRef: Ref<FieldStatusOptions> = ref({
+        required: props.field.required == true,
+        readonly: props.field.readonly == true,
+        hidden: props.field.hidden == true,
+    });
+
+    //#region ************************************* IFieldHandle：接口实现 *************************************
+    /** 字段操作句柄 */
+    const handle: IFieldHandle = Object.freeze<IFieldHandle>({
+        getField(): Promise<RunResult<FieldOptions<any>>> {
+            throw new Error("Not Implemented");
+        },
+
+        getValue<T>(validate: boolean, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult<T>> {
+            throw new Error("Not Implemented");
+        },
+        setValue<T>(value: T, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult> {
+            throw new Error("Not Implemented");
+        },
+        getStatus(traces?: ReadonlyArray<FieldActionOptions>): RunResult<FieldStatusOptions> {
+            throw new Error("Not Implemented");
+        },
+        setStatus(status: Partial<FieldStatusOptions>, traces?: ReadonlyArray<FieldActionOptions>): RunResult {
+            throw new Error("Not Implemented");
+        }
+    });
+    //#endregion
+
+    return Object.freeze(mountScope<IFieldManager>({
+        emitter, handle,
+        //  状态管理实现
+        isReqired: () => statusRef.value.required == true,
+        isReadonly: () => global.readonly == true || props.readonly == true || statusRef.value.readonly == true,
+        isHidden: () => global.mode == "runtime" && statusRef.value.hidden == true,
+    }, "IFieldManager"));
+
+}
+//#endregion
+
+//#region ************************************* IFieldContainer：字段容器接口 *************************************
 /**
  * 使用【字段容器】
  * @param global 全局上下文对象
@@ -263,7 +323,6 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
             return Promise.resolve({ success: true });
 
             /** 刷新字段实现方式：将字段移除，在添加到指定位置；移除当前先将字段句柄移除掉 */
-
         }
     });
     //#endregion
@@ -552,7 +611,6 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
     return container;
 }
 //#endregion
-
 
 //#region ************************************* 其他助手类方法 *********************************************************
 type ActionFieldInfo = { field: FieldOptions<any> } & FieldContainerLocation;

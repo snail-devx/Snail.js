@@ -3,19 +3,15 @@
     2、往代理组件传递参数时，直接使用上层属性，不中转，避免破坏响应式
 -->
 <template>
-    <FieldProxy class="option" :readonly="readonly" :parent-field-id="parentFieldId" :row-index="rowIndex"
-        :field="field" :value="valueRef" :error="errorRef" :="proxy" @rendered="hd => emits('rendered', handle = hd)">
+    <FieldProxy :type="field.type" :title="field.title" :description="field.description"
+        :="{ manager: manager, error: errorRef }">
         <!-- 下拉组合框 -->
-        <template #="{ required, readonly, hidden }" v-if="field.type == 'Combobox'">
-            <Select :key="keyRef" :readonly="readonly" :multiple="false" :="buildSelectItemsAndValue()"
-                @change="items => onChooseChange(items && items.length == 1 ? [items[0].id] : [])" />
-        </template>
+        <Select v-if="field.type == 'Combobox'" :readonly="readonly" :multiple="false" :="buildSelectItemsAndValue()"
+            @change="items => onChooseChange(items && items.length == 1 ? [items[0].id] : [])" />
         <!-- 单选、多选框 -->
-        <template #="{ required, readonly, hidden }" v-else>
-            <Choose :key="keyRef" :readonly="readonly" :type="isMultiple ? 'checkbox' : 'radio'" :mode="'beautiful'"
-                :layout="field.settings.layout || 'horizontal'" :multi="isMultiple" :items="buildChooseItems()"
-                v-model="valueIdsRef" @change="onChooseChange" />
-        </template>
+        <Choose v-else :readonly="readonly" :type="isMultiple ? 'checkbox' : 'radio'" :mode="'beautiful'"
+            :layout="field.settings.layout || 'horizontal'" :multi="isMultiple" :items="buildChooseItems()"
+            v-model="valueIdsRef" @change="onChooseChange" />
     </FieldProxy>
 </template>
 
@@ -23,38 +19,17 @@
 import { inject, onMounted, ShallowRef, shallowRef, watch, } from "vue";
 import { ChooseItem, components, SelectItem, SelectOptions } from "snail.vue";
 import { OptionControlSettings, OptionControlValueItem } from "../../models/control-model";
-import { FieldEvents, FieldProxyRenderOptions, FieldRenderOptions, IFieldHandle, } from "../../models/field-base";
-import { INJECTKEY_GlobalContext, newTraces } from "../common/field-common";
+import { FieldEvents, FieldRenderOptions, IFieldHandle, IFieldManager, } from "../../models/field-base";
+import { INJECTKEY_GlobalContext, newTraces, useField } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
 import { isArrayNotEmpty, isStringNotEmpty, newId, RunResult } from "snail.core";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const _ = defineProps<FieldRenderOptions<OptionControlSettings, OptionControlValueItem[]>>();
+const props = defineProps<FieldRenderOptions<OptionControlSettings, OptionControlValueItem[]>>();
 const emits = defineEmits<FieldEvents>();
 const { Choose, Select } = components;
 const global = inject(INJECTKEY_GlobalContext);
-const { field } = _;
-//  2、组件交互变量、常量
-field.settings || (field.settings = {});
-/**     已选选择项：field-proxy需要 */
-const valueRef = shallowRef<OptionControlValueItem[]>();
-/**     字段错误信息：如字段值验证失败、、、 */
-const errorRef: ShallowRef<string> = shallowRef("");
-/**     是否是多选 */
-const isMultiple: boolean = field.type == "Checkbox";
-/**     字段操作句柄：字段渲染完成后，由【field-proxy】组件的`rendered`事件传递出来 */
-let handle: IFieldHandle = undefined;
-//  3、选项相关
-/**     选择项目字典，key为选项id，value为选项对象 */
-const optionMap: Map<string, OptionControlValueItem> = new Map();
-/**     已选选项的id值集合*/
-const valueIdsRef: ShallowRef<string[]> = shallowRef<string[]>();
-//  4、其他变量、常量
-/**     全局唯一Key，用于在setValue时，重新渲染对应组件的选项和已选项 */
-const keyRef: ShallowRef<string> = shallowRef(newId());
-/**     字段代理对象部分实现，已冻结 */
-const proxy = Object.freeze<Pick<FieldProxyRenderOptions, "titleDisabled" | "emitter" | "getValue" | "setValue">>({
-    titleDisabled: false,
+const manager: IFieldManager = useField(global, props, {
     emitter: emits,
     getValue(validate: boolean): Promise<RunResult<any>> {
         const success: boolean = validate ? validateSelected() : true;
@@ -85,7 +60,21 @@ const proxy = Object.freeze<Pick<FieldProxyRenderOptions, "titleDisabled" | "emi
         );
     },
 });
-
+//  2、组件交互变量、常量
+/**     已选选择项：field-proxy需要 */
+const valueRef = shallowRef<OptionControlValueItem[]>();
+/**     字段错误信息：如字段值验证失败、、、 */
+const errorRef: ShallowRef<string> = shallowRef("");
+/**     是否是多选 */
+const isMultiple: boolean = props.field.type == "Checkbox";
+//  3、选项相关
+/**     选择项目字典，key为选项id，value为选项对象 */
+const optionMap: Map<string, OptionControlValueItem> = new Map();
+/**     已选选项的id值集合*/
+const valueIdsRef: ShallowRef<string[]> = shallowRef<string[]>();
+//  4、其他变量、常量
+/**     全局唯一Key，用于在setValue时，重新渲染对应组件的选项和已选项 */
+const keyRef: ShallowRef<string> = shallowRef(newId());
 // *****************************************   👉  方法+事件    ****************************************
 /**
  * 构建已选值相关选项
@@ -114,7 +103,7 @@ function buildSelectedOptions(values: OptionControlValueItem[], refresh: boolean
  * 验证已选选项；主要验证必选
  */
 function validateSelected(): boolean {
-    errorRef.value = handle.getStatus().data.required && valueIdsRef.value.length == 0
+    errorRef.value = manager.handle.getStatus().data.required && valueIdsRef.value.length == 0
         ? "请至少选择一项!"
         : undefined;
     return errorRef.value == undefined;
@@ -139,7 +128,7 @@ function buildSelectItemsAndValue(): Pick<SelectOptions<OptionControlValueItem>,
         value,
         showPath: false,
         showClear: true,
-        search: field.settings.searchEnabled ? { autoComplete: true, placeholder: '请输入选项名称' } : undefined,
+        search: props.field.settings.searchEnabled ? { autoComplete: true, placeholder: '请输入选项名称' } : undefined,
     }
 }
 /**
@@ -173,22 +162,22 @@ function onChooseChange(value: string[]) {
     });
     //  发送值改变事件
     validateSelected();
-    const traces = newTraces(_, "value-change", "manual");
+    const traces = newTraces(props, "value-change", "manual");
     emits("valueChange", newValues, oldValue, traces);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //      初始化选择项：选项text非空时才有效
-if (field.settings && isArrayNotEmpty(field.settings.options) == true) {
-    field.settings.options.forEach(item => {
+if (props.field.settings && isArrayNotEmpty(props.field.settings.options) == true) {
+    props.field.settings.options.forEach(item => {
         isStringNotEmpty(item.text) && optionMap.set(item.id, { ...item });
     });
 }
 //      初始化已选值
-buildSelectedOptions(_.value || field.value, false)
+buildSelectedOptions(props.value || props.field.value, false)
 //  2、生命周期响应
-
+onMounted(() => emits("rendered", manager.handle));
 </script>
 
 <style lang="less">
@@ -196,46 +185,37 @@ buildSelectedOptions(_.value || field.value, false)
 @import "snail.view/dist/styles/mixins.less";
 
 //  下拉组合框特定样式
-.field-proxy.optio.combobox {
-    >.field-detail {}
-}
+.field-item.combobox>.field-detail {}
 
 //  单选、多选框特定样式
-.field-proxy.option:not(.combobox) {
-    >.field-detail {
+.field-item.radio>.field-detail,
+.field-item.checkbox>.field-detail {
+    >.snail-choose {
+        width: 100%;
+        overflow-x: hidden;
 
-        //  选项定制化样式
-        >.snail-choose {
-            width: 100%;
-            overflow-x: hidden;
+        >.choose-item {
+            height: 32px;
+            margin-left: 0;
+            max-width: 100%;
 
-            >.choose-item {
-                height: 32px;
-                margin-left: 0;
-                max-width: 100%;
+            >.status {
+                width: 16px;
+                height: 16px;
+            }
 
-                >.status {
-                    width: 18px;
-                    height: 18px;
-
-                    >svg {
-                        scale: 1.2;
-                    }
-                }
-
-                >.item-text {
-                    overflow-x: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
+            >.item-text {
+                overflow-x: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
         }
+    }
 
-        //  选项定制化样式：水平布局时，间距
-        >.snail-choose.horizontal {
-            >.choose-item:not(:last-child) {
-                margin-right: 20px;
-            }
+    //  选项定制化样式：水平布局时，间距
+    >.snail-choose.horizontal {
+        >.choose-item:not(:last-child) {
+            margin-right: 20px;
         }
     }
 }

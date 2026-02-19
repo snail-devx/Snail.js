@@ -5,50 +5,45 @@
 <template>
     <div class="snail-form-fields" :class="[`tc-${global.columns}`, global.mode,]">
         <!-- 设计时：增加排序组件：这个key使用字段id可能有问题，后续再考虑优化，特别是运行时的时候；设计时构建 复制、删除 按钮 -->
-        <Sort v-if="global.mode == 'design'" draggable=".field-item" handle=".field-cover" :changer="fields.length"
+        <Sort v-if="global.mode == 'design'" draggable=".field-item" handle=".field-toolbar" :changer="fields.length"
             :group="global.global" :disabled="global.readonly" @add="onDragAddField" @update="container.moveField">
-            <div v-for="(field, index) in fields" :key="container.getFieldKey(field.id)"
-                :class="['field-item', `fw-${getFieldWidth(field)}`, field.type.toLowerCase()]">
-                <!-- <div class="field-component">{{ field.title }}</div> -->
-                <!-- 字段渲染：属性直接桥接上级属性不破坏响应式，构建出  FieldRenderOptions<Settings, Value> 所需属性-->
-                <Dynamic class="field-body" :key="container.getFieldKey(field.id)"
+            <template v-for="(field, index) in fields" :key="container.getFieldKey(field.id)">
+                <Dynamic class="field-item" :class="buildFieldClass(field)"
                     :="global.getControl(field.type).renderComponent" :readonly="readonly"
                     :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex" :field="field"
-                    :value="values ? values[field.id] : undefined" v-bind="container.buildFieldMonitor(field)" />
-                <!-- 设计时的盖板：显示复制、删除 -->
-                <div class="field-cover" v-if="global.mode == 'design'"
-                    :class="{ 'active': global.fieldSetting.isActiveField(field, location) }"
-                    @click="onActiveField(field, index)">
-                    <Icon v-if="readonly != true" type="plus" color="#aeb6c2" hover-color="#279bf1" title="复制"
-                        @click="isButtonClickInCover = true, container.copyField(field, index)" />
-                    <Icon v-if="readonly != true" type="trash" color="#aeb6c2" hover-color="#279bf1" title="删除"
-                        @click="isButtonClickInCover = true, container.deleteField(field, index)" />
-                </div>
-            </div>
+                    v-bind="container.buildFieldMonitor(field)" @copy-field="container.copyField(field, index)"
+                    @delete-field="container.deleteField(field, index)"
+                    @activate-field="global.fieldSetting.activateField(field, location)" />
+            </template>
         </Sort>
         <!-- 运行时、预览模式：无可见字段时，给出提示 -->
         <Empty v-else-if="fields.find(field => container.isVisible(field)) == undefined" message="无可用字段" />
-        <!-- 运行时、预览模式：
+        <!-- 运行时、预览模式
             1、有可见字段，直接渲染不用排序；需要计算布局，根据布局填充位置并对末尾留白补全
             2、字段渲染：属性直接桥接上级属性不破坏响应式，构建出  FieldRenderOptions<Settings, Value> 所需属性
-            3、若字段为最后行的最后一个字段，则构建空白占位区域：避免行最后一个字段展示没填充满行时显示异常 -->
-        <template v-else v-for="field in fields" :key="container.getFieldKey(field.id)">
-            <div class="field-item" v-show="layoutMapRef.get(field.id).show"
-                :class="[`fw-${layoutMapRef.get(field.id).width}`, layoutMapRef.get(field.id).isRowLast ? 'row-last' : '']">
-                <Dynamic class="field-body" :key="container.getFieldKey(field.id)"
+            3、若字段为最后行的最后一个字段，则构建空白占位区域：避免行最后一个字段展示没填充满行时显示异常 
+            注意事项：
+                1、为了和设计时的文档结构保持同层级，这里做两层 template，方便后续修改时做设计时和非设计时的同步比对
+                2、这里template下有多个元素，无法确认单根元素，运行时会有警告，忽略掉，本身就应该是这样
+                    [Vue warn]: Runtime directive used on component with non-element root node. The directives will not function as intended. 
+        -->
+        <template v-else>
+            <template v-for="(field, index) in fields" :key="container.getFieldKey(field.id)">
+                <Dynamic class="field-item" :class="buildFieldClass(field)"
                     :="global.getControl(field.type).renderComponent" :readonly="readonly"
                     :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex" :field="field"
-                    :value="values ? values[field.id] : undefined" v-bind="container.buildFieldMonitor(field)" />
-            </div>
-            <div class="field-item" v-if="layoutMapRef.get(field.id).blankWidthAfter > 0"
-                :class="[`fw-${layoutMapRef.get(field.id).blankWidthAfter}`, 'blank-item']" />
+                    v-bind="container.buildFieldMonitor(field)" :value="values ? values[field.id] : undefined"
+                    v-show="layoutMapRef.get(field.id).show" />
+                <div class="field-item" v-if="layoutMapRef.get(field.id).blankWidthAfter > 0"
+                    :class="[`fw-${layoutMapRef.get(field.id).blankWidthAfter}`, 'blank-item']" />
+            </template>
         </template>
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, onUnmounted, } from "vue";
-import { isStringNotEmpty, } from "snail.core";
+import { IScope, isStringNotEmpty, } from "snail.core";
 import { components, SortEvent, useReactive } from "snail.vue";
 import { FieldOptions, } from "../../models/field-base";
 import { FieldContainerEvents, FieldContainerLocation, FieldContainerOptions, } from "../../models/field-container";
@@ -58,35 +53,53 @@ import { INJECTKEY_GlobalContext, useFieldContainer } from "./field-common";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const _ = defineProps<FieldContainerOptions & { rowIndex: number }>();
-const { Sort, Icon, Dynamic, Empty } = components;
+const { Sort, Dynamic, Empty } = components;
 const emits = defineEmits<FieldContainerEvents>();
 const { watcher } = useReactive();
 /**     字段全局上下文 */
 const global = inject(INJECTKEY_GlobalContext);
 /**     字段位置信息：监听上级rowIndex变化，做实时更新 */
-const location: FieldContainerLocation = _.parent ? { parentFieldId: _.parent.id, rowIndex: _.rowIndex || 0 } : undefined;
-location && watcher(() => _.rowIndex, newIndex => Object.assign(location, { rowIndex: newIndex || 0 }));
+const location: FieldContainerLocation = _.parent
+    ? { parentFieldId: _.parent.id, rowIndex: _.rowIndex || 0 }
+    : undefined;
 //  2、字段容器句柄管理
 /**     字段容器对象；负责接管字段容器组件部分逻辑，减少vue组件中的非渲染代码 */
 const container = useFieldContainer(global, { ..._, }, location, emits);
 /**     容器注册作用域 */
-const scope = global.registerContainer(location, container.handle);
+const scope: IScope = global.registerContainer(location, container.handle);
 /**     覆盖defineProps上下文传递过来的fields属性，使用容器实例的响应式字段接管*/
 const { fields } = container;
 //  3、其他变量
 /**     字段布局信息；key为字段id，value为布局信息，设计时无效别使用*/
 const layoutMapRef = global.mode == "design" ? undefined : computed(calcFieldLayout);
-/**     是否时字段Cover内的按钮点击了；实现cover内部按钮点击时，不激活字段 */
-let isButtonClickInCover: boolean;
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 构建字段的 class 类样式数组
+ * @param field 
+ */
+function buildFieldClass(field: FieldOptions<any>): string[] {
+    //  字段渲染宽度：非设计时，需要进行实时计算处理
+    const width: number = global.mode == "design" ? getFieldWidth(field) : layoutMapRef.value.get(field.id).width;
+
+    const classes: string[] = [
+        `fw-${width}`,
+        global.mode,
+        global.layout,
+        field.type.toLowerCase(),
+    ];
+    //  非设计时时，最后一行添加特定类样式
+    global.mode != "design" && layoutMapRef.value.get(field.id).isRowLast && classes.push("row-last");
+
+    return classes;
+}
 /**
  * 计算字段宽度
  * @param field
  */
 function getFieldWidth(field: FieldOptions<any>): number {
     const width = field.width || global.defaultSpan;
-    return Math.max(1, Math.min(width, global.columns));
+    return Math.max(1, Math.min(width, global.columns))
 }
 /**
  * 计算字段布局信息
@@ -144,7 +157,6 @@ function asRowLastLayout(layout: FormFieldLayoutOptions, totalWidthInRow: number
     }
 }
 
-//#region ----------------------------------- 设计时相关事件、方法 ----------------------------------------
 /**
  * 添加字段时
  * - 从控件列表添加字段时
@@ -171,24 +183,10 @@ function onDragAddField(evt: SortEvent) {
         }
     }
 }
-/**
- * 激活字段-进入字段设置界面
- * @param field 
- * @param index 
- */
-function onActiveField(field: FieldOptions<any>, index: number) {
-    // 避免内部按钮点击触发时的冒泡
-    if (isButtonClickInCover != true) {
-        global.fieldSetting.activateField(field, location)
-    }
-    isButtonClickInCover = false;
-}
-//#endregion
-
-// *****************************************   👉  接口实现    ****************************************
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
+location && watcher(() => _.rowIndex, newIndex => Object.assign(location, { rowIndex: newIndex || 0 }));
 //  2、生命周期响应
 onUnmounted(scope.destroy);
 </script>
@@ -213,8 +211,44 @@ onUnmounted(scope.destroy);
 }
 
 // *****************************************   👉  特定样式适配    *****************************************
+//  设计时的适配
+.snail-form-fields.design {
+    /* 设计时；按照字段自身高度，不撑开，避免 field-cover 高度太高影响效果*/
+    align-items: flex-start;
+    user-select: none;
+
+    //  从【控件列表】拖拽字段进入时，强制宽度
+    >.control-item.snail-sort-ghost {
+        width: 50% !important;
+        height: 42px;
+        line-height: 42px;
+        color: #63688e;
+        padding-left: 10px;
+        border-color: #ed9239;
+        border-radius: 0 !important;
+    }
+}
+
+//  非【设计时】的适配
+.snail-form-fields:not(.design) {
+    >.field-item {
+        border-bottom: 1px solid #e0e1e2;
+        border-right: 1px solid #e0e1e2;
+
+        &.row-last {
+            border-right: none !important;
+        }
+
+        &.blank-item {
+            border-right: none !important;
+        }
+    }
+}
+
 //  字段宽度样式：不同总列数下，平分宽度
 .snail-form-fields {
+
+    //  总列数为1（一行一列）
     &.tc-1>.field-item {
         width: 100%;
     }
@@ -261,93 +295,6 @@ onUnmounted(scope.destroy);
 
         &.fw-4 {
             width: 100%;
-        }
-    }
-}
-
-//  设计时的适配
-.snail-form-fields.design {
-    /* 设计时；按照字段自身高度，不撑开，避免 field-cover 高度太高影响效果*/
-    align-items: flex-start;
-
-    //  从【控件列表】拖拽字段进入时，强制宽度
-    >.control-item.snail-sort-ghost {
-        width: 50% !important;
-        height: 42px;
-        line-height: 42px;
-        color: #63688e;
-        padding-left: 10px;
-        border-color: #ed9239;
-        border-radius: 0 !important;
-    }
-
-    >.field-item {
-        user-select: none;
-
-        //  拖拽效果，交给 设计时盖板 呈现
-        &.snail-sort-drag,
-        &.snail-sort-ghost {
-            border: none;
-        }
-
-        //  设计时模式下时，留出 copy、delete 按钮的空间
-        >.field-body {
-            padding-right: 40px !important;
-        }
-
-        //  设计时盖板
-        >.field-cover {
-            cursor: move;
-            border: 1px dashed transparent;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            opacity: 0;
-            transition: opacity ease-in-out 200ms;
-            z-index: 10;
-            //  绝对定位，填充父元素，隐藏溢出的内容，并定位到0,0位置
-            .absolute-fill-hidden();
-
-            >.snail-icon {
-                display: none;
-            }
-
-            >.snail-icon.trash {
-                margin-top: 2px;
-            }
-        }
-
-        //  鼠标移入时，显示操作按钮
-        &>.field-cover:hover {
-            >.snail-icon {
-                display: block;
-            }
-        }
-
-        //  鼠标移入、激活、拖拽时；特定特定边框色标记
-        &.snail-sort-drag>.field-cover,
-        &.snail-sort-ghost>.field-cover,
-        &>.field-cover:hover,
-        &>.field-cover.active {
-            opacity: 1;
-            border-color: #ed9239;
-        }
-
-    }
-}
-
-//  非【设计时】的适配
-.snail-form-fields:not(.design) {
-    >.field-item {
-        border-bottom: 1px solid #e0e1e2;
-        border-right: 1px solid #e0e1e2;
-
-        &.row-last {
-            border-right: none !important;
-        }
-
-        &.blank-item {
-            border-right: none !important;
         }
     }
 }

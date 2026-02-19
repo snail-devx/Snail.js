@@ -3,45 +3,31 @@
     2、往代理组件传递参数时，直接使用上层属性，不中转，避免破坏响应式
  -->
 <template>
-    <FieldProxy :readonly="readonly" :parent-field-id="parentFieldId" :row-index="rowIndex" :field="field"
-        :value="valueRef" :error="errorRef" :="proxy" @rendered="hd => emits('rendered', handle = hd)">
-        <template #="{ required, readonly, hidden }">
-            <input v-if="field.type == 'Text'" type="text" :readonly="readonly" v-model="valueRef"
-                :placeholder="field.placeholder" @change="onTextChange" />
-            <textarea v-else-if="field.type == 'TextArea'" v-model="valueRef" :readonly="readonly"
-                :placeholder="field.placeholder" @change="onTextChange" />
-            <div v-else>不支持的控件：{{ field.type }}</div>
-        </template>
+    <FieldProxy :type="field.type" :title="field.title" :description="field.description"
+        :="{ manager: manager, error: errorRef }">
+        <input v-if="field.type == 'Text'" type="text" :readonly="readonly" v-model="valueRef"
+            :placeholder="field.placeholder" @change="onTextChange" />
+        <textarea v-else-if="field.type == 'TextArea'" v-model="valueRef" :readonly="readonly"
+            :placeholder="field.placeholder" @change="onTextChange" />
+        <div v-else>不支持的控件：{{ field.type }}</div>
     </FieldProxy>
 </template>
 
 <script setup lang="ts">
 import { inject, nextTick, onMounted, ShallowRef, shallowRef, watch, } from "vue";
 import { TextControlSettings } from "../../models/control-model";
-import { FieldEvents, FieldProxyRenderOptions, FieldRenderOptions, IFieldHandle, } from "../../models/field-base";
-import { INJECTKEY_GlobalContext, newTraces } from "../common/field-common";
+import { FieldEvents, FieldRenderOptions, IFieldHandle, IFieldManager, } from "../../models/field-base";
+import { INJECTKEY_GlobalContext, newTraces, useField } from "../common/field-common";
 import { getValueString, validateText } from "../../utils/field-util";
 import FieldProxy from "../common/field-proxy.vue";
 import { RunResult } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const _ = defineProps<FieldRenderOptions<TextControlSettings, string>>();
+const props = defineProps<FieldRenderOptions<TextControlSettings, string>>();
 const emits = defineEmits<FieldEvents>();
 const global = inject(INJECTKEY_GlobalContext);
-const { field } = _;
-//  2、组件交互变量、常量
-/**     字段值 */
-const valueRef: ShallowRef<any> = shallowRef("");
-/**     字段错误信息：如字段值验证失败、、、 */
-const errorRef: ShallowRef<string> = shallowRef("");
-/**     旧的文本值，手工改变时，发送事件时传递旧值 */
-let oldText: string;
-/**     字段操作句柄：字段渲染完成后，由【field-proxy】组件的`rendered`事件传递出来 */
-let handle: IFieldHandle = undefined;
-/**     字段代理对象部分实现，已冻结 */
-const proxy = Object.freeze<Pick<FieldProxyRenderOptions, "titleDisabled" | "emitter" | "getValue" | "setValue">>({
-    titleDisabled: false,
+const manager: IFieldManager = useField(global, props, {
     emitter: emits,
     getValue(validate: boolean): Promise<RunResult<any>> {
         const success: boolean = validate ? validateValue() : true;
@@ -65,6 +51,13 @@ const proxy = Object.freeze<Pick<FieldProxyRenderOptions, "titleDisabled" | "emi
         );
     }
 });
+//  2、组件交互变量、常量
+/**     字段值 */
+const valueRef: ShallowRef<any> = shallowRef("");
+/**     字段错误信息：如字段值验证失败、、、 */
+const errorRef: ShallowRef<string> = shallowRef("");
+/**     旧的文本值，手工改变时，发送事件时传递旧值 */
+let oldText: string;
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -74,7 +67,7 @@ const proxy = Object.freeze<Pick<FieldProxyRenderOptions, "titleDisabled" | "emi
 function validateValue(): boolean {
     /* 设计时验证字段的配置完整性；运行时验证字段的必填、文本长度、、、；其他情况不验证 */
     if (global.mode == "runtime") {
-        let { success, reason } = validateText(valueRef.value, handle.getStatus().data, field.settings);
+        let { success, reason } = validateText(valueRef.value, manager.handle.getStatus().data, props.field.settings);
         errorRef.value = reason;
         return success;
     }
@@ -92,7 +85,7 @@ function onTextChange() {
     let oldValue = oldText, newValue = valueRef.value;
     oldText = newValue;
     if (validateValue() == true) {
-        const traces = newTraces(_, "value-change", "manual");
+        const traces = newTraces(props, "value-change", "manual");
         emits("valueChange", newValue, oldValue, traces);
     }
 }
@@ -102,11 +95,11 @@ function onTextChange() {
 //  1、数据初始化、变化监听
 //      运行时，初始化外部传入的字段值，强制默认值为空字符串
 if (global.mode == "runtime") {
-    valueRef.value = getValueString(_.value == undefined ? _.field.value : _.value);
+    valueRef.value = getValueString(props.value == undefined ? props.field.value : props.value);
     oldText = valueRef.value;
 }
 //  2、生命周期响应
-// onMounted(() => { });
+onMounted(() => emits("rendered", manager.handle));
 </script>
 
 <style lang="less">
