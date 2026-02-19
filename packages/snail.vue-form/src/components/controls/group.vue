@@ -8,17 +8,17 @@
         <!-- 设计时和Form模式 -->
         <template v-if="global.mode == 'design' || global.layout == 'form'" #="{ readonly, required }">
             <div class="group-container" v-for="(gv, index) in groupValuesRef" :data-index="index + 1">
-                <FormFields :readonly="readonly" :fields="field.settings.fields" :values="gv" :parent="field"
-                    :row-index="index" />
                 <!-- 工具栏，运行时和预览时生效：显示当前序号、操作按钮等 -->
                 <div class="container-toolbar" v-if="readonly != true">
-                    <div class="index" v-text="index + 1" />
+                    <div class="index" v-text="`${field.title}(${index + 1})`" />
                     <Icon :type="'plus'" :="{ size: 20, title: '新增', }" />
                     <Icon :type="'subtract'" :="{ size: 20, title: '删除', }" />
                     <Icon :type="'arrow'" v-if="index != groupValuesRef.length - 1"
                         :="{ size: 24, title: '下移', rotate: 90 }" />
                     <Icon :type="'arrow'" v-if="index != 0" :="{ size: 24, title: '上移', rotate: 270 }" />
                 </div>
+                <FormFields :readonly="readonly" :fields="field.settings.fields" :values="gv" :parent="field"
+                    :row-index="index" />
             </div>
         </template>
         <!-- Table模式的运行时或者预览时 -->
@@ -55,7 +55,7 @@ const errorRef: ShallowRef<string> = shallowRef("");
 let handle: IFieldHandle = undefined;
 /**     字段代理对象部分实现，已冻结 */
 const proxy = Object.freeze<Pick<FieldProxyRenderOptions, "titleDisabled" | "emitter" | "getValue" | "setValue">>({
-    titleDisabled: false,
+    titleDisabled: true,
     emitter: emits,
     getValue(validate: boolean): Promise<RunResult<any>> {
         // const success: boolean = validate ? validateValue() : true;
@@ -101,26 +101,18 @@ global.mode == "design" && (groupValuesRef.value = [Object.create(null)]);
 
 .field-proxy.group>.field-detail {
     align-items: baseline;
+    padding: 0;
 
     >.group-container {
         position: relative;
         min-height: 100px;
-        padding-bottom: 15px;
         margin-bottom: 15px;
         border: 1px solid #dddfed;
         border-radius: 4px;
 
-        >.container-header {
-            height: 34px;
-            display: flex;
-            align-items: center;
-        }
-
         >.container-toolbar {
             width: 100%;
-            position: absolute;
             height: 30px;
-            bottom: -15px;
             display: flex;
             align-items: center;
             justify-content: flex-end;
@@ -132,17 +124,14 @@ global.mode == "design" && (groupValuesRef.value = [Object.create(null)]);
             }
 
             >.index {
-                width: 20px;
+                width: 100px;
                 height: 20px;
-                border-radius: 20px;
-                border: 1px solid #dddfed;
-                color: #8a9099;
-                font-size: 12px;
-                //  flex 布局：display: flex，align-items、justify-content 都为center
-                .flex-center();
+                color: #63688e;
+                padding: 0 10px;
+                display: flex;
+                align-items: center;
                 //  向左撑开
                 margin-right: auto;
-                margin-left: 10px;
             }
 
             >.snail-icon {
