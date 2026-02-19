@@ -6,7 +6,7 @@
         这里双向绑定 valueModel ，仅是为了配合实现IFieldHandle功能，不对value做任何加工处理
 -->
 <template>
-    <div class="field-proxy" :class="field.type.toLowerCase()"
+    <div class="field-proxy" :class="[field.type.toLowerCase(), global.layout, global.mode]"
         v-bind:class="{ readonly: readonlyRef, hidden: hiddenRef }">
         <div class="field-title" v-if="titleDisabled != true">
             {{ field.title }}

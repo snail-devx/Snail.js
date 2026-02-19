@@ -5,10 +5,10 @@
 <template>
     <div class="snail-form-fields" :class="[`tc-${global.columns}`, global.mode,]">
         <!-- 设计时：增加排序组件：这个key使用字段id可能有问题，后续再考虑优化，特别是运行时的时候；设计时构建 复制、删除 按钮 -->
-        <Sort v-if="global.mode == 'design'" draggable=".field-item" :changer="fields.length" :group="global.global"
-            :disabled="global.readonly" @add="onDragAddField" @update="container.moveField">
+        <Sort v-if="global.mode == 'design'" draggable=".field-item" handle=".field-cover" :changer="fields.length"
+            :group="global.global" :disabled="global.readonly" @add="onDragAddField" @update="container.moveField">
             <div v-for="(field, index) in fields" :key="container.getFieldKey(field.id)"
-                :class="['field-item', `fw-${getFieldWidth(field)}`]">
+                :class="['field-item', `fw-${getFieldWidth(field)}`, field.type.toLowerCase()]">
                 <!-- <div class="field-component">{{ field.title }}</div> -->
                 <!-- 字段渲染：属性直接桥接上级属性不破坏响应式，构建出  FieldRenderOptions<Settings, Value> 所需属性-->
                 <Dynamic class="field-body" :key="container.getFieldKey(field.id)"
@@ -282,7 +282,6 @@ onUnmounted(scope.destroy);
     }
 
     >.field-item {
-        cursor: move;
         user-select: none;
 
         //  拖拽效果，交给 设计时盖板 呈现
@@ -298,6 +297,7 @@ onUnmounted(scope.destroy);
 
         //  设计时盖板
         >.field-cover {
+            cursor: move;
             border: 1px dashed transparent;
             display: flex;
             justify-content: flex-end;

@@ -361,7 +361,7 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
             /** 构建一个全新字段，执行钩子函数，添加后发送改变事件 */
             throwIfFalse(global.mode == "design", "only in design mode can add field");
             //  当前容器是否是子容器
-            if (location.parentFieldId != undefined) {
+            if (location && location.parentFieldId != undefined) {
                 const extend = global.getControl(type).extend;
                 if (extend && extend.childDisabled == true) {
                     alert("此控件不能在子容器中添加");

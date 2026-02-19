@@ -152,6 +152,13 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
         "settings": {
             controls: "right",
         }
+    },
+    {
+        "type": "Group",
+        "id": "1771424613060",
+        "title": "分组",
+        "width": 100000000,
+        "settings": {}
     }
 ];
 

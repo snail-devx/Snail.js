@@ -1,4 +1,5 @@
 import { ChooseOptions, ComponentOptions, NumberBaseOptions } from "snail.vue";
+import { FieldOptions } from "./field-base";
 
 /**
  * 表单控件配置选项
@@ -152,14 +153,28 @@ export type OptionControlValueItem = {
  * 分组控件的Settings数据结构
  */
 export type GroupControlSettings = {
-
+    /**
+     * 子字段配置
+     */
+    readonly fields?: FieldOptions<any>[];
 }
 
 /**
  * 分组控件的Value值数据结构
  */
 export type GroupControlValue = {
-
-}
+    /**
+     * 控件实例值
+     * - 数组，index表示第几组实例，
+     * - value为当前组实例下的字段值字典（key为字段id，value为字段值）
+     */
+    values: Array<Record<string, any>>;
+    /**
+     * 总计值
+     * - key为参与统计的字段id
+     * - value为统计结果数值
+     */
+    totalValue?: Record<string, number>;
+};
 //#endregion
 

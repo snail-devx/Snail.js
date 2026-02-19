@@ -4,8 +4,8 @@
     3、对FieldContainer再次封装，仅爆率运行时渲染器相关功能
 -->
 <template>
-    <FormFields class="snail-form-renderer" :readonly="readonly" :fields="fields || []" :values="values || []"
-        :row-index="rowIndexRef" @rendered="emits('rendered', handle)"
+    <FormFields class="snail-form-renderer" :readonly="readonly" :fields="fields || []"
+        :values="values || Object.create(null)" :row-index="rowIndexRef" @rendered="emits('rendered', handle)"
         @field-rendered="(field, evt) => emits('fieldRendered', field, evt)"
         @value-change="(field, evt) => emits('valueChange', field, evt)"
         @status-change="(field, evt) => emits('statusChange', field, evt)" />
