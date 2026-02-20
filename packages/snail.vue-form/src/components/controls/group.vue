@@ -9,13 +9,29 @@
             <div class="item-header">
                 <span class="item-title ellipsis" v-if="global.mode == 'design'" v-text="field.title" />
                 <span class="item-title ellipsis" v-else v-text="`${field.title}(${rowIndex + 1})`" />
+                <!-- 操作按钮：非设计时、 非只读时才显示：添加、删除、上移、下移-->
+                <template v-if="global.mode != 'design' && isReadonly() != true">
+                    <Icon :type="'plus'" :="{ size: 24, title: '新增', }" v-if="field.settings.disableAdd != true" />
+                    <Icon :type="'subtract'" :="{ size: 24, title: '删除', }"
+                        v-if="field.settings.disableDelete != true" />
+                    <Icon :type="'arrow'" :="{ size: 24, title: '下移', rotate: 90 }"
+                        v-if="rowIndex != groupValuesRef.length - 1 && field.settings.disableSort != true" />
+                    <Icon :type="'arrow'" :="{ size: 24, title: '上移', rotate: 270 }"
+                        v-if="rowIndex != 0 && field.settings.disableSort != true" />
+                </template>
             </div>
-            <FormFields :readonly="manager.isReadonly()" :parent="field" :row-index="rowIndex" :fields="fields"
-                :values="gv" @rendered="handle => onFieldsRendered(rowIndex, handle)"
+            <FormFields :readonly="isReadonly()" :parent="field" :row-index="rowIndex" :fields="fields" :values="gv"
+                @rendered="handle => onFieldsRendered(rowIndex, handle)"
                 @field-rendered="(field, evt) => onFieldRendered(rowIndex, field, evt)"
                 @config-change="fields => onFieldsConfigChange(rowIndex, fields)"
                 @value-change="(field, evt) => onFieldValueChange(rowIndex, field, evt)"
                 @status-change="(field, evt) => onFieldStatusChange(rowIndex, field, evt)" />
+        </div>
+        <div class="group-toolbar" v-if="isReadonly() != true && field.settings.disableAdd != true">
+            <Button :type="'link'" :size="'small'">
+                <Icon :type="'plus'" :size="22" :color="'#4c9aff'" />
+                <span v-text="field.settings.addActionName || '添加'" />
+            </Button>
         </div>
     </FieldProxy>
 </template>
@@ -24,19 +40,19 @@
 import { event, isArrayNotEmpty, RunResult, useKey } from "snail.core";
 import { inject, onMounted, ref, ShallowRef, shallowRef, } from "vue";
 import { components } from "snail.vue";
-import { FieldChangeEvent, FieldEvents, FieldOptions, FieldRenderOptions, FieldStatusOptions, FieldValueSetResult, IFieldHandle, IFieldManager } from "../../models/field-base";
 import { GroupControlSettings, GroupControlValue } from "../../models/control-model";
+import { FieldChangeEvent, FieldEvents, FieldOptions, FieldRenderOptions, FieldStatusOptions, FieldValueSetResult, IFieldHandle, IFieldManager } from "../../models/field-base";
+import { IFieldContainerHandle } from "../../models/field-container";
 import { INJECTKEY_GlobalContext, useField } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
 import FormFields from "../common/form-fields.vue";
-import { IFieldContainerHandle } from "../../form";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<FieldRenderOptions<GroupControlSettings, GroupControlValue>>();
 const emits = defineEmits<FieldEvents>();
 const { getKey, deleteKey } = useKey();
-const { Icon } = components;
+const { Icon, Button } = components;
 const global = inject(INJECTKEY_GlobalContext);
 const manager: IFieldManager = useField(global, props, {
     emitter: emits,
@@ -49,7 +65,7 @@ const manager: IFieldManager = useField(global, props, {
         throw new Error("group control does not support setValue");
     }
 });
-const { handle, getError, updateError } = manager;
+const { handle, getError, updateError, isReadonly, isReqired } = manager;
 //  2、组件交互变量、常量
 
 //  3、分组实例值相关
@@ -126,6 +142,7 @@ onMounted(() => emits("rendered", handle));
     >.group-item {
         position: relative;
         border-radius: 4px;
+        margin-bottom: 2px;
 
         >.item-header {
             width: 100%;
@@ -146,8 +163,12 @@ onMounted(() => emits("rendered", handle));
                 margin-right: auto;
             }
 
-            >.item-helper {
-                margin-right: auto;
+            >.snail-icon {
+                fill: #8a9099;
+
+                &:hover {
+                    fill: #279bf1;
+                }
             }
         }
 
@@ -191,6 +212,18 @@ onMounted(() => emits("rendered", handle));
             }
         }
     }
+
+    >.group-toolbar {
+        position: relative;
+        height: 32px;
+        display: flex;
+        align-items: center;
+
+        >.snail-button {
+            padding: 0 10px;
+            width: fit-content;
+        }
+    }
 }
 
 //  设计时时的特定样式
@@ -208,10 +241,20 @@ onMounted(() => emits("rendered", handle));
         }
     }
 
+    // &:hover>.field-detail>.group-item {
+    //     >.item-header>.snail-icon {
+    //         display: none;
+    //     }
+    // }
+
+    >.field-detail>.group-toolbar {
+        z-index: 100;
+    }
+
     //  分组控件的设计时工具栏操作按钮放到顶部，避免和子字段的操作按钮冲突遮盖
     >.field-toolbar {
         align-items: flex-start;
-        padding-top: 2px;
+        padding-top: 4px;
     }
 }
 </style>

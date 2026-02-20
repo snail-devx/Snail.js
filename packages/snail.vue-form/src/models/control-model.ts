@@ -157,6 +157,52 @@ export type GroupControlSettings = {
      * 子字段配置
      */
     readonly fields?: FieldOptions<any>[];
+
+    /**
+     * 总计 功能是否可用
+     * - 若开启统计功能，则计算子字段中的【Number】控件值和
+     */
+    readonly totalEnabled?: boolean;
+    /**
+     * 最大条数
+     * - 最大能够新建多少条数据
+     * - 仅支持0、正整数
+     * - 默认值0：表示不限制条数
+     */
+    readonly maxCount?: number;
+
+    /**
+     * 禁用【添加】功能
+     * - 为true时，不出【添加】按钮
+     * - 注意：只读时，始终不出
+     */
+    readonly disableAdd?: boolean;
+    /**
+     * 禁用【删除】功能
+     * - 为true时，不出【删除】按钮
+     * - 注意：只读时，始终不出
+     */
+    readonly disableDelete?: boolean;
+    /**
+     * 禁用【排序】功能
+     * - 为true时，不出【上移】、【下移】按钮
+     * - 注意：只读时，始终不出
+     */
+    readonly disableSort?: boolean;
+    /**
+     * 初始化条数
+     * - 控件无值时，自动初始化构建指定条数实例
+     * - 仅支持0、正整数
+     * - 默认值1，为0表示不初始化
+     * - 注意：只读时，始终不初始化
+     */
+    readonly initCount?: number;
+
+    /**
+     * 【添加】操作的名字
+     * - 默认值为【添加】
+     */
+    readonly addActionName?: string;
 }
 
 /**
