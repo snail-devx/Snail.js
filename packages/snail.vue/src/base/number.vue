@@ -7,7 +7,9 @@
 <template>
   <div class="snail-number" :class="{ 'has-prefix': hasPrefix, 'has-suffix': hasSuffix }">
     <!-- 前缀、输入框、后缀区域 -->
-    <div class="number-prefix placeholder" v-if="hasPrefix" v-text="prefix" />
+    <div class="number-prefix" v-if="hasPrefix">
+      <span class="ellipsis" v-text="prefix" />
+    </div>
     <div class="input-panel" :class="controls">
       <input type="text" ref="input" :inputmode="precision > 0 ? 'decimal' : 'numeric'"
         :placeholder="readonly ? '' : placeholder" :title="displayValueRef" v-model="displayValueRef"
@@ -30,7 +32,9 @@
         </div>
       </template>
     </div>
-    <div class="number-suffix placeholder" v-if="hasSuffix" v-text="suffix" />
+    <div class="number-suffix" v-if="hasSuffix">
+      <span class="ellipsis" v-text="suffix" />
+    </div>
     <!-- 数据的工具助手区域；强制换行：大写、千位符、、、 -->
     <div class="number-util ellipsis" v-if="upper" :title="upperTextRef" v-text="`大写：${upperTextRef || ''}`" />
     <div class="number-util ellipsis" v-if="thousands == 'below'" :title="thousandsTextRef"
@@ -228,7 +232,7 @@ watcher(displayValueRef, (newValue, oldValue) => {
 
 .snail-number {
   width: 100%;
-  min-height: 34px;
+  min-height: 32px;
   overflow-x: hidden;
   position: relative;
   display: flex;
@@ -242,13 +246,14 @@ watcher(displayValueRef, (newValue, oldValue) => {
   >.number-prefix,
   >.number-suffix {
     flex-shrink: 0;
-    line-height: 32px;
     padding: 0px 10px;
     max-width: 100px;
     user-select: none;
     color: #555;
     background-color: #f5f7fa;
     border: 1px solid #dddfed;
+    display: flex;
+    align-items: center;
   }
 
   >.number-prefix {
@@ -274,7 +279,7 @@ watcher(displayValueRef, (newValue, oldValue) => {
     min-width: 10px;
 
     >input {
-      height: 34px;
+      height: 32px;
       width: 100%;
     }
 

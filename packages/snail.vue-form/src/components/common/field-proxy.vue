@@ -60,7 +60,7 @@ let isButtonClickInCover: boolean;
 .field-item {
     position: relative;
     overflow-x: hidden;
-    min-height: 42px;
+    min-height: 40px;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
@@ -84,7 +84,7 @@ let isButtonClickInCover: boolean;
 
         //  字段详情中特定控件的强制样式
         input {
-            height: 34px;
+            height: 32px;
             width: 100%;
         }
 
