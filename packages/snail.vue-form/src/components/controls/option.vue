@@ -16,13 +16,13 @@
 </template>
 
 <script setup lang="ts">
+import { isArrayNotEmpty, isStringNotEmpty, newId, RunResult } from "snail.core";
 import { inject, onMounted, ShallowRef, shallowRef, watch, } from "vue";
 import { ChooseItem, components, SelectItem, SelectOptions } from "snail.vue";
 import { OptionControlSettings, OptionControlValueItem } from "../../models/control-model";
 import { FieldEvents, FieldRenderOptions, FieldValueSetResult, IFieldHandle, IFieldManager, } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, newTraces, useField } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
-import { isArrayNotEmpty, isStringNotEmpty, newId, RunResult } from "snail.core";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<FieldRenderOptions<OptionControlSettings, OptionControlValueItem[]>>();
@@ -50,14 +50,15 @@ const manager: IFieldManager = useField(global, props, {
             change = vm.size != 0;
         }
         //  返回操作结果；有变化则重新构建选项，并验证选项数据
-        if (change == false) {
-            return Promise.resolve({ success: true, change: false, value: values });
+        let result: FieldValueSetResult;
+        if (change == true) {
+            const oldValue = [...valueRef.value];
+            buildSelectedOptions(values, true);
+            result = validateSelected()
+                ? { success: true, change: true, newValue: valueRef.value, oldValue }
+                : { success: false, change: false };
         }
-        buildSelectedOptions(values, true);
-        return Promise.resolve(validateSelected()
-            ? { success: true, change, value: valueRef.value }
-            : { success: false, change: false, value: undefined }
-        );
+        return Promise.resolve(result || { success: true, change: false });
     },
 });
 const { handle, getError, updateError } = manager;

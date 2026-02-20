@@ -14,13 +14,13 @@
 </template>
 
 <script setup lang="ts">
+import { RunResult } from "snail.core";
 import { inject, nextTick, onMounted, ShallowRef, shallowRef, watch, } from "vue";
 import { TextControlSettings } from "../../models/control-model";
 import { FieldEvents, FieldRenderOptions, FieldValueSetResult, IFieldHandle, IFieldManager, } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, newTraces, useField } from "../common/field-common";
 import { getValueString, validateText } from "../../utils/field-util";
 import FieldProxy from "../common/field-proxy.vue";
-import { RunResult } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -37,18 +37,18 @@ const manager: IFieldManager = useField(global, props, {
         return Promise.resolve(rt);
     },
     setValue(value: string): Promise<FieldValueSetResult> {
-        /** 值有变化，才操作，无变化直接成功即可 */
+        /** 值有变化，才操作，无变化直接成功即可；有变化时更新字段值，并进行字段值验证 */
         value = getValueString(value);
-        if (value == valueRef.value) {
-            return Promise.resolve({ success: true, change: false, value: undefined })
+        let result: FieldValueSetResult;
+        if (value != valueRef.value) {
+            const oldValue = oldText;
+            valueRef.value = value;
+            oldText = oldValue;
+            result = validateValue()
+                ? { success: true, change: true, newValue: valueRef.value, oldValue: oldValue }
+                : { success: false, change: false };
         }
-        //  更新字段值，并进行字段值验证
-        valueRef.value = value;
-        oldText = value;
-        return Promise.resolve(validateValue()
-            ? { success: true, change: true, value: valueRef.value }
-            : { success: false, change: false, value: undefined }
-        );
+        return Promise.resolve(result || { success: true, change: false });
     }
 });
 const { handle, getError, updateError } = manager;

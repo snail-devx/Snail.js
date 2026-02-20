@@ -256,16 +256,22 @@ export type FieldValueSetResult = {
      * - true则设置成功
      * - false则将错误信息写入error中
      */
-    success: boolean;
+    readonly success: boolean;
     /**
      * 设置成功时，值是否改变
      */
-    change: boolean;
+    readonly change: boolean;
     /**
-     * 设置之后的值
+     * 设置之后的新值
+     * - change为true时生效
      * - 如格式化后的值，可能和传入值不一样
      */
-    value: any;
+    readonly newValue?: any;
+    /**
+     * 设置之前的旧值
+     * - change为true时生效
+     */
+    readonly oldValue?: any;
 }
 
 /**

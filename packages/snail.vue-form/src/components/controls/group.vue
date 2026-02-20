@@ -11,12 +11,12 @@
 <script setup lang="ts">
 import { RunResult } from "snail.core";
 import { inject, onMounted, ref, ShallowRef, shallowRef, } from "vue";
+import { components } from "snail.vue";
 import { FieldEvents, FieldRenderOptions, FieldValueSetResult, IFieldHandle, IFieldManager } from "../../models/field-base";
 import { GroupControlSettings, GroupControlValue } from "../../models/control-model";
 import { INJECTKEY_GlobalContext, useField } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
 import FormFields from "../common/form-fields.vue";
-import { components } from "snail.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -27,26 +27,11 @@ const global = inject(INJECTKEY_GlobalContext);
 const manager: IFieldManager = useField(global, props, {
     emitter: emits,
     getValue(validate: boolean): Promise<RunResult<any>> {
-        // const success: boolean = validate ? validateValue() : true;
-        // const rt: RunResult<any> = success
-        //     ? { success: true, data: valueRef.value }
-        //     : { success: false, reason: errorRef.value };
-        // return Promise.resolve(rt);
         throw new Error("group control does not support getValue");
     },
     setValue(value: string): Promise<FieldValueSetResult> {
         /** 值有变化，才操作，无变化直接成功即可 */
-        // value = getValueString(value);
-        // if (value == valueRef.value) {
-        //     return Promise.resolve({ success: true, change: false })
-        // }
-        // //  更新字段值，并进行字段值验证
-        // valueRef.value = value;
-        // oldText = value;
-        // return Promise.resolve(validateValue()
-        //     ? { success: true, change: true }
-        //     : { success: false, change: false }
-        // );
+
         throw new Error("group control does not support setValue");
     }
 });

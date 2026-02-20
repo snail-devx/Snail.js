@@ -41,8 +41,8 @@ const manager: IFieldManager = useField(global, props, {
         valueRef.value = value;
         await nextTick();
         return doValidate(valueRef.value)
-            ? { success: true, change: oldNumber != valueRef.value, value: valueRef.value }
-            : { success: false, change: false, value: undefined };
+            ? { success: true, change: oldNumber != valueRef.value, newValue: valueRef.value, oldValue: oldNumber }
+            : { success: false, change: false };
     },
 });
 const { handle, getError, updateError } = manager;

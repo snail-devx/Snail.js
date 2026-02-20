@@ -184,8 +184,9 @@ export function useField(global: IFieldGlobalContext, props: FieldRenderOptions<
     const handle: IFieldHandle = Object.freeze<IFieldHandle>({
         async getField(): Promise<RunResult<FieldOptions<any>>> {
             const field = options.getField ? await options.getField() : props.field;
-            return isStringNotEmpty(errorRef.value)
-                ? { success: false, reason: errorRef.value }
+            const error: string = manager.getError();
+            return isStringNotEmpty(error)
+                ? { success: false, reason: error }
                 : { success: true, data: getCopy(field) };
         },
 
@@ -200,24 +201,26 @@ export function useField(global: IFieldGlobalContext, props: FieldRenderOptions<
         async setValue<T>(value: T, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult> {
             /*  设置字段值，并判断是否变化，发送对应事件处理；备份旧值，进行深拷贝，避免引用类型数据被修改   */
             let result: RunResult = canRunAction(props, "set-value", traces);
+            //  更新值，分析更新结果，进行值改变事件触发
             if (result.success == true) {
-                const oldValue = getCopy(await options.getValue(false));
                 const setResult: FieldValueSetResult = await options.setValue(value);
                 if (setResult.change == true) {
+                    const newValue = getCopy(setResult.newValue);
+                    const oldValue = getCopy(setResult.oldValue);
                     traces = newTraces(props, "set-value", "code", traces);
-                    setTimeout(() => emitter("valueChange", getCopy(setResult.value), oldValue, traces));
+                    setTimeout(() => emitter("valueChange", newValue, oldValue, traces));
                 }
                 result = setResult.success
                     ? { success: true }
-                    : { success: false, reason: errorRef.value };
-
+                    : { success: false, reason: manager.getError() };
             }
             return result;
         },
         getStatus(traces?: ReadonlyArray<FieldActionOptions>): RunResult<FieldStatusOptions> {
             /*还需要验证是否死循环了、、；仅获取状态，直接返回的，死循坏验证先忽略*/
             return {
-                success: true, data: {
+                success: true,
+                data: {
                     required: manager.isReqired(),
                     readonly: manager.isReqired(),
                     hidden: manager.isHidden()
