@@ -13,9 +13,9 @@
         </div>
         <div class="field-detail">
             <slot />
+            <div class="field-desc ellipsis" v-if="isStringNotEmpty(description)" v-text="description" />
+            <div class="field-error ellipsis" v-if="isStringNotEmpty(error)" v-text="error" />
         </div>
-        <div class="field-desc ellipsis" v-if="isStringNotEmpty(description)" v-text="description" />
-        <div class="field-error ellipsis" v-if="isStringNotEmpty(error)" v-text="error" />
         <!-- 字段工具栏：拖拽、复制、删除 -->
         <div class="field-toolbar" v-if="global.mode == 'design'"
             @click="isButtonClickInCover ? (isButtonClickInCover = false) : emitter('activateField')">
@@ -76,13 +76,29 @@ let isButtonClickInCover: boolean;
         }
     }
 
+    //  字段详情：控件展示区域，字段描述、字段错误信息展示区域
     >.field-detail {
         flex: 1;
         min-width: 10px;
         overflow-x: hidden;
         padding: 4px 10px;
 
-        //  字段详情中特定控件的强制样式
+        >.field-desc,
+        >.field-error {
+            width: 100%;
+            color: #aaa;
+            font-size: 12px;
+            height: 20px;
+            line-height: 20px;
+        }
+
+        >.field-error {
+            color: #f74b4b;
+        }
+    }
+
+    //  字段详情中特定控件的强制样式
+    >.field-detail {
         input {
             height: 32px;
             width: 100%;
@@ -92,31 +108,6 @@ let isButtonClickInCover: boolean;
             min-height: 50px;
             width: 100%;
         }
-    }
-}
-
-//  字段描述、字段错误信息展示区域
-.field-item {
-
-    >.field-desc,
-    >.field-error {
-        width: 100%;
-        flex-shrink: 0;
-        color: #aaa;
-        font-size: 12px;
-        line-height: 20px;
-        height: 20px;
-        padding-left: 130px;
-        padding-right: 10px;
-    }
-
-    >.field-error {
-        color: #f74b4b;
-    }
-
-    &.no-title>.field-desc,
-    &.no-title>.field-error {
-        padding-left: 10px;
     }
 }
 
