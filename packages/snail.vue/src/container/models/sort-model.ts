@@ -105,6 +105,10 @@ export type SortEvents = {
      */
     start: [evt: SortEvent];
     /**
+     * 移动中
+     */
+    move: [evt: SortEvent, originalEvent: SortEvent];
+    /**
      * 移动到新容器时
      */
     add: [evt: SortEvent];

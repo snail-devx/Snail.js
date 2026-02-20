@@ -60,6 +60,7 @@ function buildSortable() {
             fallbackTolerance: 2,
             //  事件监听
             onStart: (evt: SortEvent) => emits("start", evt),
+            onMove: (evt, originalEvent) => emits("move", evt, originalEvent),
             onAdd: (evt: SortEvent) => emits("add", evt),
             onRemove: (evt: SortEvent) => emits("remove", evt),
             onEnd: (evt: SortEvent) => emits("add", evt),
