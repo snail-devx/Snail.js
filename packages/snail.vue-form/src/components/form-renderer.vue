@@ -4,8 +4,8 @@
     3、对FieldContainer再次封装，仅爆率运行时渲染器相关功能
 -->
 <template>
-    <FormFields class="snail-form-renderer" :readonly="readonly" :fields="fields || []"
-        :values="values || Object.create(null)" :row-index="rowIndexRef" @rendered="emits('rendered', handle)"
+    <FormFields class="snail-form-renderer" :readonly="readonly" :parent="null" :row-index="0" :fields="fields || []"
+        :values="values || Object.create(null)" @rendered="emits('rendered', handle)"
         @field-rendered="(field, evt) => emits('fieldRendered', field, evt)"
         @value-change="(field, evt) => emits('valueChange', field, evt)"
         @status-change="(field, evt) => emits('statusChange', field, evt)" />
@@ -46,10 +46,6 @@ const handle: IFormRenderHandle = useFormHandle(global) as IFormRenderHandle;
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
-
-const rowIndexRef = shallowRef(0);
-// setInterval(() => rowIndexRef.value++, 1000);
-
 </script>
 
 <style lang="less">

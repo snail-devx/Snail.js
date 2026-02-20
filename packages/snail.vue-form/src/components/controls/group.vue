@@ -5,23 +5,37 @@
 <template>
     <FieldProxy :type="field.type" :title="null" :description="field.description"
         :="{ manager: manager, error: getError() }">
+        <div class="group-item" v-for="(gv, rowIndex) in groupValuesRef" :key="getKey(gv)">
+            <div class="item-header">
+                <span class="item-title ellipsis" v-if="global.mode == 'design'" v-text="field.title" />
+                <span class="item-title ellipsis" v-else v-text="`${field.title}(${rowIndex + 1})`" />
+            </div>
+            <FormFields :readonly="manager.isReadonly()" :parent="field" :row-index="rowIndex" :fields="fields"
+                :values="gv" @rendered="handle => onFieldsRendered(rowIndex, handle)"
+                @field-rendered="(field, evt) => onFieldRendered(rowIndex, field, evt)"
+                @config-change="fields => onFieldsConfigChange(rowIndex, fields)"
+                @value-change="(field, evt) => onFieldValueChange(rowIndex, field, evt)"
+                @status-change="(field, evt) => onFieldStatusChange(rowIndex, field, evt)" />
+        </div>
     </FieldProxy>
 </template>
 
 <script setup lang="ts">
-import { RunResult } from "snail.core";
+import { event, isArrayNotEmpty, RunResult, useKey } from "snail.core";
 import { inject, onMounted, ref, ShallowRef, shallowRef, } from "vue";
 import { components } from "snail.vue";
-import { FieldEvents, FieldRenderOptions, FieldValueSetResult, IFieldHandle, IFieldManager } from "../../models/field-base";
+import { FieldChangeEvent, FieldEvents, FieldOptions, FieldRenderOptions, FieldStatusOptions, FieldValueSetResult, IFieldHandle, IFieldManager } from "../../models/field-base";
 import { GroupControlSettings, GroupControlValue } from "../../models/control-model";
 import { INJECTKEY_GlobalContext, useField } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
 import FormFields from "../common/form-fields.vue";
+import { IFieldContainerHandle } from "../../form";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<FieldRenderOptions<GroupControlSettings, GroupControlValue>>();
 const emits = defineEmits<FieldEvents>();
+const { getKey, deleteKey } = useKey();
 const { Icon } = components;
 const global = inject(INJECTKEY_GlobalContext);
 const manager: IFieldManager = useField(global, props, {
@@ -37,15 +51,60 @@ const manager: IFieldManager = useField(global, props, {
 });
 const { handle, getError, updateError } = manager;
 //  2、组件交互变量、常量
-/**     字段值 */
-const valueRef: ShallowRef<any> = shallowRef("");
-/**     字段管理器 */
 
 //  3、分组实例值相关
+/**     分组中子字段集合 */
+const fields: FieldOptions<any>[] = isArrayNotEmpty(props.field.settings.fields)
+    ? [...props.field.settings.fields]
+    : [];
 /**     分组实例值：index表示第几个实例，每个数组元素表示本组下子控件字段值（key为字段id，value为字段值）*/
 const groupValuesRef: ShallowRef<Array<Record<string, any>>> = shallowRef(undefined);
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 分组实例中所有字段渲染完成时
+ * @param rowIndex 分组实例索引
+ * @param handle 实例组容器句柄
+ */
+function onFieldsRendered(rowIndex: number, handle: IFieldContainerHandle) {
+    console.log("分组实例渲染完成时", rowIndex, handle);
+}
+/**
+ * 分组实例中指定字段渲染完成时
+ * @param rowIndex 分组实例索引
+ * @param field 
+ * @param evt 
+ */
+function onFieldRendered(rowIndex: number, field: FieldOptions<any>, evt: FieldChangeEvent) {
+    console.log("分组实例中字段渲染完成时", rowIndex, field, evt);
+}
+/**
+ * 分组实例中配置改变时
+ * - 设计时生效
+ * @param rowIndex 分组实例索引
+ * @param field 分组实例容器包含的所有字段
+ */
+function onFieldsConfigChange(rowIndex: number, field: FieldOptions<any>[]) {
+    console.log("分组实例中配置改变时", rowIndex, field);
+}
+/**
+ * 分组实例中字段值改变时
+ * @param rowIndex 分组实例索引
+ * @param field 改变值的字段
+ * @param evt fend字段值改变事件，包含新旧值和追踪信息
+ */
+function onFieldValueChange(rowIndex: number, field: FieldOptions<any>, evt: FieldChangeEvent<any>) {
+    console.log("分组实例中字段值改变时", rowIndex, field, evt);
+}
+/**
+ * 分组实例中字段状态改变时
+ * @param rowIndex 分组实例索引
+ * @param field 改变状态的字段
+ * @param evt 字段状态改变事件，包含新旧状态和追踪信息
+ */
+function onFieldStatusChange(rowIndex: number, field: FieldOptions<any>, evt: FieldChangeEvent<FieldStatusOptions>) {
+    console.log("分组实例中字段状态改变时", rowIndex, field, evt);
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
@@ -64,12 +123,40 @@ onMounted(() => emits("rendered", handle));
     align-items: baseline;
     padding: 0;
 
-    >.group-container {
+    >.group-item {
         position: relative;
-        min-height: 100px;
-        margin-bottom: 15px;
-        border: 1px solid #dddfed;
         border-radius: 4px;
+
+        >.item-header {
+            width: 100%;
+            height: 32px;
+            overflow: hidden;
+            color: #63688e;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+
+            >.item-title {
+                max-width: 50%;
+                padding: 0 10px;
+                display: flex;
+                align-items: center;
+                //  向左撑开
+                margin-right: auto;
+            }
+
+            >.item-helper {
+                margin-right: auto;
+            }
+        }
+
+        >.snail-form-fields {
+            width: 100%;
+            min-height: 40px;
+            overflow-x: hidden;
+            overflow-y: visible;
+        }
 
         >.container-toolbar {
             width: 100%;
@@ -102,20 +189,29 @@ onMounted(() => emits("rendered", handle));
                     fill: #279bf1;
                 }
             }
-
         }
     }
 }
 
 //  设计时时的特定样式
-.field-item.group.design>.field-detail {
-    >.group-container {
+.field-item.group.design {
+    padding-right: 0 !important;
 
-        //  强制给定z-index，避免分组控件自身的field-cover盖住了
-        .snail-form-fields {
+    >.field-detail>.group-item {
+        border: 1px solid #dddfed;
+        border-radius: 0;
+
+        //  强制z-index，避免group控件自身的工具栏遮挡住了子容器
+        >.snail-form-fields {
             min-height: 200px;
             z-index: 100;
         }
+    }
+
+    //  分组控件的设计时工具栏操作按钮放到顶部，避免和子字段的操作按钮冲突遮盖
+    >.field-toolbar {
+        align-items: flex-start;
+        padding-top: 2px;
     }
 }
 </style>

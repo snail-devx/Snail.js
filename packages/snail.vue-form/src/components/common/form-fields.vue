@@ -3,10 +3,11 @@
     2、内部不控制高度和宽度，由外部自己控制
 -->
 <template>
-    <div class="snail-form-fields" :class="[`tc-${global.columns}`, global.mode,]">
+    <div class="snail-form-fields" :class="[`tc-${global.columns}`, global.mode]" :title="buildGlobalTitle()">
         <!-- 设计时：增加排序组件：这个key使用字段id可能有问题，后续再考虑优化，特别是运行时的时候；设计时构建 复制、删除 按钮 -->
         <Sort v-if="global.mode == 'design'" draggable=".field-item" handle=".field-toolbar" :changer="fields.length"
-            :group="global.global" :disabled="global.readonly" @add="onDragAddField" @update="container.moveField">
+            :group="global.global" :disabled="global.readonly" @move="console.log" @add="onDragAddField"
+            @update="container.moveField">
             <template v-for="(field, index) in fields" :key="container.getFieldKey(field.id)">
                 <Dynamic class="field-item" :class="buildFieldClass(field)"
                     :="global.getControl(field.type).renderComponent" :readonly="readonly"
@@ -75,6 +76,15 @@ const layoutMapRef = global.mode == "design" ? undefined : computed(calcFieldLay
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
+ * 构建全局title提示
+ */
+function buildGlobalTitle(): string {
+    //  设计时非只读时，若无字段，则提示拖拽控件
+    return global.readonly != true && global.mode == "design" && fields.length == 0
+        ? "拖拽控件/字段到容器中，完成字段配置"
+        : "";
+}
+/**
  * 构建字段的 class 类样式数组
  * @param field 
  */
@@ -88,6 +98,8 @@ function buildFieldClass(field: FieldOptions<any>): string[] {
         global.layout,
         field.type.toLowerCase(),
     ];
+    //  设计时，加上是否时激活字段标记
+    global.mode == "design" && global.fieldSetting.isActiveField(field, location) && classes.push("active");
     //  非设计时时，最后一行添加特定类样式
     global.mode != "design" && layoutMapRef.value.get(field.id).isRowLast && classes.push("row-last");
 
@@ -216,6 +228,16 @@ onUnmounted(scope.destroy);
     /* 设计时；按照字段自身高度，不撑开，避免 field-cover 高度太高影响效果*/
     align-items: flex-start;
     user-select: none;
+
+    // &::before {
+    //     position: absolute;
+    //     color: gray;
+    //     content: '拖拽字段';
+    //     left: 0;
+    //     width: 100%;
+    //     text-align: center;
+    //     top: 40px
+    // }
 
     //  从【控件列表】拖拽字段进入时，强制宽度
     >.control-item.snail-sort-ghost {

@@ -154,6 +154,7 @@ let isButtonClickInCover: boolean;
     //  鼠标移入、激活、拖拽时；特定特定边框色标记
     &.snail-sort-drag>.field-toolbar,
     &.snail-sort-ghost>.field-toolbar,
+    &.active>.field-toolbar,
     &>.field-toolbar:hover,
     &>.field-toolbar.active {
         opacity: 1;
