@@ -189,7 +189,6 @@ export function useField(global: IFieldGlobalContext, props: FieldRenderOptions<
                 ? { success: false, reason: error }
                 : { success: true, data: getCopy(field) };
         },
-
         async getValue<T>(validate: boolean, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult<T>> {
             let result: RunResult<any> = canRunAction(props, "get-value", traces);
             if (result.success == true) {
@@ -420,6 +419,14 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
                 tryTriggerRenderEvent();
             };
             /**
+             * 字段配置改变事件
+             * @param field 新的字段配置
+             */
+            function onConfigChange(field: FieldOptions<any>) {
+                //  直接触发容器的配置改变事件
+                triggerConfigChangeEvent();
+            }
+            /**
              * 字段值变更
              * - 在用户交互或程序赋值导致字段值变化后触发（新旧值不同）
              * @param newValue 新的字段值
@@ -450,7 +457,7 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
                 emitter('statusChange', field, buildFieldChangeEvent(newStatus, oldStatus, traces));
             };
 
-            return { onRendered, onValueChange, onStatusChange };
+            return { onRendered, onConfigChange, onValueChange, onStatusChange };
         },
         /**
          * 字段是否应该显示

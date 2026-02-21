@@ -285,6 +285,11 @@ export type FieldEvents = {
      */
     rendered: [handle: IFieldHandle];
     /**
+     * 字段配置改变事件
+     * @param field 新的字段配置
+     */
+    configChange: [field: FieldOptions<any>];
+    /**
      * 字段值变更
      * - 在用户交互或程序赋值导致字段值变化后触发（新旧值不同）
      * @param newValue 新的字段值

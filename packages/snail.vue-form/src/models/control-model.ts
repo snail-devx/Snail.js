@@ -1,5 +1,6 @@
-import { ChooseOptions, ComponentOptions, NumberBaseOptions } from "snail.vue";
-import { FieldOptions } from "./field-base";
+import { ChooseOptions, ComponentOptions, EventsType, NumberBaseOptions } from "snail.vue";
+import { FieldOptions, IFieldManager } from "./field-base";
+import { FieldContainerEvents } from "./field-container";
 
 /**
  * 表单控件配置选项
@@ -222,4 +223,53 @@ export type GroupControlValue = {
      */
     totalValue?: Record<string, number>;
 };
+
+/**
+ * 接口：分组控件管理器
+ */
+export interface IGroupControlManager {
+    /**
+     * 控件的子字段
+     */
+    fields: FieldOptions<any>[];
+    /**
+     * 控件实例值
+     */
+    values: GroupControlValue["values"];
+
+    /**
+     * 分组字段管理器
+     */
+    fieldManager: IFieldManager;
+
+    /**
+     * 获取【一个实例项】的唯一标识Key值
+     * @param itemValue 本条分组实例数据，key为字段id，value为字段值
+     * @returns 唯一标识Key值
+     */
+    getItemKey(itemValue: Record<string, any>): string;
+    /**
+     * 构建【一个实例项】的事件监听器
+     * @param itemValue 本条分组实例数据，key为字段id，value为字段值
+     * @returns 字段容器事件监听
+     */
+    buildItemMonitor(itemValue: Record<string, any>): EventsType<FieldContainerEvents>;
+
+    /**
+     * 新建【一个实例项】
+     * @param rowIndex 新项所属的行索引位置，不传入则追加
+     */
+    addNewItem(rowIndex?: number): void;
+    /**
+     * 移动【一个实例项】
+     * @param rowIndex 实例项当前所在的行索引位置
+     * @param newRowIndex 新的行索引位置
+     */
+    moveItem(rowIndex: number, newRowIndex: number): void;
+    /**
+     * 删除【一个实例项】
+     * @param rowIndex 删除项的索引位置
+     */
+    deleteItem(rowIndex: number): void;
+}
 //#endregion
