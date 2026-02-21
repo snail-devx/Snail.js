@@ -9,11 +9,13 @@
             <Sort v-else draggable=".control-item" changer="1" :disabled="global.readonly" :sortDisabled="true"
                 :group="{ name: global.global, pull: 'clone', put: false }" @remove="onControlItemRemove"
                 @end="evt => console.log('end', evt)">
-                <div v-for="control in global.controls" class="control-item" :key="control.type"
-                    v-show="control.name.indexOf(searchTextRef || '') != -1" :data-type="control.type"
-                    @click="emits('click', control.type)">
-                    {{ control.name }}
-                </div>
+                <Transitions :group="true">
+                    <div v-for="control in global.controls" class="control-item" :key="control.type"
+                        v-show="control.name.indexOf(searchTextRef || '') != -1" :data-type="control.type"
+                        @click="emits('click', control.type)">
+                        {{ control.name }}
+                    </div>
+                </Transitions>
             </Sort>
         </Scroll>
     </div>
@@ -29,7 +31,7 @@ import { INJECTKEY_GlobalContext } from "./field-common";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const emits = defineEmits<{ click: [type: string] }>();
-const { Scroll, Search, Sort, Empty } = components;
+const { Scroll, Search, Sort, Empty, Transitions } = components;
 /**   字段全局上下文 */
 const global = inject(INJECTKEY_GlobalContext);
 /**     搜索文本 */

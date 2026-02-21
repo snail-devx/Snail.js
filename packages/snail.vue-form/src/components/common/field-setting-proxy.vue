@@ -1,23 +1,26 @@
 <!-- 字段设置代理组件 -->
 <template>
     <div class="field-setting-proxy">
-        <!-- 字段类型配置、、、 -->
-        <div class="setting-item divider">
-            <div class="item-title">字段ID</div>
-            <div class="item-detail placeholder" v-text="field.id" />
-        </div>
-        <div class="setting-item divider">
-            <div class="item-title">控件类型</div>
-            <div class="item-detail placeholder" v-text="`${name}(${type})`" />
-        </div>
-        <!-- <div class="setting-divider" /> -->
-        <!-- 插槽，进行字段详细配置 -->
-        <slot />
+        <Transitions :group="true">
+            <!-- 字段类型配置、、、 -->
+            <div class="setting-item divider">
+                <div class="item-title">字段ID</div>
+                <div class="item-detail placeholder" v-text="field.id" />
+            </div>
+            <div class="setting-item divider">
+                <div class="item-title">控件类型</div>
+                <div class="item-detail placeholder" v-text="`${name}(${type})`" />
+            </div>
+            <!-- <div class="setting-divider" /> -->
+            <!-- 插槽，进行字段详细配置 -->
+            <slot />
+        </Transitions>
     </div>
 </template>
 
 <script setup lang="ts">
 import { inject, ref, shallowRef, } from "vue";
+import { components } from "snail.vue";
 import { FieldSettingOptions } from "../../models/field-setting";
 import { INJECTKEY_GlobalContext } from "./field-common";
 
@@ -25,6 +28,7 @@ import { INJECTKEY_GlobalContext } from "./field-common";
 //  1、props、event、model、components
 const { field, container } = defineProps<FieldSettingOptions<any>>();
 const emits = defineEmits<{ redn }>();
+const { Transitions } = components;
 const global = inject(INJECTKEY_GlobalContext);
 const { name, type } = global.getControl(field.type);
 

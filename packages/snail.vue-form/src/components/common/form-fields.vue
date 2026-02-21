@@ -8,14 +8,14 @@
         <Sort v-if="global.mode == 'design'" draggable=".field-item" handle=".field-toolbar" :changer="fields.length"
             :group="global.global" :disabled="global.readonly" @move="console.log" @add="onDragAddField"
             @update="container.moveField">
-            <template v-for="(field, index) in fields" :key="container.getFieldKey(field.id)">
-                <Dynamic class="field-item" :class="buildFieldClass(field)"
-                    :="global.getControl(field.type).renderComponent" :readonly="readonly"
-                    :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex" :field="field"
-                    v-bind="container.buildFieldMonitor(field)" @copy-field="container.copyField(field, index)"
-                    @delete-field="container.deleteField(field, index)"
+            <Transitions :group="true">
+                <Dynamic v-for="(field, index) in fields" :key="container.getFieldKey(field.id)"
+                    :class="buildFieldClass(field)" :="global.getControl(field.type).renderComponent"
+                    :readonly="readonly" :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex"
+                    :field="field" v-bind="container.buildFieldMonitor(field)"
+                    @copy-field="container.copyField(field, index)" @delete-field="container.deleteField(field, index)"
                     @activate-field="global.fieldSetting.activateField(field, location)" />
-            </template>
+            </Transitions>
         </Sort>
         <!-- 运行时、预览模式：无可见字段时，给出提示 -->
         <Empty v-else-if="fields.find(field => container.isVisible(field)) == undefined" message="无可用字段" />
@@ -23,22 +23,17 @@
             1、有可见字段，直接渲染不用排序；需要计算布局，根据布局填充位置并对末尾留白补全
             2、字段渲染：属性直接桥接上级属性不破坏响应式，构建出  FieldRenderOptions<Settings, Value> 所需属性
             3、若字段为最后行的最后一个字段，则构建空白占位区域：避免行最后一个字段展示没填充满行时显示异常 
-            注意事项：
-                1、为了和设计时的文档结构保持同层级，这里做两层 template，方便后续修改时做设计时和非设计时的同步比对
-                2、这里template下有多个元素，无法确认单根元素，运行时会有警告，忽略掉，本身就应该是这样
-                    [Vue warn]: Runtime directive used on component with non-element root node. The directives will not function as intended. 
         -->
-        <template v-else>
+        <Transitions v-else :group="true">
             <template v-for="(field, index) in fields" :key="container.getFieldKey(field.id)">
-                <Dynamic class="field-item" :class="buildFieldClass(field)"
-                    :="global.getControl(field.type).renderComponent" :readonly="readonly"
-                    :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex" :field="field"
-                    v-bind="container.buildFieldMonitor(field)" :value="values ? values[field.id] : undefined"
-                    v-show="layoutMapRef.get(field.id).show" />
+                <Dynamic :class="buildFieldClass(field)" :="global.getControl(field.type).renderComponent"
+                    :readonly="readonly" :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex"
+                    :field="field" v-bind="container.buildFieldMonitor(field)"
+                    :value="values ? values[field.id] : undefined" v-show="layoutMapRef.get(field.id).show" />
                 <div class="field-item" v-if="layoutMapRef.get(field.id).blankWidthAfter > 0"
                     :class="[`fw-${layoutMapRef.get(field.id).blankWidthAfter}`, 'blank-item']" />
             </template>
-        </template>
+        </Transitions>
     </div>
 </template>
 
@@ -54,7 +49,7 @@ import { INJECTKEY_GlobalContext, useFieldContainer } from "./field-common";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const _ = defineProps<FieldContainerOptions & { rowIndex: number }>();
-const { Sort, Dynamic, Empty } = components;
+const { Sort, Dynamic, Empty, Transitions } = components;
 const emits = defineEmits<FieldContainerEvents>();
 const { watcher } = useReactive();
 /**     字段全局上下文 */
@@ -93,6 +88,7 @@ function buildFieldClass(field: FieldOptions<any>): string[] {
     const width: number = global.mode == "design" ? getFieldWidth(field) : layoutMapRef.value.get(field.id).width;
 
     const classes: string[] = [
+        "field-item",
         `fw-${width}`,
         global.mode,
         global.layout,
