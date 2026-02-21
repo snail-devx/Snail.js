@@ -26,9 +26,9 @@ const { watcher } = useReactive();
 //  2、组件交互变量、常量
 /**      动态加载组件的ref实例引用 */
 const componentRef = ref(null);
-/**     动态加载出来的组件：使用浅层相应 */
+/**     动态加载出来的组件 */
 const dynamicComponentRef = shallowRef<Component | string>();
-/**     动态加载时的错误信息：使用浅层相应 */
+/**     动态加载时的错误信息 */
 const errorRef = shallowRef<string | undefined>(undefined);
 //  3、特定组件，辅助组件加载渲染展示
 /**     loading提示组件 */
