@@ -49,6 +49,7 @@ export * from "./container/models/layout-model";
 export * from "./container/models/scroll-model";
 export * from "./container/models/sort-model";
 export * from "./container/models/table-model";
+export * from "./container/models/transition-model";
 export * from "./container/models/tree-model";
 export * from "./container/models/wrapper-model";
 //  组件导出：赋值给 components
@@ -60,6 +61,7 @@ import Sort from "./container/sort.vue";
 import Table from "./container/table.vue";
 import TableRow from "./container/components/table-row.vue";
 import TableCol from "./container/components/table-col.vue";
+import Transitions from "./container/transitions.vue";
 import Tree from "./container/tree.vue";
 import Wrapper from "./container/wrapper.vue";
 //  方法导出
@@ -87,7 +89,7 @@ export const components = {
     //  base下的组件
     Button, Choose, DatePicker, Footer, Header, Icon, Input, Number, Search, Select, Switch,
     //  container 下的组件
-    Dynamic, Fold, Layout, Scroll, Sort, Table, TableRow, TableCol, Tree, Wrapper,
+    Dynamic, Fold, Layout, Scroll, Sort, Table, TableRow, TableCol, Transitions, Tree, Wrapper,
     //  prompt 下的组件
     DragVerify, Empty, Loading
 };
