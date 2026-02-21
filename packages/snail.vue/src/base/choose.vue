@@ -70,8 +70,8 @@ function onItemClick(node: ChooseItemNode, index: number) {
     if (props.readonly == true) {
         return;
     }
-    //  更新选中状态
-    //      多选模式：反选
+    //  更新选中状态；若无值变化，则不用进行改变事件触发了
+    //      多选模式：反选，点击时肯定改变了
     if (props.multi == true) {
         node.selected = !node.selected;
         valuesModel.value = chooseItemsRef.value.filter(item => item.selected).map(item => item.item.value);
@@ -81,8 +81,13 @@ function onItemClick(node: ChooseItemNode, index: number) {
         const newSelected = type == "checkbox" && props.items.length == 1 ? !node.selected : true;
         chooseItemsRef.value.forEach(item => item.selected = false);
         node.selected = newSelected;
-        valuesModel.value = newSelected ? node.item.value : undefined;
+        const newValue = newSelected ? node.item.value : undefined;
+        if (valuesModel.value == newValue) {
+            return;
+        }
+        valuesModel.value = newValue;
     }
+
     //  延迟change事件；外部同时使用v-model和change事件时，valueModel.value修改不会立马生效
     nextTick(() => emits("change", valuesModel.value));
 }
