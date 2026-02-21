@@ -6,17 +6,13 @@
 <template>
     <component ref="componentRef" :is="dynamicComponentRef" :="props" v-bind="$attrs">
         <template v-for="(_, name) in $slots" v-slot:[name]="slotData" :key="name">
-            <slot :name="name" v-bind="slotData" />
+            <slot :name="name" v-bind="slotData == undefined ? {} : slotData" />
         </template>
     </component>
-    <div class="snail-dynamic-error" v-if="dynamicErrorRef != undefined" v-bind="$attrs">
-        load component error：<span>{{ dynamicErrorRef }}</span>
-    </div>
-    <Loading v-else-if="dynamicComponentRef == undefined" :show="true" :mask-disabled="true" />
 </template>
 
 <script setup lang="ts">
-import { Component, onErrorCaptured, ref, shallowRef } from "vue";
+import { Component, defineComponent, onErrorCaptured, ref, shallowRef } from "vue";
 import { delay, isObject, isStringNotEmpty, script, } from "snail.core";
 import Loading from "../prompt/loading.vue"
 import { useReactive } from "../base/reactive";
@@ -24,24 +20,41 @@ import { DynamicOptions } from "./models/dynamic-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
+defineOptions({ name: "Dynamic", inheritAttrs: false, });
 const { name, component, url, props = {} } = defineProps<DynamicOptions<Record<string, any>>>();
 const { watcher } = useReactive();
+//  2、组件交互变量、常量
 /**      动态加载组件的ref实例引用 */
 const componentRef = ref(null);
 /**     动态加载出来的组件：使用浅层相应 */
-const dynamicComponentRef = shallowRef<Component | string>(undefined);
+const dynamicComponentRef = shallowRef<Component | string>();
 /**     动态加载时的错误信息：使用浅层相应 */
-const dynamicErrorRef = shallowRef<string | undefined>(undefined);
-//  2、可选配置选项
-defineOptions({ name: "Dynamic", inheritAttrs: false, });
+const errorRef = shallowRef<string | undefined>(undefined);
+//  3、特定组件，辅助组件加载渲染展示
+/**     loading提示组件 */
+const loadingComponent = defineComponent({
+    inheritAttrs: false,
+    components: { Loading },
+    template: "<Loading :mask-disabled='true' />"
+});
+/**     错误信息显示组件 */
+const errorComponent = defineComponent({
+    inheritAttrs: false,
+    template: `<div class="snail-dynamic-error">load component error：<span v-text="error" /></div>`,
+    data() {
+        return {
+            error: errorRef
+        }
+    }
+});
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
  * 构建动态组件
  */
 async function buildDynamicComponent() {
-    dynamicComponentRef.value = undefined;
-    dynamicErrorRef.value = undefined;
+    dynamicComponentRef.value = loadingComponent;
+    errorRef.value = undefined;
     /* 根据优先级加载组件：name > component > url */
     if (isStringNotEmpty(name) == true) {
         dynamicComponentRef.value = name;
@@ -59,7 +72,7 @@ async function buildDynamicComponent() {
                 loader: () => script.load<Component>(url),
                 loadingComponent: SnailLoading,
                 delay: 100,
-                errorComponent: dynamicErrorComponent
+                errorComponent: errorComponent
             }); 
          */
         //  加载组件：增加延迟效果
@@ -71,15 +84,15 @@ async function buildDynamicComponent() {
             const comp = await task;
             isObject(comp) || isStringNotEmpty(comp)
                 ? (dynamicComponentRef.value = comp)
-                : (dynamicErrorRef.value = `load component failed:return nulll or undefined. url:${url}.`)
+                : (errorRef.value = `load component failed:return nulll or undefined. url:${url}.`)
         }
         catch (ex: any) {
             dynamicComponentRef.value = undefined;
-            dynamicErrorRef.value = ex.message;
+            errorRef.value = ex.message;
         }
     }
     else {
-        dynamicErrorRef.value = "load error: name component、url are all empty.";
+        errorRef.value = "load error: name component、url are all empty.";
     }
 }
 
@@ -89,6 +102,7 @@ async function buildDynamicComponent() {
     watcher(() => name, buildDynamicComponent);
     watcher(() => component, buildDynamicComponent);
     watcher(() => url, buildDynamicComponent);
+    watcher(errorRef, () => isStringNotEmpty(errorRef.value) && (dynamicComponentRef.value = errorComponent));
     buildDynamicComponent();
 }
 //  2、生命周期响应
@@ -102,6 +116,9 @@ onErrorCaptured((error, vm, info) => {
 </script>
 
 <style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/mixins.less";
+
 // 动态加载组件是的错误信息
 .snail-dynamic-error {
     color: red;
