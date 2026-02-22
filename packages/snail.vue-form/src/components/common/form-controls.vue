@@ -79,7 +79,7 @@ function onControlItemRemove(evt: SortEvent) {
 
     //  控件列表
     >.control-list {
-        padding: 10px;
+        padding: 0 10px 10px 10px;
         flex: 1;
         display: flex;
         flex-wrap: wrap;

@@ -379,11 +379,9 @@ export function useFieldContainer(global: IFieldGlobalContext, options: FieldCon
             if (index != -1) {
                 Object.assign(fieldsRef.value[index], toRaw(field));
                 fieldKeyMap.get(fieldId).value = newId();
-                triggerConfigChangeEvent();
+                global.mode == "design" && triggerConfigChangeEvent();
             }
             return Promise.resolve({ success: true });
-
-            /** 刷新字段实现方式：将字段移除，在添加到指定位置；移除当前先将字段句柄移除掉 */
         }
     });
     //#endregion
