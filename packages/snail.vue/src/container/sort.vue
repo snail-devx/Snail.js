@@ -63,7 +63,7 @@ function buildSortable() {
             onMove: (evt, originalEvent) => emits("move", evt, originalEvent),
             onAdd: (evt: SortEvent) => emits("add", evt),
             onRemove: (evt: SortEvent) => emits("remove", evt),
-            onEnd: (evt: SortEvent) => emits("add", evt),
+            onEnd: (evt: SortEvent) => emits("end", evt),
             onUpdate: (evt: SortEvent) => emits("update", evt.oldIndex, evt.newIndex),
         });
     }
