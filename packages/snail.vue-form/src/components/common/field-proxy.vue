@@ -1,29 +1,28 @@
 <!-- 字段代理组件：代理字段的渲染逻辑
-    1、字段标题、必填状态、显隐状态
-    2、代理字段描述信息、字段错误信息
-    3、字段的控件渲染，使用插槽进行具体渲染
-    4、代理字段设计时的操作句柄和复制、删除字段操作
-    代理字段，会自动带上类样式 field-item 这里就不用再单独样式了
+    1、多根节点组件，仅配合 form-fields 组件配合使用，由 form-fields 组件框定最外层容器
+        1、字段标题、必填状态、显隐状态
+        2、代理字段描述信息、字段错误信息
+        3、字段的控件渲染，使用插槽进行具体渲染
+        4、代理字段设计时的操作句柄和复制、删除字段操作
+    2、代理字段，会自动带上类样式 field-item 这里就不用再单独样式了
 -->
 <template>
-    <div :class="$attrs.class" v-bind:class="{ 'no-title': isStringNotEmpty(title) == false }">
-        <div class="field-title" v-if="isStringNotEmpty(title)">
-            {{ title }}
-            <span v-if="isReqired()">*</span>
-        </div>
-        <div class="field-detail">
-            <slot />
-            <div class="field-desc ellipsis" v-if="isStringNotEmpty(description)" v-text="description" />
-            <div class="field-error ellipsis" v-if="isStringNotEmpty(error)" v-text="error" />
-        </div>
-        <!-- 字段工具栏：拖拽、复制、删除 -->
-        <div class="field-toolbar" v-if="global.mode == 'design'"
-            @click="isButtonClickInCover ? (isButtonClickInCover = false) : emitter('activateField')">
-            <Icon v-if="isReadonly() != true" type="plus" color="#aeb6c2" hover-color="#279bf1" title="复制"
-                @click="isButtonClickInCover = true, emitter('copyField')" />
-            <Icon v-if="isReadonly() != true" type="trash" color="#aeb6c2" hover-color="#279bf1" title="删除"
-                @click="isButtonClickInCover = true, emitter('deleteField')" />
-        </div>
+    <div class="field-title" v-if="isStringNotEmpty(title)">
+        {{ title }}
+        <span v-if="isReqired()">*</span>
+    </div>
+    <div class="field-detail">
+        <slot />
+        <div class="field-desc ellipsis" v-if="isStringNotEmpty(description)" v-text="description" />
+        <div class="field-error ellipsis" v-if="isStringNotEmpty(error)" v-text="error" />
+    </div>
+    <!-- 字段工具栏：拖拽、复制、删除 -->
+    <div class="field-toolbar" v-if="global.mode == 'design'"
+        @click="isButtonClickInCover ? (isButtonClickInCover = false) : emitter('activateField')">
+        <Icon v-if="isReadonly() != true" type="plus" color="#aeb6c2" hover-color="#279bf1" title="复制"
+            @click="isButtonClickInCover = true, emitter('copyField')" />
+        <Icon v-if="isReadonly() != true" type="trash" color="#aeb6c2" hover-color="#279bf1" title="删除"
+            @click="isButtonClickInCover = true, emitter('deleteField')" />
     </div>
 </template>
 
@@ -56,15 +55,8 @@ let isButtonClickInCover: boolean;
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
 
-//  字段标题、详情基础样式：字段详情，给点最小款第，避免撑不开宽度
+//  字段标题、详情基础样式：字段详情，给点最小宽度，避免撑不开宽度
 .field-item {
-    position: relative;
-    overflow-x: hidden;
-    min-height: 40px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-
     >.field-title {
         width: 120px;
         flex-shrink: 0;

@@ -6,14 +6,16 @@
     <div class="snail-form-fields" :class="[`tc-${global.columns}`, global.mode]" :title="buildGlobalTitle()">
         <!-- 设计时：增加排序组件：这个key使用字段id可能有问题，后续再考虑优化，特别是运行时的时候；设计时构建 复制、删除 按钮 -->
         <Sort v-if="global.mode == 'design'" draggable=".field-item" handle=".field-toolbar" :changer="fields.length"
-            :group="global.global" :disabled="global.readonly" @move="console.log" @add="onDragAddField"
-            @update="container.moveField">
+            :group="global.global" :disabled="global.readonly" @start="onDragStart" @move="console.log"
+            @add="onDragAddField" @update="container.moveField" @end="onDragEnd">
             <template v-for="(field, index) in fields" :key="container.getFieldKey(field.id)">
-                <Dynamic :class="buildFieldClass(field)" :="global.getControl(field.type).renderComponent"
-                    :readonly="readonly" :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex"
-                    :field="field" v-bind="container.buildFieldMonitor(field)"
-                    @copy-field="container.copyField(field, index)" @delete-field="container.deleteField(field, index)"
-                    @activate-field="global.fieldSetting.activateField(field, location)" />
+                <div class="field-item" :class="buildFieldClass(field)">
+                    <Dynamic :="global.getControl(field.type).renderComponent" :readonly="readonly"
+                        :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex" :field="field"
+                        v-bind="container.buildFieldMonitor(field)" @copy-field="container.copyField(field, index)"
+                        @delete-field="container.deleteField(field, index)"
+                        @activate-field="global.fieldSetting.activateField(field, location)" />
+                </div>
             </template>
         </Sort>
         <!-- 运行时、预览模式：无可见字段时，给出提示 -->
@@ -25,10 +27,12 @@
         -->
         <template v-else>
             <template v-for="(field, index) in fields" :key="container.getFieldKey(field.id)">
-                <Dynamic :class="buildFieldClass(field)" :="global.getControl(field.type).renderComponent"
-                    :readonly="readonly" :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex"
-                    :field="field" v-bind="container.buildFieldMonitor(field)"
-                    :value="values ? values[field.id] : undefined" v-show="layoutMapRef.get(field.id).show" />
+                <div class="field-item" :class="buildFieldClass(field)">
+                    <Dynamic :="global.getControl(field.type).renderComponent" :readonly="readonly"
+                        :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex" :field="field"
+                        v-bind="container.buildFieldMonitor(field)" :value="values ? values[field.id] : undefined"
+                        v-show="layoutMapRef.get(field.id).show" />
+                </div>
                 <div class="field-item" v-if="layoutMapRef.get(field.id).blankWidthAfter > 0"
                     :class="[`fw-${layoutMapRef.get(field.id).blankWidthAfter}`, 'blank-item']" />
             </template>
@@ -88,7 +92,6 @@ function buildFieldClass(field: FieldOptions<any>): string[] {
     const width: number = global.mode == "design" ? getFieldWidth(field) : layoutMapRef.value.get(field.id).width;
 
     const classes: string[] = [
-        "field-item",
         `fw-${width}`,
         global.mode,
         global.layout,
@@ -166,6 +169,17 @@ function asRowLastLayout(layout: FormFieldLayoutOptions, totalWidthInRow: number
 }
 
 /**
+ * 开始拖拽时
+ * - 分析出元素所属字段相关信息
+ * @param evt 
+ */
+function onDragStart(evt: SortEvent) {
+
+
+
+    console.log(1);
+}
+/**
  * 添加字段时
  * - 从控件列表添加字段时
  * - 从其他容器中移动过来时
@@ -187,9 +201,19 @@ function onDragAddField(evt: SortEvent) {
         }
         //  从其他字段容器移动过来的字段；先判断是否能够删除，若能删除再添加，添加成功再从移除
         else {
+            console.log(evt.item["_data"]);
+            console.log(evt.item.getAttribute("data-tag"));
             alert("移动添加还没实现呢");
         }
     }
+}
+/**
+ * 拖拽结束时
+ * - 清理掉附加到元素上的信息
+ * @param evt 
+ */
+function onDragEnd(evt: SortEvent) {
+    console.log(4);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
@@ -214,7 +238,10 @@ onUnmounted(scope.destroy);
         flex-shrink: 0;
         position: relative;
         overflow-x: hidden;
-        min-height: 30px;
+        min-height: 40px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
     }
 }
 
