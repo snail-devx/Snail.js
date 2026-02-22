@@ -34,7 +34,7 @@ import { FieldSettingOptions } from "../models/field-setting";
 //  1、props、event、model、components
 defineOptions({ name: "FormDesigner" });
 const _ = defineProps<FormDesignerOptions>();
-const { Dynamic, Empty } = components;
+const { Dynamic, Empty, Transitions } = components;
 const { fields } = _;
 const emits = defineEmits<FormDesignerEvents>();
 /**     字段全局上下文：构建后注入方便子组件中直接使用 */

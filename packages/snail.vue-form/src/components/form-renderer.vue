@@ -13,6 +13,7 @@
 
 <script setup lang="ts">
 import { provide, shallowRef, } from "vue";
+import { components } from "snail.vue";
 import { } from "../models/control-model";
 import { FormRenderEvents, FormRenderOptions, IFormRenderHandle } from "../models/form-model";
 import FormFields from "./common/form-fields.vue";
@@ -25,6 +26,7 @@ import { useFormHandle } from "./common/form-common";
 defineOptions({ name: "FormRenderer" });
 const _ = defineProps<FormRenderOptions>();
 const emits = defineEmits<FormRenderEvents>();
+const { Transitions } = components;
 const { fields, values } = _;
 //  2、组件交互变量、常量
 /**     字段全局上下文：构建后注入方便子组件中直接使用 */

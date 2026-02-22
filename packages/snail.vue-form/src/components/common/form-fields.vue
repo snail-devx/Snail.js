@@ -8,14 +8,13 @@
         <Sort v-if="global.mode == 'design'" draggable=".field-item" handle=".field-toolbar" :changer="fields.length"
             :group="global.global" :disabled="global.readonly" @move="console.log" @add="onDragAddField"
             @update="container.moveField">
-            <Transitions :group="true">
-                <Dynamic v-for="(field, index) in fields" :key="container.getFieldKey(field.id)"
-                    :class="buildFieldClass(field)" :="global.getControl(field.type).renderComponent"
+            <template v-for="(field, index) in fields" :key="container.getFieldKey(field.id)">
+                <Dynamic :class="buildFieldClass(field)" :="global.getControl(field.type).renderComponent"
                     :readonly="readonly" :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex"
                     :field="field" v-bind="container.buildFieldMonitor(field)"
                     @copy-field="container.copyField(field, index)" @delete-field="container.deleteField(field, index)"
                     @activate-field="global.fieldSetting.activateField(field, location)" />
-            </Transitions>
+            </template>
         </Sort>
         <!-- 运行时、预览模式：无可见字段时，给出提示 -->
         <Empty v-else-if="fields.find(field => container.isVisible(field)) == undefined" message="无可用字段" />
@@ -24,7 +23,7 @@
             2、字段渲染：属性直接桥接上级属性不破坏响应式，构建出  FieldRenderOptions<Settings, Value> 所需属性
             3、若字段为最后行的最后一个字段，则构建空白占位区域：避免行最后一个字段展示没填充满行时显示异常 
         -->
-        <Transitions v-else :group="true">
+        <template v-else>
             <template v-for="(field, index) in fields" :key="container.getFieldKey(field.id)">
                 <Dynamic :class="buildFieldClass(field)" :="global.getControl(field.type).renderComponent"
                     :readonly="readonly" :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex"
@@ -33,7 +32,7 @@
                 <div class="field-item" v-if="layoutMapRef.get(field.id).blankWidthAfter > 0"
                     :class="[`fw-${layoutMapRef.get(field.id).blankWidthAfter}`, 'blank-item']" />
             </template>
-        </Transitions>
+        </template>
     </div>
 </template>
 

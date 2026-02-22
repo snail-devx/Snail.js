@@ -9,13 +9,11 @@
             <Sort v-else draggable=".control-item" changer="1" :disabled="global.readonly" :sortDisabled="true"
                 :group="{ name: global.global, pull: 'clone', put: false }" @remove="onControlItemRemove"
                 @end="evt => console.log('end', evt)">
-                <Transitions :group="true">
-                    <div v-for="control in global.controls" class="control-item" :key="control.type"
-                        v-show="control.name.indexOf(searchTextRef || '') != -1" :data-type="control.type"
-                        @click="emits('click', control.type)">
-                        {{ control.name }}
-                    </div>
-                </Transitions>
+                <div v-for="control in global.controls" class="control-item" :key="control.type"
+                    v-show="control.name.indexOf(searchTextRef || '') != -1" :data-type="control.type"
+                    @click="emits('click', control.type)">
+                    {{ control.name }}
+                </div>
             </Sort>
         </Scroll>
     </div>
