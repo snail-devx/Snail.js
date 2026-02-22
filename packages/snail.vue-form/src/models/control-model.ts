@@ -61,7 +61,7 @@ export type ControlExtendOptions = {
     /**
      * 禁止作为子控件使用
      * - true 时，无法在子容器中添加此控件；只能在顶级表单中使用
-     * - 若 group 控件，不允许再在group控件中使用
+     * - 如 group 控件，不允许再在group控件中使用
      */
     childDisabled?: boolean;
     /**

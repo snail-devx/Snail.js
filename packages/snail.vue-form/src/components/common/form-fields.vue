@@ -43,7 +43,8 @@ import { components, SortEvent, useReactive } from "snail.vue";
 import { FieldOptions, } from "../../models/field-base";
 import { FieldContainerEvents, FieldContainerLocation, FieldContainerOptions, } from "../../models/field-container";
 import { FormFieldLayoutOptions } from "../../models/form-model";
-import { INJECTKEY_GlobalContext, useFieldContainer } from "./field-common";
+import { INJECTKEY_GlobalContext } from "./field-common";
+import { useFieldContainer } from "./field-container";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
