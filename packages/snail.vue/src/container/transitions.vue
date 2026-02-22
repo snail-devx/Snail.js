@@ -26,16 +26,16 @@
             }
   -->
 <template>
-    <component :is="group ? TransitionGroup : Transition" appear :enter-active-class="`${classNames} enter-active`"
-        :enter-from-class="`${classNames} enter-from`" :enter-to-class="`${classNames} enter-to`"
-        :leave-active-class="`${classNames} leave-active`" :leave-from-class="`${classNames} leave-from`"
-        :leave-to-class="`${classNames} leave-to`">
+    <component :is="group ? TransitionGroup : Transition" :="$attrs" appear
+        :enter-active-class="`${classNames} enter-active`" :enter-from-class="`${classNames} enter-from`"
+        :enter-to-class="`${classNames} enter-to`" :leave-active-class="`${classNames} leave-active`"
+        :leave-from-class="`${classNames} leave-from`" :leave-to-class="`${classNames} leave-to`">
         <slot />
     </component>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, shallowRef, Transition, TransitionGroup } from "vue";
+import { computed, Transition, TransitionGroup } from "vue";
 import { TransitionOptions } from "./models/transition-model";
 import { isArray } from "snail.core";
 
