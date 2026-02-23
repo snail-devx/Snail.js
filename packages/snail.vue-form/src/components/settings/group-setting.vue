@@ -47,6 +47,7 @@ const _ = defineProps<FieldSettingOptions<GroupControlSettings>>();
 const proxy = useTemplateRef("setting-proxy");
 const { field, readonly } = _;
 //  2、组件交互变量、常量
+field.settings || (field.settings = {});
 /**     属性帮助信息字段，key为属性名，value为帮助信息说明 */
 const propertyHelps = Object.freeze({
     totalEnabled: ["若启用，则对子字段中的【Number】控件求和展示"].join("\n"),
