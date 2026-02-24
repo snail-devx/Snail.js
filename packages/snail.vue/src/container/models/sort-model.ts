@@ -82,19 +82,25 @@ export type SortGroupOptions = {
      * - false：列表容器内的列表单元不可以被移出；
      * - "clone"：列表单元移出，移动的为该元素的副本；
      * - function：用来进行pull的函数判断，可以进行复杂逻辑，在函数中return false/true来判断是否移出；
-     * - - 暂时不支持 function
      */
-    pull: true | false | "clone";
+    pull: true | false | "clone" | SortGroupHook;
     /**
      * 用来定义往这个列表容器放置列表单元的的设置
      * - true:列表容器可以从其他列表容器内放入列表单元；
      * - false：与true相反；
      * - string|string[]：代表的是group配置项里定义的name值。如['foo','bar']
      * - function：用来进行put的函数判断，可以进行复杂逻辑，在函数中return false/true来判断是否放入；
-     * - - 暂时不支持 function
      */
-    put: true | false | string | string[];
+    put: true | false | string | string[] | SortGroupHook;
 };
+/**
+ * 排序组件的Group属性钩子
+ * - 用于pull和put中使用，返回false时不执行pull、put操作
+ * - @param item 移动的元素
+ * - @param to 目标容器dom元素
+ * - @param from 来源容器dom元素
+ */
+export type SortGroupHook = (item: HTMLElement, to: HTMLElement, from: HTMLElement) => void;
 
 /**
  * 排序组件 事件

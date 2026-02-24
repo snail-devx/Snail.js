@@ -75,7 +75,7 @@ const classNames = computed<string>(() => {
     &.leave-active {
         transition-property: all;
         transition-duration: 0.4s;
-        transition-timing-function: ease-in-out;
+        transition-timing-function: ease;
     }
 }
 
@@ -126,6 +126,7 @@ const classNames = computed<string>(() => {
 
     &.enter-active,
     &.leave-active {
+        overflow: hidden;
         transform: translateY(0);
     }
 
@@ -143,6 +144,7 @@ const classNames = computed<string>(() => {
 
     &.enter-active,
     &.leave-active {
+        overflow: hidden;
         transform: translateY(0);
     }
 
@@ -160,6 +162,7 @@ const classNames = computed<string>(() => {
 
     &.enter-active,
     &.leave-active {
+        overflow: hidden;
         transform: translateY(0);
     }
 
@@ -174,6 +177,7 @@ const classNames = computed<string>(() => {
 
     &.enter-active,
     &.leave-active {
+        overflow: hidden;
         transform: translateY(0);
     }
 
@@ -188,6 +192,7 @@ const classNames = computed<string>(() => {
 
     &.enter-active,
     &.leave-active {
+        overflow: hidden;
         transform: translateX(0);
     }
 
@@ -202,6 +207,7 @@ const classNames = computed<string>(() => {
 
     &.enter-active,
     &.leave-active {
+        overflow: hidden;
         transform: translateX(0);
     }
 
@@ -216,6 +222,7 @@ const classNames = computed<string>(() => {
 
     &.enter-active,
     &.leave-active {
+        overflow: hidden;
         transform: translateX(0);
     }
 
@@ -233,6 +240,7 @@ const classNames = computed<string>(() => {
 
     &.enter-active,
     &.leave-active {
+        overflow: hidden;
         transform: translateX(0);
     }
 

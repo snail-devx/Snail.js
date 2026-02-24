@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import { onMounted, getCurrentInstance, onUnmounted, onBeforeUnmount, nextTick, shallowRef } from "vue";
 import { SortEvents, SortOptions, SortGroupOptions, SortEvent } from "./models/sort-model";
-import { IScope, isObject, isStringNotEmpty, newId, script, useTimer } from "snail.core";
+import { IScope, isFunction, isObject, isStringNotEmpty, newId, script, useTimer } from "snail.core";
 import { useReactive } from "../base/reactive";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -44,6 +44,15 @@ function buildSortable() {
             ? (group.name = props.group as string)
             : isObject(props.group) && Object.assign(group, props.group);
         group.name || (group.name = newId());
+        //  put和pull配置处理
+        if (typeof group.pull == "function") {
+            const orign = group.pull;
+            group.pull = (to: any, from: any, item: HTMLElement) => orign(item, to.el, from.el);
+        }
+        if (typeof group.put == "function") {
+            const orign = group.put;
+            group.put = (to: any, from: any, item: HTMLElement) => orign(item, to.el, from.el);
+        }
         //  构建排序对象
         sortInstance = new MODULE_Sortable(sortPanel, {
             group: group,

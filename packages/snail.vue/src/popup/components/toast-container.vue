@@ -5,8 +5,8 @@
 <template>
     <div class="snail-toast" :class="[popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
         @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
-        <Icon type="close" class="close-icon" :fill="closeFillRef" :size="20" @mouseenter="closeFillRef = 'red'"
-            @mouseleave="closeFillRef = '#707070'" @click="closePopup();" />
+        <Icon class="close-icon" v-if="props.closeDisabled != true" type="close" :fill="closeFillRef" :size="20"
+            @mouseenter="closeFillRef = 'red'" @mouseleave="closeFillRef = '#707070'" @click="closePopup();" />
         <div class="icon" v-if="props.type">
             <Icon :type="props.type" fill="#707070" :size="20" />
         </div>
@@ -24,9 +24,10 @@ import { IScope, useTimer } from "snail.core";
 //  1、props、data
 const { options, extOptions, zIndex, popupStatus, popupTransition } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
 const { onTimeout } = useTimer();
-//  解构一些常用参数
+const props: ToastOptions = options.props;
 const { closePopup } = extOptions;
-const props: ToastOptions = options.props as any;
+/** 显示时长，默认1500ms */
+const duration = props.duration > 0 ? props.duration : 1500;
 /** 计算出来的填充颜色 */
 const closeFillRef = ref("#707070");
 /** 自动销毁时的定时器 */
@@ -42,7 +43,7 @@ defineOptions({ name: "ToastContainer", inheritAttrs: true });
  */
 function onMouseEvent(isLeave: boolean) {
     destroyTimer && destroyTimer.destroy();
-    destroyTimer = isLeave ? onTimeout(closePopup, 1500) : undefined;
+    destroyTimer = isLeave ? onTimeout(closePopup, duration) : undefined;
 }
 
 // *****************************************   👉  组件渲染    *****************************************

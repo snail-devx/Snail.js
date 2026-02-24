@@ -13,5 +13,14 @@ export type ToastOptions = {
      */
     message: string;
 
-    //  后期支持配置自动消失时间等
+    /**
+     * 提示显示时间
+     * - 单位毫秒，默认1500ms
+     */
+    duration?: number;
+
+    /**
+     * 关闭按钮是否禁用
+     */
+    closeDisabled?: boolean;
 }
