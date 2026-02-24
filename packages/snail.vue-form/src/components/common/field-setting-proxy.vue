@@ -1,7 +1,7 @@
 <!-- 字段设置代理组件 -->
 <template>
-    <div class="field-setting-proxy">
-        <Transitions :group="true">
+    <Transitions :group="false">
+        <div class="field-setting-proxy">
             <!-- 字段类型配置、、、 -->
             <div class="setting-item divider">
                 <div class="item-title">字段ID</div>
@@ -14,8 +14,8 @@
             <!-- <div class="setting-divider" /> -->
             <!-- 插槽，进行字段详细配置 -->
             <slot />
-        </Transitions>
-    </div>
+        </div>
+    </Transitions>
 </template>
 
 <script setup lang="ts">
@@ -79,6 +79,7 @@ function refresh() {
     overflow-x: hidden;
     overflow-y: auto;
     padding: 6px 0;
+    transition-duration: 400ms !important;
 
     .setting-item {
         margin: 6px 12px;

@@ -6,7 +6,8 @@
 import { IScope, RunResult } from "snail.core";
 import { EmitterType, EventsType, ReadonlyOptions } from "snail.vue";
 import { ControlOptions } from "./control-model";
-import { FieldActionOptions, FieldChangeEvent, FieldEvents, FieldOptions, FieldStatusOptions, FieldLocation } from "./field-base";
+import { FieldActionOptions, FieldChangeEvent, FieldEvents, FieldOptions, FieldStatusOptions, FieldLocation, IFieldHandle } from "./field-base";
+import { FormFieldLayoutOptions } from "./form-model";
 
 /**
  * 字段容器配置选项
@@ -70,12 +71,24 @@ export interface IFieldContainer {
      */
     getFieldKey(fieldId: string): string;
     /**
+     * 获取字段的有效宽度
+     * - 基于字段的 width 和全局配置中定义的列数
+     * @param field 
+     */
+    getFieldWidth(field: FieldOptions<any>): number;
+    /**
      * 构建字段监听器
      * - 监听字段相关事件，并进行对外分发
      * @param field 
      * @returns 事件监听器对象
      */
     buildFieldMonitor(field: FieldOptions<any>): EventsType<FieldEvents>;
+    /**
+    * 获取字段句柄
+    * @param fieldId 
+    * @returns 字段句柄和失败原因
+    */
+    getFieldHandle(fieldId: string): RunResult<IFieldHandle>;
     /**
      * 字段是否应该显示
      * - 运行时根据实际值判断，设计时、预览等模式下始终显示
@@ -84,78 +97,111 @@ export interface IFieldContainer {
      */
     isVisible(field: FieldOptions<any>): boolean;
 
-    //  ------------------ 设计时：字段增删改查管理方法
+    /**
+     * 计算表单布局信息
+     * - 在Form模式下，计算容器下所有字段如何布局
+     * @returns 表单字段布局字段，key为字段id，value为字段布局信息
+     */
+    calcFormLayout(): Map<string, FormFieldLayoutOptions>;
+
+    //#region ------------------------------------ 字段管理相关：增删改 ------------------------------------
+    /**
+     * 是否能够【添加字段】
+     * - 仅设计时生效；执行hook判断是否能够添加
+     * - 从控件列表添加字段时；从其他容器中移动过来时
+     * @param type 字段类型
+     * @param originField 原始字段，undefined表示从控件列表全新添加字段；否则表示从其他容器中移动字段过来
+     * @returns false 阻止添加；其余值允许
+     */
+    canAddField(type: string, originField?: FieldOptions<any>): boolean
     /**
      * 添加字段
-     * - 仅设计时生效；执行hook判断是否能够添加
+     * - 仅设计时生效；直接添加，外部根据需要可先调用 `canAddField` 判断是否可添加
      * - 从控件列表添加字段时；从其他容器中移动过来时
      * @param type 字段类型
      * @param index 添加到哪个位置，不传入则追加到末尾
      * @param originField 原始模板字段，不传入则全新构建，否则复制此字段配置
-     * @returns 添加是否成功
      */
-    addField(type: string, index?: number, originField?: FieldOptions<any>): boolean;
+    addField(type: string, index?: number, originField?: FieldOptions<any>): void;
     /**
-     * 删除字段
-     * - 仅设计时生效；执行hook判断是否能够删除
-     * @param field 要删除的字段
-     * @param index 字段所在位置
-     * @returns 复制是否成功
+     * 刷新字段
+     * - 设计时被指改变后，重新刷新配置，运行时基于规则重新调整字段适配时渲染
+     * - 使用最新的字段配置重建 DOM 或虚拟节点，直接使用v-if做一下重新渲染
+     * @param fieldId 字段id
+     * @param field 完整字段配置
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns 操作结果；`.success`操作是否成功：true则刷新成功；false则`.reason`失败原因
      */
-    deleteField(field: FieldOptions<any>, index: number): boolean;
-    /**
-     * 复制字段
-     * - 仅设计时生效；执行hook判断是否能够复制
-     * @param field 要赋值的模板字段
-     * @param index 模板字段所在位置
-     * @returns 复制是否成功
-     */
-    copyField(field: FieldOptions<any>, index: number): boolean;
+    refresh(fieldId: string, field: FieldOptions<any>, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult>;
+
     /**
      * 移动字段
      * - 仅设计时生效
      * @param oldIndex 字段旧的索引位置
      * @param newIndex 字段新的索引位置
-     * @returns 复制是否成功
      */
-    moveField(oldIndex: number, newIndex: number): boolean;
+    moveField(oldIndex: number, newIndex: number): void;
+
+    /**
+     * 是否能够【复制字段】
+     * - 仅设计时生效；执行hook判断是否能够复制
+     * @param field 要被复制的字段
+     * @returns false 阻止复制；其余值允许
+     */
+    canCopyField(field: FieldOptions<any>): boolean;
+    /**
+     * 复制字段
+     * - 仅设计时生效；直接复制，外部根据需要可先调用 `canCopyField` 判断是否可复制
+     * @param field 要赋值的模板字段
+     * @param index 模板字段所在位置
+     */
+    copyField(field: FieldOptions<any>, index: number): void;
+
+    /**
+     * 是否能够【删除字段】
+     * - 仅设计时生效；执行hook判断是否能够删除
+     * @param field 要被删除的字段
+     * @returns false 阻止删除；其余值允许
+     */
+    canDeleteField(field: FieldOptions<any>): boolean;
+    /**
+     * 删除字段
+     * - 仅设计时生效；直接复制，外部根据需要可先调用 `canDeleteField` 判断是否可删除
+     * @param field 要删除的字段
+     * @param index 字段所在位置
+     */
+    deleteField(field: FieldOptions<any>, index: number): void;
+    //#endregion
 }
 /**
  * 字段容器钩子函数
- * - 用于在设计时干预字段操作（添加、复制、移除、移动等）
+ * - 用于在设计时干预字段操作（添加、复制、移除等）
+ * - 移动到其他容器，走【删除-添加】钩子函数
  * - 返回 false 表示阻止操作；返回 true / undefined / void 表示允许操作
  */
 export type FieldContainerHook = {
     /**
      * 添加字段时
-     * @param field 要添加的字段，可修改字段属性，如调整字段id等等
+     * @param type 新字段的类型
+     * @param originField 原始字段，undefined表示从控件列表全新添加字段；否则表示从其他容器中移动字段过来
      * @param parent 所属父级字段信息，无则表示为顶级字段
      * @returns false 阻止添加；其余值允许
      */
-    addField?: (field: FieldOptions<any>, parent?: FieldOptions<any>) => boolean | undefined;
+    addField?: (type: string, originField?: FieldOptions<any>, parent?: FieldOptions<any>) => boolean | undefined;
     /**
     * 复制字段时
-    * @param field 要复制的字段
-     * @param parent 所属父级字段信息，无则表示为顶级字段
+    * @param field 被复制的字段
+    * @param parent 所属父级字段信息，无则表示为顶级字段
     * @returns false 阻止复制；其余值允许复制，然后执行添加字段逻辑
     */
     copyField?: (field: FieldOptions<any>, parent?: FieldOptions<any>) => boolean | undefined;
     /**
-     * 移除字段
+     * 删除字段
      * @param field 要删除的字段
      * @param parent 所属父级字段信息，无则表示为顶级字段
      * @returns false 阻止删除；其余值允许
      */
-    removeField?: (field: FieldOptions<any>, parent?: FieldOptions<any>) => boolean | undefined;
-    /**
-     * 移动字段时
-     * - 支持在容器间移动（如从顶级移入容器，或容器间迁移）
-     * @param field 要移动的字段
-     * @param from 原父级字段信息，无则表示为顶级字段
-     * @param to 新的父级字段信息，无则表示为顶级字段
-     * @returns false 阻止移动；其余值允许移动
-     */
-    moveField?: (field: FieldOptions<any>, from: FieldOptions<any> | undefined, to: FieldOptions<any> | undefined) => boolean | undefined;
+    deleteField?: (field: FieldOptions<any>, parent?: FieldOptions<any>) => boolean | undefined;
 }
 /**
  * 接口：字段容器 句柄
@@ -170,6 +216,16 @@ export interface IFieldContainerHandle {
      * @returns 操作结果；`.success`是否成功：true则添加成功；false则`.reason`失败原因
      */
     addField(field: FieldOptions<any>): Promise<RunResult>;
+    /**
+     * 刷新字段
+     * - 设计时被指改变后，重新刷新配置，运行时基于规则重新调整字段适配时渲染
+     * - 使用最新的字段配置重建 DOM 或虚拟节点，直接使用v-if做一下重新渲染
+     * @param fieldId 字段id
+     * @param field 完整字段配置
+     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
+     * @returns 操作结果；`.success`操作是否成功：true则刷新成功；false则`.reason`失败原因
+     */
+    refresh(fieldId: string, field: FieldOptions<any>, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult>;
     /**
      * 获取所有字段
      * - 设计时，验证字段配置是否正确，不正确则返回失败
@@ -240,17 +296,6 @@ export interface IFieldContainerHandle {
      * @returns 操作结果；`.success`操作是否成功：true则设置成功；false则`.reason`失败原因
      */
     setStatus(fieldId: string, status: Partial<FieldStatusOptions>, traces?: ReadonlyArray<FieldActionOptions>): RunResult;
-
-    /**
-     * 刷新字段
-     * - 设计时被指改变后，重新刷新配置，运行时基于规则重新调整字段适配时渲染
-     * - 使用最新的字段配置重建 DOM 或虚拟节点，直接使用v-if做一下重新渲染
-     * @param fieldId 字段id
-     * @param field 完整字段配置
-     * @param traces 操作追踪信息，事件中触发时，会传入该参数，从而避免调用死循环
-     * @returns 操作结果；`.success`操作是否成功：true则刷新成功；false则`.reason`失败原因
-     */
-    refresh(fieldId: string, field: FieldOptions<any>, traces?: ReadonlyArray<FieldActionOptions>): Promise<RunResult>;
 }
 
 /**

@@ -1,16 +1,18 @@
 <!-- 分组控件的设置 -->
 <template>
     <FieldSettingProxy :="_" ref="setting-proxy">
+        <div class="setting-divider" />
         <FieldTitle :="_" />
         <FieldLikeText title="字段说明" :readonly="readonly" :value="field.description"
             @change="value => proxy.update('description', false, value)" />
         <div class="setting-divider" />
+        <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
+            @change="value => proxy.update('required', false, value)" />
         <FieldLikeBoolean title="只读" :readonly="readonly" :value="field.readonly"
             @change="value => proxy.update('readonly', false, value)" />
         <FieldLikeBoolean title="隐藏" :readonly="readonly" :value="field.hidden"
             @change="value => proxy.update('hidden', false, value)" />
-        <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
-            @change="value => proxy.update('required', false, value)" />
+        <div class="setting-divider" />
         <FieldLikeNumber title="最大条数" :readonly="readonly" :min-value="0" :precision="0"
             :value="field.settings.maxCount || 0" :help="propertyHelps.maxCount"
             @change="value => proxy.update('maxCount', true, value)" />
@@ -26,8 +28,8 @@
             :help="propertyHelps.disableDelete" @change="value => proxy.update('disableDelete', true, !value)" />
         <FieldLikeBoolean title="启用排序" :readonly="readonly" :help="propertyHelps.disableSort"
             :value="!field.settings.disableSort" @change="value => proxy.update('disableSort', true, !value)" />
-        <FieldLikeText title="添加按钮名" :readonly="readonly" :value="field.settings.addActionName"
-            :help="propertyHelps.addActionName" @change="value => proxy.update('addActionName', true, value)" />
+        <FieldLikeText title="添加按钮名" :readonly="readonly" :help="propertyHelps.addActionName" :placeholder="'添加'"
+            :value="field.settings.addActionName" @change="value => proxy.update('addActionName', true, value)" />
     </FieldSettingProxy>
 </template>
 

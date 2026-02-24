@@ -7,6 +7,7 @@
 -->
 <template>
     <FieldSettingProxy :="_" ref="setting-proxy">
+        <div class="setting-divider" />
         <FieldTitle :="_" />
         <FieldWidth :="_" />
         <FieldLikeText title="字段说明" :readonly="readonly" :value="field.description" :multiple="false"

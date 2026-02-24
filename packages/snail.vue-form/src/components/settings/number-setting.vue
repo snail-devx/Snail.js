@@ -4,6 +4,7 @@
 -->
 <template>
     <FieldSettingProxy :="_" ref="setting-proxy">
+        <div class="setting-divider" />
         <FieldTitle :="_" />
         <FieldWidth :="_" />
         <FieldLikeText title="提示信息" :readonly="readonly" :value="field.placeholder"
@@ -11,12 +12,13 @@
         <FieldLikeText title="字段说明" :readonly="readonly" :value="field.description"
             @change="value => proxy.update('description', false, value)" />
         <div class="setting-divider" />
+        <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
+            @change="value => proxy.update('required', false, value)" />
         <FieldLikeBoolean title="只读" :readonly="readonly" :value="field.readonly"
             @change="value => proxy.update('readonly', false, value)" />
         <FieldLikeBoolean title="隐藏" :readonly="readonly" :value="field.hidden"
             @change="value => proxy.update('hidden', false, value)" />
-        <FieldLikeBoolean title="必填" :readonly="readonly" :value="field.required"
-            @change="value => proxy.update('required', false, value)" />
+        <div class="setting-divider" />
         <FieldLikeNumber title="默认值" :readonly="readonly" :value="field.value"
             @change="value => proxy.update('value', false, value)" />
         <FieldLikeNumber title="最小值" :readonly="readonly" :value="field.settings.minValue"
