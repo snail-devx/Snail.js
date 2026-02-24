@@ -5,14 +5,14 @@
 <template>
     <FieldProxy :type="field.type" :title="null" :description="field.description"
         :="{ manager: group.fieldManager, error: getError() }">
-        <div class="group-item" v-for="(gv, rowIndex) in group.values" :key="getItemKey(gv)">
+        <div class="group-item" v-for="(gv, rowIndex) in group.children" :key="getItemKey(gv)">
             <div class="item-header">
                 <span class="item-title ellipsis" v-if="global.mode == 'design'" v-text="field.title" />
                 <span class="item-title ellipsis" v-else v-text="`${field.title}(${rowIndex + 1})`" />
                 <!-- 操作按钮：非设计时、 非只读时才显示：添加、删除、上移、下移-->
                 <template v-if="global.mode != 'design' && isReadonly() != true">
                     <Icon :type="'arrow'" :="{ size: 24, title: '下移', rotate: 90 }"
-                        v-if="rowIndex != group.values.length - 1 && field.settings.disableSort != true"
+                        v-if="rowIndex != group.children.length - 1 && field.settings.disableSort != true"
                         @click="moveItem(rowIndex, rowIndex + 1)" />
                     <Icon :type="'arrow'" :="{ size: 24, title: '上移', rotate: 270 }"
                         v-if="rowIndex != 0 && field.settings.disableSort != true"
@@ -64,7 +64,7 @@ const { handle, getError, updateError, isReadonly, isReqired } = group.fieldMana
 const needAddRef = computed<boolean>(() => props.field.settings.disableAdd == true
     ? false
     : props.field.settings.maxCount > 0
-        ? group.values.length < props.field.settings.maxCount
+        ? group.children.length < props.field.settings.maxCount
         : true
 );
 //  3、分组实例值相关

@@ -21,8 +21,8 @@ export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<
     props.field.settings || (props.field.settings = {} as GroupControlSettings);
     /** 分组控件的子字段 */
     const fieldsRef: ShallowRef<GroupControlSettings["fields"]> = shallowRef();
-    /** 分组控件的字段值 */
-    const valuesRef: Ref<GroupControlValue["values"]> = ref();
+    /** 子字段值 */
+    const childrenRef: Ref<GroupControlValue["children"]> = ref();
     /** 分组控件的容器字典；ke为分组项值，value为构建的容器句柄对象 */
     const containerMap: Map<Object, IFieldContainerHandle> = new Map();
     /** 字段管理器 */
@@ -75,7 +75,7 @@ export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<
                  *      发送rendered事件时，仅对外发送字段句柄，容器句柄不在这里发送
                  */
                 containerMap.set(itemValue, handle);
-                valuesRef.value.length == containerMap.size && emittor("rendered", fieldManager.handle as any);
+                childrenRef.value.length == containerMap.size && emittor("rendered", fieldManager.handle as any);
             },
             onFieldRendered(field: FieldOptions<any>, evt: FieldChangeEvent) {
                 //  子字段渲染完成事件，暂时不做处理，也不再次对外冒泡，后期看情况
@@ -108,8 +108,8 @@ export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<
     function addNewItem(rowIndex?: number): void {
         const newItem = markRaw(Object.create(null));
         rowIndex == undefined
-            ? valuesRef.value.push(newItem)
-            : valuesRef.value.splice(rowIndex, 0, newItem);
+            ? childrenRef.value.push(newItem)
+            : childrenRef.value.splice(rowIndex, 0, newItem);
         //  发送值改变事件
         console.warn("addNewItem：还没完成值改变事件发送、、、、");
     }
@@ -119,7 +119,7 @@ export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<
      * @param newRowIndex 新的行索引位置
      */
     function moveItem(rowIndex: number, newRowIndex: number): void {
-        moveFromArray(valuesRef.value, rowIndex, newRowIndex);
+        moveFromArray(childrenRef.value, rowIndex, newRowIndex);
         //  发送值改变事件
         console.warn("moveItem：还没完成值改变事件发送、、、、");
     }
@@ -128,8 +128,8 @@ export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<
      * @param rowIndex 删除项的索引位置
      */
     function deleteItem(rowIndex: number): void {
-        const gv = valuesRef.value[rowIndex];
-        valuesRef.value.splice(rowIndex, 1);
+        const gv = childrenRef.value[rowIndex];
+        childrenRef.value.splice(rowIndex, 1);
         //  清理掉已有句柄等缓存
         containerMap.delete(gv);
         keyed.deleteKey(gv);
@@ -156,23 +156,23 @@ export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<
             ? [...props.field.settings.fields]
             : [];
         //  控件实例值初始化，空时非运行时或者未配置初始化条数时，始终初始化1条
-        if (props.value && isArrayNotEmpty(props.value.values)) {
-            valuesRef.value = props.value.values.map(markRaw);
+        if (props.value && isArrayNotEmpty(props.value.children)) {
+            childrenRef.value = props.value.children.map(markRaw);
         }
         else {
             const initCount = (global.mode != "runtime" || props.field.settings.initCount == undefined)
                 ? 1
                 : props.field.settings.initCount;
-            valuesRef.value = [];
+            childrenRef.value = [];
             for (let index = 0; index < initCount; index++) {
-                valuesRef.value.push(markRaw(Object.create(null)));
+                childrenRef.value.push(markRaw(Object.create(null)));
             }
         }
     }
     //  构建管理器对象，并管理内部子作用域
     const manager = Object.freeze(mountScope<IGroupControl>({
         fields: fieldsRef.value,
-        values: valuesRef.value,
+        children: childrenRef.value,
         fieldManager: fieldManager,
         getItemKey: keyed.getKey,
         buildItemMonitor,

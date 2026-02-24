@@ -29,167 +29,151 @@ let hidden: boolean = false;
 //  2、组件交互变量、常量
 // 测试时
 const testFields: FieldOptions<TextControlSettings | OptionControlSettings | NumberControlSettings | GroupControlSettings>[] = [
-    // {
-    //     "type": "Text",
-    //     "id": "1770087123812",
-    //     "title": "文本框",
-    //     "width": 2,
-    //     "required": true,
-    //     "readonly": false,
-    //     "hidden": false,
-    //     "placeholder": "",
-    //     "description": "ddddd顶顶顶"
-    // },
-    // {
-    //     "type": "Text",
-    //     "id": "1770087124425",
-    //     "title": "文本框(1)",
-    //     "width": 2
-    // },
-    // {
-    //     "type": "Text",
-    //     "id": "1770087126216",
-    //     "title": "文本框(2)",
-    //     "width": 2,
-    //     "settings": {}
-    // },
-    // {
-    //     "type": "TextArea",
-    //     "id": "1770087127027",
-    //     "title": "文本框(3)",
-    //     "width": 2
-    // },
-    // {
-    //     "type": "Checkbox",
-    //     "id": "1770544423261",
-    //     "title": "复选框",
-    //     "width": 2,
-    //     "value": [
-    //         {
-    //             "id": "111-2",
-    //             "text": "dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2"
-    //         }
-    //     ],
-    //     "settings": {
-    //         "codeEnabled": true,
-    //         "options": [
-    //             {
-    //                 "id": "111-1",
-    //                 "text": "dhd的皇帝皇后-1"
-    //             },
-    //             {
-    //                 "id": "111-1-1",
-    //                 "text": "dhd的皇帝皇后-1-1"
-    //             },
-    //             {
-    //                 "id": "111-1-2",
-    //                 "text": "dhd的皇帝皇后-1-2"
-    //             },
-    //             {
-    //                 "id": "111-2",
-    //                 "text": "dhd的皇帝皇后-2"
-    //             },
-    //             {
-    //                 "id": "111-3",
-    //                 "text": "dhd的皇帝皇后-3"
-    //             },
-    //             {
-    //                 "id": "111-4",
-    //                 "text": "dhd的皇帝皇后-4"
-    //             }
-    //         ]
-    //     }
-    // },
-    // {
-    //     "type": "Radio",
-    //     "id": "1770544427165",
-    //     "title": "单选框",
-    //     "width": 2,
-    //     "settings": {
-    //         "layout": "vertical",
-    //         "options": [
-    //             {
-    //                 "id": "111-1",
-    //                 "text": "dhd的皇帝皇后-1dhd的皇帝皇后-2dhd的皇帝皇后-2"
-    //             },
-    //             {
-    //                 "id": "111-2",
-    //                 "text": "dhd的皇帝皇后-2"
-    //             },
-    //             {
-    //                 "id": "111-3",
-    //                 "text": "dhd的皇帝皇后-3"
-    //             },
-    //             {
-    //                 "id": "111-4",
-    //                 "text": "dhd的皇帝皇后-4"
-    //             }
-    //         ]
-    //     }
-    // },
-    // {
-    //     "type": "Combobox",
-    //     "id": "1770544428598",
-    //     "title": "下拉框",
-    //     "width": 3,
-    //     "settings": {
-    //         "options": [
-    //             {
-    //                 "id": "111-1",
-    //                 "text": "dhd的皇帝皇后-1"
-    //             },
-    //             {
-    //                 "id": "111-2",
-    //                 "text": "dhd的皇帝皇后-2"
-    //             },
-    //             {
-    //                 "id": "111-3",
-    //                 "text": "dhd的皇帝皇后-3"
-    //             },
-    //             {
-    //                 "id": "111-4",
-    //                 "text": "dhd的皇帝皇后-4"
-    //             }
-    //         ],
-    //         "searchEnabled": true
-    //     },
-    //     "required": true
-    // },
+    {
+        "type": "Text",
+        "id": "1770087123812",
+        "title": "文本框",
+        "width": 2,
+        "required": true,
+        "readonly": false,
+        "hidden": false,
+        "placeholder": "",
+        "description": "ddddd顶顶顶"
+    },
+    {
+        "type": "Text",
+        "id": "1770087124425",
+        "title": "文本框(1)",
+        "width": 2
+    },
+    {
+        "type": "Text",
+        "id": "1770087126216",
+        "title": "文本框(2)",
+        "width": 2,
+        "settings": {}
+    },
+    {
+        "type": "TextArea",
+        "id": "1770087127027",
+        "title": "文本框(3)",
+        "width": 2
+    },
+    {
+        "type": "Checkbox",
+        "id": "1770544423261",
+        "title": "复选框",
+        "width": 2,
+        "value": [
+            {
+                "id": "111-2",
+                "text": "dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2dhd的皇帝皇后-2"
+            }
+        ],
+        "settings": {
+            "codeEnabled": true,
+            "options": [
+                {
+                    "id": "111-1",
+                    "text": "dhd的皇帝皇后-1"
+                },
+                {
+                    "id": "111-1-1",
+                    "text": "dhd的皇帝皇后-1-1"
+                },
+                {
+                    "id": "111-1-2",
+                    "text": "dhd的皇帝皇后-1-2"
+                },
+                {
+                    "id": "111-2",
+                    "text": "dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-3",
+                    "text": "dhd的皇帝皇后-3"
+                },
+                {
+                    "id": "111-4",
+                    "text": "dhd的皇帝皇后-4"
+                }
+            ]
+        }
+    },
+    {
+        "type": "Radio",
+        "id": "1770544427165",
+        "title": "单选框",
+        "width": 2,
+        "settings": {
+            "layout": "vertical",
+            "options": [
+                {
+                    "id": "111-1",
+                    "text": "dhd的皇帝皇后-1dhd的皇帝皇后-2dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-2",
+                    "text": "dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-3",
+                    "text": "dhd的皇帝皇后-3"
+                },
+                {
+                    "id": "111-4",
+                    "text": "dhd的皇帝皇后-4"
+                }
+            ]
+        }
+    },
+    {
+        "type": "Combobox",
+        "id": "1770544428598",
+        "title": "下拉框",
+        "width": 3,
+        "settings": {
+            "options": [
+                {
+                    "id": "111-1",
+                    "text": "dhd的皇帝皇后-1"
+                },
+                {
+                    "id": "111-2",
+                    "text": "dhd的皇帝皇后-2"
+                },
+                {
+                    "id": "111-3",
+                    "text": "dhd的皇帝皇后-3"
+                },
+                {
+                    "id": "111-4",
+                    "text": "dhd的皇帝皇后-4"
+                }
+            ],
+            "searchEnabled": true
+        },
+        "required": true
+    },
 
-    // {
-    //     "type": "Number",
-    //     "id": "1770715672053",
-    //     "title": "数值-最大值10w clamp",
-    //     "width": 3,
-    //     required: true,
-    //     "settings": {
-    //         maxValue: 100000,
-    //         clamp: "clamp",
-    //         controls: "default",
-    //         suffix: "万元",
-    //         prefix: "￥",
-    //         precision: 3,
-    //         thousands: "inline",
-    //         upper: true,
-    //         formatMultiplier: 10000
-    //     }
-    // },
-    // {
-    //     "type": "Number",
-    //     "id": "1770715672054",
-    //     "title": "数值2-最小值10 keep",
-    //     "width": 2,
-    //     "settings": {
-    //         minValue: 10,
-    //         clamp: "keep",
-    //         controls: "right",
-    //         step: 100,
-    //         suffix: "元",
-    //         prefix: "￥",
-    //         thousands: "below",
-    //         upper: true,
-    //     }
-    // },
+    {
+        "type": "Number",
+        "id": "1770715672053",
+        "title": "数值-最大值10w clamp",
+        "width": 3,
+        required: true,
+        "settings": {
+            maxValue: 100000,
+            clamp: "clamp",
+            controls: "default",
+            suffix: "万元",
+            prefix: "￥",
+            precision: 3,
+            thousands: "inline",
+            upper: true,
+            formatMultiplier: 10000
+        }
+    },
     {
         "type": "Number",
         "id": "1770715672054",
@@ -200,6 +184,8 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
             clamp: "keep",
             controls: "right",
             step: 100,
+            suffix: "元",
+            prefix: "￥",
             thousands: "below",
             upper: true,
         }
@@ -211,7 +197,7 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
         "width": 100000000,
         // description: "dvdfa",
         "settings": {
-            maxCount: 2,
+            maxCount: 4,
             "fields": [
                 {
                     "type": "Number",
@@ -220,13 +206,20 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
                     "width": 2,
                     "settings": {}
                 }
-            ]
-        }
+            ],
+        },
     }
 ];
 const values = {
     "1770087123812": "单行文本框测试",
-    "1770715672054": 12312312
+    "1770715672054": 12312312,
+    "1771424613060": {
+        children: [
+            { "1771668207004": 1111 },
+            { "1771668207004": 12.3 },
+            { "1771668207004": 3445 },
+        ]
+    }
 }
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -265,11 +258,11 @@ async function setFieldValue() {
 
 }
 function getFieldStatus() {
-    console.log(handle.getStatus("17700871270271"));
+    console.log(handle.getStatus("1771424613060"));
 }
 function setFieldStatus() {
     hidden = !hidden;
-    console.log(handle.setStatus("17700871270271", { hidden: hidden }));
+    console.log(handle.setStatus("1770544423261", { hidden: hidden }));
 }
 
 // *****************************************   👉  组件渲染    *****************************************

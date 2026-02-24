@@ -211,11 +211,11 @@ export type GroupControlSettings = {
  */
 export type GroupControlValue = {
     /**
-     * 控件实例值
+     * 子字段值
      * - 数组，index表示第几组实例，
      * - value为当前组实例下的字段值字典（key为字段id，value为字段值）
      */
-    values: Array<Record<string, any>>;
+    children: Array<Record<string, any>>;
     /**
      * 总计值
      * - key为参与统计的字段id
@@ -233,9 +233,9 @@ export interface IGroupControl {
      */
     fields: FieldOptions<any>[];
     /**
-     * 控件实例值
+     * 子字段值
      */
-    values: GroupControlValue["values"];
+    children: GroupControlValue["children"];
 
     /**
      * 分组字段管理器
