@@ -225,9 +225,9 @@ export type GroupControlValue = {
 };
 
 /**
- * 接口：分组控件管理器
+ * 接口：分组控件
  */
-export interface IGroupControlManager {
+export interface IGroupControl {
     /**
      * 控件的子字段
      */

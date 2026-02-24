@@ -42,18 +42,18 @@ import { computed, inject, onMounted, ref, ShallowRef, shallowRef, } from "vue";
 import { components, usePopup } from "snail.vue";
 import FieldProxy from "../common/field-proxy.vue";
 import FormFields from "../common/form-fields.vue";
-import { GroupControlSettings, GroupControlValue, IGroupControlManager } from "../../models/control-model";
+import { GroupControlSettings, GroupControlValue, IGroupControl } from "../../models/control-model";
 import { FieldEvents, FieldRenderOptions } from "../../models/field-base";
 import { } from "../../models/field-container";
 import { INJECTKEY_GlobalContext, useField } from "../common/field-common";
-import { useGroup } from "../common/group-manager";
+import { useGroup } from "../common/group-common";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<FieldRenderOptions<GroupControlSettings, GroupControlValue>>();
 const emits = defineEmits<FieldEvents>();
 const global = inject(INJECTKEY_GlobalContext);
-const group: IGroupControlManager = useGroup(global, props, emits);
+const group: IGroupControl = useGroup(global, props, emits);
 //      解构对象，便捷引入使用
 const { Icon, Button, Empty } = components;
 const { confirm } = usePopup();
@@ -67,7 +67,6 @@ const needAddRef = computed<boolean>(() => props.field.settings.disableAdd == tr
         ? group.values.length < props.field.settings.maxCount
         : true
 );
-
 //  3、分组实例值相关
 
 // *****************************************   👉  方法+事件    ****************************************

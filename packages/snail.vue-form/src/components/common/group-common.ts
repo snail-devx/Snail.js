@@ -1,23 +1,23 @@
 /**
- * 分组控件管理器
+ * 分组控件通用逻辑代码
  */
 
 import { isArrayNotEmpty, IScope, mountScope, moveFromArray, RunResult, useKey } from "snail.core";
 import { markRaw, Ref, ref, shallowRef, ShallowRef } from "vue";
 import { EmitterType, EventsType } from "snail.vue";
-import { GroupControlSettings, GroupControlValue, IGroupControlManager } from "../../models/control-model";
+import { GroupControlSettings, GroupControlValue, IGroupControl } from "../../models/control-model";
 import { FieldContainerEvents, IFieldContainerHandle } from "../../models/field-container";
 import { IFieldGlobalContext } from "../../models/field-share";
-import { FieldActionOptions, FieldChangeEvent, FieldEvents, FieldOptions, FieldRenderOptions, FieldStatusOptions, FieldValueSetResult, IFieldHandle, IFieldManager } from "../../models/field-base";
+import { FieldChangeEvent, FieldEvents, FieldOptions, FieldRenderOptions, FieldStatusOptions, FieldValueSetResult } from "../../models/field-base";
 import { useField } from "./field-common";
 
 /**
- * 使用【分组控件管理器】
+ * 使用【分组控件】
  * @param global 全局上下文
  * @param props 分组控件定义的实例属性
  * @param emittor 分组字段的事件发射器：分组控件字段自身事件+中转分组项容器事件
  */
-export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<GroupControlSettings, GroupControlValue>, emittor: EmitterType<FieldEvents>): IGroupControlManager & IScope {
+export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<GroupControlSettings, GroupControlValue>, emittor: EmitterType<FieldEvents>): IGroupControl & IScope {
     props.field.settings || (props.field.settings = {} as GroupControlSettings);
     /** 分组控件的子字段 */
     const fieldsRef: ShallowRef<GroupControlSettings["fields"]> = shallowRef();
@@ -61,7 +61,7 @@ export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<
     }
     //#endregion
 
-    //#region ************************************* IGroupControlManager：接口实现 *************************************
+    //#region ************************************* IGroupControl：接口实现 ********************************************
     /**
      * 构建【一个实例项】的事件监听器
      * @param itemValue 本条分组实例数据，key为字段id，value为字段值
@@ -170,7 +170,7 @@ export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<
         }
     }
     //  构建管理器对象，并管理内部子作用域
-    const manager = Object.freeze(mountScope<IGroupControlManager>({
+    const manager = Object.freeze(mountScope<IGroupControl>({
         fields: fieldsRef.value,
         values: valuesRef.value,
         fieldManager: fieldManager,
