@@ -12,9 +12,8 @@
                 <div class="field-item" :class="buildFieldClass(field)" :data-type="'field'" :data-index="index">
                     <Dynamic :="global.getControl(field.type).renderComponent" :readonly="readonly"
                         :parent-field-id="parent ? parent.id : undefined" :row-index="rowIndex" :field="field"
-                        v-bind="buildFieldMonitor(field)"
-                        @copy-field="(field, index) => canCopyField(field) && copyField(field, index)"
-                        @delete-field="(field, index) => canDeleteField(field) && deleteField(field, index)"
+                        v-bind="buildFieldMonitor(field)" @copy-field=" canCopyField(field) && copyField(field, index)"
+                        @delete-field=" canDeleteField(field) && deleteField(field, index)"
                         @activate-field="global.fieldSetting.activateField(field, location)" />
                 </div>
             </template>
