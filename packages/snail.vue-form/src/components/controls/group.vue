@@ -23,8 +23,8 @@
                         @click="onDeleteItem(rowIndex, gv);" />
                 </template>
             </div>
-            <FormFields :readonly="isReadonly()" :parent="field" :row-index="rowIndex" :fields="group.fields"
-                :values="gv" :="buildItemMonitor(gv)" />
+            <FormFields :readonly="isReadonly()" :parent="field" :row-index="rowIndex" :fields="fields" :values="gv"
+                :="buildItemMonitor(gv)" />
         </div>
         <!-- 分组控件的工具栏：显示添加按钮、总计等；若无任何内容，则加一条白线，用于占位盖住表单字段行的最后一条边框线 -->
         <div class="group-toolbar" v-if="isReadonly() != true && needAddRef">
@@ -57,7 +57,7 @@ const group: IGroupControl = useGroup(global, props, emits);
 //      解构对象，便捷引入使用
 const { Icon, Button, Empty } = components;
 const { confirm } = usePopup();
-const { getItemKey, buildItemMonitor, addNewItem, moveItem, deleteItem } = group;
+const { fields, getItemKey, buildItemMonitor, addNewItem, moveItem, deleteItem } = group;
 const { handle, getError, updateError, isReadonly, isReqired } = group.fieldManager;
 //  2、组件交互变量、常量
 /**     是否需要添加按钮 */
@@ -196,10 +196,6 @@ async function onDeleteItem(rowIndex: number, gv: Record<string, any>) {
             min-height: 200px;
             z-index: 100;
         }
-    }
-
-    >.field-detail>.group-toolbar {
-        z-index: 100;
     }
 
     //  分组控件的设计时工具栏操作按钮放到顶部，避免和子字段的操作按钮冲突遮盖

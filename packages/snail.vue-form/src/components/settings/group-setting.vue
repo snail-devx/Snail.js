@@ -20,8 +20,9 @@
             :value="field.settings.initCount == undefined ? 1 : field.settings.initCount"
             :help="propertyHelps.initCount" @change="value => proxy.update('initCount', true, value)" />
         <div class="setting-divider" />
+        <!-- 启用统计，暂时不支持，后续再完善，启用时，需要配置哪些字段参与统计，弹窗做选择
         <FieldLikeBoolean title="启用统计" :readonly="readonly" :value="field.settings.totalEnabled"
-            :help="propertyHelps.totalEnabled" @change="value => proxy.update('totalEnabled', true, value)" />
+            :help="propertyHelps.totalEnabled" @change="value => proxy.update('totalEnabled', true, value)" /> -->
         <FieldLikeBoolean title="启用添加" :readonly="readonly" :value="!field.settings.disableAdd"
             :help="propertyHelps.disableAdd" @change="value => proxy.update('disableAdd', true, !value)" />
         <FieldLikeBoolean title="启用删除" :readonly="readonly" :value="!field.settings.disableDelete"

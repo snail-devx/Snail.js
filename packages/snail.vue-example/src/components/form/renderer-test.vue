@@ -1,8 +1,9 @@
 <!-- 表单渲染器测试 -->
 <template>
     <FormRenderer :columns="4" :controls="undefined" :readonly="false" :fields="testFields" :values="values"
-        mode="runtime" @rendered="hd => (handle = hd, console.log('rendered', hd))" @field-rendered="console.log"
-        @value-change="console.log" @status-change="console.log" />
+        mode="runtime" @rendered="hd => (handle = hd, console.log('rendered', hd))"
+        @field-rendered="(field, evt) => console.log('field-rendered', field, evt)"
+        @value-change="(field, evt) => console.log('value-change', field, evt)" @status-change="console.log" />
     <div class="formrenderer-test-buttons">
         <button @click="getValues">获取表单值</button>
         <button @click="getFieldValue">获取字段值</button>
@@ -195,6 +196,7 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
         "id": "1771424613060",
         "title": "分组",
         "width": 100000000,
+        required: true,
         // description: "dvdfa",
         "settings": {
             maxCount: 4,
