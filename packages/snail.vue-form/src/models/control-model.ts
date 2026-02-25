@@ -253,7 +253,7 @@ export interface IGroupControl {
      * @param itemValue 本条分组实例数据，key为字段id，value为字段值
      * @returns 字段容器事件监听
      */
-    buildItemMonitor(itemValue: Record<string, any>): EventsType<FieldContainerEvents>;
+    buildItemMonitor(itemValue: Record<string, any>): Required<EventsType<FieldContainerEvents>>;
 
     /**
      * 新建【一个实例项】

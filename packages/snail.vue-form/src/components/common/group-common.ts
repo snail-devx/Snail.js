@@ -130,7 +130,7 @@ export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<
      * @param itemValue 本条分组实例数据，key为字段id，value为字段值
      * @returns 字段容器事件监听
      */
-    function buildItemMonitor(itemValue: Record<string, any>): EventsType<FieldContainerEvents> {
+    function buildItemMonitor(itemValue: Record<string, any>): Required<EventsType<FieldContainerEvents>> {
         return {
             onRendered(handle: IFieldContainerHandle) {
                 /** 更新容器句柄；
