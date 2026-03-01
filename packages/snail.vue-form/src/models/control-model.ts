@@ -42,6 +42,11 @@ export type ControlOptions = {
      * - 不传入则采用默认图标
      */
     icon?: string | string[];
+    /**
+     * 控件图标大小
+     * - 默认22
+     */
+    iconSize?: number;
 
     /**
      * 控件扩展配置选项
