@@ -87,24 +87,31 @@ export function useGlobalContext(options: FieldContainerOptions & Pick<IFieldGlo
     //#endregion
 
     //  构建上下文，并冻结
-    return Object.freeze(mountScope<IFieldGlobalContext>({
-        global: newId(),
-        readonly: options.readonly == true,
-        mode: options.mode || "runtime",
+    {
+        const fieldSetting = useFieldSetting({ getContainer });
+        const context = Object.freeze(mountScope<IFieldGlobalContext>({
+            global: newId(),
+            readonly: options.readonly == true,
+            mode: options.mode || "runtime",
 
-        layout: options.layout || "form",
-        columns: columns as any,
-        defaultSpan: Math.max(1, Math.min(columns, parseInt(String(options.defaultSpan || columns / 2)))),
+            layout: options.layout || "form",
+            columns: columns as any,
+            defaultSpan: Math.max(1, Math.min(columns, parseInt(String(options.defaultSpan || columns / 2)))),
 
-        hook: options.hook || Object.create({}),
-        controls: controls,
-        getControl: type => controlMap[type],
+            hook: options.hook || Object.create({}),
+            controls: controls,
+            getControl: type => controlMap[type],
 
-        registerContainer,
-        getContainer,
+            registerContainer,
+            getContainer,
 
-        fieldSetting: useFieldSetting({ getContainer }),
-    }, "useFieldContainerContext"));
+            fieldSetting: fieldSetting,
+        }, "useFieldContainerContext"));
+
+        context.onDestroy(fieldSetting.destroy);
+
+        return context;
+    }
 }
 //#endregion
 
@@ -114,7 +121,7 @@ export function useGlobalContext(options: FieldContainerOptions & Pick<IFieldGlo
  * @param gloabl 字段全局上下文部分对象
  * @returns 
  */
-function useFieldSetting(gloabl: Pick<IFieldGlobalContext, "getContainer">): IFieldSettingHandle {
+function useFieldSetting(gloabl: Pick<IFieldGlobalContext, "getContainer">): IFieldSettingHandle & IScope {
     /** 当前激活字段 */
     const fieldRef: ShallowRef<FieldOptions<any>> = shallowRef(undefined);
     /** 当前激活字段所属容器 */
@@ -122,32 +129,60 @@ function useFieldSetting(gloabl: Pick<IFieldGlobalContext, "getContainer">): IFi
     /** 唯一key值，每次激活都刷新 */
     const keyRef: ShallowRef<string> = shallowRef();
 
-    const handle: IFieldSettingHandle = Object.freeze<IFieldSettingHandle>({
-        getActiveKey() {
-            return keyRef.value;
-        },
-        getactiveField() {
-            return fieldRef.value
-                ? { field: fieldRef.value, container: containerRef.value, }
-                : undefined;
-        },
-        isActiveField(field, container) {
-            return field == fieldRef.value && container == containerRef.value;
-        },
-        activateField(field, container) {
-            if (fieldRef.value != field || containerRef.value != container) {
-                keyRef.value = newId();
-                fieldRef.value = field;
-                containerRef.value = container;
-            }
-        },
-        deactivateField() {
-            fieldRef.value = undefined;
-            containerRef.value = undefined;
-        },
-    });
+    //#region *************************************实现接口：IFieldSettingHandle 接口*************************************
+    /**
+     * 获取当前激活状态唯一标记
+     * - 用于唯一标记激活面板
+     */
+    function getActiveKey(): string {
+        return keyRef.value;
+    }
+    /**
+     * 获取激活字段信息
+     * @requires 字段对象，字段所属容器对象
+     */
+    function getactiveField(): { field: FieldOptions<any>, container: FieldContainerLocation } | undefined {
+        return fieldRef.value
+            ? { field: fieldRef.value, container: containerRef.value, }
+            : undefined;
+    }
+    /**
+     * 是否是激活字段
+     * @param field 字段
+     * @param container 字段所属容器，顶级字段是容器传undefined
+     * @returns true为激活字段
+     */
+    function isActiveField(field: FieldOptions<any>, container: FieldContainerLocation | undefined): boolean {
+        return field == fieldRef.value && container == containerRef.value;
+    }
+    /**
+     * 激活字段，打开此字段的设置面板
+     * @param field 字段
+     * @param container 字段所属容器，顶级字段是容器传undefined
+     */
+    function activateField(field: FieldOptions<any>, container: FieldContainerLocation | undefined) {
+        if (fieldRef.value != field || containerRef.value != container) {
+            keyRef.value = newId();
+            fieldRef.value = field;
+            containerRef.value = container;
+        }
+    }
+    /**
+     * 取消激活字段
+     */
+    function deactivateField() {
+        fieldRef.value = undefined;
+        containerRef.value = undefined;
+    }
+    //#endregion
 
-    return handle;
+    return Object.freeze(mountScope<IFieldSettingHandle>({
+        getActiveKey,
+        getactiveField,
+        isActiveField,
+        activateField,
+        deactivateField,
+    }, "IFieldSettingHandle"));
 }
 //#endregion
 
