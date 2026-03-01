@@ -126,6 +126,10 @@ function onControlItemRemove(evt: SortEvent) {
                 flex: 1;
             }
 
+            svg {
+                cursor: move;
+            }
+
             //  鼠标移入、激活、拖拽时；特定特定边框色标记
             &:hover,
             &.actived,
@@ -139,8 +143,6 @@ function onControlItemRemove(evt: SortEvent) {
             &.snail-sort-ghost {
                 transform: none !important;
             }
-
-
         }
     }
 }
