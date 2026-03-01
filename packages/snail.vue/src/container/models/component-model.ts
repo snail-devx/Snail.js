@@ -12,13 +12,13 @@ export type ComponentOptions = {
     /**
      * Vue组件对象
      * - name未传入时生效
+     * - 推荐外部使用 shallowRef 包裹对象，避免响应式的性能问题
      */
     component?: Component;
     /**
      * 组件js文件url地址
      * - 支持#号锚点钻取
      * - name、component未传入时生效
-     * - 推荐外部使用 shallowRef 包裹对象，避免响应式的性能问题
      */
     url?: string;
 }
