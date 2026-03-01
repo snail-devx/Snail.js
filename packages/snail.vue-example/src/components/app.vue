@@ -22,6 +22,8 @@ import InputTest from "./base/input-test.vue";
 import SearchTest from "./base/search-test.vue";
 import SelectTest from "./base/select-test.vue";
 import SwitchTest from "./base/switch-test.vue";
+import TextareaTest from "./base/textarea-test.vue";
+
 //  👉 容器组件
 import DynamicTest from "./container/dynamic-test.vue";
 import FoldTest from "./container/fold-test.vue";
@@ -75,6 +77,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Search 搜索组件", data: SearchTest, clickable: true, searchable: true, },
                 { text: "Select 选项菜单组件", data: SelectTest, clickable: true, searchable: true, },
                 { text: "Switch 开关组件", data: SwitchTest, clickable: true, searchable: true, },
+                { text: "Textarea 多行文本框", data: TextareaTest, clickable: true, searchable: true }
             ],
         },
         {
@@ -126,7 +129,7 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 }
 
 onMounted(() => {
-    onTreeNodeClick(treeOptions.nodes[2].children[1], undefined);
+    onTreeNodeClick(treeOptions.nodes[0].children[10], undefined);
 });
 </script>
 
