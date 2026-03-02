@@ -50,6 +50,13 @@ const testFields: FieldOptions<TextControlSettings | OptionControlSettings | Num
         "width": 2
     },
     {
+        "type": "Datetime",
+        "id": "1772459703920",
+        "title": "日期时间",
+        "width": 2,
+        "settings": {}
+    },
+    {
         "type": "Checkbox",
         "id": "1770544423261",
         "title": "复选框",

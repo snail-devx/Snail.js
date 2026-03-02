@@ -113,6 +113,8 @@ function refresh() {
 
         >.item-detail {
             flex: 1;
+            overflow: hidden;
+            position: relative;
 
             &.right {
                 justify-content: flex-end;

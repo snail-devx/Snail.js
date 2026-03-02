@@ -6,19 +6,22 @@ import { ComponentOptions } from "snail.vue";
 import { Component, shallowRef } from "vue";
 import { ControlExtendOptions, ControlOptions } from "../models/control-model";
 
-import Datetime from "../components/controls/datetime.vue";
-//  👉 Group
-import Group from "../components/controls/group.vue";
-import GroupSetting from "../components/settings/group-setting.vue";
 //  👉 Text、TextArea   
 import Text from "../components/controls/text.vue";
 import TextSetting from "../components/settings/text-setting.vue";
 //  👉 Number
 import Number from "../components/controls/number.vue";
 import NumberSetting from "../components/settings/number-setting.vue";
+//  👉 Datetime
+import Datetime from "../components/controls/datetime.vue";
+import DatetimeSetting from "../components/settings/datetime-setting.vue";
 //  👉 Radio、Checkbox、Combobox
 import Option from "../components/controls/option.vue";
 import OptionSetting from "../components/settings/option-setting.vue";
+//  👉 Group
+import Group from "../components/controls/group.vue";
+import GroupSetting from "../components/settings/group-setting.vue";
+
 
 /**
  * 包裹组件
@@ -86,6 +89,30 @@ const defaultControls: ControlOptions[] = [
         renderComponent: wrapComponent(Number),
         settingComponent: wrapComponent(NumberSetting)
     },
+    //  日期类控件
+    {
+        type: "Datetime",
+        name: "日期时间",
+        icon: [
+            "M766.478454 1024.000599c-141.608828 0-256.834274-115.683827-256.834274-257.862885s115.224447-257.862885 256.834274-257.862885c141.618815 0 " +
+            "256.834274 115.683827 256.834274 257.862885S908.097269 1024.000599 766.478454 1024.000599zM766.478454 576.872222c-103.939681 0-188.495531 " +
+            "84.905378-188.495531 189.265492 0 104.349129 84.55585 189.24452 188.495531 189.24452 103.929695 0 188.495531-84.895391 188.495531-189.24452C954.973985 " +
+            "661.778599 870.408149 576.872222 766.478454 576.872222zM98.473261 932.293404c-26.099765 0-50.656614-10.216208-69.131672-28.771159C10.871523 884.977281 " +
+            "0.690268 860.330554 0.690268 834.105957L0.690268 227.314126c0-26.22959 10.181255-50.886303 28.651321-69.426275 18.450092-18.539971 43.006941-28.751186 " +
+            "69.131672-28.751186l93.084336 0L191.557597 1.383133l68.327758 0L259.885355 129.135667l376.997054 0L636.882409 1.383133l68.347731 0L705.230139 " +
+            "129.135667l61.247316 0c26.134718 0 50.691566 10.221201 69.136666 28.766166 18.485045 18.524991 28.661307 43.171718 28.661307 69.411295l0 " +
+            "243.042892-3.255605-1.31822c-18.574924-7.589754-38.34823-12.907575-58.710741-15.813652L69.018026 453.239127l0 380.86683c0 7.869376 3.070854 15.289359 " +
+            "8.653318 20.911769 5.597443 5.59245 12.982474 8.658311 20.801917 8.658311l368.368702 0.009987-0.374494 1.468018c9.277475 22.869127 21.760623 44.160383 " +
+            "37.084935 63.284566l3.095821 3.854796L98.473261 932.293404 98.473261 932.293404zM98.473261 213.432866c-7.834424 0-15.22944 3.080841-20.82189 " +
+            "8.673291-5.562491 5.582464-8.633345 13.00744-8.633345 20.896789l0 157.302641 726.910671 0L795.928696 243.002946c0-7.919309-3.055875-15.339292-8.638338-" +
+            "20.891796-5.572477-5.597443-12.962501-8.678284-20.811904-8.678284l-61.247316 0 0 95.805662-68.347731 0 0-95.805662L259.886353 213.432866l0 95.805662-68.327758 " +
+            "0 0-95.805662L98.473261 213.432866zM732.304589 800.441404l0-164.428022 68.337744 0 0 95.810656 95.431168 0 0 68.617367L732.304589 800.441404zM159.74055 " +
+            "788.297798l0-68.617367 227.384032 0 0 68.617367L159.74055 788.297798zM159.74055 628.613372l0-68.60738 227.384032 0 0 68.60738L159.74055 628.613372z"
+        ],
+        iconSize: 20,
+        renderComponent: wrapComponent(Datetime),
+        settingComponent: wrapComponent(DatetimeSetting),
+    },
     //  选项类控件
     {
         type: "Radio",
@@ -110,7 +137,7 @@ const defaultControls: ControlOptions[] = [
             "725.333333s-23.466667-4.266667-29.866667-12.8l-170.666667-170.666667C217.6 535.466667 213.333333 524.8 213.333333 512c0-23.466667 " +
             "19.2-42.666667 42.666667-42.666667 12.8 0 23.466667 4.266667 29.866667 12.8l140.8 140.8 311.466667-311.466667c8.533333-8.533333 " +
             "19.2-12.8 29.866667-12.8 23.466667 0 42.666667 19.2 42.666667 42.666667 0 12.8-4.266667 23.466667-12.8 29.866667L456.533333 712.533333z",
-        iconSize: 16,
+        iconSize: 18,
         renderComponent: wrapComponent(Option),
         settingComponent: wrapComponent(OptionSetting)
     },

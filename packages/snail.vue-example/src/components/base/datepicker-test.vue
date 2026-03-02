@@ -27,7 +27,6 @@
                     format="yyyy-MM-dd HH:mm:ss" @change="value => (dateTextRef = value)" />
             </div>
         </div>
-
     </div>
 </template>
 
