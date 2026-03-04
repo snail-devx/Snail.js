@@ -31,6 +31,14 @@ let hidden: boolean = false;
 // 测试时
 const testFields: FieldOptions<TextControlSettings | OptionControlSettings | NumberControlSettings | GroupControlSettings>[] = [
     {
+        "type": "Datetime",
+        "id": "1772459703920",
+        "title": "日期时间",
+        "width": 2,
+        description: "xxxxxxxxxxxxxxxxx",
+        "settings": {}
+    },
+    {
         "type": "Text",
         "id": "1770087123812",
         "title": "文本框",

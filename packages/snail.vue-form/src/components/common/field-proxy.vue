@@ -71,6 +71,7 @@ let isButtonClickInCover: boolean;
     //  字段详情：控件展示区域，字段描述、字段错误信息展示区域
     >.field-detail {
         flex: 1;
+        position: relative;
         min-width: 10px;
         overflow-x: hidden;
         padding: 4px 10px;

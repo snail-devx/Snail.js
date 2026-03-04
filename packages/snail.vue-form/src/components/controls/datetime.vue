@@ -5,14 +5,18 @@
 <template>
     <FieldProxy :type="field.type" :title="field.title" :description="field.description"
         :="{ manager: manager, error: getError() }">
-        <!-- <Number :readonly="readonly" :placeholder="field.placeholder" :="field.settings" v-model="valueRef"
-            @error="updateError" @change="onNumberChange" /> -->
+        <div class="date-select">
+            <DatePicker ref="data-picker" :="datePickerOptiions" @change="value => valueRef = value" />
+            <span class="date-text ellipsis" v-if="valueRef" v-text="valueRef" />
+            <Icon v-if="isReadonly() != true" :type="'datepicker'" :size="18" :color="'#8a9099'"
+                :hover-color="'#3292ea'" @click="dataPickerDom.showPicker(200)" />
+        </div>
     </FieldProxy>
 </template>
 
 <script setup lang="ts">
 import { isNumberNotNaN, RunResult, } from "snail.core";
-import { inject, nextTick, onMounted, ShallowRef, shallowRef, } from "vue";
+import { inject, nextTick, onMounted, ShallowRef, shallowRef, useTemplateRef, } from "vue";
 import { components, DatepickerOptions, useReactive } from "snail.vue";
 import { DatetimeControlSettings, NumberControlSettings } from "../../models/control-model";
 import { FieldEvents, FieldRenderOptions, FieldValueSetResult, IFieldHandle, IFieldManager, } from "../../models/field-base";
@@ -23,7 +27,7 @@ import FieldProxy from "../common/field-proxy.vue";
 //  1、props、event、model、components
 const props = defineProps<FieldRenderOptions<DatetimeControlSettings, string>>();
 const emits = defineEmits<FieldEvents>();
-const { DatePicker } = components;
+const { DatePicker, Icon } = components;
 const global = inject(INJECTKEY_GlobalContext);
 const manager: IFieldManager = useField(global, props, {
     emitter: emits,
@@ -46,13 +50,16 @@ const manager: IFieldManager = useField(global, props, {
         throw new Error("setValue method not implemented");
     },
 });
-const { handle, getError, updateError } = manager;
+const { handle, getError, updateError, isReadonly } = manager;
 //  2、组件交互变量、常量
+/**     日期选择组件引用 */
+const dataPickerDom = useTemplateRef('data-picker');
+/**     日志选择组件配置选项 */
 const datePickerOptiions: DatepickerOptions = {
 
 };
 /**     已选选择项：field-proxy需要 */
-const valueRef = shallowRef<number>(isNumberNotNaN(props.value) ? props.value : props.field.value);
+const valueRef = shallowRef<string>(isNumberNotNaN(props.value) ? props.value : props.field.value);
 //  3、选项相关
 
 
@@ -67,4 +74,31 @@ onMounted(() => emits("rendered", handle));
 <style lang="less">
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
+
+.field-item.datetime>.field-detail {
+    >.date-select {
+        position: relative;
+        height: 32px;
+        display: flex;
+        align-items: center;
+
+        //  真正的日期选择控件，在背后工作，z-index强制-100
+        >.snail-datepicker {
+            z-index: -100;
+        }
+
+        >span.date-text {
+            color: #2E3033;
+            width: fit-content;
+            max-width: calc(100% - 30px);
+            // line-height: 32px;
+            margin-right: 4px;
+        }
+
+        >svg {
+            // transform: translateY(7px);
+        }
+    }
+
+}
 </style>

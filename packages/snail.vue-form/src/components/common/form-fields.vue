@@ -234,7 +234,7 @@ onUnmounted(() => scope.destroy());
         overflow-x: hidden;
         min-height: 40px;
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: flex-start;
     }
 }
