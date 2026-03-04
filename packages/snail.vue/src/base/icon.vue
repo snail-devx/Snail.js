@@ -7,8 +7,8 @@
         :style="rotate ? `transform: rotate(${rotate}deg);` : ''" :width="size || 24" :height="size || 24"
         @mouseenter="isMouseEnterRef = true" @mouseleave="isMouseEnterRef = false">
         <title v-text="title || ''" />
-        <path v-for="draw in getSvgDraw(type, draw)" :fill="isMouseEnterRef ? (hoverColor || color) : color"
-            :stroke="stroke" :stroke-width="strokeWidth" :d="draw" />
+        <path v-for="d in getSvgDraw(type, draw)" :fill="isMouseEnterRef ? (hoverColor || color) : color"
+            :stroke="stroke" :stroke-width="strokeWidth" :d="d" />
     </svg>
 </template>
 

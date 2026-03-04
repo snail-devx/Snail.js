@@ -35,9 +35,9 @@
 </template>
 
 <script setup lang="ts">
+import { isArray } from "snail.core";
 import { computed, Transition, TransitionGroup } from "vue";
 import { TransitionOptions } from "./models/transition-model";
-import { isArray } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components "snail-transition"

@@ -37,7 +37,7 @@ export type TransitionOptions = {
      *  |   `left-right` | 左进右出     | 进入时 `translateX` -100% - 0    | 离开时 `translateX` 0 - 100%     |
      *  |   `right-left` | 右进左出     | 进入时 `translateX` 100% - 0     | 离开时 `translateX` 0 - -100%    |
      */
-    effect?: TransitionEffect | Array<TransitionEffect>;
+    effect?: TransitionEffectOptions | Array<TransitionEffectOptions>;
     /**
      * 是分组动画，还是单个动画
      * - true 则使用  TransitionGroup
@@ -45,6 +45,6 @@ export type TransitionOptions = {
      */
     group: boolean;
 }
-export type TransitionEffect = "fade" | "scale" | "rotate"
+export type TransitionEffectOptions = "fade" | "scale" | "rotate"
     | "up" | "down" | "up-down" | "down-up"
     | "left" | "right" | "left-right" | "right-left";
