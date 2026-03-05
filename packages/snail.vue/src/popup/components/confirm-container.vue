@@ -14,12 +14,13 @@
 <script setup lang="ts">
 import { ConfirmOptions } from "../models/confirm-model"
 import { DialogHandle } from "../models/dialog-model";
+import { PopupStatusOptions } from "../models/popup-model";
 import Header from "../../base/header.vue";
 import Footer from "../../base/footer.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-defineProps<ConfirmOptions & DialogHandle<boolean>>();
+defineProps<ConfirmOptions & DialogHandle<boolean> & PopupStatusOptions>();
 //  2、可选配置选项
 defineOptions({ name: "ConfirmContainer", inheritAttrs: true, });
 </script>

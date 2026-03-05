@@ -5,8 +5,8 @@
 -->
 <template>
     <Dynamic class="snail-popup" :class="[popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
-        :name="options.name" :component="options.component" :url="options.url" :props="props" v-bind="extOptions"
-        v-model="model" />
+        :name="options.name" :component="options.component" :url="options.url" :props="props" :="extOptions"
+        :popup-status="popupStatus.value" v-model="model" />
 </template>
 
 <script setup lang="ts">

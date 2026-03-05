@@ -3,7 +3,7 @@
     <div :class="['snail-dialog', options.rootClass, popupStatus.value, popupTransition.value]"
         :style="{ 'z-index': zIndex }" @click.self="options.closeOnMask && closePopup();">
         <Dynamic class="dialog-body" :name="options.name" :component="options.component" :url="options.url"
-            :props="props" v-bind="dialogExtend" v-model="model" />
+            :props="props" :="dialogExtend" :popup-status="popupStatus.value" v-model="model" />
     </div>
 </template>
 

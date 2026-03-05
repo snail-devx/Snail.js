@@ -5,7 +5,7 @@
 <template>
     <Dynamic class="snail-follow initial" :class="[popupStatus.value, popupTransition.value]"
         :style="{ 'z-index': zIndex }" :name="options.name" :component="options.component" :url="options.url"
-        :props="props" v-bind="followExt" v-model="model" />
+        :props="props" :="followExt" v-model="model" />
 </template>
 
 <script setup lang="ts">
