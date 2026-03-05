@@ -254,6 +254,20 @@ export function mustObject(data: any, paramName: string): boolean {
 
 //#region *************************************        数据值处理        *************************************
 /**
+ * 修正空值；Nullish（空值，为undefined、null）
+ * - 若为空值则返回新值，非空返回自己
+ * - 等同于 `??` 运算符，但需要兼容低版本浏览器，独立方法
+ * @param value 要修正的值
+ * @param newValue 空值时的修正值
+ * @returns 修正后的值
+ */
+export function correctNullish<T>(value: T, newValue: T): T {
+    //  https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing
+    return (value === null || value === undefined)
+        ? newValue
+        : value;
+}
+/**
  * 整理字符串；去除前后空格，空或者非字符串强制undeined
  * @param str 要处理的字符串数据
  * @returns 去除前后空格的字符串
@@ -364,5 +378,32 @@ export function getFromArray<T>(array: T[], from: number): T | undefined {
             : array[array.length + from];
     }
     return undefined;
+}
+
+/**
+ * 将字节数转换为带单位的字符串 (B, KB, MB, GB, TB, PB)
+ * - 将字节数转换为人类可读的文件大小字符串
+ * @param  bytes 字节数（必须是非负数）
+ * @param decimals  保留小数位数（默认 2 位）
+ * @returns  格式化后的字符串，如 "1.23KB", "512B"
+ */
+export function formatBytes(bytes: number, decimals: number = 2): string {
+    // 边界处理：非数字、NaN、负数
+    if (typeof bytes !== 'number' || isNaN(bytes) || bytes < 0) {
+        return '0B';
+    }
+    // 特殊情况：0 字节
+    if (bytes === 0) {
+        return '0B';
+    }
+    const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const k = 1024; // 使用二进制单位（1 KB = 1024 B）
+    // 计算单位索引（使用对数避免循环）
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    // 防止越界（最大支持到 YB）
+    const index = Math.min(i, units.length - 1);
+    // 计算对应单位的数值
+    const size = parseFloat((bytes / Math.pow(k, index)).toFixed(decimals));
+    return `${size}${units[index]}`;
 }
 //#endregion
