@@ -19,7 +19,8 @@ export default defineConfig({
         include: [
             // "packages/*/__test__/**",
             // "tests/**/*.test.ts",
-            "packages/*/test/**/*.test.ts"
+            "packages/*/test/**/*.test.ts",
+            "rollups/*/test/**/*.test.ts",
         ]
     },
 })

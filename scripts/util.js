@@ -122,49 +122,62 @@ export function checkExists(path, paramName) {
 //#region  *****************************************   👉 打包配置    *****************************************
 /** 是否是生产环境 */
 export const isProd = process.env.NODE_ENV === "production";
+
+/**
+ * 分析指定目录下的npm包集合
+ * - 忽略私有包，忽略无package.json、rollup.config.js的项目
+ * @param {string} rootDir npm包的上层目录
+ * @returns {import("../typings/package").Package[]}
+ */
+function analysisPackagesInDir(rootDir) {
+    return readdirSync(rootDir)
+        .map(dir => {
+            const root = resolve(rootDir, dir);
+            if (statSync(root).isDirectory() != true) {
+                return undefined;
+            }
+            const packageFile = resolve(root, "package.json");
+            if (existsSync(packageFile) != true) {
+                return undefined;
+            }
+            const pkgJson = require(resolve(root, "package.json"));
+            if (pkgJson.private == true || pkgJson.private == "true") {
+                return undefined;
+            }
+            const rollupFile = resolve(root, "rollup.config.js");
+            if (existsSync(rollupFile) != true) {
+                return undefined;
+            }
+            /** 构建发布的输出根目录 */
+            const releaseRoot = resolve(DIR_RELEASEROOT, dir);
+            //  构建包信息返回
+            /**     @type {import("../typings/package").Package}*/
+            const pkg = {
+                name: pkgJson.name || dir,
+
+                dir,
+                root,
+                // srcRoot: resolve(root, "src"),
+                releaseRoot: releaseRoot,
+                distRoot: resolve(releaseRoot, "dist"),
+                typesRoot: resolve(releaseRoot, "dist/_types"),
+
+                pkgJson: pkgJson
+            };
+            return Object.freeze(pkg);
+
+        })
+        .filter(pkg => pkg != undefined);
+}
+
 /**
  * 所有可用的Packages项目包；从根目录的【packages】目录下自动分析
  * @type {import("../typings/package").Package[]}
- * @remarks 忽略私有包，忽略无package.json、rollup.config.js的项目
  */
-export const allPackages = readdirSync(resolve(__dirname, "../packages"))
-    .map(dir => {
-        const root = resolve(__dirname, "../packages", dir);
-        if (statSync(root).isDirectory() != true) {
-            return undefined;
-        }
-        const packageFile = resolve(root, "package.json");
-        if (existsSync(packageFile) != true) {
-            return undefined;
-        }
-        const pkgJson = require(resolve(root, "package.json"));
-        if (pkgJson.private == true || pkgJson.private == "true") {
-            return undefined;
-        }
-        const rollupFile = resolve(root, "rollup.config.js");
-        if (existsSync(rollupFile) != true) {
-            return undefined;
-        }
-        /** 构建发布的输出根目录 */
-        const releaseRoot = resolve(DIR_RELEASEROOT, dir);
-        //  构建包信息返回
-        /**     @type {import("../typings/package").Package}*/
-        const pkg = {
-            name: pkgJson.name || dir,
-
-            dir,
-            root,
-            // srcRoot: resolve(root, "src"),
-            releaseRoot: releaseRoot,
-            distRoot: resolve(releaseRoot, "dist"),
-            typesRoot: resolve(releaseRoot, "dist/_types"),
-
-            pkgJson: pkgJson
-        };
-        return Object.freeze(pkg);
-
-    })
-    .filter(pkg => pkg != undefined);
+export const allPackages = [
+    ...analysisPackagesInDir(resolve(__dirname, "../packages")),
+    ...analysisPackagesInDir(resolve(__dirname, "../rollups"))
+];
 
 /**
  * 获取符合条件的项目包集合
