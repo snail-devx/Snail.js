@@ -1,16 +1,10 @@
-<!-- 日期时间 控件
-    1、支持 年月日  年月  年；年月日时分秒    年月日时分    年月日时
-    2、支持单独时间
+<!-- 时间组件，支持显示时间选择
+    1、支持时分秒、时分 两种格式
 -->
 <template>
     <FieldProxy :type="field.type" :title="field.title" :description="field.description"
         :="{ manager: manager, error: getError() }">
-        <div class="date-select">
-            <DatePicker ref="data-picker" :="datePickerOptiions" @change="value => valueRef = value" />
-            <span class="date-text ellipsis" v-if="valueRef" v-text="valueRef" />
-            <Icon v-if="isReadonly() != true" :type="'datepicker'" :size="18" :color="'#8a9099'"
-                :hover-color="'#3292ea'" @click="dataPickerDom.showPicker(200)" />
-        </div>
+        <div>时间控件</div>
     </FieldProxy>
 </template>
 
@@ -27,7 +21,7 @@ import FieldProxy from "../common/field-proxy.vue";
 //  1、props、event、model、components
 const props = defineProps<FieldRenderOptions<DatetimeControlSettings, string>>();
 const emits = defineEmits<FieldEvents>();
-const { DatePicker, Icon } = components;
+const { Icon } = components;
 const global = inject(INJECTKEY_GlobalContext);
 const manager: IFieldManager = useField(global, props, {
     emitter: emits,
@@ -52,50 +46,19 @@ const manager: IFieldManager = useField(global, props, {
 });
 const { handle, getError, updateError, isReadonly } = manager;
 //  2、组件交互变量、常量
-/**     日期选择组件引用 */
-const dataPickerDom = useTemplateRef('data-picker');
-/**     日志选择组件配置选项 */
-const datePickerOptiions: DatepickerOptions = {
-
-};
 /**     已选选择项：field-proxy需要 */
 const valueRef = shallowRef<string>();
+
 
 // *****************************************   👉  方法+事件    ****************************************
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
-onMounted(() => emits("rendered", handle));
+
 </script>
 
 <style lang="less">
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
-
-.field-item.datetime>.field-detail {
-    >.date-select {
-        position: relative;
-        height: 32px;
-        display: flex;
-        align-items: center;
-
-        //  真正的日期选择控件，在背后工作，z-index强制-100
-        >.snail-datepicker {
-            z-index: -100;
-        }
-
-        >span.date-text {
-            width: fit-content;
-            max-width: calc(100% - 30px);
-            // line-height: 32px;
-            margin-right: 4px;
-        }
-
-        >svg {
-            // transform: translateY(7px);
-        }
-    }
-
-}
 </style>

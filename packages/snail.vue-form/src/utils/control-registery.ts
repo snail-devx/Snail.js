@@ -14,6 +14,7 @@ import Number from "../components/controls/number.vue";
 import NumberSetting from "../components/settings/number-setting.vue";
 //  👉 Datetime
 import Datetime from "../components/controls/datetime.vue";
+import Time from "../components/controls/time.vue";
 import DatetimeSetting from "../components/settings/datetime-setting.vue";
 //  👉 Radio、Checkbox、Combobox
 import Option from "../components/controls/option.vue";
@@ -112,6 +113,20 @@ const defaultControls: ControlOptions[] = [
         iconSize: 20,
         renderComponent: wrapComponent(Datetime),
         settingComponent: wrapComponent(DatetimeSetting),
+    },
+    {
+        type: "Time",
+        name: "时间",
+        icon: [
+            "M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 " +
+            "276.352 85.333333 512 85.333333z m0 85.333334C323.477333 170.666667 170.666667 323.477333 170.666667 512s152.810667 341.333333 341.333333 341.333333 " +
+            "341.333333-152.810667 341.333333-341.333333S700.522667 170.666667 512 170.666667z m0 106.666666a21.333333 21.333333 0 0 1 21.333333 " +
+            "21.333334v234.666666h170.666667a21.333333 21.333333 0 0 1 21.333333 21.333334v42.666666a21.333333 21.333333 0 0 1-21.333333 21.333334H469.333333a21.333333 " +
+            "21.333333 0 0 1-21.333333-21.333334V298.666667a21.333333 21.333333 0 0 1 21.333333-21.333334h42.666667z",
+        ],
+        iconSize: 20,
+        renderComponent: wrapComponent(Time),
+        settingComponent: wrapComponent(DatetimeSetting)
     },
     //  选项类控件
     {

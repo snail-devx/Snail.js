@@ -100,19 +100,21 @@ export type NumberControlSettings = NumberBaseOptions;
 
 /**
  * 日期时间控件的Settings数据结构
+ * - 支撑日期时间、时间控件配置
  */
 export type DatetimeControlSettings = {
     /**
      * 日期时间格式
+     * - 日期时间控件特有："yyyy-MM-dd HH:mm:ss" | "yyyy-MM-dd HH:mm" | "yyyy-MM-dd" | "yyyy-MM" | "yyyy"
+     * - 时间控件特有格式： "HH:mm:ss" | "HH:mm" 
      */
     format?: "yyyy-MM-dd HH:mm:ss" | "yyyy-MM-dd HH:mm" | "yyyy-MM-dd" | "yyyy-MM" | "yyyy" | "HH:mm:ss" | "HH:mm";
     /**
-     * 初始化当前时间
+     * 初始化当前日期时间
      * - 为true时，若值为空，则初始化当前日期时间
      */
     initNow?: boolean;
 }
-
 
 /**
  * 选项类控件的Settings数据结构

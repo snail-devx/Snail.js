@@ -1,4 +1,6 @@
-<!-- 日期时间的控件设置 -->
+<!-- 日期时间的控件设置 
+    1、支持 Datetime、Time控件的设置
+ -->
 <template>
     <FieldSettingProxy :="_" ref="setting-proxy">
         <div class="setting-divider" />
@@ -17,7 +19,7 @@
             @change="value => proxy.update('hidden', false, value)" />
         <div class="setting-divider" />
         <FieldLikeBoolean title="自动初始化" :readonly="readonly" :value="field.settings.initNow" :help="'为空时自动初始化当前日期时间'"
-            @change="value => proxy.update('hinitNown', true, value)" />
+            @change="value => proxy.update('initNow', true, value)" />
         <div class="setting-item">
             <div class="item-title" v-text="'格式化'" />
             <div class="item-detail">
@@ -63,20 +65,25 @@ const { Select, DatePicker } = components;
 const { field, readonly } = _;
 //  2、组件交互变量、常量
 field.settings || (field.settings = {});
+/**     是否是日期时间控件，false则为时间控件 */
+const isDatetime: boolean = field.type === "datetime";
 /**     格式选项 */
-const formatItems: SelectItem<string>[] = [
-    { type: "item", text: "yyyy-MM-dd HH:mm:ss", data: "yyyy-MM-dd HH:mm:ss", clickable: true },
-    { type: "item", text: "yyyy-MM-dd HH:mm", data: "yyyy-MM-dd HH:mm", clickable: true },
-    { type: "item", text: "yyyy-MM-dd", data: "yyyy-MM-dd", clickable: true },
-    { type: "item", text: "yyyy-MM", data: "yyyy-MM", clickable: true },
-    { type: "item", text: "yyyy", data: "yyyy-MM", clickable: true },
-    { type: "item", text: "HH:mm:ss", data: "HH:mm:ss", clickable: true },
-    { type: "item", text: "HH:mm", data: "HH:mm", clickable: true },
-];
+const formatItems: SelectItem<string>[] = isDatetime
+    ? [
+        { type: "item", text: "年月日 时分秒", data: "yyyy-MM-dd HH:mm:ss", clickable: true },
+        { type: "item", text: "年月日 时分", data: "yyyy-MM-dd HH:mm", clickable: true },
+        { type: "item", text: "年月日", data: "yyyy-MM-dd", clickable: true },
+        { type: "item", text: "年月", data: "yyyy-MM", clickable: true },
+        { type: "item", text: "年", data: "yyyy", clickable: true },
+    ]
+    : [
+        { type: "item", text: "时分秒", data: "HH:mm:ss", clickable: true },
+        { type: "item", text: "时分", data: "HH:mm", clickable: true },
+    ];
 /**     格式值 */
 const formatRef: ShallowRef<SelectItem<string>> = shallowRef(_.field.settings.format
-    ? formatItems.find(item => item.data == _.field.settings.format) || formatItems[2]
-    : formatItems[2]);
+    ? formatItems.find(item => item.data == _.field.settings.format) || formatItems[isDatetime ? 2 : 0]
+    : formatItems[isDatetime ? 2 : 0]);
 
 // *****************************************   👉  方法+事件    ****************************************
 /**

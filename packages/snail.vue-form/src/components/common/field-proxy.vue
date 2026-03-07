@@ -75,14 +75,19 @@ let isButtonClickInCover: boolean;
         min-width: 10px;
         overflow-x: hidden;
         padding: 4px 10px;
+        //  字段详情默认颜色
+        color: #2E3033;
 
         >.field-desc,
         >.field-error {
             width: 100%;
-            color: #aaa;
             font-size: 12px;
             height: 20px;
             line-height: 20px;
+        }
+
+        >.field-desc {
+            color: #aaa;
         }
 
         >.field-error {
