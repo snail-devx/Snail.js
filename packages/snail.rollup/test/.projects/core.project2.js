@@ -1,5 +1,5 @@
 /**
- * @type {import("../../../packages/snail.rollup/src/models/project").ProjectOptions}
+ * @type {import("../../../rollups/snail.rollup/src/models/project").ProjectOptions}
  */
 export const components = [
     { src: "./index.ts" }

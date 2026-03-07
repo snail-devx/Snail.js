@@ -12,7 +12,7 @@ const root = resolve(__dirname, "../");
 
 /**
  * 构建器文件配置
- * @type {import("../../../packages/snail.rollup/src/models/builder").BuilderOptions}
+ * @type {import("../../../rollups/snail.rollup/src/models/builder").BuilderOptions}
  */
 export default {
     root: root,

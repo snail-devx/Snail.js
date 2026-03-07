@@ -3,7 +3,7 @@
   "description": "配合【snail.rollup】使用的插件，支持静态资源文件拷贝到输出目录",
   "author": "snail_dev@163.com",
   "license": "MIT",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "snail.core": ">=2.0.21",
-    "snail.rollup": ">=1.2.10",
-    "snail.rollup-url": ">=1.2.3"
+    "snail.rollup": ">=2.0.0",
+    "snail.rollup-url": ">=2.0.0"
   }
 }
