@@ -60,8 +60,6 @@ const datePickerOptiions: DatepickerOptions = {
 };
 /**     已选选择项：field-proxy需要 */
 const valueRef = shallowRef<string>(isNumberNotNaN(props.value) ? props.value : props.field.value);
-//  3、选项相关
-
 
 // *****************************************   👉  方法+事件    ****************************************
 
