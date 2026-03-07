@@ -1,13 +1,18 @@
+/**
+ * 把类型判断等基础合并到一起测试
+ * - 如isString、isDate、、、、
+ */
+
 import { assert, describe, expect, test } from 'vitest'
 import {
     drill, extract, hasAny, hasOwnProperty,
     getType, isString, isStringNotEmpty, isArray, isArrayNotEmpty, isBoolean, isDate, isFalsey, isFunction, isNumber, isNumberNotNaN,
     isUndefined, isNull, isNullOrUndefined, isObject, isPromise, isRegexp, isWindow,
-    newId, tidyFunction, tidyString,
+    tidyFunction, tidyString,
     mustArray, mustFunction, mustString, mustObject,
     moveFromArray,
     removeFromArray
-} from "../../src/base/data"
+} from "../../src/base"
 
 //  getType、isXX测试
 describe("getType、isXX", () => {
@@ -175,30 +180,9 @@ describe("tidyXXX", () => {
     });
 });
 
-describe("newId", () => {
-    test("", () => {
-        const id = newId();
-        assert.isTrue(id.length > 0);
-    });
-    const x = Object.create(null);
-    const tmpFunc = () => {
-        const str = newId();
-        hasOwnProperty(x, str) && assert.fail(`存在重复id值:${str}`);
-        x[str] = 1;
-    }
-    test("1", tmpFunc);
-    test("2", tmpFunc);
-    test("3", tmpFunc);
-    test("4", tmpFunc);
-    test("5", tmpFunc);
-    test("loop", () => {
-        for (let index = 0; index < 10000; index++) {
-            tmpFunc();
-        }
-    })
-})
+
 test("drill", () => {
-    expect(drill.call(undefined)).toBeUndefined();
+    expect(drill.call(undefined, undefined)).toBeUndefined();
     expect(drill(1)).toBe(1);
     expect(drill({}, ["1", "2"])).toBeUndefined();
     expect(drill(undefined, ["1", "2"])).toBeUndefined();

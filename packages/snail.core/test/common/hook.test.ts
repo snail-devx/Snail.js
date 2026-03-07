@@ -1,9 +1,7 @@
 import { beforeEach, afterEach, describe, expect, it, vi, test } from 'vitest';
-import { useHook } from "../../src/base/hook";
-import { HookFunction, IHookManager } from '../../src/base/models/hook-model';
-import { throwError } from '../../src/base/error';
-import { delay } from '../../src/base/promise';
-import { IScope } from '../../src/base/scope';
+import { throwError, delay } from '../../src/base';
+import { } from "../../src/common";
+import { useHook, HookFunction, IHookManager, IScope } from '../../src/common';
 
 const flag: string[] = [];
 beforeEach(() => flag.splice(0));

@@ -1,8 +1,6 @@
 import { assert, describe, expect, test } from 'vitest'
-import { useHttp, useHttpByServer, configHttp, configHttpIntercept } from "../../src/web/http"
-import { IHttpClient } from '../../src/web/models/http-model';
-import { delay } from '../../src/base/promise';
-import { server } from '../../src/web/server';
+import { delay } from '../../src/base';
+import { useHttp, useHttpByServer, configHttp, configHttpIntercept, server, IHttpClient } from "../../src/web"
 
 const hc: IHttpClient = useHttp({ origin: "https://fanyi.baidu.com/" });
 //  默认配置：百度接口，没做其他配置，虽然后返回值，状态码200，

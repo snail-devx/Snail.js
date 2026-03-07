@@ -1,16 +1,11 @@
-import { removeFromArray, tidyString } from "../base/data";
-import { checkScope, IScope, mountScope, useScope } from "../base/scope";
-import { HttpOptions, HttpInterceptor, IHttpClient, HttpRequest, HttpResponse } from "./models/http-model";
-import { server, ServerOptions } from "./server";
-import {
-    HTTP_CONFIG, HTTP_INTERCEPTORS,
-    checkInterceptor, runRequestInterceptor, runResponseInterceptor,
-    runHttpRequest,
-    checkHttpOptions,
-} from "./utils/http-util";
 
-// 把自己的类型共享出去
-export * from "./models/http-model";
+import { removeFromArray, tidyString } from "../../base";
+import { checkScope, IScope, mountScope, useScope } from "../../common";
+import { HttpOptions, HttpInterceptor, IHttpClient, HttpRequest, HttpResponse } from "../models/http-model";
+import { ServerOptions } from "../models/server-model";
+import { server } from "./server";
+import { checkInterceptor, runRequestInterceptor, runResponseInterceptor, runHttpRequest, checkHttpOptions, } from "../utils/http-util";
+import { HTTP_CONFIG, HTTP_INTERCEPTORS, } from "../utils/http-util";
 
 /**
  * 使用【Http客户端】

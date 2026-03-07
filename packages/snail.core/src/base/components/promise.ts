@@ -1,15 +1,29 @@
 /**
- * 异步模块：Promise相关功能封装
+ * Promise 相关扩展
  */
 
-import { isPromise } from "./data";
-import { RunResult } from "./function";
-import { FlatPromise } from "./models/promise-model";
-import { buildResultByError } from "./utils/function-util";
+import { RunResult } from "../models/function-model";
+import { FlatPromise } from "../models/promise-model";
+import { getType } from "../utils/type-utils";
+import { buildResultByError } from "./error";
 
-/** 把自己的类型共享出去 */
-export * from "./models/promise-model"
+//#region *************************************        判断校验        *************************************
+/**
+ * 是否是Promise；支持类Promise（有then方法）对象
+ * @param data
+ * @returns 是返回true；否则返回false
+ */
+export function isPromise(data: any): boolean {
+    //  * @param likeAs    类Promise是否也算作Promise；默认不算
+    //  不用支持likeAs，没有太大意义；强制必须是Promise即可
+    // return getType(data) == "[object Promise]"
+    //     ? true
+    //     : likeAs === true && hasOwnProperty(data, "then") && isFunction(data["then"]);
+    return getType(data) == "[object Promise]";
+}
+//#endregion
 
+//#region *************************************        操作扩展        *************************************
 /**
  * 延迟对象
  * @returns 
@@ -47,3 +61,4 @@ export function wait<T>(task: Promise<T> | T): Promise<RunResult<T>> {
             reason => buildResultByError<T>(reason, "wait task error.")
         );
 }
+//#endregion

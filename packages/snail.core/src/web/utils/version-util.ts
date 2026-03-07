@@ -2,7 +2,7 @@
  * 版本管理 助手类
  *  1、仅针对 version.ts 提供，不对外
  */
-import { extract, hasOwnProperty, tidyString } from "../../base/data";
+import { extract, hasOwnProperty, tidyString } from "../../base";
 import { VersionOptions } from "../models/version-model";
 
 //#region ************************************* 版本配置 *************************************

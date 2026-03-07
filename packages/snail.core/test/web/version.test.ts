@@ -1,6 +1,5 @@
 import { assert, describe, expect, test, it, afterEach } from 'vitest'
-import { configVersion, useVersion, version } from "../../src/web/version"
-import { IVersionManager } from '../../src/web/models/version-model'
+import { configVersion, useVersion, version, IVersionManager } from "../../src/web"
 
 function tmpFunc(vm: IVersionManager): void {
     expect(vm.getVersion()).toStrictEqual("1x3");

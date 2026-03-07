@@ -1,4 +1,4 @@
-import { RunResult } from "./function-model";
+import { RunResult } from "../../base";
 import { IScope } from "./scope-model";
 
 /**

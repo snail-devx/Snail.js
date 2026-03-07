@@ -1,7 +1,7 @@
 import { assert, describe, expect, it, test } from 'vitest'
-import { wait, defer, delay } from "../../src/base/promise"
-import { getMessage } from '../../src/base/error';
-import { RunResult } from '../../src/base/function';
+import { wait, defer, delay } from "../../src/base"
+import { getMessage } from '../../src/base';
+import { RunResult } from '../../src/base';
 
 test("defer", async () => {
     let deferred = defer<number>();

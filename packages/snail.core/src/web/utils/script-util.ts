@@ -3,14 +3,11 @@
  *  1、将 script.ts中部分逻辑提取到这里；内部逻辑方法，不可挂载给外部库使用
  *  3、这些都是静态方法，和IScriptManager实例级别无关
  */
-import { extract, hasOwnProperty, isNullOrUndefined, isStringNotEmpty } from "../../base/data";
-import { drill, mustFunction, mustString, tidyString, } from "../../base/data";
-import { getMessage, throwIfTrue } from "../../base/error";
-import { defer } from "../../base/promise";
-import { url } from "../url";
-import { useHttp } from "../http";
-import { IScriptManager, ScriptFile, ScriptLoadOptions, ScriptOptions } from "../models/script-model";
+import { isNullOrUndefined, mustFunction, mustString, tidyString, defer, extract, drill, hasOwnProperty, getMessage, throwIfTrue } from "../../base";
+import { IScriptManager, ScriptLoadOptions, ScriptOptions } from "../models/script-model";
 import { IHttpClient } from "../models/http-model";
+import { url } from "../components/url";
+import { useHttp } from "../components/http";
 
 //#region ************************************* 脚本配置 *************************************
 /** 全局脚本配置 */

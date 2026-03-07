@@ -17,6 +17,7 @@
     //  包含所需的所有ts文件
     "include": [
         "packages/*/src",
+        "packages/*/test/",
         "packages/*/test/web",
         "packages/*/rollup.config.js",
         "scripts/**/*.js",

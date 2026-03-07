@@ -1,6 +1,5 @@
 import { assert, describe, expect, test } from 'vitest'
-import { url } from "../../src/web/url"
-import { UrlParseResult } from '../../src/web/models/url-model';
+import { url } from "../../src/web/components/url"
 
 test("isSite", () => {
     expect(url.isSite(undefined!)).toStrictEqual(false);

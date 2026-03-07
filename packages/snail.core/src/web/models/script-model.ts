@@ -1,4 +1,4 @@
-import { IScope } from "../../base/models/scope-model";
+import { IScope } from "../../common";
 import { IVersionManager } from "./version-model";
 
 /**

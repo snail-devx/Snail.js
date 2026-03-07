@@ -5,13 +5,12 @@
  *  2、还没有补充单元测试、、、
  */
 
-import { isArrayNotEmpty, isStringNotEmpty, mustFunction } from "./data";
-import { run } from "./function";
-import { ITimer } from "./models/timer-model";
+import { mustFunction, run } from "../../base";
+import { ITimer } from "../models/timer-model";
 import { IScope, IScopes, mountScope, useScopes } from "./scope";
 
 /** 把自己的类型共享出去 */
-export * from "./models/timer-model"
+export * from "../models/timer-model"
 
 /**
  * 使用【定时器】

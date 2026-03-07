@@ -4,16 +4,12 @@
  * - 不支持cmd中使用require方法，核心为异步方式加载js，require为同步方式，强制报错
  */
 
-import { isArray, isArrayNotEmpty, isObject, isStringNotEmpty, hasOwnProperty, extract, isFunction } from "../base/data";
-import { mustString, tidyString, } from "../base/data";
-import { getMessage, throwIfNullOrUndefined, throwIfTrue } from "../base/error";
+import { isArray, isArrayNotEmpty, isObject, isStringNotEmpty, isFunction } from "../../base";
+import { mustString, tidyString, hasOwnProperty, extract, getMessage, throwIfNullOrUndefined, throwIfTrue } from "../../base";
+import { checkScope, IScope, mountScope, useScope } from "../../common";
+import { IScriptManager, ScriptFile, ScriptLoadOptions, ScriptOptions } from "../models/script-model";
+import { SCRIPT_CONFIG, checkScriptOptions, formScriptUrl, buildScriptByUrl, drillScriptByHash } from "../utils/script-util";
 import { version } from "./version";
-import { IScriptManager, ScriptFile, ScriptLoadOptions, ScriptOptions } from "./models/script-model";
-import { checkScope, IScope, mountScope, useScope } from "../base/scope";
-import { SCRIPT_CONFIG, checkScriptOptions, formScriptUrl, buildScriptByUrl, drillScriptByHash } from "./utils/script-util";
-
-// 把自己的类型共享出去
-export * from "./models/script-model"
 
 /**
  * 使用【脚本管理】

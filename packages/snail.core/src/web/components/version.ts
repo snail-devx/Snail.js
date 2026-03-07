@@ -1,13 +1,9 @@
-import { mustString } from "../base/data";
-import { throwIfUndefined } from "../base/error";
+import { mustString, throwIfUndefined } from "../../base";
+import { checkScope, IScope, mountScope } from "../../common";
+import { IVersionManager, VersionOptions } from "../models/version-model";
+import { UrlParseResult } from "../models/url-model";
+import { checkVersionOptions, DEFAULT_VERSION, VERSION_CONFIG } from "../utils/version-util";
 import { url } from "./url";
-import { IVersionManager, VersionOptions } from "./models/version-model";
-import { UrlParseResult } from "./models/url-model";
-import { checkScope, IScope, mountScope } from "../base/scope";
-import { checkVersionOptions, DEFAULT_VERSION, VERSION_CONFIG } from "./utils/version-util";
-
-// 把自己的类型共享出去
-export * from "./models/version-model"
 
 /**
  * 使用【版本管理器】

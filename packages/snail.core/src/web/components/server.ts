@@ -4,13 +4,9 @@
  * - 支持新作用域 newScope ，和全局配置隔离
  */
 
-import { mustString, hasOwnProperty, isObject, isStringNotEmpty } from "../base/data";
-import { throwError, throwIfNullOrUndefined } from "../base/error";
-import { IServerManager, ServerOptions } from "./models/server-model";
-import { checkScope, IScope, mountScope } from "../base/scope"
-
-// 把自己的类型共享出去
-export * from "./models/server-model"
+import { mustString, hasOwnProperty, isObject, isStringNotEmpty, throwError, throwIfNullOrUndefined } from "../../base";
+import { checkScope, IScope, mountScope } from "../../common"
+import { IServerManager, ServerOptions } from "../models/server-model";
 
 /** 默认的服务器类型；后续支持configServer方法中做配置*/
 const DEFAULT_ServerType: keyof (ServerOptions) = "api";

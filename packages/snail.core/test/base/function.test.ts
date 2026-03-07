@@ -1,6 +1,6 @@
 import { beforeEach, afterEach, afterAll, assert, beforeAll, describe, expect, it, test, vi } from 'vitest'
-import { run, runAsync, debounce, throttle, polling } from "../../src/base/function"
-import { throwError } from '../../src/base/error';
+import { run, runAsync, debounce, throttle, polling } from "../../src/base"
+import { throwError } from '../../src/base';
 
 vi.mock("../../src/base/function", { spy: true });
 

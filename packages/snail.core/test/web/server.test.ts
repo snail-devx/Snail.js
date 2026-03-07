@@ -1,5 +1,5 @@
 import { assert, describe, expect, test } from 'vitest'
-import { server, useServer } from "../../src/web/server"
+import { server, useServer } from "../../src/web/components/server"
 import { IServerManager } from '../../src/web/models/server-model'
 
 /**

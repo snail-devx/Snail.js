@@ -1,7 +1,6 @@
 import { assert, describe, expect, test } from 'vitest'
-import { event, useEvent } from "../../src/base/event"
-import { EventHandle, IEventManager } from '../../src/base/models/event-model';
-import { delay } from '../../src/base/promise';
+import { delay } from '../../src/base';
+import { event, useEvent, EventHandle, IEventManager } from "../../src/common"
 
 /**
  * 测试方法

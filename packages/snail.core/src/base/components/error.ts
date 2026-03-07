@@ -1,9 +1,14 @@
 /**
- * 错误模块：指定条件下抛出错误
+ * Error 相关扩展
+ * - 便捷构建 Error 对象
+ * - 特定情况 throw Error 对象
  */
-import { isNullOrUndefined, isString } from "./data";
 
-//#region *************************************        错误异常相关        *************************************  
+import { RunResult } from "../models/function-model";
+import { isNullOrUndefined } from "./nullish";
+import { isString } from "./string";
+
+//#region *************************************        判断校验        *************************************
 /**
  * 抛出异常信息：throw new Error(msg)
  * @param msg 报错信息
@@ -56,7 +61,7 @@ export function throwIfNullOrUndefined(data: any, msg: string): void {
 }
 //#endregion
 
-//#region *************************************        异常优化        *************************************
+//#region *************************************        操作扩展        *************************************
 /**
  * 获取异常消息
  * @param error 错误对象；如果是Error及其子类，则error.message；否则error自身
@@ -68,5 +73,23 @@ export function getMessage(error: Error | any, preMessage: string = ''): string 
         ? error.message
         : typeof error == "string" ? error : JSON.stringify(error);
     return `${preMessage}${message}`;
+}
+
+/**
+ * 基于错误信息构建运行结果
+ * - error 为   Error 时，ex为error，reason:error.message
+ * - error 不为 Error 时，ex为undefined，reason:error
+ * @param error 错误信息
+ * @param title 日志输出时的标题信息
+ * @returns 
+ */
+export function buildResultByError<T>(error: any, title: string): RunResult<T> {
+    console.error(title, error);
+    const isEx: boolean = error instanceof Error;
+    return {
+        success: false,
+        ex: isEx ? error : undefined,
+        reason: isEx ? error.message : error
+    }
 }
 //#endregion

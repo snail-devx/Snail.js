@@ -1,9 +1,24 @@
-import { newId } from "./data";
-import { IKeyManager } from "./models/key-model";
+/**
+ * 键值管理，确保唯一性
+ */
+
+import { IKeyManager } from "../models/key-model";
 import { checkScope, IScope, mountScope } from "./scope";
 
 //  导出数据结构
-export * from "./models/key-model";
+export * from "../models/key-model";
+
+/**
+ * 生成一个唯一id字符串
+ * @returns 
+ */
+export function newId(): string {
+    var newId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16).toUpperCase();
+    });
+    return newId.toLowerCase().replace(/-/g, "");
+};
 
 /**
  * 使用Key管理器

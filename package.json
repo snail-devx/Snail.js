@@ -51,11 +51,6 @@
     "typescript": "^5.8.3",
     "vitest": "^3.1.4"
   },
-  "pnpm": {
-    "overrides": {
-      "snail.core": "2.0.19"
-    }
-  },
   "peerDependencies": {
     "typescript": ">=5.8.2"
   },

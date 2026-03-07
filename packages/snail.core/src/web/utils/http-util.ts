@@ -2,10 +2,8 @@
  * Http助手类
  *  1、仅限 http.ts 使用，将其部分静态方法移动到此
  */
-import { mustString, extract, hasOwnProperty, tidyString } from "../../base/data";
-import { isFunction, isNullOrUndefined, isObject, isPromise, isRegexp, isStringNotEmpty } from "../../base/data";
-import { throwIfTrue, throwIfUndefined } from "../../base/error";
-import { defer } from "../../base/promise";
+import { isFunction, isNullOrUndefined, isObject, isPromise, isRegexp, isStringNotEmpty } from "../../base";
+import { mustString, extract, hasOwnProperty, tidyString, defer, throwIfTrue, throwIfUndefined } from "../../base";
 import { HttpOptions, HttpInterceptor, HttpRequest, HttpResponse, HttpError } from "../models/http-model";
 
 //#region ************************************* HTTP配置 *************************************

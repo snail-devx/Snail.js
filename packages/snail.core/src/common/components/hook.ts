@@ -1,11 +1,7 @@
-import { mustFunction } from "./data";
-import { RunResult, run, runAsync } from "./function";
-import { HookFunction, HookRunOptions, IHookManager } from "./models/hook-model";
-import { IScope } from "./models/scope-model";
+import { mustFunction, run, runAsync, RunResult } from "../../base";
+import { HookFunction, HookRunOptions, IHookManager } from "../models/hook-model";
+import { IScope } from "../models/scope-model";
 import { checkScope, mountScope, useScope } from "./scope";
-
-// 把自己的类型共享出去
-export * from "./models/hook-model";
 
 /**
  * 使用【钩子函数】

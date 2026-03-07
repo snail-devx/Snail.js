@@ -1,8 +1,5 @@
 import { afterAll, assert, describe, expect, test } from 'vitest'
-import { script, useScript, IScriptManager, configScript } from "../../src/web/script"
-import { useHttp, configHttpIntercept } from '../../src/web/http';
-import { HttpRequest } from '../../src/web/models/http-model';
-import { version } from '../../src/web/version';
+import { script, useScript, version, useHttp, configHttpIntercept, IScriptManager, configScript, HttpRequest } from "../../src/web"
 
 //  HTTP全局拦截：支持的几种加载模式，返回代码
 let counterAMD = 0, counterIIFE = 0, counterUMD = 0;

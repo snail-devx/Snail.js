@@ -1,12 +1,49 @@
-import { mustFunction, isFunction, isPromise } from "./data";
-import { getMessage } from "./error";
-import { RunResult } from "./models/function-model";
-import { AsyncResult, defer } from "./promise";
-import { buildResultByError } from "./utils/function-util";
+/**
+ * function 相关扩展
+ */
 
-/** 把自己的类型共享出去 */
-export * from "./models/function-model"
+import { RunResult } from "../models/function-model";
+import { AsyncResult } from "../models/promise-model";
+import { getType } from "../utils/type-utils";
+import { buildResultByError, getMessage } from "./error";
+import { defer, isPromise } from "./promise";
 
+//#region *************************************        判断校验        *************************************
+/**
+ * 是否是Function
+ * @param data
+ * @returns 是返回true；否则返回false
+ */
+export function isFunction(data: any): boolean {
+    //  支持异步方法
+    const type: string = getType(data);
+    return type == "[object Function]" || type == "[object AsyncFunction]";
+}
+
+/**
+ * data必须是Function方法，否则报错
+ * @param data 要验证的数据
+ * @param paramName 参数名，用于拼接报错信息。paramName + " must be a function."
+ * @returns 是function返回true
+ */
+export function mustFunction(data: any, paramName: string): boolean {
+    if (isFunction(data) == true) {
+        return true;
+    }
+    throw new Error(`${paramName} must be a function.`);
+}
+
+/**
+ * 整理Function
+ * @param func 
+ * @returns func不是Function时，返回undefined；否则自身
+ */
+export function tidyFunction(func: any): Function | undefined {
+    return isFunction(func) ? func : undefined;
+}
+//#endregion
+
+//#region *************************************        操作扩展        *************************************
 /**
  * 运行执行方法；内部自动拦截异常
  * @param func 要运行的方法
@@ -130,3 +167,4 @@ export function polling<T>(fn: (...args: any[]) => T | Promise<T> | undefined, c
     deferred.promise.stop = () => runReject("polling stopped");
     return deferred.promise as AsyncResult<T>;
 }
+//#endregion

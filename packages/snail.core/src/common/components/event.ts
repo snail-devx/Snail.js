@@ -1,10 +1,7 @@
-import { mustFunction, mustString, hasAny, hasOwnProperty, isFunction, isObject, newId, tidyString } from "./data";
-import { run } from "./function";
-import { EventHandle, EventSender, IEventManager } from "./models/event-model";
+import { mustFunction, mustString, hasAny, hasOwnProperty, isFunction, isObject, tidyString, run } from "../../base";
+import { EventHandle, EventSender, IEventManager } from "../models/event-model";
+import { newId } from "./key";
 import { checkScope, IScope, mountScope } from "./scope";
-
-// 把自己的类型共享出去
-export * from "./models/event-model";
 
 /**
  * 使用【事件管理器】

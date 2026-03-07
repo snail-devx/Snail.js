@@ -1,10 +1,8 @@
-import { isPromise, isStringNotEmpty, mustFunction } from "./data";
-import { throwIfFalse, throwIfTrue } from "./error";
-import { run } from "./function";
-import { IScope, IAsyncScope, IScopes, KeyScopeUseResult } from "./models/scope-model";
+import { isPromise, isStringNotEmpty, mustFunction, run, throwIfFalse, throwIfTrue } from "../../base";
+import { IScope, IAsyncScope, IScopes, KeyScopeUseResult } from "../models/scope-model";
 
 // 把自己的类型共享出去
-export * from "./models/scope-model";
+export * from "../models/scope-model";
 
 /** 挂载【作用域】的回调函数列表 */
 const mountHandles: Array<(scope: IScope) => void> = [];

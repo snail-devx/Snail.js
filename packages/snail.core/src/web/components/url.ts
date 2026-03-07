@@ -1,8 +1,5 @@
-import { isStringNotEmpty } from "../base/data";
-import { IUrlManager, UrlParseResult } from "./models/url-model";
-
-// 把自己的类型共享出去
-export * from "./models/url-model";
+import { isStringNotEmpty } from "../../base";
+import { IUrlManager, UrlParseResult } from "../models/url-model";
 
 /**
  * 使用【Url管理器】

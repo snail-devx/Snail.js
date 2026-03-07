@@ -10,10 +10,10 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 export default dealRollupDefault(
     [
         {
-            input: "src/snail.core.ts",
+            input: "src/index.ts",
             output: [//  Valid values are "amd", "cjs", "system", "es", "iife" or "umd".
-                { file: "dist/snail.core.js", format: "es", name: "Snail", },
-                { file: "dist/snail.core.umd.js", format: "umd", name: "Snail", }
+                { file: "dist/index.js", format: "es", name: "Snail", },
+                { file: "dist/index.umd.js", format: "umd", name: "Snail", }
             ],
         }
     ],

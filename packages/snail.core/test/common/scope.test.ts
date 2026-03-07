@@ -1,7 +1,6 @@
 import { assert, describe, expect, it, test } from 'vitest'
-import { wait, defer, delay } from "../../src/base/promise"
-import { getMessage, throwError } from '../../src/base/error';
-import { IScope, useScope, useScopes, useAsyncScope, checkScope, useKeyScope, onMountScope, mountScope } from '../../src/base/scope';
+import { wait, defer, delay, getMessage, throwError } from "../../src/base"
+import { IScope, useScope, useScopes, useAsyncScope, checkScope, useKeyScope, onMountScope, mountScope } from '../../src/common';
 
 //  不用测试【mountScope】，在useScope等方法内部就是使用【mountScope】方法实现，附带就测试了
 
@@ -20,11 +19,11 @@ describe("useScope", () => {
 
     test("property-set", () => {
         expect(sc.destroyed).toStrictEqual(false);
-        expect(() => sc.destroyed = true).toThrow("Cannot set property destroyed of [object Object] which has only a getter");
+        expect(() => sc.destroyed = true).toThrow("Cannot set property destroyed of [object IScope] which has only a getter");
         expect(sc.destroyed).toStrictEqual(false);
 
-        expect(() => sc.onDestroy = undefined!).toThrow("Cannot assign to read only property 'onDestroy' of object '[object Object]'");
-        expect(() => sc.destroy = undefined!).toThrow("Cannot assign to read only property 'destroy' of object '[object Object]'");
+        expect(() => sc.onDestroy = undefined!).toThrow("Cannot assign to read only property 'onDestroy' of object '[object IScope]'");
+        expect(() => sc.destroy = undefined!).toThrow("Cannot assign to read only property 'destroy' of object '[object IScope]'");
     });
     test("ondestroy", () => {
         sc.onDestroy(() => destroyedCount++);
