@@ -55,7 +55,7 @@ const valueRef = shallowRef<string>();
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
-
+onMounted(() => emits("rendered", handle));
 </script>
 
 <style lang="less">
