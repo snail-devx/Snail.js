@@ -54,7 +54,11 @@
 | [Tree](https://www.yuque.com/snail-devx/js/kaynh9t44gbl6fxc#tKdSd)    | **树组件；基于 nodes 渲染树，支持节点自定义，集成节点事件和本地搜索**                                                     |
 | [Wrapper](https://www.yuque.com/snail-devx/js/kaynh9t44gbl6fxc#gita6) | **包裹层组件；作为常用组件的包裹层，自动实现组件在 page 和 popup 中展现，让内容组件关注核心逻辑即可**                     |
 
-## 3.3. **popup 弹窗组件**
+## 3.3. picker 选择器组件
+
+> 基于IPopupManager实现的各类选择器组件，如日期选择器、时间选择器、颜色选择器、、、
+
+## 3.4. **popup 弹窗组件**
 
 **基于 IPopupManager 实现弹窗管理，自动管理弹窗层级、弹窗生命周期；提供基础 popup 弹窗方法；并扩展 dialog、follow、toast、confirm 弹窗方法**
 
@@ -69,7 +73,7 @@
 | [toast](https://www.yuque.com/snail-devx/js/byho94c6ms40kdb2#FWNH1)    | **消息提示弹窗；模拟 Android 的 Toast 弹窗提示消息**                                   |
 | [confirm](https://www.yuque.com/snail-devx/js/byho94c6ms40kdb2#wohc0)  | **确认弹窗；模拟实现原生 confirm 弹窗**                                                |
 
-## 3.4. **prompt 提示组件**
+## 3.5. **prompt 提示组件**
 
 **封装一些提示性质的通用组件，如数据加载状态、无数据提醒等等**
 

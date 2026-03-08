@@ -24,7 +24,12 @@
             <span>yyyy-MM-dd HH:mm:ss</span>
             <div style="position: relative; width: 200px;display: inline-block;">
                 <DatePicker style="height: 30px;border: 1px solid red;margin-bottom: 10px;opacity: 1;"
-                    format="yyyy-MM-dd HH:mm:ss" @change="value => (dateTextRef = value)" />
+                    format="yyyy-MM-dd HH:mm:ss" @change="value => (dateTextRef = value)" min="2026-03-08 12:00:00" />
+            </div>
+            <span>yyyy</span>
+            <div style="position: relative; width: 200px;display: inline-block;">
+                <DatePicker style="height: 30px;border: 1px solid red;margin-bottom: 10px;opacity: 1;"
+                    :secondDisabled="true" @change="value => (dateTextRef = value)" />
             </div>
         </div>
     </div>

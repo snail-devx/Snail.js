@@ -69,6 +69,13 @@ import Wrapper from "./container/wrapper.vue";
 //  方法导出
 export * from "./container/utils/component-util";
 
+// *****************************************   👉  picker 相关导出    ****************************************
+//  类型导出
+export * from "./picker/models/datetime-model"
+export * from "./picker/models/picker-model"
+//  方法导出
+export * from "./picker/manager";
+
 // *****************************************   👉  popup 相关导出    ****************************************
 //  类型在【./popup/manager】中导出了
 //  组件导出：赋值给 components

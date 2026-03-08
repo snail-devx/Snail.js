@@ -33,6 +33,9 @@ import TreeTest from "./container/tree-test.vue";
 //  👉 表单组件
 import DesignerTest from "./form/designer-test.vue";
 import RendererTest from "./form/renderer-test.vue";
+//  👉 选择器组件
+import TimepickerTest from "./picker/timepicker-test.vue";
+
 //  👉 弹窗组件
 import DialogTest from "./popup/dialog-test.vue";
 import FollowTest from "./popup/follow-test.vue";
@@ -98,6 +101,12 @@ const treeOptions: TreeOptions<Component> = {
             ]
         },
         {
+            text: "选择器",
+            children: [
+                { text: "时间选择器", data: TimepickerTest, clickable: true, searchable: true }
+            ]
+        },
+        {
             text: "弹窗管理",
             children: [
                 { text: "Dialog 模态弹窗", data: DialogTest, clickable: true, searchable: true, },
@@ -129,7 +138,8 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 }
 
 onMounted(() => {
-    onTreeNodeClick(treeOptions.nodes[2].children[0], undefined);
+    // onTreeNodeClick(treeOptions.nodes[2].children[0], undefined);
+    onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
 });
 </script>
 

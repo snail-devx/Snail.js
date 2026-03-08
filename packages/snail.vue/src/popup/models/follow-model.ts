@@ -19,7 +19,7 @@ export type FollowOptions<Props = void, Model = void> = PopupOptions<Props, Mode
      */
     followWidth?: boolean;
     /**
-     * 启用【高度】更碎
+     * 启用【高度】跟随
      * - 为true则和 target 高度保持一致
      * - false时，高度由 弹出组件 自己维护
      * - 不管是true、还是false，若高度超过浏览器最大高度，会进行强制干预
