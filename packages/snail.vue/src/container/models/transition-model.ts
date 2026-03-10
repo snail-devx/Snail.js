@@ -3,6 +3,18 @@
  */
 export type TransitionOptions = {
     /**
+     * 是分组动画，还是单个动画
+     * - true 则使用  TransitionGroup
+     * - false 则使用   Transition 
+     */
+    group: boolean;
+    /**
+     * 动画持续时间
+     * - 单位ms，默认200ms
+     */
+    duration?: number;
+
+    /**
      * 动画的自定义类样式名称
      * - 默认为 `snail-transition`；不会作为 Transition的 name 属性名
      * - 动画生效时组成的`class`规则为：`customClass`+动画状态；类似`snail-transition enter-from`
@@ -38,12 +50,6 @@ export type TransitionOptions = {
      *  |   `right-left` | 右进左出     | 进入时 `translateX` 100% - 0     | 离开时 `translateX` 0 - -100%    |
      */
     effect?: TransitionEffectOptions | Array<TransitionEffectOptions>;
-    /**
-     * 是分组动画，还是单个动画
-     * - true 则使用  TransitionGroup
-     * - false 则使用   Transition 
-     */
-    group: boolean;
 }
 export type TransitionEffectOptions = "fade" | "scale" | "rotate"
     | "up" | "down" | "up-down" | "down-up"
