@@ -91,6 +91,7 @@ export type FollowOptions<Props = void, Model = void> = PopupOptions<Props, Mode
     /**
      * target改变时是否关闭弹窗
      * - target尺寸、位置变化
+     * - target点击时
      */
     closeOnTarget?: boolean;
 };

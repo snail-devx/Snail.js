@@ -26,7 +26,7 @@
             }
   -->
 <template>
-    <component :is="group ? TransitionGroup : Transition" :="$attrs" appear
+    <component :is="group ? TransitionGroup : Transition" :="$attrs" appear :duration="duration"
         :enter-active-class="`${classNames} enter-active`" :enter-from-class="`${classNames} enter-from`"
         :enter-to-class="`${classNames} enter-to`" :leave-active-class="`${classNames} leave-active`"
         :leave-from-class="`${classNames} leave-from`" :leave-to-class="`${classNames} leave-to`">
@@ -54,6 +54,7 @@ const classNames = computed<string>(() => {
     else {
         array.push(props.effect as string || "fade")
     }
+    console.log(array);
     return array.join(" ");
 });
 
@@ -82,22 +83,22 @@ const classNames = computed<string>(() => {
 //  淡入淡出     | 进入时 `opacity` 0-1             | 离开时 `opacity` 1 - 0
 .snail-transition.fade {
 
-    &.enter-active,
-    &.leave-active {
-        opacity: 1;
-    }
-
     &.enter-from,
     &.leave-to {
         opacity: 0;
+    }
+
+    &.enter-to,
+    &.leave-from {
+        opacity: 1;
     }
 }
 
 //  缩放动画     | 进入时 `scale` 0-1               | 离开时 `scale` 0 - 1            
 .snail-transition.scale {
 
-    &.enter-active,
-    &.leave-active {
+    &.enter-from,
+    &.leave-to {
         transform: scale(0);
     }
 
@@ -110,8 +111,8 @@ const classNames = computed<string>(() => {
 //  旋转动画     | 进入时 `rotate` 360deg - 0       | 离开时 `rotate` 0 - 360deg 
 .snail-transition.rotate {
 
-    &.enter-active,
-    &.leave-active {
+    &.enter-from,
+    &.leave-to {
         transform: rotate(360deg);
     }
 
@@ -123,50 +124,45 @@ const classNames = computed<string>(() => {
 
 //  上进上出     | 进入时 `translateY` 100% - 0     | 离开时 `translateY` 0 - -100% 
 .snail-transition.up {
-
-    &.enter-active,
-    &.leave-active {
-        overflow: hidden;
-        transform: translateY(0);
-    }
-
     &.enter-from {
         transform: translateY(100%);
     }
 
-    &.leave-to {
-        transform: translateY(-100%);
-    }
-}
-
-//  下进下出     | 进入时 `translateY` -100% - 0    | 离开时 `translateY` 0 - 100% 
-.snail-transition.down {
-
-    &.enter-active,
-    &.leave-active {
-        overflow: hidden;
+    &.enter-to,
+    &.leave-from {
         transform: translateY(0);
     }
 
-    &.enter-from {
-        transform: translateY(-100%);
-    }
-
     &.leave-to {
-        transform: translateY(100%);
+        transform: translateY(-100%);
     }
 }
 
 //  上进下出     | 进入时 `translateY` 100% - 0     | 离开时 `translateY` 0 - 100%
 .snail-transition.up-down {
 
-    &.enter-active,
-    &.leave-active {
-        overflow: hidden;
+    &.enter-from,
+    &.leave-to {
+        transform: translateY(100%);
+    }
+
+    &.enter-to,
+    &.leave-from {
+        transform: translateY(0);
+    }
+}
+
+//  下进下出     | 进入时 `translateY` -100% - 0    | 离开时 `translateY` 0 - 100% 
+.snail-transition.down {
+    &.enter-from {
+        transform: translateY(-100%);
+    }
+
+    &.enter-to,
+    &.leave-from {
         transform: translateY(0);
     }
 
-    &.enter-from,
     &.leave-to {
         transform: translateY(100%);
     }
@@ -175,77 +171,71 @@ const classNames = computed<string>(() => {
 //  下进上出     | 进入时 `translateY` -100% - 0    | 离开时 `translateY` 0 - -100%
 .snail-transition.down-up {
 
-    &.enter-active,
-    &.leave-active {
-        overflow: hidden;
-        transform: translateY(0);
-    }
-
     &.enter-from,
     &.leave-to {
         transform: translateY(-100%);
     }
+
+    &.enter-to,
+    &.leave-from {
+        transform: translateY(0);
+    }
+
 }
 
 //  左进左出     | 进入时 `translateX` -100% - 0    | 离开时 `translateX` 0 - -100%
 .snail-transition.left {
 
-    &.enter-active,
-    &.leave-active {
-        overflow: hidden;
-        transform: translateX(0);
-    }
-
     &.enter-from,
     &.leave-to {
         transform: translateX(-100%);
+    }
+
+    &.enter-to,
+    &.leave-from {
+        transform: translateX(0);
+    }
+}
+
+//  左进右出     | 进入时 `translateX` -100% - 0    | 离开时 `translateX` 0 - 100%
+.snail-transition.left-right {
+    &.enter-from {
+        transform: translateX(-100%);
+    }
+
+    &.enter-to,
+    &.leave-from {
+        transform: translateX(0);
+    }
+
+    &.leave-to {
+        transform: translateX(100%);
     }
 }
 
 //  右进右出     | 进入时 `translateX` 100% - 0     | 离开时 `translateX` 0 - 100%
 .snail-transition.right {
 
-    &.enter-active,
-    &.leave-active {
-        overflow: hidden;
-        transform: translateX(0);
-    }
-
     &.enter-from,
     &.leave-to {
         transform: translateX(100%);
     }
-}
 
-//  左进右出     | 进入时 `translateX` -100% - 0    | 离开时 `translateX` 0 - 100%
-.snail-transition.left-right {
-
-    &.enter-active,
-    &.leave-active {
-        overflow: hidden;
+    &.enter-to,
+    &.leave-from {
         transform: translateX(0);
-    }
-
-    &.enter-from {
-        transform: translateX(-100%);
-    }
-
-    &.leave-to {
-        transform: translateX(100%);
     }
 }
 
 //  右进左出     | 进入时 `translateX` 100% - 0     | 离开时 `translateX` 0 - -100% 
 .snail-transition.right-left {
-
-    &.enter-active,
-    &.leave-active {
-        overflow: hidden;
-        transform: translateX(0);
-    }
-
     &.enter-from {
         transform: translateX(100%);
+    }
+
+    &.enter-to,
+    &.leave-from {
+        transform: translateX(0);
     }
 
     &.leave-to {

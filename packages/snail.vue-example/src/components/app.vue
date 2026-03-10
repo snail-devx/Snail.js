@@ -29,6 +29,7 @@ import DynamicTest from "./container/dynamic-test.vue";
 import FoldTest from "./container/fold-test.vue";
 import ScrollTest from "./container/scroll-test.vue";
 import TableTest from "./container/table-test.vue";
+import TransitionsTest from "./container/transitions-test.vue";
 import TreeTest from "./container/tree-test.vue";
 //  👉 表单组件
 import DesignerTest from "./form/designer-test.vue";
@@ -90,6 +91,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Fold 折叠组件", data: FoldTest, clickable: true, searchable: true, },
                 { text: "Scroll 滚动组件", data: ScrollTest, clickable: true, searchable: true, },
                 { text: "Table 表格组件", data: TableTest, clickable: true, searchable: true, },
+                { text: "Transitions 动画组件", data: TransitionsTest, clickable: true, searchable: true },
                 { text: "Tree 树组件", data: TreeTest, clickable: true, searchable: true, },
             ]
         },
@@ -167,6 +169,12 @@ onMounted(() => {
         padding: 10px;
         overflow: hidden;
         position: relative;
+    }
+
+    section {
+        margin: 10px;
+        width: 30%;
+        float: left;
     }
 }
 </style>

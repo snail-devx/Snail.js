@@ -138,12 +138,22 @@ onMounted(() => {
             );
             //  监听点击：确保比子元素先捕获点击事件，否则可能在子元素被vue重新渲染更新后，判断 contains 会出问题
             onEvent(window, "click", (event: MouseEvent) => {
-                //  非【跟随组件】中的元素点击时才触发时关闭；若钉住弹窗了，则不关闭；
-                options.closeOnMask
-                    && followExt.pinned.value != true
-                    && rootDom.value != event.target
-                    && rootDom.value.contains(event.target as HTMLElement) == false
-                    && closePopup(undefined)
+                /**
+                 * 自动关闭的例外情况：
+                 *  1、未配置 点击遮罩关闭时；钉住时不自动关闭；
+                 *  2、是跟随容器自身、内部点击时不自动关闭
+                 *  3、是跟随的目标元素自身、内部点击时不自动关闭；这个暂时不做实现，外部不一定是click激活的
+                 */
+                if (options.closeOnMask != true || followExt.pinned.value == true) {
+                    return;
+                }
+                //  检测元素点击事件
+                const isClickInContainer = rootDom.value === event.target || rootDom.value.contains(event.target as HTMLElement);
+                const isClickInTarget = extOptions.target == event.target || extOptions.target.contains(event.target as HTMLElement);
+                if (isClickInContainer || (isClickInTarget && options.closeOnTarget != true)) {
+                    return;
+                }
+                closePopup(undefined);
             });
             //  监听子元素变化：暂时不监听属性变化
             onMutation(rootDom.value, {
