@@ -15,10 +15,12 @@ export * from "./components/promise"
 export * from "./components/regexp"
 export * from "./components/stream"
 export * from "./components/string"
+export * from "./components/time"
 
 //  models 类型导出
 export * from "./models/function-model"
 export * from "./models/promise-model"
+export * from "./models/time-model"
 
 //  utils 助手导出
 export * from "./utils/type-utils"
