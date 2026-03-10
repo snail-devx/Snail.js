@@ -14,6 +14,27 @@ export type ScrollOptions = {
      * - true 支持滚动
      */
     scrollY?: boolean;
+
+    /**
+     * 滚动条尺寸
+     * - normal ：常规，10px
+     * - small ：小尺寸，宽度 6px
+     * - mini ：迷你尺寸，宽度 4px
+     * - none ：无，不显示滚动条，但仍然能够滚动
+     */
+    barSize?: "normal" | "small" | "mini" | "none";
+    /**
+     * 滚动条模式
+     * - auto（默认值）：自动，内容溢出时自动显示滚动条
+     * - hover：鼠标进入时才显示滚动条
+     */
+    barMode?: "auto" | "hover";
+    /**
+     * 滚动条防抖处理
+     * - 垂直滚动条在【有-无】之间变化时，会导致内容width变化，从而产生抖动
+     * - 为true时，会给滚动条方向一个处理padding值，从而实现防抖效果
+     */
+    debounce?: boolean;
 }
 
 /**

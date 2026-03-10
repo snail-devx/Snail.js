@@ -3,7 +3,7 @@
     2、支持PC、移动端；移动端为上下加载、下拉刷新
 -->
 <template>
-    <div class="snail-scroll" ref="scroll-root" :class="classRef" @scroll="refreshScrollInfo">
+    <div class="snail-scroll" ref="scroll-root" :class="classRef" :style="styleRef" @scroll="refreshScrollInfo">
         <slot></slot>
     </div>
 </template>
@@ -22,7 +22,38 @@ const rootDom = useTemplateRef("scroll-root");
 const { onSize } = useObserver();
 const { onInterval } = useTimer();
 /** 动态绑定样式 */
-const classRef = computed(() => ({ 'scroll-x': props.scrollX == true, 'scroll-y': props.scrollY == true }));
+const classRef = computed(() => ({
+    // "scroll-x": props.scrollX == true,
+    // "scroll-y": props.scrollY == true,
+    'debounce': props.scrollY == true && props.debounce == true,
+    //  滚动条模式
+    "hover-show": props.barMode == "hover",
+}));
+/** 自定义style样式 */
+const styleRef = computed(() => {
+    const style = Object.create(null);
+    //  滚动条overflow
+    (props.scrollX || props.scrollY) && (style["--scroll-overflow"] = `${props.scrollX ? 'auto' : 'hidden'} ${props.scrollY ? 'auto' : 'hidden'}`);
+    //  滚动条 尺寸
+    if (props.barSize) {
+        switch (props.barSize) {
+            case "normal":
+                style["--scroll-bar-size"] = "10px";
+                break;
+            case "small":
+                style["--scroll-bar-size"] = "6px";
+                break;
+            case "mini":
+                style["--scroll-bar-size"] = "4px";
+                break;
+            case "none":
+                style["--scroll-bar-size"] = "0";
+                break;
+        }
+    }
+
+    return style;
+});
 /** 备份滚动条状态信息 */
 var preStatus: ScrollStatus = undefined;
 //  2、可选配置选项
@@ -127,14 +158,30 @@ onMounted(() => {
 
 <style lang="less">
 .snail-scroll {
-    overflow: hidden;
+    --scroll-overflow: hidden;
+    overflow: var(--scroll-overflow, hidden);
 
-    &.scroll-x {
-        overflow-x: auto;
+    //  滚动条尺寸
+    &::-webkit-scrollbar {
+        width: var(--scroll-bar-size, 10px);
+        height: var(--scroll-bar-size, 10px);
     }
 
-    &.scroll-y {
-        overflow-y: auto;
+    //  滚动条显示模式：hover-show 时候，鼠标未移入时，不显示滚动条
+    &.hover-show:not(:hover)::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+    }
+
+    //  防抖效果处理：仅处理垂直滚动条
+    &.debounce {
+        padding-right: var(--scroll-bar-size, 10px);
+
+        //  有垂直滚动条时，padding-right设置为0；兼容一下 hover 显示滚动条模式
+        &.y-bar:not(.hover-show),
+        &.y-bar.hover-show:hover {
+            padding-right: 0;
+        }
     }
 }
 </style>

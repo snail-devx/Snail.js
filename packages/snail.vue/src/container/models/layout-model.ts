@@ -4,6 +4,9 @@
 
 import { ScrollOptions } from "./scroll-model";
 
+/**
+ * 布局组件配置选项
+ */
 export type LayoutOptions = {
     /**
      * 布局模式：水平，还是垂直
