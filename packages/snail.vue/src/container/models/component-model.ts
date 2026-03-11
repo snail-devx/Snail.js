@@ -38,6 +38,12 @@ export type EmitterType<Events extends Record<string, any[]>> = {
     <K extends keyof Events>(event: K, ...payload: Events[K]): any;
 };
 /**
+ * 提取【组件插槽】类型
+ */
+export type SlotsType<Slots extends Record<string, any>> = {
+    [key in keyof Slots]: (props: Slots[key]) => any;
+};
+/**
  * 提取【组件事件】类型
  * - 将【组件事件】中的key首字母小写，追加上on前缀；key对应的value为监听函数参数
  * - T的类型约束：Record<string, unknown[]>

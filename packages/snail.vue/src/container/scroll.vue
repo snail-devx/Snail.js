@@ -3,7 +3,7 @@
     2、支持PC、移动端；移动端为上下加载、下拉刷新
 -->
 <template>
-    <div class="snail-scroll" ref="scroll-root" :class="classRef" :style="styleRef" @scroll="refreshScrollInfo">
+    <div class="snail-scroll" ref="scroll-root" :style="styleRef" @scroll="refreshScrollInfo">
         <slot></slot>
     </div>
 </template>
@@ -21,19 +21,11 @@ const emits = defineEmits<ScrollEvents>();
 const rootDom = useTemplateRef("scroll-root");
 const { onSize } = useObserver();
 const { onInterval } = useTimer();
-/** 动态绑定样式 */
-const classRef = computed(() => ({
-    // "scroll-x": props.scrollX == true,
-    // "scroll-y": props.scrollY == true,
-    'debounce': props.scrollY == true && props.debounce == true,
-    //  滚动条模式
-    "hover-show": props.barMode == "hover",
-}));
 /** 自定义style样式 */
 const styleRef = computed(() => {
     const style = Object.create(null);
     //  滚动条overflow
-    (props.scrollX || props.scrollY) && (style["--scroll-overflow"] = `${props.scrollX ? 'auto' : 'hidden'} ${props.scrollY ? 'auto' : 'hidden'}`);
+    (props.scrollX || props.scrollY) && (style["--scroll-overflow"] = `${props.scrollX == true ? 'auto' : 'hidden'} ${props.scrollY == true ? 'auto' : 'hidden'}`);
     //  滚动条 尺寸
     if (props.barSize) {
         switch (props.barSize) {
@@ -131,15 +123,9 @@ function refreshScrollInfo() {
     events.bottom && emits("bottom");
     //  增加样式标记，减少外部适配：水平、垂直滚动条；水平位置、垂直位置等
     if (rootDom.value) {
-        rootDom.value.classList.remove("x-bar", "y-bar", "left", "right", "top", "bottom");
-        const classes: string[] = [];
-        status.xbar && classes.push("x-bar");
-        status.ybar && classes.push("y-bar");
-        status.left && classes.push("left");
-        status.right && classes.push("right");
-        status.top && classes.push("top");
-        status.bottom && classes.push("bottom");
-        classes.length && rootDom.value.classList.add(...classes);
+        rootDom.value.classList.remove("x-bar", "y-bar");
+        status.xbar && rootDom.value.classList.add("x-bar");
+        status.ybar && rootDom.value.classList.add("y-bar");
     }
 }
 
@@ -158,6 +144,7 @@ onMounted(() => {
 
 <style lang="less">
 .snail-scroll {
+    //  支持变量 --scroll-overflow 是否出滚动条，默认hidden；--scroll-bar-size ：滚动条尺寸，默认10px
     --scroll-overflow: hidden;
     overflow: var(--scroll-overflow, hidden);
 
@@ -165,23 +152,6 @@ onMounted(() => {
     &::-webkit-scrollbar {
         width: var(--scroll-bar-size, 10px);
         height: var(--scroll-bar-size, 10px);
-    }
-
-    //  滚动条显示模式：hover-show 时候，鼠标未移入时，不显示滚动条
-    &.hover-show:not(:hover)::-webkit-scrollbar {
-        width: 0;
-        height: 0;
-    }
-
-    //  防抖效果处理：仅处理垂直滚动条
-    &.debounce {
-        padding-right: var(--scroll-bar-size, 10px);
-
-        //  有垂直滚动条时，padding-right设置为0；兼容一下 hover 显示滚动条模式
-        &.y-bar:not(.hover-show),
-        &.y-bar.hover-show:hover {
-            padding-right: 0;
-        }
     }
 }
 </style>

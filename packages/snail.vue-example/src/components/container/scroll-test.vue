@@ -59,6 +59,7 @@
                 </div>
             </Scroll>
         </section>
+        <!-- 滚动条显示时机：Scroll移除此属性，暂时不对外开放
         <section>
             <Scroll class="scroll-test" :scroll-x="true" :scroll-y="true" :bar-size="'mini'" :bar-mode="'hover'">
                 <div>
@@ -74,24 +75,7 @@
                     <code>:scroll-x="true" :scroll-y="true" :bar-size="'small'" :bar-mode="'hover'"</code>
                 </div>
             </Scroll>
-        </section>
-        <section>
-            <Scroll class="scroll-test" :scroll-x="true" :scroll-y="true" :bar-mode="'hover'" :debounce="true">
-                <div>
-                    都滚动，鼠标移入才显示滚动条；防抖效果
-                    <code>:scroll-x="true" :scroll-y="true"  :bar-mode="'hover'" :debounce="true</code>
-                </div>
-            </Scroll>
-        </section>
-        <section>
-            <Scroll class="scroll-test" :scroll-x="true" :scroll-y="true" :debounce="true">
-                <div>
-                    都滚动，防抖效果
-                    <code>:scroll-x="true" :scroll-y="true"  :debounce="true</code>
-                    <code>:scroll-x="true" :scroll-y="true"  :debounce="true</code>
-                </div>
-            </Scroll>
-        </section>
+        </section>-->
         <!-- 事件相关 -->
         <section style="width: 100%;height: 2px;">事件相关：看控制台输出</section>
         <section>

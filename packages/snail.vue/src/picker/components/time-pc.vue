@@ -2,10 +2,10 @@
     1、实现上，参照效果【zane-calendar】库效果
   -->
 <template>
-    <div class="snail-time-picker pc" :class="{ 'second-disabled': secondDisabled }">
-        <!-- 时分秒选择区域-->
-        <Transitions :group="true" :effect="['down-up']">
-            <div class="time-zone">
+    <Layout class="snail-time-picker pc" :class="{ 'second-disabled': secondDisabled }" :mode="'vertical'">
+        <Transitions :group="true" :effect="'down-up'">
+            <!-- 时分秒选择区域-->
+            <template #default>
                 <div class="tz-item" ref="hour-items">
                     <div class="tzi-number" v-for="(_, index) in Array(24).fill(undefined)"
                         :class="getTimeClass('hour', index)" v-text="String(index).padStart(2, '0')"
@@ -21,16 +21,16 @@
                         :class="getTimeClass('second', index)" v-text="String(index).padStart(2, '0')"
                         @click="onTimeClick('second', index)" />
                 </div>
-            </div>
+            </template>
             <!-- 操作区域 -->
-            <div class="time-operation">
+            <template #bottom>
                 <Button :type="'link'" :size="'small'" v-text="'清空'"
                     @click="emits('clear'), inPopup && closePopup('')" />
                 <Button :type="'link'" :size="'small'" v-text="'现在'" v-if="tm.validate(getTimeNow())" @click="onNow" />
                 <Button :type="'link'" :size="'small'" v-text="'确定'" @click="onConfirm" />
-            </div>
+            </template>
         </Transitions>
-    </div>
+    </Layout>
 </template>
 
 <script setup lang="ts">
@@ -40,6 +40,7 @@ import { FollowExtend, FollowHandle, usePopup } from "../../popup/manager";
 import { DatetimePickerEvents, TimePickerOptions } from "../models/datetime-model";
 import Button from "../../base/button.vue";
 import Transitions from "../../container/transitions.vue";
+import Layout from "../../container/layout.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -217,10 +218,9 @@ onMounted(async () => {
     .flex-column();
 
     //  时分秒选择区域
-    >.time-zone {
-        flex: 1;
-        display: flex;
+    >.main-area {
         overflow: hidden;
+        display: flex;
         flex-wrap: nowrap;
         justify-content: space-between;
         margin: 10px;
@@ -276,8 +276,7 @@ onMounted(async () => {
     }
 
     //  操作区域
-    >.time-operation {
-        flex-shrink: 0;
+    >.bottom-area {
         height: 30px;
         padding-right: 10px;
         border-top: solid 1px #eee;
@@ -304,7 +303,7 @@ onMounted(async () => {
 .snail-time-picker.pc.second-disabled {
     width: 180px;
 
-    >.time-zone {
+    >.main-area {
         >.tz-item {
             width: 46%;
         }
