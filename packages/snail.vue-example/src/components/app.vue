@@ -36,6 +36,7 @@ import TreeTest from "./container/tree-test.vue";
 import DesignerTest from "./form/designer-test.vue";
 import RendererTest from "./form/renderer-test.vue";
 //  👉 选择器组件
+import DatepickerTest2 from "./picker/datepicker-test.vue";
 import TimepickerTest from "./picker/timepicker-test.vue";
 
 //  👉 弹窗组件
@@ -107,7 +108,8 @@ const treeOptions: TreeOptions<Component> = {
         {
             text: "选择器",
             children: [
-                { text: "时间选择器", data: TimepickerTest, clickable: true, searchable: true }
+                { text: "日期选择器", data: DatepickerTest2, clickable: true, searchable: true },
+                { text: "时间选择器", data: TimepickerTest, clickable: true, searchable: true },
             ]
         },
         {
@@ -144,7 +146,7 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[2].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
-    onTreeNodeClick(treeOptions.nodes[1].children[2], undefined);
+    onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
 });
 </script>
 

@@ -3,15 +3,16 @@
     <div class="snail-layout-test">
         左中右布局：<br />
         <Layout :mode="'horizontal'" style="width: 100%;height: 30%;" :top="{ height: '40px' }">
-            <template #>default</template>
+            <template #main>main</template>
             <template #top>top</template>
             <template #bottom>bottom</template>
             <template #left>left</template>
             <template #right>right</template>
         </Layout>
         <br />上中下布局：<br />
-        <Layout :mode="'vertical'" style="width: 100%;height: 30%;" :top="{ height: '40px', scroll: { scrollY: true } }">
-            <template #>default</template>
+        <Layout :mode="'vertical'" style="width: 100%;height: 30%;"
+            :top="{ height: '40px', scroll: { scrollY: true } }">
+            <template #main>main</template>
             <template #top>top</template>
             <template #bottom>bottom</template>
             <template #left>left</template>
@@ -20,14 +21,16 @@
         <br />上中下，再嵌套左中右布局：<br />
         <Layout :mode="'vertical'" style="width: 100%;height: 30%;margin-top: 10px;"
             :top="{ height: '40px', maxHeight: '200px', scroll: { scrollY: true } }">
-            <Layout :mode="'horizontal'" style="height: 100%;"
-                :top="{ height: '20px', maxHeight: '200px', scroll: { scrollY: true } }">
-                <template #>default</template>
-                <template #top>top</template>
-                <template #bottom>bottom</template>
-                <template #left>left</template>
-                <template #right>right</template>
-            </Layout>
+            <template #main>
+                <Layout :mode="'horizontal'" style="height: 100%;"
+                    :top="{ height: '20px', maxHeight: '200px', scroll: { scrollY: true } }">
+                    <template #main>main</template>
+                    <template #top>top</template>
+                    <template #bottom>bottom</template>
+                    <template #left>left</template>
+                    <template #right>right</template>
+                </Layout>
+            </template>
             <template #top>top</template>
             <template #bottom>bottom</template>
             <template #left>left</template>
@@ -36,14 +39,16 @@
         <br />左中右，再嵌套上中下布局：<br />
         <Layout :mode="'horizontal'" style="width: 100%;height: 30%;margin-top: 10px;"
             :top="{ height: '40px', maxHeight: '200px', scroll: { scrollY: true } }">
-            <Layout :mode="'vertical'" style="height: 100%;"
-                :top="{ height: '40px', maxHeight: '200px', scroll: { scrollY: true } }">
-                <template #>default</template>
-                <template #top>top</template>
-                <template #bottom>bottom</template>
-                <template #left>left</template>
-                <template #right>right</template>
-            </Layout>
+            <template #main>
+                <Layout :mode="'vertical'" style="height: 100%;"
+                    :top="{ height: '40px', maxHeight: '200px', scroll: { scrollY: true } }">
+                    <template #main>main</template>
+                    <template #top>top</template>
+                    <template #bottom>bottom</template>
+                    <template #left>left</template>
+                    <template #right>right</template>
+                </Layout>
+            </template>
             <template #top>top</template>
             <template #bottom>bottom</template>
             <template #left>left</template>
@@ -53,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, } from "vue";
+import { onMounted, ref, shallowRef, } from "vue";
 import { components } from "../../libraries/snail.vue";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -68,6 +73,8 @@ const { Layout } = components;
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
+onMounted(() => {
+});
 
 </script>
 

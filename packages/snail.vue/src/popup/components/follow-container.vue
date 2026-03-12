@@ -174,7 +174,6 @@ onMounted(() => {
     background-color: white;
     position: fixed;
     //  内联块级元素，内容随着内部实际元素自动撑开，最大不能超过浏览器窗口
-    display: inline-block;
     max-width: 100%;
     max-height: 100%;
     //  动画效果 width, height 不设置动画，否则会触发onSize事件，导致多次follow计算
