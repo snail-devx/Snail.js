@@ -5,7 +5,7 @@
 -->
 <template>
     <div class="snail-layout" :class="mode">
-        <template v-for="item in ['top', 'left', 'default', 'right', 'bottom']" :key="item">
+        <template v-for="item in ['top', 'left', 'main', 'right', 'bottom']" :key="item">
             <template v-if="areaMap[item] && $slots[item]">
                 <Scroll v-if="areaMap[item].scrollable" :class="areaMap[item].class" :style="areaMap[item].style"
                     :="props[item].scroll">
@@ -29,13 +29,13 @@ import { SlotsType } from "./models/component-model";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<LayoutOptions>();
-defineSlots<SlotsType<Pick<LayoutOptions, "default" | "top" | "bottom" | "left" | "right">>>();
+defineSlots<SlotsType<Pick<LayoutOptions, "main" | "top" | "bottom" | "left" | "right">>>();
 //  2、组件交互变量、常量
 /** 布局区域映射，key为插槽名称，value为对应的布局配置项相关信息 */
 const areaMap = computed(() => {
-    const map: Record<"default" | "top" | "bottom" | "left" | "right", LayoutAreaItem> = Object.create(null);
-    map.default = {
-        scrollable: props.default && props.default.scroll != undefined,
+    const map: Record<"main" | "top" | "bottom" | "left" | "right", LayoutAreaItem> = Object.create(null);
+    map.main = {
+        scrollable: props.main && props.main.scroll != undefined,
         class: "main-area",
         style: undefined,
     };

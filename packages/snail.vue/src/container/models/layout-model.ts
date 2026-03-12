@@ -19,11 +19,11 @@ export type LayoutOptions = {
     mode?: "horizontal" | "vertical";
 
     /**
-     * 内容区域配置
-     * - 对应插槽名：default；主要内容显示区域，处于布局中的【中】区域
+     * 主内容区域配置
+     * - 对应插槽名：main；主要内容显示区域，处于布局中的【中】区域
      * - 配置主内容区域的滚动条配置
      */
-    default?: Pick<LayoutAraeOptions<void>, "scroll">;
+    main?: Pick<LayoutAraeOptions<void>, "scroll">;
     /**
      * 【左侧】区域配置
      * - 对应插槽名`left` ；`mode` 为 `horizontal` 时生效
