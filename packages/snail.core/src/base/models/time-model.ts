@@ -3,6 +3,13 @@
  */
 
 /**
+ * 时间格式
+ * - HH:mm:ss ： 时分秒
+ * - HH:mm ： 时分
+ * - HH ： 时
+ */
+export type TimeFormat = "HH:mm:ss" | "HH:mm" | "HH";
+/**
  * 时间值，描述时分秒值
  */
 export type TimeValue = {
@@ -28,15 +35,15 @@ export interface ITimeValueManager {
     /**
      * 当前的时间格式
      */
-    readonly format: TimeValueFormat;
+    readonly format: TimeFormat;
     /**
      * 时间最小值
      */
-    readonly min?: TimeValue;
+    readonly min: TimeValue;
     /**
      * 时间最大值
      */
-    readonly max?: TimeValue;
+    readonly max: TimeValue;
 
     /**
      * 从文本解析时间值
@@ -51,9 +58,9 @@ export interface ITimeValueManager {
      * - 2、格式为 HH 时， mm、ss为多余部分；格式为 HH:mm:ss 时，若仅传入了小时部分，则 mm、ss部分为缺失部分
      * - 3、`hour`为undefined时，返回undefined
      * @param time 时间值
-     * @returns `time`自身
+     * @returns 有效返回`time`自身，否则undefined
      */
-    correct(time: TimeValue): TimeValue;
+    correct(time: TimeValue): TimeValue | undefined;
 
     /**
      * 将时间值转为数值
@@ -109,13 +116,6 @@ export interface ITimeValueManager {
      */
     validateHHmmss(hour: number, minute: number, second: number): boolean;
 }
-/**
- * 时间值格式
- * - HH:mm:ss ： 时分秒
- * - HH:mm ： 时分
- * - HH ： 时
- */
-export type TimeValueFormat = "HH:mm:ss" | "HH:mm" | "HH";
 
 /**
  * 时间值管理器选项
@@ -124,7 +124,7 @@ export type TimeValueManagerOptions = {
     /**
      * 时间格式
      */
-    format?: TimeValueFormat;
+    format?: TimeFormat;
     /**
      * 时间最小值
      */

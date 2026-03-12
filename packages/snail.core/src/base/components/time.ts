@@ -4,28 +4,33 @@
  */
 
 // import { TimeValue } from "../models/time-model";
-import { ITimeValueManager, TimeValue, TimeValueFormat, TimeValueManagerOptions } from "../models/time-model";
+import { ITimeValueManager, TimeValue, TimeFormat, TimeValueManagerOptions } from "../models/time-model";
+import { correctDate } from "./date";
 import { correctNumber, isNumberInRange } from "./number";
 import { isStringNotEmpty } from "./string";
 
 /**
- * 获取【现在】时间
- * @returns 现在的时间值
+ * 获取时间值
+ * - 分析日期的时分秒部分的值转成 TimeValue
+ * @param date 日期对象
+ * @returns 时间值；若date不是有效日期，则返回undefined
  */
-export function getTimeNow(): TimeValue {
-    const nowDate = new Date();
-    return {
-        hour: nowDate.getHours(),
-        minute: nowDate.getMinutes(),
-        second: nowDate.getSeconds(),
-    }
+export function getTimeValue(date: Date): TimeValue | undefined {
+    date = correctDate(date, undefined);
+    return date != undefined
+        ? {
+            hour: date.getHours(),
+            minute: date.getMinutes(),
+            second: date.getSeconds(),
+        }
+        : undefined;
 }
 /**
  * 从文本解析时间值
  * @param text 时间文本
  * @returns 时间值，无效则返回undefined
  */
-export function parseTime(text: string): TimeValue | undefined {
+export function parseTimeValue(text: string): TimeValue | undefined {
     if (isStringNotEmpty(text)) {
         const [h, m, s] = text.split(":");
         const time: TimeValue = { hour: undefined, minute: undefined, second: undefined };
@@ -33,7 +38,7 @@ export function parseTime(text: string): TimeValue | undefined {
         time.minute = parseInt(m);
         time.second = parseInt(s);
         //  基础验证，需有效值
-        return correctTime(time);
+        return correctTimeValue(time);
     }
     return undefined;
 }
@@ -43,9 +48,9 @@ export function parseTime(text: string): TimeValue | undefined {
  * - 若传入了不在这些区间内的数值，则整体强制为无效时间值
  * - 若hour为undefined，则返回undefined
  * @param time 时间值
- * @returns 若为无效值，则返回undefined 
+ * @returns 验证通过返回time自身；验证失败返回undefined
  */
-export function correctTime(time: TimeValue): TimeValue | undefined {
+export function correctTimeValue(time: TimeValue): TimeValue | undefined {
     /** 小时部分必须🉐有值且在0-23之间，不然没有意义 */
     if (time) {
         //  传入值不是有效数值时，强制undefined
@@ -75,7 +80,7 @@ export function correctTime(time: TimeValue): TimeValue | undefined {
  * @param options 配置选项：时间格式、最大值、最小值校验
  * @returns 时间值管理器
  */
-export function useTime(options?: TimeValueManagerOptions): ITimeValueManager {
+export function useTimeValue(options?: TimeValueManagerOptions): ITimeValueManager {
     //  初始值校验
     const { format, min, max } = correctOptions(options);
 
@@ -87,7 +92,7 @@ export function useTime(options?: TimeValueManagerOptions): ITimeValueManager {
     * @returns 时间值，若`text`无效，将返回undefined
     */
     function parse(text?: string): TimeValue | undefined {
-        const time: TimeValue = parseTime(text);
+        const time: TimeValue = parseTimeValue(text);
         return correct(time);
     }
     /**
@@ -100,7 +105,7 @@ export function useTime(options?: TimeValueManagerOptions): ITimeValueManager {
      */
     function correct(time: TimeValue): TimeValue | undefined {
         //  基于时间格式处理：多余部分设置为undefined、缺失部分设置为0
-        time = correctTime(time);
+        time = correctTimeValue(time);
         if (time) {
             switch (format) {
                 case "HH":
@@ -260,12 +265,12 @@ function correctOptions(options?: TimeValueManagerOptions): Required<TimeValueMa
     let { format, min, max } = { ...options };
     format = format || "HH:mm:ss";
     //  最小值不传入则为0
-    min = correctTime({ ...min }) || { hour: 0 };
+    min = correctTimeValue({ ...min }) || { hour: 0 };
     min.minute == undefined && (min.minute = 0);
     min.second == undefined && (min.second = 0);
     Object.freeze(min);
     //  最大值不传入则为 23:59:59
-    max = correctTime({ ...max }) || { hour: 23 };
+    max = correctTimeValue({ ...max }) || { hour: 23 };
     max.minute == undefined && (max.minute = 59);
     max.second == undefined && (max.second = 59);
     Object.freeze(max);

@@ -18,6 +18,7 @@ export * from "./components/string"
 export * from "./components/time"
 
 //  models 类型导出
+export * from "./models/date-model"
 export * from "./models/function-model"
 export * from "./models/promise-model"
 export * from "./models/time-model"
