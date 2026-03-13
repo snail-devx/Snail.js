@@ -7,7 +7,7 @@
 import { ITimeValueManager, TimeValue, TimeFormat, TimeValueManagerOptions } from "../models/time-model";
 import { correctDate } from "./date";
 import { correctNumber, isNumberInRange } from "./number";
-import { isStringNotEmpty } from "./string";
+import { isStringNotEmpty, padStart } from "./string";
 
 /**
  * 获取时间值
@@ -71,6 +71,48 @@ export function correctTimeValue(time: TimeValue): TimeValue | undefined {
         time.minute == undefined && (time.second = undefined);
 
         return time;
+    }
+    return undefined;
+}
+/**
+ * 校正时间格式
+ * @param format 时间格式
+ * @param newValue 新的时间格式
+ * @returns format是有效时，返回`format`，其他情况返回`newValue`
+ */
+export function correctTimeFormat(format: TimeFormat, newValue: TimeFormat): TimeFormat {
+    switch (format) {
+        case "HH":
+        case "HH:mm":
+        case "HH:mm:ss":
+            return format;
+        default:
+            return newValue;
+    }
+}
+
+/**
+ * 格式化时间值
+ * @param time 时间值
+ * @param format 格式，默认`HH:mm:ss`
+ * @returns 格式化后的时间字符串；time无效返回undefined
+ */
+export function formatTimeValue(time: TimeValue, format?: TimeFormat): string | undefined {
+    //  考虑再优化一下，避免一开始构建全部构建出来
+    time = correctTimeValue({ ...time });
+    if (time) {
+        const { hour, minute, second } = time;
+        const items: string[] = [
+            padStart(hour | 0, 2, "0"),
+            padStart(minute | 0, 2, "0"),
+            padStart(second | 0, 2, "0")
+        ];
+        switch (format) {
+            case "HH": items.splice(1); break;
+            case "HH:mm": items.splice(2); break;
+            default: break;
+        }
+        return items.join(":");
     }
     return undefined;
 }
@@ -148,22 +190,7 @@ export function useTimeValue(options?: TimeValueManagerOptions): ITimeValueManag
      * @returns 字符串，若对应位置无值，则用 00 补齐
      */
     function toString(time: TimeValue): string | undefined {
-        time = correct({ ...time });
-        if (time) {
-            const { hour, minute, second } = time;
-            const items: string[] = [
-                String(hour).padStart(2, "0"),
-                String(minute || 0).padStart(2, "0"),
-                String(second || 0).padStart(2, "0")
-            ];
-            switch (format) {
-                case "HH": items.splice(1); break;
-                case "HH:mm": items.splice(2); break;
-                default: break;
-            }
-            return items.join(":");
-        }
-        return undefined;
+        return formatTimeValue(time, format);
     }
 
     /**
@@ -263,7 +290,7 @@ function getTimeNumber(hour: number, minute: number, second: number) {
  */
 function correctOptions(options?: TimeValueManagerOptions): Required<TimeValueManagerOptions> {
     let { format, min, max } = { ...options };
-    format = format || "HH:mm:ss";
+    format = correctTimeFormat(format, "HH:mm:ss");
     //  最小值不传入则为0
     min = correctTimeValue({ ...min }) || { hour: 0 };
     min.minute == undefined && (min.minute = 0);
