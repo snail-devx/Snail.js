@@ -2,8 +2,8 @@
  * 日期/时间 选择器助手方法
  */
 
-import { correctNumber, DateFormat, DateValue, formatDate, formatDateValue, formatTimeValue, getDateByValue, getDateValue, padStart, TimeFormat } from "snail.core";
-import { DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, TimePickerOptions } from "../models/datetime-model";
+import { correctNumber, DateFormat, DateValue, formatDate, formatDateValue, formatTimeValue, getDateByValue, getDateValue, padStart, TimeFormat, TimeValue } from "snail.core";
+import { DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, TimePickerHourItem, TimePickerMinuteItem, TimePickerOptions, TimePickerSecondItem } from "../models/datetime-model";
 import { ValueOptions, DisabledOptions } from "../../base/models/base-model";
 import { padEnd } from "../../../../snail.core/src";
 
@@ -50,14 +50,16 @@ export function buildYearItems(year: number, min: DateValue, max: DateValue): Da
      * 基准年始终在第10个
      */
     year = year - 10;
-    return new Array(18).fill(undefined).map<DatePickerYearItem>(() => {
+    const items: DatePickerYearItem[] = new Array(18);
+    for (var index = 0; index < items.length; index++) {
         year += 1;
-        return Object.freeze<DatePickerYearItem>({
+        items[index] = Object.freeze<DatePickerYearItem>({
             year: year,
             disabled: (min && min.year != undefined && year < min.year)
                 || (max && max.year != undefined && year > max.year),
         });
-    });
+    }
+    return items;
 }
 /**
  * 构建月份选择项目
@@ -101,7 +103,9 @@ export function buildDayItems(monthItem: DatePickerMonthItem, min: DateValue, ma
     const maxDate = new Date(formatDateValue(max, "yyyy-MM-dd"));
     const date = new Date(monthItem.year, monthItem.month - 1);
     date.setDate(date.getDate() - (date.getDay() || 7) - 1);
-    return new Array(42).fill(undefined).map(() => {
+    //  遍历构建
+    const items: DatePickerDayItem[] = new Array(42);
+    for (var index = 0; index < items.length; index++) {
         date.setDate(date.getDate() + 1);
         const item: DatePickerDayItem = {
             day: date.getDate(),
@@ -113,7 +117,102 @@ export function buildDayItems(monthItem: DatePickerMonthItem, min: DateValue, ma
             const date = new Date(formatDateValue(item, "yyyy-MM-dd"));
             item.disabled = (minDate != undefined && date < minDate) || (maxDate != undefined && date > maxDate);
         }
-        return Object.freeze<DatePickerDayItem>(item);
-    });
+        items[index] = Object.freeze(item);
+    }
+    return items;
+}
+//#endregion
+
+
+//#region *************************************        时间选择器相关        ***********************************
+/**
+ * 构建小时选择项目
+ * @param min 时间最小值
+ * @param max 时间最大值
+ * @returns 时间选择项集合
+ */
+export function buildHourItems(min: TimeValue, max: TimeValue): TimePickerHourItem[] {
+    const items: TimePickerHourItem[] = new Array(24);
+    for (var index = 0; index < items.length; index++) {
+        items[index] = Object.freeze<TimePickerHourItem>({
+            hour: index,
+            disabled: (min && min.hour != undefined && index < min.hour)
+                || (max && max.hour != undefined && index > max.hour),
+        });
+    }
+    return items;
+}
+/**
+ * 构建分钟选择项
+ * @param hourItem 小时选项
+ * @param min 时间最小值
+ * @param max 时间最大值
+ * @returns 分钟选择项集合
+ */
+export function buildMinuteItems(hourItem: TimePickerHourItem, min: TimeValue, max: TimeValue): TimePickerMinuteItem[] {
+    const items: TimePickerMinuteItem[] = new Array(60);
+    const minNumber = min && min.minute != undefined
+        ? getTimeNumber(min.hour, min.minute, 0)
+        : undefined;
+    const maxNumber = max && max.minute != undefined
+        ? getTimeNumber(max.hour, max.minute, 0)
+        : undefined;
+    for (let index = 0; index < items.length; index++) {
+        const item: TimePickerMinuteItem = {
+            minute: index,
+            hour: hourItem.hour,
+            disabled: hourItem.disabled
+        }
+        if (item.disabled != true) {
+            const number = getTimeNumber(item.hour, item.minute, 0);
+            item.disabled = (minNumber != undefined && number < minNumber) || (maxNumber != undefined && number > maxNumber);
+        }
+
+        items[index] = Object.freeze(item);
+    }
+    return items;
+}
+/**
+ * 构建秒钟选择项
+ * @param hourItem 分钟选项
+ * @param min 时间最小值
+ * @param max 时间最大值
+ * @returns 秒钟选择项集合
+ */
+export function buildSecondItems(minuteItem: TimePickerMinuteItem, min: TimeValue, max: TimeValue): TimePickerSecondItem[] {
+    const items: TimePickerSecondItem[] = new Array(60);
+    const minNumber = min && min.minute != undefined
+        ? getTimeNumber(min.hour, min.minute, min.second)
+        : undefined;
+    const maxNumber = max && max.minute != undefined
+        ? getTimeNumber(max.hour, max.minute, max.second)
+        : undefined;
+    for (let index = 0; index < items.length; index++) {
+        const item: TimePickerSecondItem = {
+            second: index,
+            minute: minuteItem.minute,
+            hour: minuteItem.hour,
+            disabled: minuteItem.disabled
+        }
+        if (item.disabled != true) {
+            const number = getTimeNumber(item.hour, item.minute, item.second);
+            item.disabled = (minNumber != undefined && number < minNumber) || (maxNumber != undefined && number > maxNumber);
+        }
+        items[index] = Object.freeze(item);
+    }
+    return items;
+}
+
+/**
+ * 获取时间数值
+ * - 按照 HHmmss 组装出时间值
+ * - 用于比较大小使用
+ * @param hour 小时
+ * @param minute 分钟
+ * @param second 秒钟
+ * @returns 组成的数值
+ */
+export function getTimeNumber(hour: number, minute: number, second: number): number {
+    return (hour || 0) * 10000 + (minute || 0) * 100 + (second || 0);
 }
 //#endregion

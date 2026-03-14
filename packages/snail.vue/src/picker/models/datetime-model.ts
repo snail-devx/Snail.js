@@ -1,4 +1,4 @@
-import { DateFormat, DateValue, IAsyncScope, ITimeValueManager } from "snail.core";
+import { DateFormat, DateValue, IAsyncScope, ITimeValueManager, TimeValue } from "snail.core";
 import { DisabledOptions, ValueOptions } from "../../base/models/base-model";
 
 /**
@@ -31,21 +31,7 @@ export type DatePickerOptions = {
      * - 为true则不显示【确定】、【现在】等按钮
      */
     toolbarDisabled?: boolean;
-    // /**
-    //  * 禁用【初始化】功能
-    //  * - 仅在`value`为空时才生效，若`value`不为空，则忽略此属性配置
-    //  * - 为true，不自动选中【现在】的时分秒
-    //  * - 为false时，自动选中【现在】的时分秒
-    //  * - 默认自动初始化
-    //  */
-    // initialDisabled?: boolean;
-    // /**
-    //  * 禁用【现在】功能
-    //  * - 为true时，不出【现在】功能
-    //  */
-    // nowDisabled?: boolean;
 }
-
 /**
  * 时间选择控件配置项
  */
@@ -79,21 +65,6 @@ export type TimePickerOptions = {
      * - 为true则不显示【确定】、【现在】等按钮的工具条区域
      */
     toolbarDisabled?: boolean;
-
-    /**
-     * 禁用【初始化】功能
-     * - 仅在`value`为空时才生效，若`value`不为空，则忽略此属性配置
-     * - 为true，不自动选中【现在】的时分秒
-     * - 为false时，自动选中【现在】的时分秒
-     * - 默认自动初始化
-     */
-    initialDisabled?: boolean;
-    /**
-     * 禁用【现在】功能
-     * - 为true时，不出【现在】功能
-     */
-    nowDisabled?: boolean;
-
 }
 
 /**
@@ -128,3 +99,19 @@ export type DatePickerMonthItem = Required<Pick<DateValue, "month" | "year"> & D
  * - disabled 标记当前选项是否禁用，基于min和max校验出来的
  */
 export type DatePickerDayItem = Required<Pick<DateValue, "day" | "month" | "year"> & DisabledOptions>;
+
+/**
+ * 时间选择器 一个小时项
+ * - disabled 标记当前选项是否禁用，基于min和max校验出来的
+ */
+export type TimePickerHourItem = Required<Pick<TimeValue, "hour"> & DisabledOptions>;
+/**
+ * 时间选择器 一个分钟项
+ * - disabled 标记当前选项是否禁用，基于min和max校验出来的
+ */
+export type TimePickerMinuteItem = Required<Pick<TimeValue, "minute" | "hour"> & DisabledOptions>;
+/**
+ * 时间选择器 一个秒项
+ * - disabled 标记当前选项是否禁用，基于min和max校验出来的
+ */
+export type TimePickerSecondItem = Required<TimeValue & DisabledOptions>;

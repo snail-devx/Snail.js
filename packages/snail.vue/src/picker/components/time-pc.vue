@@ -2,63 +2,73 @@
     1、实现上，参照效果【zane-calendar】库效果
   -->
 <template>
-    <Layout class="time-picker pc" :class="{ 'second-disabled': secondDisabled }" :mode="'vertical'">
+    <Layout class="time-picker pc" :class="{ 'second-disabled': format != 'HH:mm:ss' }" :mode="'vertical'">
         <!-- 时分秒选择区域-->
         <template #main>
             <Transitions :group="true" :effect="'down-up'">
                 <div class="tz-item" ref="hour-items">
-                    <div class="tzi-number" v-for="(_, index) in Array(24).fill(undefined)"
-                        :class="getTimeClass('hour', index)" v-text="String(index).padStart(2, '0')"
-                        @click="onTimeClick('hour', index)" />
+                    <div class="tzi-number" v-for="item in hourItems" :key="item.hour"
+                        :class="{ active: item.hour == timeRef.hour, disabled: item.disabled }"
+                        v-text="padStart(item.hour, 2, '0')" @click="onHourClick(item)" />
                 </div>
                 <div class="tz-item" ref="minute-items">
-                    <div class="tzi-number" v-for="(_, index) in Array(60).fill(undefined)"
-                        :class="getTimeClass('minute', index)" v-text="String(index).padStart(2, '0')"
-                        @click="onTimeClick('minute', index)" />
+                    <div class="tzi-number" v-for="item in minuteItems" :key="`${item.hour}:${item.minute}`"
+                        :class="{ active: item.minute == timeRef.minute, disabled: item.disabled }"
+                        v-text="padStart(item.minute, 2, '0')" @click="onMinuteClick(item)" />
                 </div>
-                <div class="tz-item" ref="second-items" v-if="secondDisabled != true">
-                    <div class="tzi-number" v-for="(_, index) in Array(60).fill(undefined)"
-                        :class="getTimeClass('second', index)" v-text="String(index).padStart(2, '0')"
-                        @click="onTimeClick('second', index)" />
+                <div class="tz-item" ref="second-items" v-if="format == 'HH:mm:ss'">
+                    <div class="tzi-number" v-for="item in secondItems"
+                        :key="`${item.hour}:${item.minute}:${item.second}`"
+                        :class="{ active: item.second == timeRef.second, disabled: item.disabled }"
+                        v-text="padStart(item.second, 2, '0')" @click="onSecondClick(item)" />
                 </div>
             </Transitions>
         </template>
         <!-- 操作区域 -->
         <template #bottom v-if="toolbarDisabled != true">
             <Button :type="'link'" :size="'small'" v-text="'清空'" @click="emits('clear'), inPopup && closePopup('')" />
-            <Button :type="'link'" :size="'small'" v-text="'现在'" v-if="tm.validate(getTimeValue(new Date()))"
-                @click="onNow" />
-            <Button :type="'link'" :size="'small'" v-text="'确定'" @click="onConfirm" />
+            <Button :type="'link'" :size="'small'" v-text="'现在'" @click="rebuildItems(getTimeValue(new Date()))" />
+            <Button :type="'link'" :size="'small'" v-text="'确定'" :class="{ disabled: isValidTimeRef != true }"
+                @click="onConfirm" />
         </template>
     </Layout>
 </template>
 
 <script setup lang="ts">
-import { isNumberNotNaN, newId, useTimeValue, TimeValue, parseTimeValue, ITimeValueManager, getTimeValue } from "snail.core";
-import { onMounted, ref, ShallowRef, shallowRef, useTemplateRef, nextTick, Ref } from "vue";
+import { isNumberNotNaN, newId, useTimeValue, TimeValue, parseTimeValue, ITimeValueManager, getTimeValue, padStart, TimeFormat, formatTimeValue } from "snail.core";
+import { onMounted, ref, ShallowRef, shallowRef, useTemplateRef, nextTick, Ref, computed } from "vue";
 import { FollowExtend, FollowHandle, usePopup } from "../../popup/manager";
-import { DatetimePickerEvents, TimePickerOptions } from "../models/datetime-model";
+import { DatetimePickerEvents, TimePickerHourItem, TimePickerMinuteItem, TimePickerOptions, TimePickerSecondItem } from "../models/datetime-model";
 import Button from "../../base/button.vue";
 import Transitions from "../../container/transitions.vue";
 import Layout from "../../container/layout.vue";
 import { PickerExtend } from "../models/picker-model";
+import { buildHourItems, buildMinuteItems, buildSecondItems } from "../utils/datetime-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<TimePickerOptions & PickerExtend & FollowHandle<string> & FollowExtend>();
 const emits = defineEmits<DatetimePickerEvents>();
-const tm = useTimeValue({
-    format: props.format == "HH:mm" ? "HH:mm" : "HH:mm:ss",
-    min: parseTimeValue(props.min),
-    max: parseTimeValue(props.max)
-});
-const { toast } = usePopup();
+/**  时间格式 */
+const format = props.format == "HH:mm" ? "HH:mm" : "HH:mm:ss";
+/**  时间最小值 */
+const min = parseTimeValue(props.min);
+/**  时间最大值 */
+const max = parseTimeValue(props.max);
 //  2、组件交互变量、常量
-const { inPopup, closePopup } = props;
-/**     是否禁用了秒选择 */
-const secondDisabled: boolean = tm.format == "HH:mm";
 /**     已选择的时间值 */
-const tvRef: Ref<TimeValue> = ref();
+const timeRef: Ref<TimeValue> = ref(parseTimeValue(props.value) || getTimeValue(new Date()));
+/**     是否是有效的时间值 */
+const isValidTimeRef = computed(() => format == "HH:mm"
+    ? minuteItems.value && minuteItems.value[timeRef.value.minute].disabled != true
+    : secondItems.value && secondItems.value[timeRef.value.second].disabled != true
+);
+/**     小时 选择项集合*/
+const hourItems: ShallowRef<TimePickerHourItem[]> = shallowRef(buildHourItems(min, max));
+/**     分钟选择项集合*/
+const minuteItems: ShallowRef<TimePickerMinuteItem[]> = shallowRef();
+/**     秒钟选择项集合*/
+const secondItems: ShallowRef<TimePickerSecondItem[]> = shallowRef();
 //  3、Dome元素相关引用
 /**     小时选择外层scroll */
 const hItemsDom = useTemplateRef("hour-items");
@@ -69,138 +79,95 @@ const sItemsDom = useTemplateRef("second-items");
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
- * 获取时间的自定义样式
- * @param type 类型：时分秒
- * @param value 具体的时间值
- * @returns 自定义类样式记录，key为类样式名称，value为是否生效
+ * 重新构建时间选择项
+ * @param time 新的时间值，非undefined时，更新给 timeRef 
  */
-function getTimeClass(type: "hour" | "minute" | "second", value: number): Record<string, boolean> {
-    switch (type) {
-        case "hour":
-            return {
-                active: tvRef.value.hour == value,
-                disabled: tm.validateHH(value) == false
-            }
-        case "minute":
-            return {
-                active: tvRef.value.minute == value,
-                disabled: tm.validateHHmm(tvRef.value.hour, value) == false
-            };
-        case "second":
-            return {
-                active: tvRef.value.second == value,
-                disabled: tm.validateHHmmss(tvRef.value.hour, tvRef.value.minute, value) == false
-            }
-    }
+async function rebuildItems(time: TimeValue | undefined) {
+    // // 获取当前时间,做选中处理
+    time != undefined && (timeRef.value = time);
+    minuteItems.value = buildMinuteItems(hourItems.value[timeRef.value.hour], min, max);
+    secondItems.value = buildSecondItems(minuteItems.value[timeRef.value.minute], min, max);
+    //  现在的值有效时，进行滚动处理
+    await nextTick();
+    scrollIntoView(hItemsDom.value);
+    scrollIntoView(mItemsDom.value);
+    scrollIntoView(sItemsDom.value);
 }
+
 /**
  * 选举合理时间项显示出来，避免始终从 00 区域显示
  * @param items 
  */
 function scrollIntoView(items: HTMLElement) {
-    //  遍历计算出 当前选中项、第一个和最后一个有效数据，当前时间对应的数据多因
-    let activeIndex: number = undefined, firstValidIndex: number;
+    /** 遍历选举出合适的选项滚动到可见据
+     *  1、现在先始终使用 选中值，后期做一些优化，如选中值无效时，将靠近它的可选值滚动出来，在上则滚动到底部；再下面则滚动到顶部
+     */
+    let activeIndex: number = undefined;
     for (var index = 0; index < (items ? items.children.length : 0); index++) {
         const ele = items.children[index] as HTMLElement;
-        if (ele.classList.contains("disabled") == true) {
-            continue;
-        }
-        if (firstValidIndex == undefined) {
-            firstValidIndex = index;
-        }
         if (ele.classList.contains("active") == true) {
             activeIndex = index;
             break;
         }
     }
-    //  选举出合理的显示区域出来：优先显示出已选值，无则显示出第一个有效的选项数据出来
-    let showIndex = activeIndex;
-    if (activeIndex == undefined) {
-        if (firstValidIndex != undefined) {
-            showIndex = firstValidIndex;
+    activeIndex != undefined && items.children[activeIndex].scrollIntoView({ behavior: "smooth", block: "center" });
+}
+/**
+ * 小时点击时
+ * @param item 
+ */
+function onHourClick(item: TimePickerHourItem) {
+    /** 非禁用，且有改变时，基于小时构建分钟*/
+    if (item.disabled == true || timeRef.value.hour == item.hour) {
+        return;
+    }
+    timeRef.value.hour = item.hour;
+    minuteItems.value = buildMinuteItems(item, min, max);
+    secondItems.value = buildSecondItems(minuteItems.value[timeRef.value.minute], min, max);
+}
+/**
+ * 分钟点击时
+ * @param item 
+ */
+function onMinuteClick(item: TimePickerMinuteItem) {
+    if (item.disabled != true) {
+        if (format == "HH:mm") {
+            const value = formatTimeValue(item, "HH:mm");
+            emits("confirm", value);
+            props.inPopup && props.closePopup(value);
+        }
+        else {
+            timeRef.value.minute = item.minute;
+            secondItems.value = buildSecondItems(item, min, max);
         }
     }
-    //  这个后期做一下优化，选择时间后，可能会触发分钟、秒选项的滚动
-    showIndex != undefined && items.children[showIndex].scrollIntoView({ behavior: "smooth", block: "center" });
 }
-
 /**
- * 点击时间选择时
- * @param type 类型，时分秒
- * @param value 具体时选择值 
+ * 秒钟点击时
+ * @param item 
  */
-async function onTimeClick(type: "hour" | "minute" | "second", value: number) {
-    switch (type) {
-        case "hour":
-            if (tm.validateHH(value)) {
-                tvRef.value.hour = value;
-                await nextTick();
-                scrollIntoView(mItemsDom.value);
-            }
-            break;
-        case "minute":
-            if (tm.validateHHmm(tvRef.value.hour, value)) {
-                tvRef.value.minute = value
-                await nextTick();
-                scrollIntoView(sItemsDom.value);
-            }
-            break;
-        case "second":
-            if (tm.validateHHmmss(tvRef.value.hour, tvRef.value.minute, value)) {
-                tvRef.value.second = value;
-            }
-            break;
+function onSecondClick(item: TimePickerSecondItem) {
+    if (item.disabled != true) {
+        timeRef.value.second = item.second;
+        onConfirm();
     }
 }
 
 /**
- * 现在 按钮点击
- */
-async function onNow() {
-    // 获取当前时间,做选中处理
-    tvRef.value = getTimeValue(new Date());
-    //  现在的值有效时，进行滚动处理
-    if (tm.validate(tvRef.value)) {
-        await nextTick();
-        scrollIntoView(hItemsDom.value);
-        scrollIntoView(mItemsDom.value);
-        scrollIntoView(sItemsDom.value);
-    }
-}
-/**
- * 确定 按钮点击
+ * 点击【确认】按钮时
  */
 function onConfirm() {
-    //  验证处理，先校正一下，避免出问题；未禁用【秒】时的特殊处理
-    tvRef.value = tm.correct(tvRef.value) || Object.create(null);
-    if (tvRef.value == undefined || tvRef.value.hour == undefined) {
-        return toast("error", "请选选择时间");
+    if (isValidTimeRef.value == true) {
+        const value = formatTimeValue(timeRef.value, format);
+        emits("confirm", value);
+        props.inPopup && props.closePopup(value);
     }
-    if (secondDisabled != true && tvRef.value.minute == undefined) {
-        return toast("error", "请选选择时间");
-    }
-    //  组装值；提交选择
-    const value: string = tm.toString(tvRef.value);
-    emits("confirm", value);
-    inPopup && closePopup(value);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
-{
-    //  初始化已选值；确保值非undefined
-    props.value && (tvRef.value = tm.parse(props.value));
-    tvRef.value || props.initialDisabled || (tvRef.value = tm.correct(getTimeValue(new Date())));
-    tvRef.value || (tvRef.value = Object.create(null));
-}
 //  2、生命周期响应
-//      挂载完成后，找到所有激活的item，显示出来
-onMounted(async () => {
-    await nextTick();
-    scrollIntoView(hItemsDom.value);
-    scrollIntoView(mItemsDom.value);
-    scrollIntoView(sItemsDom.value);
-});
+onMounted(rebuildItems);
 </script>
 
 <style lang="less">
@@ -244,16 +211,18 @@ onMounted(async () => {
                 }
 
                 &.active {
-                    background-color: #0f7eef !important;
-                    border-color: #0f7eef;
-                    color: white;
+                    background-color: #58a4fd;
+                    border-color: #58a4fd;
+                    color: white !important;
+
+                    &.disabled {
+                        opacity: 0.6;
+                    }
                 }
 
                 &.disabled {
                     cursor: not-allowed;
-                    border-color: #eee;
-                    color: #ddd !important;
-                    background-color: initial !important;
+                    color: #ddd;
                 }
             }
 
@@ -292,7 +261,12 @@ onMounted(async () => {
 
             &:last-child,
             &:hover {
-                color: #0f7eef;
+                color: #58a4fd;
+            }
+
+            &.disabled {
+                cursor: not-allowed;
+                opacity: 0.6;
             }
         }
     }
