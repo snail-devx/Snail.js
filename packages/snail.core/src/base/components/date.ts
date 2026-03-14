@@ -89,7 +89,9 @@ export function formatDate(date: Date, format: DateFormat): string | undefined {
             case "yyyy-MM-dd HH:mm:ss":
                 break;
         }
-        return [ymdItems.join("-"), hmsItems.join(":")].join(" ");
+        return hmsItems.length == 0
+            ? ymdItems.join("-")
+            : [ymdItems.join("-"), hmsItems.join(":")].join(" ");
     }
     return undefined;
 }
