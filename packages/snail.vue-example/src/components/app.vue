@@ -172,14 +172,30 @@ onMounted(() => {
     >.container {
         flex: 1;
         padding: 10px;
-        overflow: hidden;
+        overflow: hidden auto;
         position: relative;
-    }
 
-    section {
-        margin: 10px;
-        width: 30%;
-        float: left;
+        >section {
+            margin: auto;
+            width: 30%;
+            float: left;
+        }
+
+        >article {
+            float: left;
+            width: 100%;
+
+            >h1 {
+                width: 100%;
+            }
+
+            >section {
+                vertical-align: top;
+                padding: 4px;
+                width: 30%;
+                float: left;
+            }
+        }
     }
 }
 </style>

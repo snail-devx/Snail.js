@@ -24,7 +24,7 @@
             </Transitions>
         </template>
         <!-- 操作区域 -->
-        <template #bottom>
+        <template #bottom v-if="toolbarDisabled != true">
             <Button :type="'link'" :size="'small'" v-text="'清空'" @click="emits('clear'), inPopup && closePopup('')" />
             <Button :type="'link'" :size="'small'" v-text="'现在'" v-if="tm.validate(getTimeValue(new Date()))"
                 @click="onNow" />
@@ -41,10 +41,11 @@ import { DatetimePickerEvents, TimePickerOptions } from "../models/datetime-mode
 import Button from "../../base/button.vue";
 import Transitions from "../../container/transitions.vue";
 import Layout from "../../container/layout.vue";
+import { PickerExtend } from "../models/picker-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<TimePickerOptions & FollowHandle<string> & FollowExtend>();
+const props = defineProps<TimePickerOptions & PickerExtend & FollowHandle<string> & FollowExtend>();
 const emits = defineEmits<DatetimePickerEvents>();
 const tm = useTimeValue({
     format: props.format == "HH:mm" ? "HH:mm" : "HH:mm:ss",
@@ -214,6 +215,7 @@ onMounted(async () => {
     border: 1px solid rgba(0, 0, 0, 0.12);
     border-radius: 4px;
     overflow: hidden !important;
+    user-select: none;
 
     //  时分秒选择区域
     >.main-area {
@@ -242,8 +244,8 @@ onMounted(async () => {
                 }
 
                 &.active {
-                    background-color: #58a4fd !important;
-                    border-color: #58a4fd;
+                    background-color: #0f7eef !important;
+                    border-color: #0f7eef;
                     color: white;
                 }
 

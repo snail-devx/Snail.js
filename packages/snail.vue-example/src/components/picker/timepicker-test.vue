@@ -1,37 +1,55 @@
 <!-- 时间选择组件测试 -->
 <template>
-    <section class="">
-        默认情况：
-        <input type="text" @click="evt => onClick(evt)" />
-    </section>
-    <section class="">
-        时分选择：
-        <input type="text" @click="evt => onClick(evt, { format: 'HH:mm' })" />
-    </section>
-    <section>
-        最小值 19:30:00：
-        <input type="text" @click="evt => onClick(evt, { min: '19:30:00' })" />
-    </section>
-    <section>
-        最小值 19:30:00 默认值 18:30:00：
-        <input type="text" @click="evt => onClick(evt, { value: '18:30:00', min: '19:30:00' })" />
-    </section>
-    <section>
-        最大值 19:30:00：
-        <input type="text" @click="evt => onClick(evt, { max: '19:30:00' })" />
-    </section>
-    <section>
-        最大值 19:30:00 默认值 18:30:00：
-        <input type="text" @click="evt => onClick(evt, { value: '18:30:00', max: '19:30:00' })" />
-    </section>
-    <section>
-        禁用初始化：
-        <input type="text" @click="evt => onClick(evt, { initialDisabled: true })" />
-    </section>
-    <section>
-        禁用初始化，最小值 19:30:00：
-        <input type="text" @click="evt => onClick(evt, { initialDisabled: true, min: '19:30:00' })" />
-    </section>
+    <article>
+        <h1>默认format</h1>
+        <section class="">
+            默认情况
+            <input type="text" @click="evt => onClick(evt)" />
+        </section>
+        <section class="">
+            禁用工具条
+            <input type="text" @click="evt => onClick(evt, { toolbarDisabled: true })" />
+        </section>
+        <section>
+            最小值 19:30:00：
+            <input type="text" @click="evt => onClick(evt, { min: '19:30:00' })" />
+        </section>
+        <section>
+            最小值 19:30:00 默认值 18:30:00：
+            <input type="text" @click="evt => onClick(evt, { value: '18:30:00', min: '19:30:00' })" />
+        </section>
+        <section>
+            最大值 19:30:00：
+            <input type="text" @click="evt => onClick(evt, { max: '19:30:00' })" />
+        </section>
+        <section>
+            最大值 19:30:00 默认值 18:30:00：
+            <input type="text" @click="evt => onClick(evt, { value: '18:30:00', max: '19:30:00' })" />
+        </section>
+    </article>
+    <article>
+        <h1>时分选择</h1>
+        <section class="">
+            时分选择：
+            <input type="text" @click="evt => onClick(evt, { format: 'HH:mm' })" />
+        </section>
+        <section class="">
+            时分选择，禁用工具条
+            <input type="text" @click="evt => onClick(evt, { format: 'HH:mm', toolbarDisabled: true })" />
+        </section>
+    </article>
+
+    <article>
+        <h1>其他配置</h1>
+        <section>
+            禁用初始化：
+            <input type="text" @click="evt => onClick(evt, { initialDisabled: true })" />
+        </section>
+        <section>
+            禁用初始化，最小值 19:30:00：
+            <input type="text" @click="evt => onClick(evt, { initialDisabled: true, min: '19:30:00' })" />
+        </section>
+    </article>
 </template>
 
 <script setup lang="ts">

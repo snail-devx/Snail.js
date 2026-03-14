@@ -1,22 +1,143 @@
 <!-- 日期选择组件测试 -->
 <template>
-    <section class="">
-        默认情况：
-        <input type="text" @click="evt => onClick(evt)" />
-    </section>
-    <section class="">
-        yyyy-MM-dd选择：
-        <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd' })" />
-    </section>
-    <section class="">
-        yyyy-MM选择：
-        <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM' })" />
-    </section>
-    <section class="">
-        yyyy选择：
-        <input type="text" @click="evt => onClick(evt, { format: 'yyyy' })" />
-    </section>
-
+    <!-- yyyy 测试 -->
+    <article>
+        <h1>yyyy</h1>
+        <section class="">
+            默认情况
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy' })" />
+        </section>
+        <section class="">
+            最小值 2026
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy', min: '2026' })" />
+        </section>
+        <section class="">
+            最大值 2026
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy', max: '2026' })" />
+        </section>
+        <section class="">
+            最大值 2025
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy', max: '2025' })" />
+        </section>
+        <section class="">
+            最小值 2026；最大值 2026
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy', min: '2026', max: '2026' })" />
+        </section>
+        <section class="">
+            最小值 1990；最大值 2026
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy', min: '1990', max: '2026' })" />
+        </section>
+    </article>
+    <!-- yyyy-MM 测试 -->
+    <article>
+        <h1>yyyy-MM</h1>
+        <section class="">
+            默认情况
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM' })" />
+        </section>
+        <section class="">
+            最小值 2026-03
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM', min: '2026-03' })" />
+        </section>
+        <section class="">
+            最小值 2026-04
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM', min: '2026-04' })" />
+        </section>
+        <section class="">
+            最大值 2026-03
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM', max: '2026-03' })" />
+        </section>
+        <section class="">
+            最大值 2026-04
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM', max: '2026-04' })" />
+        </section>
+        <section class="">
+            最小值 2026-03；最大值 2026-03
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM', min: '2026-03', max: '2026-03' })" />
+        </section>
+        <section class="">
+            最小值 2026-03；最大值 2026-04
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM', min: '2026-03', max: '2026-04' })" />
+        </section>
+        <section class="">
+            最小值 2026-03；最大值 2026-12
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM', min: '2026-03', max: '2026-12' })" />
+        </section>
+        <section class="">
+            最小值 2025-03；最大值 2026-12
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM', min: '2025-03', max: '2026-12' })" />
+        </section>
+    </article>
+    <!-- yyyy-MM-dd 测试 -->
+    <article>
+        <h1>yyyy-MM-dd</h1>
+        <section class="">
+            不指定格式
+            <input type="text" @click="evt => onClick(evt)" />
+        </section>
+        <section class="">
+            默认情况
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd' })" />
+        </section>
+        <section class="">
+            最小值 2026-03-25
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd', min: '2026-03-25' })" />
+        </section>
+        <section class="">
+            最小值 2026-04-25
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd', min: '2026-04-25' })" />
+        </section>
+        <section class="">
+            最大值 2026-03-25
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd', max: '2026-03-25' })" />
+        </section>
+        <section class="">
+            最大值 2026-04-25
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd', max: '2026-04-25' })" />
+        </section>
+        <section class="">
+            最小值 2026-03-25；最大值 2026-03-25
+            <input type="text"
+                @click="evt => onClick(evt, { format: 'yyyy-MM-dd', min: '2026-03-25', max: '2026-03-25' })" />
+        </section>
+        <section class="">
+            最小值 2026-03-25；最大值 2026-04-25
+            <input type="text"
+                @click="evt => onClick(evt, { format: 'yyyy-MM-dd', min: '2026-03-25', max: '2026-04-25' })" />
+        </section>
+        <section class="">
+            最小值 2026-03-25；最大值 2026-12-25
+            <input type="text"
+                @click="evt => onClick(evt, { format: 'yyyy-MM-dd', min: '2026-03-25', max: '2026-12-25' })" />
+        </section>
+        <section class="">
+            最小值 2025-03-25；最大值 2026-12-25
+            <input type="text"
+                @click="evt => onClick(evt, { format: 'yyyy-MM-dd', min: '2025-03-25', max: '2026-12-25' })" />
+        </section>
+    </article>
+    <article>
+        <h1>yyyy-MM-dd HH:mm</h1>
+        <section class="">
+            默认情况
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd HH:mm' })" />
+        </section>
+        <section class="">
+            禁用操作按钮
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd HH:mm', toolbarDisabled: true })" />
+        </section>
+    </article>
+    <article>
+        <h1>yyyy-MM-dd HH:mm:ss</h1>
+        <section class="">
+            默认情况
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd HH:mm:ss' })" />
+        </section>
+        <section class="">
+            禁用操作按钮
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd HH:mm:ss', toolbarDisabled: true })" />
+        </section>
+    </article>
 </template>
 
 <script setup lang="ts">

@@ -3,146 +3,140 @@
     2、内部集成 time-pc.vue时间选择
   -->
 <template>
-  <Layout class="date-picker pc" :mode="'vertical'" :top="{ height: '40px' }" :bottom="{ height: '30px' }">
+  <Layout class="date-picker pc" :class="{ 'time-now': pinned && pinned.value == true }" :mode="'vertical'"
+    :top="{ height: '40px' }" :bottom="{ height: '30px' }">
     <!-- 顶部导航区域：展示左右切换等功能 -->
     <template #top>
-      <Icon :type="'arrow'" :rotate="180" :size="26" @click="onPreNextClick(true)" />
+      <Icon :type="'arrow'" :rotate="180" :size="26" @click="buildPickerItems(stepRef, -1)" />
       <div class="header-content" :class="stepRef">
         <template v-if="stepRef == 'year'">
-          <div v-text="`${yearItems[0]}年 - ${getFromArray(yearItems, -1)}年`" />
+          <div v-text="`${yearItems[0].year}年 - ${getFromArray(yearItems, -1).year}年`" />
         </template>
         <template v-else>
           <div v-text="`${dateRef.year}年`" @click="onSwitchStepClick('year')" />
           <div v-text="`${dateRef.month}月`" v-if="stepRef == 'day'" @click="onSwitchStepClick('month')" />
         </template>
       </div>
-      <Icon :type="'arrow'" :size="26" @click="onPreNextClick(false)" />
+      <Icon :type="'arrow'" :size="26" @click="buildPickerItems(stepRef, 1)" />
     </template>
     <!-- 年月日选择-->
     <template #main>
       <!-- 选择年份 -->
       <template v-if="stepRef == 'year'">
-        <div class="year-item" v-for="item in yearItems" :key="item">
-          <span v-text="item" :class="buildYearItemClass(item)" @click="onYearItemClick(item)" />
+        <div class="year-item" v-for="item in yearItems" :key="item.year"
+          :class="{ 'active': dateRef.year == item.year, 'disabled': item.disabled, }">
+          <span v-text="item.year" @click="onYearItemClick(item)" />
         </div>
       </template>
       <!-- 选择月份 -->
       <template v-else-if="stepRef == 'month'">
-        <div class="month-item" v-for="item in buildMonthItems()" :key="item.text">
-          <span v-text="item.text" :class="buildMonthItemClass(item.value)" @click="onMonthItemClick(item.value)" />
+        <div class="month-item" v-for="item in monthItems" :key="`${item.year}-${item.month}`"
+          :class="{ 'active': dateRef.month == item.month, 'disabled': item.disabled, }">
+          <span v-text="item.text" @click="onMonthItemClick(item)" />
         </div>
       </template>
       <!-- 选择天 -->
       <template v-else>
         <div class="day-item week" v-for="item in weekItems" :key="item" v-text="item" />
-        <div class="day-item" v-for="item in dayItemsRef" :key="`${item.year}-${item.month}-${item.day}`">
-          <span v-text="item.day" :class="buildDayItemClass(item)" @click="onDayItemClick(item)" />
+        <div class="day-item" v-for="item in dayItemsRef" :key="`${item.year}-${item.month}-${item.day}`" :class="{
+          'active': dateRef.year == item.year && dateRef.month == item.month && dateRef.day == item.day,
+          'now-month': dateRef.year == item.year && dateRef.month == item.month,
+          'disabled': item.disabled,
+        }">
+          <span v-text="item.day" @click="onDayItemClick(item)" />
         </div>
       </template>
     </template>
     <!-- 操作区域 -->
     <template #bottom v-if="stepRef == 'day'">
-      <Button :type="'link'" :size="'small'" v-text="'清空'" @click="emits('clear'), inPopup && closePopup('')" />
-      <Button :type="'link'" :size="'small'" v-text="'现在'" @click="onNow" />
-      <Button :type="'link'" :size="'small'" v-text="'确定'" @click="onConfirm" /></template>
+      <div class="time-area" ref="time-area" v-if="timeFormat != undefined"
+        v-text="`时间：${formatTimeValue(dateRef as any, timeFormat) || '请选择'}`" @click="onSelectTime" />
+      <template v-if="toolbarDisabled != true">
+        <Button :type="'link'" :size="'small'" v-text="'清空'" @click="emits('clear'), inPopup && closePopup('')" />
+        <Button :type="'link'" :size="'small'" v-text="'现在'" @click="onNow" />
+        <Button :type="'link'" :size="'small'" v-text="'确定'" :class="{ 'disabled': canConfirmRef != true }"
+          @click="onConfirm" />
+      </template>
+    </template>
   </Layout>
 </template>
 
 <script setup lang="ts">
-import { computed, Ref, ref, ShallowRef, shallowRef, } from "vue";
-import { DatePickerDayItem, DatePickerOptions, DatetimePickerEvents } from "../models/datetime-model";
+import { correctDateFormat, DateValue, formatDateValue, formatTimeValue, getDateValue, getFromArray, isStringNotEmpty, parseTimeValue } from "snail.core";
+import { Ref, ref, ShallowRef, shallowRef, useTemplateRef, } from "vue";
+import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
+import { DatePickerDayItem, DatePickerMonthItem, DatePickerOptions, DatePickerYearItem, DatetimePickerEvents, TimePickerOptions } from "../models/datetime-model";
+import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initStepByFormat } from "../utils/datetime-util";
+import Transitions from "../../container/transitions.vue";
 import Layout from "../../container/layout.vue";
 import Icon from "../../base/icon.vue";
 import Button from "../../base/button.vue";
-import Transitions from "../../container/transitions.vue";
-import { DateFormat, DateValue, getDateValue, getFromArray, newId, TimeValue } from "snail.core";
-import { buildDayItems, buildMonthItems, buildYearItems } from "../utils/datetime-util";
-import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
+import { PickerExtend } from "../models/picker-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<DatePickerOptions & FollowExtend & FollowHandle<string>>();
+const props = defineProps<DatePickerOptions & PickerExtend & FollowExtend & FollowHandle<string>>();
 const emits = defineEmits<DatetimePickerEvents>();
 const { inPopup } = props;
-/**   校验出来的格式 */
-const format = (() => {
-  switch (props.format) {
-    case "yyyy":
-    case "yyyy-MM":
-    case "yyyy-MM-dd HH:mm":
-    case "yyyy-MM-dd HH:mm:ss":
-      return props.format;
-    default: return "yyyy-MM-dd";
-  }
-})();
-//  2、存储选择值
+//  2、整理传入属性值
 /**   选择的日期值：年月日时分秒*/
-const dateRef: Ref<DateValue> = ref();
+const dateRef: Ref<DateValue> = ref(getDateValue(new Date(props.value)));
+/**   日期格式 */
+const format = correctDateFormat(props.format, "yyyy-MM-dd");
+/**   最小日期值 */
+const min: DateValue = Object.freeze(getDateValue(new Date(props.min)));
+/**   最大日期值 */
+const max: DateValue = Object.freeze(getDateValue(new Date(props.max)));
 //  3、组件交互变量、常量
 /**   步骤值：year（选择年）、month（选择月）、day（选择日） */
-const stepRef: ShallowRef<"year" | "month" | "day"> = shallowRef();
+const stepRef: ShallowRef<"year" | "month" | "day"> = shallowRef(initStepByFormat(format));
 /**   年分选择项集合*/
-const yearItems: ShallowRef<number[]> = shallowRef();
+const yearItems: ShallowRef<DatePickerYearItem[]> = shallowRef();
+/**   月份选择项集合 */
+const monthItems: ShallowRef<DatePickerMonthItem[]> = shallowRef();
 /**   天的选择项集合 */
 const dayItemsRef: ShallowRef<DatePickerDayItem[]> = shallowRef([]);
 /**   星期几的展示项目 */
 const weekItems = Object.freeze(["日", "一", "二", "三", "四", "五", "六"]);
+/**   【确定】按钮是否可用 */
+const canConfirmRef: ShallowRef<boolean> = shallowRef(false);
+//  4、时间处理相关
+/**   时间格式 */
+const timeFormat: "HH:mm" | "HH:mm:ss" = format == "yyyy-MM-dd HH:mm"
+  ? "HH:mm"
+  : format == "yyyy-MM-dd HH:mm:ss" ? "HH:mm:ss" : undefined;
+/**   时间选择区域：显示已选使时间，并触发时间选择器 */
+const timeAreaDom = timeFormat ? useTemplateRef("time-area") : undefined;
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
- * 构建【年份】选择项的类样式
- * @param year 年份
- * @returns 类样式记录，key为类样式名称，value为是否生效
+ *  构建选择器的选择项目
+ * @param step 哪个选择步骤的选择项
+ * @param basis 基准值，在现有基础上构建，还是上一个、下一个（如上一年、上一月）
  */
-function buildYearItemClass(year: number): Record<string, boolean> {
-  //  是否在最大值最小值区间
-  return {
-    "active": dateRef.value.year == year,
-    // "disabled":
-  }
-}
-/**
- * 构建【月份】选择项的类样式
- * @param year 月份
- * @returns 类样式记录，key为类样式名称，value为是否生效
- */
-function buildMonthItemClass(month: number): Record<string, boolean> {
-  //  是否在最大值最小值区间，需要和年份对上
-  return {
-    "active": dateRef.value.month == month,
-    // "disabled":
-  }
-}
-/**
- * 构建【天树】选择项的类样式
- * @param item 天数
- * @returns 类样式记录，key为类样式名称，value为是否生效
- */
-function buildDayItemClass(item: DatePickerDayItem): Record<string, boolean> {
-  //  是否在最大值最小值区间，需要和年份对上
-  return {
-    "active": dateRef.value.year == item.year && dateRef.value.month == item.month && dateRef.value.day == item.day,
-    // "disabled":
-    "now-month": dateRef.value.year == item.year && dateRef.value.month == item.month,
-  }
-}
 
-/**
- * 上一个、下一个按钮点击时
- * @param isPre 是上一个点击吗
- */
-function onPreNextClick(isPre: boolean) {
-  const basis = (isPre ? -1 : 1);
-  switch (stepRef.value) {
+function buildPickerItems(step: typeof stepRef.value, basis: 0 | 1 | -1) {
+  switch (step) {
     //  选择年份：每次切换18个年份
     case "year": {
       dateRef.value.year += basis * 18;
-      yearItems.value = buildYearItems(dateRef.value.year);
+      yearItems.value = buildYearItems(dateRef.value.year, min, max);
+      if (basis != 0) {
+        dateRef.value.month = 1;
+        dateRef.value.day = 1;
+      }
       break;
     }
     //  选择月份时：每年切换
     case "month": {
       dateRef.value.year += basis;
+      let yearItem = (yearItems.value || []).find(item => item.year == dateRef.value.year);
+      if (yearItem == undefined) {
+        buildPickerItems("year", 0);
+        yearItem = yearItems.value[9];
+      }
+      monthItems.value = buildMonthItems(yearItem, min, max);
+      basis != 0 && (dateRef.value.day = 1);
       break;
     }
     //  选择天数：每次切换一个月
@@ -151,12 +145,26 @@ function onPreNextClick(isPre: boolean) {
       date.setMonth(date.getMonth() + basis);
       dateRef.value.year = date.getFullYear();
       dateRef.value.month = date.getMonth() + 1;
-      dayItemsRef.value = buildDayItems(dateRef.value.year, dateRef.value.month);
+      let monthItem = (monthItems.value || []).find(item => item.year == dateRef.value.year && item.month == dateRef.value.month);
+      if (monthItem == undefined) {
+        buildPickerItems("month", 0);
+        monthItem = monthItems.value[dateRef.value.month - 1];
+      }
+      dayItemsRef.value = buildDayItems(monthItem, min, max);
+      basis != 0 && (dateRef.value.day = 1);
       break;
     }
   }
-  dateRef.value.day = 1;
 }
+/**
+ * 验证选择的日期值是否可用
+ * - 不可用更新 canConfirmRef 值
+ */
+function validateSelected(): boolean {
+  canConfirmRef.value = true;
+  return true;
+}
+
 /**
  * 切换选择步骤时
  * @param newValue 新的步骤
@@ -168,42 +176,48 @@ function onSwitchStepClick(newValue: typeof stepRef.value) {
 
 /**
  * 点击选择了 年 时
- * @param year 
+ * @param item 
  */
-function onYearItemClick(year: number) {
-  //  是否是在有效范围，不在则不能响应
-  //  在则触发响应
-  dateRef.value.year = year;
-  if (format == "yyyy") {
-    const value = String(year).padStart(4, "0");
-    emits("confirm", value);
-    props.inPopup && props.closePopup(value);
-  }
-  else {
-    dateRef.value.month = 1;
-    onSwitchStepClick("month");
+function onYearItemClick(item: DatePickerYearItem) {
+  /** 选项可用的情况下才处理
+   *  1、仅为【yyyy】则直接关闭弹窗
+   *  2、其他情况，则切换到【月份选择】
+   */
+  if (item.disabled != true) {
+    dateRef.value.year = item.year;
+    if (format == "yyyy") {
+      const value = String(dateRef.value.year).padStart(4, "0");
+      emits("confirm", value);
+      props.inPopup && props.closePopup(value);
+    }
+    else {
+      dateRef.value.month = 1;
+      monthItems.value = buildMonthItems(item, min, max);
+    }
   }
 }
 /**
  * 点击选择了 月 时
  * @param month 
  */
-function onMonthItemClick(month: number) {
-  //  是否是在有效范围，不在则不能响应
-  //  在则触发响应
-  dateRef.value.month = month;
-  if (format == "yyyy-MM") {
-    const value = [
-      String(dateRef.value.year).padStart(4, "0"),
-      String(month).padStart(2, "0")
-    ].join("-");
-    emits("confirm", value);
-    props.inPopup && props.closePopup(value);
-  }
-  else {
-    dateRef.value.day = 1;
-    dayItemsRef.value = buildDayItems(dateRef.value.year, dateRef.value.month);
-    onSwitchStepClick("day");
+function onMonthItemClick(item: DatePickerMonthItem) {
+  /** 选项可用的情况下才处理
+   *  1、仅为【yyyy-MM】则直接关闭弹窗
+   *  2、其他情况，则切换到【天选择】
+   */
+  if (item.disabled != true) {
+    dateRef.value.year = item.year;
+    dateRef.value.month = item.month;
+    if (format == "yyyy-MM") {
+      const value = formatDateValue(dateRef.value, "yyyy-MM");
+      emits("confirm", value);
+      props.inPopup && props.closePopup(value);
+    }
+    else {
+      dateRef.value.day = 1;
+      dayItemsRef.value = buildDayItems(item, min, max);
+      onSwitchStepClick("day");
+    }
   }
 }
 /**
@@ -211,21 +225,58 @@ function onMonthItemClick(month: number) {
  * @param item 
  */
 function onDayItemClick(item: DatePickerDayItem) {
-  //  验证是否可选，不可选不响应；可能选择的是上一个月和下一个月的数据
-  dateRef.value.year = item.year;
-  dateRef.value.month = item.month;
-  dateRef.value.day = item.day;
-  if (format == "yyyy-MM-dd") {
-    const value = [
-      String(dateRef.value.year).padStart(4, "0"),
-      String(dateRef.value.month).padStart(2, "0"),
-      String(dateRef.value.day).padStart(2, "0")
-    ].join("-");
-    emits("confirm", value);
-    props.inPopup && props.closePopup(value);
+  /** 选项可用的情况下才处理
+   *  1、仅为【yyyy-MM-dd】则直接关闭弹窗
+   *  2、其他情况，则校验选择是否有效
+   */
+  if (item.disabled != true) {
+    const isNowMonth = item.year == dateRef.value.year && item.month == dateRef.value.month;
+    Object.assign(dateRef.value, { year: item.year, month: item.month, day: item.day });
+    if (format == "yyyy-MM-dd") {
+      const value = formatDateValue(dateRef.value, "yyyy-MM-dd");
+      emits("confirm", value);
+      props.inPopup && props.closePopup(value);
+    }
+    else {
+      isNowMonth || buildPickerItems("day", 0);
+      validateSelected();
+    }
   }
-  else {
-    //  刷新时间选择、、
+}
+
+/**
+ * 选择时间
+ * @param evt 
+ */
+async function onSelectTime() {
+  if (timeAreaDom.value != undefined && props.pinned.value != true) {
+    if (props.picker) {
+      props.pinned.value = true;
+      const task = props.picker.showTime(timeAreaDom.value, {
+        format: timeFormat,
+        min: formatTimeValue(min as any, timeFormat),
+        max: formatTimeValue(max as any, timeFormat),
+        toolbarDisabled: true,
+        //  跟随效果
+        followX: "start",
+        followY: "before",
+        spaceX: -2,
+        spaceY: 4,
+      });
+      task.finally(() => setTimeout(() => props.pinned.value = false)).then(
+        text => {
+          if (isStringNotEmpty(text) === true) {
+            const time = parseTimeValue(text);
+            dateRef.value.hour = time.hour;
+            dateRef.value.minute = time.minute;
+            dateRef.value.second = time.second;
+          }
+        },
+        reason => {
+          console.error(reason);
+        }
+      );
+    }
   }
 }
 
@@ -233,37 +284,28 @@ function onDayItemClick(item: DatePickerDayItem) {
  * 【现在】按钮点击时
  */
 function onNow() {
-
+  stepRef.value = initStepByFormat(format);
+  dateRef.value = getDateValue(new Date());
+  buildPickerItems(stepRef.value, 0);
 }
 /**
  * 【确认】按钮点击时
  */
 function onConfirm() {
-
+  if (canConfirmRef.value == true) {
+    const value = formatDateValue(dateRef.value, format);
+    emits("confirm", value);
+    props.inPopup && props.closePopup(value);
+  }
 }
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
-{
-  //  初始化第一屏展示的选择步骤
-  switch (format) {
-    case "yyyy":
-      stepRef.value = "year";
-      break;
-    case "yyyy-MM":
-      stepRef.value = "month";
-      break;
-    default:
-      stepRef.value = "day";
-      break;
-  }
-  //  初始化已选值
-  dateRef.value == undefined && (dateRef.value = getDateValue(new Date()));
-  yearItems.value = buildYearItems(dateRef.value.year);
-  dayItemsRef.value = buildDayItems(dateRef.value.year, dateRef.value.month);
-}
+//    若无值，则选举一个适合的值出来做选择：先始终使用现在值
+dateRef.value == undefined && (dateRef.value = electDateValue(min, max));
+validateSelected();
+buildPickerItems(stepRef.value, 0);
 //  2、生命周期响应
-
 </script>
 
 <style lang="less">
@@ -279,6 +321,18 @@ function onConfirm() {
   border-radius: 4px;
   overflow: hidden !important;
   user-select: none;
+
+  //  正在选择时间时，当前窗体样式调整一下
+  &.time-now::after {
+    position: absolute;
+    opacity: 0.6;
+    content: "";
+    //  left、 top起始位置：left: 0; top: 0
+    .left-top-start();
+    //  width:100%；height:100%
+    .wh-fill();
+    background-color: gray;
+  }
 
   >.top-area {
     display: flex;
@@ -330,7 +384,6 @@ function onConfirm() {
       flex-shrink: 0;
       position: relative;
       font-size: 13px;
-      cursor: pointer;
       //  flex 布局：display: flex，align-items、justify-content 都为center
       .flex-center();
 
@@ -338,18 +391,31 @@ function onConfirm() {
         height: 28px;
         //  flex 布局：display: flex，align-items、justify-content 都为center
         .flex-center();
+      }
 
-        &:hover {
-          background: #f4f4f4;
-        }
+      //  鼠标移入选项文本时，给出特定样式
+      >span:hover {
+        cursor: pointer;
+        background: #f4f4f4;
+      }
 
-        &.active {
-          background-color: #58a4fd;
-          color: white;
+      //  当前选中元素样式，无效禁用时，给出特定透明度
+      &.active {
+        >span {
+          background-color: #0f7eef;
+          color: white !important;
         }
 
         &.disabled {
-          cursor: not-allowed !important;
+          opacity: 0.6;
+        }
+      }
+
+      //  无效元素不允许选择，非【选中】时，字体颜色凸显
+      &.disabled {
+        >span {
+          cursor: not-allowed;
+          color: #aaa;
         }
       }
     }
@@ -357,18 +423,19 @@ function onConfirm() {
     //  选择day
     >div.day-item {
       width: 36px;
+      height: 30px;
 
       &.week {
         font-weight: bold;
       }
 
-      >span.active,
-      >span:hover {
+      &.active>span,
+      &:hover>span {
         width: 28px;
         border-radius: 100%;
       }
 
-      >span:not(.now-month) {
+      &:not(.now-month)>span {
         color: #aaa;
       }
     }
@@ -378,8 +445,8 @@ function onConfirm() {
     >div.year-item {
       width: 30%;
 
-      >span.active,
-      >span:hover {
+      &.active>span,
+      &:hover>span {
         width: fit-content;
         padding: 0 8px;
         border-radius: 15px;
@@ -396,15 +463,30 @@ function onConfirm() {
     justify-content: flex-end;
     align-items: center;
 
+    //选择时间区域
+    >.time-area {
+      margin-left: 10px;
+      margin-right: auto;
+      font-size: 13px;
+      // color: #999;
+      color: #0f7eef;
+      cursor: pointer;
+    }
+
     >.snail-button {
       margin-left: 4px;
       font-size: 12px;
-      color: #999;
       // color: #58a4fd;
+      color: #999;
 
       &:last-child,
       &:hover {
         color: #0f7eef;
+      }
+
+      &.disabled {
+        cursor: not-allowed;
+        color: #999;
       }
     }
   }
