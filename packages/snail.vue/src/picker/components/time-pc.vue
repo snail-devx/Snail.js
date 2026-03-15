@@ -37,9 +37,9 @@
 </template>
 
 <script setup lang="ts">
-import { isNumberNotNaN, newId, useTimeValue, TimeValue, parseTimeValue, ITimeValueManager, getTimeValue, padStart, TimeFormat, formatTimeValue } from "snail.core";
+import { TimeValue, parseTimeValue, getTimeValue, padStart, TimeFormat, formatTimeValue } from "snail.core";
 import { onMounted, ref, ShallowRef, shallowRef, useTemplateRef, nextTick, Ref, computed } from "vue";
-import { FollowExtend, FollowHandle, usePopup } from "../../popup/manager";
+import { FollowExtend, FollowHandle } from "../../popup/manager";
 import { DatetimePickerEvents, TimePickerHourItem, TimePickerMinuteItem, TimePickerOptions, TimePickerSecondItem } from "../models/datetime-model";
 import Button from "../../base/button.vue";
 import Transitions from "../../container/transitions.vue";
@@ -120,12 +120,11 @@ function scrollIntoView(items: HTMLElement) {
  */
 function onHourClick(item: TimePickerHourItem) {
     /** 非禁用，且有改变时，基于小时构建分钟*/
-    if (item.disabled == true || timeRef.value.hour == item.hour) {
-        return;
+    if (item.disabled != true && timeRef.value.hour != item.hour) {
+        timeRef.value.hour = item.hour;
+        minuteItems.value = buildMinuteItems(item, min, max);
+        secondItems.value = buildSecondItems(minuteItems.value[timeRef.value.minute], min, max);
     }
-    timeRef.value.hour = item.hour;
-    minuteItems.value = buildMinuteItems(item, min, max);
-    secondItems.value = buildSecondItems(minuteItems.value[timeRef.value.minute], min, max);
 }
 /**
  * 分钟点击时
@@ -138,7 +137,7 @@ function onMinuteClick(item: TimePickerMinuteItem) {
             emits("confirm", value);
             props.inPopup && props.closePopup(value);
         }
-        else {
+        else if (timeRef.value.minute != item.minute) {
             timeRef.value.minute = item.minute;
             secondItems.value = buildSecondItems(item, min, max);
         }
