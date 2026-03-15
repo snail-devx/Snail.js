@@ -2,7 +2,7 @@
  * 日期/时间 选择器助手方法
  */
 
-import { correctNumber, DateFormat, DateValue, formatDate, formatDateValue, formatTimeValue, getDateByValue, getDateValue, padStart, TimeFormat, TimeValue } from "snail.core";
+import { correctNumber, correctTimeValue, DateFormat, DateValue, formatDate, formatDateValue, formatTimeValue, getDateByValue, getDateValue, padStart, TimeFormat, TimeValue } from "snail.core";
 import { DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, TimePickerHourItem, TimePickerMinuteItem, TimePickerOptions, TimePickerSecondItem } from "../models/datetime-model";
 import { ValueOptions, DisabledOptions } from "../../base/models/base-model";
 import { padEnd } from "../../../../snail.core/src";
@@ -214,5 +214,35 @@ export function buildSecondItems(minuteItem: TimePickerMinuteItem, min: TimeValu
  */
 export function getTimeNumber(hour: number, minute: number, second: number): number {
     return (hour || 0) * 10000 + (minute || 0) * 100 + (second || 0);
+}
+/**
+ * 是否是有效的时间值
+ * @param format 时间格式
+ * @param time 时间值
+ * @param min 时间最小值
+ * @param max 时间最大值
+ * @returns 有效返回true，否则false
+ */
+export function isValidTime(format: "HH:mm" | "HH:mm:ss", time: TimeValue, min: TimeValue, max: TimeValue): boolean {
+    time = correctTimeValue(time);
+    if (time) {
+        min = correctTimeValue({ ...min });
+        const timeNumber = getTimeNumber(time.hour, time.minute, format == "HH:mm" ? 0 : time.second);
+        if (min != undefined) {
+            const minNumber = getTimeNumber(min.hour, min.minute, format == "HH:mm" ? 0 : max.second);
+            if (timeNumber < minNumber) {
+                return false;
+            }
+        }
+        max = correctTimeValue({ ...max });
+        if (max != undefined) {
+            const maxNumber = getTimeNumber(max.hour, max.minute, format == "HH:mm" ? 0 : max.second);
+            if (timeNumber > maxNumber) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 //#endregion

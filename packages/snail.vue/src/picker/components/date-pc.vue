@@ -1,6 +1,6 @@
 <!-- 日期选择器 PC端组件
     1、外部使用 follow弹窗打开
-    2、内部集成 time-pc.vue时间选择
+    2、内部集成 time-pc.vue时间选择，但时间的最大、最小值单独设置，不从日期的最大、最小值中提取
   -->
 <template>
     <Layout class="date-picker pc" :class="{ 'time-now': pinned && pinned.value == true }" :mode="'vertical'"
@@ -49,8 +49,8 @@
                 </div>
             </template>
         </template>
-        <!-- 操作区域 -->
-        <template #bottom v-if="stepRef == 'day'">
+        <!-- 操作区域：只有是最后一个操作步骤时才显示，此时若有时间操作时，必须得有个确定 -->
+        <template #bottom v-if="endStep == stepRef && (toolbarDisabled != true || timeFormat != undefined)">
             <div class="time-area" ref="time-area" v-if="timeFormat != undefined"
                 :class="{ placeholder: dateRef.hour == undefined }"
                 v-text="formatTimeValue(dateRef as any, timeFormat) || '选择时间'" @click="onSelectTime" />
@@ -58,19 +58,19 @@
                 <Button :type="'link'" :size="'small'" v-if="clearDisabled != true" v-text="'清空'"
                     @click="emits('clear'), inPopup && closePopup('')" />
                 <Button :type="'link'" :size="'small'" v-if="nowDisabled != true" v-text="'现在'" @click="onNow" />
-                <Button :type="'link'" :size="'small'" v-text="'确定'" :class="{ 'disabled': canConfirmRef != true }"
-                    @click="onConfirm" />
             </template>
+            <Button :type="'link'" :size="'small'" v-text="'确定'" :class="{ 'disabled': isValidDateRef != true }"
+                @click="onConfirm" />
         </template>
     </Layout>
 </template>
 
 <script setup lang="ts">
-import { correctDateFormat, DateValue, formatDateValue, formatTimeValue, getDateValue, getFromArray, isStringNotEmpty, parseTimeValue } from "snail.core";
-import { Ref, ref, ShallowRef, shallowRef, useTemplateRef, } from "vue";
+import { correctDateFormat, DateValue, formatDateValue, formatTimeValue, getDateByValue, getDateValue, getFromArray, isStringNotEmpty, parseDateValue, parseTimeValue, TimeValue } from "snail.core";
+import { computed, Ref, ref, ShallowRef, shallowRef, useTemplateRef, } from "vue";
 import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
 import { DatePickerDayItem, DatePickerMonthItem, DatePickerOptions, DatePickerYearItem, DatetimePickerEvents, TimePickerOptions } from "../models/datetime-model";
-import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initStepByFormat } from "../utils/datetime-util";
+import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initStepByFormat, isValidTime } from "../utils/datetime-util";
 import Transitions from "../../container/transitions.vue";
 import Layout from "../../container/layout.vue";
 import Icon from "../../base/icon.vue";
@@ -84,25 +84,31 @@ const emits = defineEmits<DatetimePickerEvents>();
 const { inPopup } = props;
 //  2、整理传入属性值
 /**   选择的日期值：年月日时分秒*/
-const dateRef: Ref<DateValue> = ref(getDateValue(new Date(props.value)));
+const dateRef: Ref<DateValue> = ref(parseDateValue(props.value));
 /**   日期格式 */
 const format = correctDateFormat(props.format, "yyyy-MM-dd");
 /**   最小日期值 */
-const min: DateValue = Object.freeze(getDateValue(new Date(props.min)));
+const min: DateValue = Object.freeze(parseDateValue(props.min));
 /**   最大日期值 */
-const max: DateValue = Object.freeze(getDateValue(new Date(props.max)));
+const max: DateValue = Object.freeze(parseDateValue(props.max));
 //  3、组件交互变量、常量
+/**   选择操作的最后是什么 */
+const endStep: "year" | "month" | "day" = initStepByFormat(format);
 /**   步骤值：year（选择年）、month（选择月）、day（选择日） */
-const stepRef: ShallowRef<"year" | "month" | "day"> = shallowRef(initStepByFormat(format));
+const stepRef: ShallowRef<"year" | "month" | "day"> = shallowRef(endStep);
 /**   年分选择项集合*/
 const yearItems: ShallowRef<DatePickerYearItem[]> = shallowRef();
 /**   月份选择项集合 */
 const monthItems: ShallowRef<DatePickerMonthItem[]> = shallowRef();
 /**   天的选择项集合 */
 const dayItemsRef: ShallowRef<DatePickerDayItem[]> = shallowRef([]);
-/**   【确定】按钮是否可用 */
-const canConfirmRef: ShallowRef<boolean> = shallowRef(false);
+/**   是否是有效日期 */
+const isValidDateRef = computed(validateDate);
 //  4、时间处理相关
+/**   最小选择时间值 */
+const minPickTime: TimeValue = Object.freeze(parseTimeValue(props.minPickTime));
+/**    最大选择时间值 */
+const maxPickTime: TimeValue = Object.freeze(parseTimeValue(props.maxPickTime));
 /**   时间格式 */
 const timeFormat: "HH:mm" | "HH:mm:ss" = format == "yyyy-MM-dd HH:mm"
     ? "HH:mm"
@@ -111,6 +117,39 @@ const timeFormat: "HH:mm" | "HH:mm:ss" = format == "yyyy-MM-dd HH:mm"
 const timeAreaDom = timeFormat ? useTemplateRef("time-area") : undefined;
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 是否是有效的日期
+ * 配合 
+ */
+function validateDate(): boolean {
+    switch (format) {
+        case "yyyy": {
+            const item = yearItems.value.find(item => item.year == dateRef.value.year);
+            return item && item.disabled != true;
+        }
+        case "yyyy-MM": {
+            const item = monthItems.value.find(item => item.year == dateRef.value.year && item.month == dateRef.value.month);
+            return item && item.disabled != true;
+        }
+        case "yyyy-MM-dd": {
+            const item = dayItemsRef.value.find(item => item.year == dateRef.value.year && item.month == dateRef.value.month && item.day == dateRef.value.day);
+            return item ? item.disabled != true : false;
+        }
+        //  包含时间时，需要同步进行时间值验证
+        case "yyyy-MM-dd HH:mm":
+        case "yyyy-MM-dd HH:mm:ss": {
+            if (isValidTime(timeFormat, dateRef.value as any, minPickTime, maxPickTime) == true) {
+                const date = getDateByValue(dateRef.value);
+                const disabled = (min && date < getDateByValue(min)) || (max && date > getDateByValue(max));
+                return disabled != true;
+            }
+            return false;
+        }
+        //  其他情况，返回false
+        default: return false;
+    }
+}
+
 /**
  *  构建选择器的选择项目
  * @param step 哪个选择步骤的选择项
@@ -156,14 +195,6 @@ function buildPickerItems(step: typeof stepRef.value, basis: 0 | 1 | -1) {
             break;
         }
     }
-}
-/**
- * 验证选择的日期值是否可用
- * - 不可用更新 canConfirmRef 值
- */
-function validateSelected(): boolean {
-    canConfirmRef.value = true;
-    return true;
 }
 
 /**
@@ -241,7 +272,6 @@ function onDayItemClick(item: DatePickerDayItem) {
         }
         else {
             isNowMonth || buildPickerItems("day", 0);
-            validateSelected();
         }
     }
 }
@@ -251,37 +281,38 @@ function onDayItemClick(item: DatePickerDayItem) {
  * @param evt 
  */
 async function onSelectTime() {
-    if (timeAreaDom.value != undefined && props.pinned.value != true) {
-        if (props.picker) {
-            props.pinned.value = true;
-            const task = props.picker.showTime(timeAreaDom.value, {
-                format: timeFormat,
-                min: formatTimeValue(min as any, timeFormat),
-                max: formatTimeValue(max as any, timeFormat),
-                // toolbarDisabled: true,
-                //  跟随效果
-                followX: "start",
-                followY: "before",
-                spaceX: -2,
-                spaceY: 4,
-            });
-            task.finally(() => setTimeout(() => props.pinned.value = false)).then(
-                text => {
-                    if (text != undefined) {
-                        const time = parseTimeValue(text) || Object.create(null);
-                        dateRef.value.hour = time.hour;
-                        dateRef.value.minute = time.minute;
-                        dateRef.value.second = time.second;
-                    }
-                },
-                reason => {
-                    console.error(reason);
-                }
-            );
-        }
+    if (props.picker == undefined || timeAreaDom.value == undefined || props.pinned.value == true) {
+        return;
     }
+    props.pinned.value = true;
+    const task = props.picker.showTime(timeAreaDom.value, {
+        format: timeFormat,
+        value: formatTimeValue(dateRef.value as any, timeFormat),
+        // min: formatTimeValue(min as any, timeFormat),
+        // max: formatTimeValue(max as any, timeFormat),
+        min: props.minPickTime,
+        max: props.minPickTime,
+        // toolbarDisabled: true,
+        //  跟随效果
+        followX: "start",
+        followY: "before",
+        spaceX: -2,
+        spaceY: 4,
+    });
+    task.finally(() => setTimeout(() => props.pinned.value = false)).then(
+        text => {
+            if (text != undefined) {
+                const time = parseTimeValue(text) || Object.create(null);
+                dateRef.value.hour = time.hour;
+                dateRef.value.minute = time.minute;
+                dateRef.value.second = time.second;
+            }
+        },
+        reason => {
+            console.error(reason);
+        }
+    );
 }
-
 /**
  * 【现在】按钮点击时
  */
@@ -294,7 +325,7 @@ function onNow() {
  * 【确认】按钮点击时
  */
 function onConfirm() {
-    if (canConfirmRef.value == true) {
+    if (isValidDateRef.value == true) {
         const value = formatDateValue(dateRef.value, format);
         emits("confirm", value);
         props.inPopup && props.closePopup(value);
@@ -305,7 +336,6 @@ function onConfirm() {
 //  1、数据初始化、变化监听
 //    若无值，则选举一个适合的值出来做选择：先始终使用现在值
 dateRef.value == undefined && (dateRef.value = electDateValue(min, max));
-validateSelected();
 buildPickerItems(stepRef.value, 0);
 //  2、生命周期响应
 </script>
@@ -488,7 +518,8 @@ buildPickerItems(stepRef.value, 0);
 
             &.disabled {
                 cursor: not-allowed;
-                color: #999;
+                // color: #999;
+                opacity: 0.6;
             }
         }
     }

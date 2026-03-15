@@ -8,8 +8,12 @@
             <input type="text" @click="evt => onClick(evt, { format: 'yyyy' })" />
         </section>
         <section class="">
+            禁用操作按钮
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy', toolbarDisabled: true })" />
+        </section>
+        <section class="">
             最小值 2026
-            <input type="text" @click="evt => onClick(evt, { format: 'yyyy', min: '2026' })" />
+            <input type="text" value="2023" @click="evt => onClick(evt, { format: 'yyyy', min: '2026' })" />
         </section>
         <section class="">
             最大值 2026
@@ -34,6 +38,10 @@
         <section class="">
             默认情况
             <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM' })" />
+        </section>
+        <section class="">
+            禁用操作按钮
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM', toolbarDisabled: true })" />
         </section>
         <section class="">
             最小值 2026-03
@@ -80,6 +88,10 @@
             <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd' })" />
         </section>
         <section class="">
+            禁用操作按钮
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd', toolbarDisabled: true })" />
+        </section>
+        <section class="">
             最小值 2026-03-25
             <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd', min: '2026-03-25' })" />
         </section>
@@ -121,6 +133,14 @@
         <section class="">
             默认情况
             <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd HH:mm' })" />
+        </section>
+        <section class="">
+            最小值2026-03-15
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd HH:mm', min: '2026-03-15' })" />
+        </section>
+        <section class="">
+            最小值2026-03-15 22:00
+            <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd HH:mm', min: '2026-03-15 22:00' })" />
         </section>
         <section class="">
             禁用操作按钮
