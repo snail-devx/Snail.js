@@ -2,6 +2,27 @@ import { DateFormat, DateValue, IAsyncScope, ITimeValueManager, TimeValue } from
 import { DisabledOptions, ValueOptions } from "../../base/models/base-model";
 
 /**
+ * 日期时间的功能禁用配置选项
+ */
+export type DatetimeDisabledOptions = {
+    /**
+     * 禁用【工具条】
+     * - 为true则不显示【确定】、【现在】等按钮的工具条区域
+     */
+    toolbarDisabled?: boolean;
+    /**
+     * 禁用【现在】按钮
+     * - 为true时不显示【现在】按钮
+     */
+    nowDisabled?: boolean;
+    /**
+     * 禁用【清空】按钮
+     * - 为true时不显示【清空】按钮
+     */
+    clearDisabled?: boolean;
+}
+
+/**
  * 日期选择器 配置选项
  */
 export type DatePickerOptions = {
@@ -25,13 +46,7 @@ export type DatePickerOptions = {
      * 最大值
      */
     max?: string;
-
-    /**
-     * 禁用【工具条】
-     * - 为true则不显示【确定】、【现在】等按钮
-     */
-    toolbarDisabled?: boolean;
-}
+} & DatetimeDisabledOptions;
 /**
  * 时间选择控件配置项
  */
@@ -59,13 +74,7 @@ export type TimePickerOptions = {
      * - 如 "08" ，则 08:00:00为最大时间，之后时间不可选择
      */
     max?: string;
-
-    /**
-     * 禁用【工具条】
-     * - 为true则不显示【确定】、【现在】等按钮的工具条区域
-     */
-    toolbarDisabled?: boolean;
-}
+} & DatetimeDisabledOptions;
 
 /**
  * 日期时间选择 事件

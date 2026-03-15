@@ -10,6 +10,18 @@
             禁用工具条
             <input type="text" @click="evt => onClick(evt, { toolbarDisabled: true })" />
         </section>
+        <section class="">
+            禁用现在
+            <input type="text" @click="evt => onClick(evt, { nowDisabled: true })" />
+        </section>
+        <section class="">
+            禁用清空
+            <input type="text" @click="evt => onClick(evt, { clearDisabled: true })" />
+        </section>
+        <section class="">
+            禁用清空+现在
+            <input type="text" @click="evt => onClick(evt, { nowDisabled: true, clearDisabled: true })" />
+        </section>
         <section>
             最小值 19:30:00：
             <input type="text" @click="evt => onClick(evt, { min: '19:30:00' })" />
@@ -28,7 +40,7 @@
         </section>
     </article>
     <article>
-        <h1>时分选择</h1>
+        <h1>HH:mm</h1>
         <section class="">
             时分选择：
             <input type="text" @click="evt => onClick(evt, { format: 'HH:mm' })" />
@@ -38,16 +50,15 @@
             <input type="text" @click="evt => onClick(evt, { format: 'HH:mm', toolbarDisabled: true })" />
         </section>
     </article>
-
     <article>
-        <h1>其他配置</h1>
-        <section>
-            禁用初始化：
-            <input type="text" @click="evt => onClick(evt, { initialDisabled: true })" />
+        <h1>HH:mm:ss</h1>
+        <section class="">
+            时分秒选择：
+            <input type="text" @click="evt => onClick(evt, { format: 'HH:mm:ss' })" />
         </section>
-        <section>
-            禁用初始化，最小值 19:30:00：
-            <input type="text" @click="evt => onClick(evt, { initialDisabled: true, min: '19:30:00' })" />
+        <section class="">
+            时分秒，禁用工具条
+            <input type="text" @click="evt => onClick(evt, { format: 'HH:mm:ss', toolbarDisabled: true })" />
         </section>
     </article>
 </template>

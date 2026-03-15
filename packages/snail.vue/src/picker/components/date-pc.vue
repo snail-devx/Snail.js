@@ -54,9 +54,9 @@
             <div class="time-area" ref="time-area" v-if="timeFormat != undefined"
                 v-text="`时间：${formatTimeValue(dateRef as any, timeFormat) || '请选择'}`" @click="onSelectTime" />
             <template v-if="toolbarDisabled != true">
-                <Button :type="'link'" :size="'small'" v-text="'清空'"
+                <Button :type="'link'" :size="'small'" v-if="clearDisabled != true" v-text="'清空'"
                     @click="emits('clear'), inPopup && closePopup('')" />
-                <Button :type="'link'" :size="'small'" v-text="'现在'" @click="onNow" />
+                <Button :type="'link'" :size="'small'" v-if="nowDisabled != true" v-text="'现在'" @click="onNow" />
                 <Button :type="'link'" :size="'small'" v-text="'确定'" :class="{ 'disabled': canConfirmRef != true }"
                     @click="onConfirm" />
             </template>

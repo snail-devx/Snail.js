@@ -26,8 +26,10 @@
         </template>
         <!-- 操作区域 -->
         <template #bottom v-if="toolbarDisabled != true">
-            <Button :type="'link'" :size="'small'" v-text="'清空'" @click="emits('clear'), inPopup && closePopup('')" />
-            <Button :type="'link'" :size="'small'" v-text="'现在'" @click="rebuildItems(getTimeValue(new Date()))" />
+            <Button :type="'link'" :size="'small'" v-if="clearDisabled != true" v-text="'清空'"
+                @click="emits('clear'), inPopup && closePopup('')" />
+            <Button :type="'link'" :size="'small'" v-if="nowDisabled != true" v-text="'现在'"
+                @click="rebuildItems(getTimeValue(new Date()))" />
             <Button :type="'link'" :size="'small'" v-text="'确定'" :class="{ disabled: isValidTimeRef != true }"
                 @click="onConfirm" />
         </template>
@@ -49,11 +51,11 @@ import { buildHourItems, buildMinuteItems, buildSecondItems } from "../utils/dat
 //  1、props、event、model、components
 const props = defineProps<TimePickerOptions & PickerExtend & FollowHandle<string> & FollowExtend>();
 const emits = defineEmits<DatetimePickerEvents>();
-/**  时间格式 */
+/**     时间格式 */
 const format = props.format == "HH:mm" ? "HH:mm" : "HH:mm:ss";
-/**  时间最小值 */
+/**     时间最小值 */
 const min = parseTimeValue(props.min);
-/**  时间最大值 */
+/**     时间最大值 */
 const max = parseTimeValue(props.max);
 //  2、组件交互变量、常量
 /**     已选择的时间值 */
