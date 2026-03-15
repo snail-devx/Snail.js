@@ -52,7 +52,8 @@
         <!-- 操作区域 -->
         <template #bottom v-if="stepRef == 'day'">
             <div class="time-area" ref="time-area" v-if="timeFormat != undefined"
-                v-text="`时间：${formatTimeValue(dateRef as any, timeFormat) || '请选择'}`" @click="onSelectTime" />
+                :class="{ placeholder: dateRef.hour == undefined }"
+                v-text="formatTimeValue(dateRef as any, timeFormat) || '选择时间'" @click="onSelectTime" />
             <template v-if="toolbarDisabled != true">
                 <Button :type="'link'" :size="'small'" v-if="clearDisabled != true" v-text="'清空'"
                     @click="emits('clear'), inPopup && closePopup('')" />
@@ -193,6 +194,7 @@ function onYearItemClick(item: DatePickerYearItem) {
         else {
             dateRef.value.month = 1;
             monthItems.value = buildMonthItems(item, min, max);
+            onSwitchStepClick("month");
         }
     }
 }
@@ -256,7 +258,7 @@ async function onSelectTime() {
                 format: timeFormat,
                 min: formatTimeValue(min as any, timeFormat),
                 max: formatTimeValue(max as any, timeFormat),
-                toolbarDisabled: true,
+                // toolbarDisabled: true,
                 //  跟随效果
                 followX: "start",
                 followY: "before",
@@ -265,8 +267,8 @@ async function onSelectTime() {
             });
             task.finally(() => setTimeout(() => props.pinned.value = false)).then(
                 text => {
-                    if (isStringNotEmpty(text) === true) {
-                        const time = parseTimeValue(text);
+                    if (text != undefined) {
+                        const time = parseTimeValue(text) || Object.create(null);
                         dateRef.value.hour = time.hour;
                         dateRef.value.minute = time.minute;
                         dateRef.value.second = time.second;
@@ -467,7 +469,7 @@ buildPickerItems(stepRef.value, 0);
         >.time-area {
             margin-left: 10px;
             margin-right: auto;
-            font-size: 13px;
+            font-size: 12px;
             // color: #999;
             color: #58a4fd;
             cursor: pointer;

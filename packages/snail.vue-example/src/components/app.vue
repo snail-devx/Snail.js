@@ -146,7 +146,7 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[2].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
-    onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
+    onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
 });
 </script>
 
