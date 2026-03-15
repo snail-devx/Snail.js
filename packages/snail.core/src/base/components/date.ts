@@ -200,22 +200,8 @@ export function formatTimeValue(time: TimeValue, format?: TimeFormat): string | 
  * @returns Date对象；若text无效则返回undefined
  */
 export function parseDate(text: string): Date | undefined {
-    if (isStringNotEmpty(text) == true) {
-        const [ymdText, hmsText] = text.split(" ");
-        const [year, month, day] = (ymdText || "").split("-");
-        const [hour, minute, second] = (hmsText || "").split(":");
-        const monthIndex = correctNumber(parseInt(month), undefined);
-        const date = new Date(
-            correctNumber(parseInt(year), undefined),
-            monthIndex != undefined ? (monthIndex - 1) : undefined,
-            correctNumber(parseInt(day), undefined),
-            correctNumber(parseInt(hour), 0),
-            correctNumber(parseInt(minute), 0),
-            correctNumber(parseInt(second), 0)
-        );
-        return correctDate(date, undefined);
-    }
-    return undefined;
+    const value = parseDateValue(text);
+    return value ? getDateByValue(value) : undefined;
 }
 /**
  * 解析日期值
@@ -223,8 +209,27 @@ export function parseDate(text: string): Date | undefined {
  * @returns 日期值，text无效返回undefined
  */
 export function parseDateValue(text: string): DateValue | undefined {
-    const date = parseDate(text);
-    return getDateValue(date);
+    if (isStringNotEmpty(text) == true) {
+        const [ymdText, hmsText] = text.split(" ");
+        const [year, month, day] = (ymdText || "").split("-");
+        const monthIndex = correctNumber(parseInt(month), undefined);
+        const date = new Date(
+            correctNumber(parseInt(year), undefined),
+            monthIndex != undefined ? (monthIndex - 1) : undefined,
+            correctNumber(parseInt(day), undefined),
+        );
+        //  时间部分进行校准，无效则给出undefined属性值
+        const value = getDateValue(date);
+        if (value != undefined) {
+            Object.assign(value, parseTimeValue(hmsText) || {
+                hour: undefined,
+                minute: undefined,
+                second: undefined
+            });
+        }
+        return value;
+    }
+    return undefined;
 }
 /**
  * 从文本解析时间值
@@ -252,7 +257,14 @@ export function parseTimeValue(text: string): TimeValue | undefined {
  */
 export function getDateByValue(value: DateValue): Date | undefined {
     if (value && value.year != undefined) {
-        const date = new Date(value.year, value.month ? value.month - 1 : 0, value.day || 1, value.hour || 0, value.minute || 0, value.second || 0);
+        const date = new Date(
+            value.year,
+            value.month ? value.month - 1 : 0,
+            value.day || 1,
+            value.hour || 0,
+            value.minute || 0,
+            value.second || 0
+        );
         return correctDate(date, undefined);
     }
     return undefined;
