@@ -1,8 +1,8 @@
 import { assert, describe, expect, test, it, afterEach, vi, afterAll } from 'vitest'
 import { JSDOM } from "jsdom";
 import { link, useLink, ILinkManager, LinkOptions, configLink, linkMap } from "../src/components/link"
-import { version } from '../../snail.core/src/web/version';
-import { IScope } from '../../snail.core/src/base/models/scope-model';
+import { version } from "snail.core";
+import { IScope } from "snail.core";
 import { LINK_CONTAINER_ID } from '../src/utils/link-util';
 
 //@ts-ignore
