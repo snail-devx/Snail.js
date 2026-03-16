@@ -31,12 +31,12 @@ export type DateValue = {
     /**
      * 月
      */
-    month?: number;
+    month: number;
     /**
      * 日
      */
-    day?: number;
-} & Partial<TimeValue>;
+    day: number;
+} & TimeValue;
 /**
  * 时间值，描述时分秒值
  */
@@ -48,9 +48,9 @@ export type TimeValue = {
     /**
      * 分钟
      */
-    minute?: number;
+    minute: number;
     /**
      * 秒钟
      */
-    second?: number;
+    second: number;
 }

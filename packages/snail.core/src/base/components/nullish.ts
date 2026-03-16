@@ -23,14 +23,12 @@ export function isUndefined(data: any): boolean {
     return data === undefined;
 }
 /**
- * 是否是Null或Undefined
- * @param data
- * @returns 是返回true；否则返回false
+ * 是否时空值（undefined/null）
+ * @param data  
+ * @returns 
  */
-export function isNullOrUndefined(data: any): boolean {
-    // const type = getType(data);
-    // return type === "[object Null]" || type === "[object Undefined]";
-    return data === null || data === undefined;
+export function isNullish(data: any): boolean {
+    return data === undefined || data === null;
 }
 
 /**

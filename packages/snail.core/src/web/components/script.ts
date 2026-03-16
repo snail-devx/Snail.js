@@ -5,7 +5,7 @@
  */
 
 import { isArray, isArrayNotEmpty, isObject, isStringNotEmpty, isFunction } from "../../base";
-import { mustString, tidyString, hasOwnProperty, extract, getMessage, throwIfNullOrUndefined, throwIfTrue } from "../../base";
+import { mustString, tidyString, hasOwnProperty, extract, getMessage, throwIfNullish, throwIfTrue } from "../../base";
 import { checkScope, IScope, mountScope, useScope } from "../../common";
 import { IScriptManager, ScriptFile, ScriptLoadOptions, ScriptOptions } from "../models/script-model";
 import { SCRIPT_CONFIG, checkScriptOptions, formScriptUrl, buildScriptByUrl, drillScriptByHash } from "../utils/script-util";
@@ -38,7 +38,7 @@ export function useScript(options?: Partial<ScriptOptions>): IScriptManager & IS
         const defaultOrign: string = options.origin || SCRIPT_CONFIG.origin;
         isArrayNotEmpty(files) && files.forEach(file => {
             //  格式化验证
-            throwIfNullOrUndefined(file, "file is invalid in files:null or undefined");
+            throwIfNullish(file, "file is invalid in files:null or undefined");
             let sf: ScriptFile = undefined;
             if (typeof (file) == "string") {
                 sf = formScriptUrl(file, undefined, defaultOrign);

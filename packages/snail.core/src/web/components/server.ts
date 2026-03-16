@@ -4,7 +4,7 @@
  * - 支持新作用域 newScope ，和全局配置隔离
  */
 
-import { mustString, hasOwnProperty, isObject, isStringNotEmpty, throwError, throwIfNullOrUndefined } from "../../base";
+import { mustString, hasOwnProperty, isObject, isStringNotEmpty, throwError, throwIfNullish } from "../../base";
 import { checkScope, IScope, mountScope } from "../../common"
 import { IServerManager, ServerOptions } from "../models/server-model";
 
@@ -59,7 +59,7 @@ export function useServer(): IServerManager & IScope {
     function getUrl(code: string, type?: keyof (ServerOptions)): string {
         checkScope(manager, "getUrl: server manager destroyed.");
         const server = servers[code];
-        throwIfNullOrUndefined(server, `the server[${code}] is not registered`);
+        throwIfNullish(server, `the server[${code}] is not registered`);
         type = type || DEFAULT_ServerType;
         const url: string = server[type];
         isStringNotEmpty(url) || throwError(`the server[${code}] has not this type[${type}] server address`);

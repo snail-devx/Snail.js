@@ -2,7 +2,7 @@
  * Http助手类
  *  1、仅限 http.ts 使用，将其部分静态方法移动到此
  */
-import { isFunction, isNullOrUndefined, isObject, isPromise, isRegexp, isStringNotEmpty } from "../../base";
+import { isFunction, isNullish, isObject, isPromise, isRegexp, isStringNotEmpty } from "../../base";
 import { mustString, extract, hasOwnProperty, tidyString, defer, throwIfTrue, throwIfUndefined } from "../../base";
 import { HttpOptions, HttpInterceptor, HttpRequest, HttpResponse, HttpError } from "../models/http-model";
 
@@ -191,7 +191,7 @@ export function runHttpRequest<T>(request: HttpRequest, defaultHeaders: Record<s
         signal: controller ? controller.signal : undefined
     }
     //      body格式化：json和form做处理，其他的原样写入
-    if (isNullOrUndefined(request.data) == false) {
+    if (isNullish(request.data) == false) {
         const contentType: string = headers.get("content-type");
         if (/application\/json/i.test(contentType) == true) {
             fOptions.body = JSON.stringify(request.data);

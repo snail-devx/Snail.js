@@ -1,6 +1,6 @@
 import { assert, describe, expect, test } from 'vitest'
 import {
-    getMessage, throwError, throwIfFalse, throwIfNull, throwIfNullOrUndefined, throwIfTrue, throwIfUndefined,
+    getMessage, throwError, throwIfFalse, throwIfNull, throwIfNullish, throwIfTrue, throwIfUndefined,
 
 } from "../../src/base"
 
@@ -22,8 +22,8 @@ test("getMessage", () => {
 [
     { src: true, throwIfTrue: true },
     { src: false, throwIfFalse: true },
-    { src: undefined, throwIfUndefined: true, throwIfNullOrUndefined: true },
-    { src: null, throwIfNull: true, throwIfNullOrUndefined: true },
+    { src: undefined, throwIfUndefined: true, throwIfNullish: true },
+    { src: null, throwIfNull: true, throwIfNullish: true },
     { src: 0 },
     { src: NaN, },
     { src: '0', },
@@ -41,7 +41,7 @@ test("getMessage", () => {
         throwIfFalse,
         throwIfUndefined,
         throwIfNull,
-        throwIfNullOrUndefined
+        throwIfNullish
     ].forEach(func => {
         const name = func.name;
         const flag = item[name] === true ? true : false;

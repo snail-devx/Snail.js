@@ -5,7 +5,7 @@
  */
 
 import { RunResult } from "../models/function-model";
-import { isNullOrUndefined } from "./nullish";
+import { isNullish } from "./nullish";
 import { isString } from "./string";
 
 //#region *************************************        判断校验        *************************************
@@ -52,12 +52,12 @@ export function throwIfNull(data: any, msg: string): void {
     data === null && throwError(msg);
 }
 /**
- * 当data为null或者undefined时，执行 throw new Error(msg)
+ * 当data为空值（undefined/null）时，执行 throw new Error(msg)
  * @param data 要判断的数据
  * @param msg 报错信息
  */
-export function throwIfNullOrUndefined(data: any, msg: string): void {
-    isNullOrUndefined(data) && throwError(msg);
+export function throwIfNullish(data: any, msg: string): void {
+    isNullish(data) && throwError(msg);
 }
 //#endregion
 

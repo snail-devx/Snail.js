@@ -7,7 +7,7 @@ import { assert, describe, expect, test } from 'vitest'
 import {
     drill, extract, hasAny, hasOwnProperty,
     getType, isString, isStringNotEmpty, isArray, isArrayNotEmpty, isBoolean, isDate, isFalsey, isFunction, isNumber, isNumberNotNaN,
-    isUndefined, isNull, isNullOrUndefined, isObject, isPromise, isRegexp, isWindow,
+    isUndefined, isNull, isNullish, isObject, isPromise, isRegexp, isWindow,
     tidyFunction, tidyString,
     mustArray, mustFunction, mustString, mustObject,
     moveFromArray,
@@ -18,8 +18,8 @@ import {
 describe("getType、isXX", () => {
     [
         //  无效值
-        { src: null, getType: "[object Null]", isNull: true, isNullOrUndefined: true, isFalsey: true },
-        { src: undefined, getType: "[object Undefined]", isUndefined: true, isNullOrUndefined: true, isFalsey: true },
+        { src: null, getType: "[object Null]", isNull: true, isNullish: true, isFalsey: true },
+        { src: undefined, getType: "[object Undefined]", isUndefined: true, isNullish: true, isFalsey: true },
         //  object
         { src: {}, getType: "[object Object]", isObject: true },
         { src: new Object(), getType: "[object Object]", isObject: true },
@@ -68,7 +68,7 @@ describe("getType、isXX", () => {
             getType,
             isNull,
             isUndefined,
-            isNullOrUndefined,
+            isNullish,
             isObject,
             isFunction,
             isArray,

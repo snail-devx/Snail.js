@@ -3,7 +3,7 @@
  *  1、将 script.ts中部分逻辑提取到这里；内部逻辑方法，不可挂载给外部库使用
  *  3、这些都是静态方法，和IScriptManager实例级别无关
  */
-import { isNullOrUndefined, mustFunction, mustString, tidyString, defer, extract, drill, hasOwnProperty, getMessage, throwIfTrue } from "../../base";
+import { isNullish, mustFunction, mustString, tidyString, defer, extract, drill, hasOwnProperty, getMessage, throwIfTrue } from "../../base";
 import { IScriptManager, ScriptLoadOptions, ScriptOptions } from "../models/script-model";
 import { IHttpClient } from "../models/http-model";
 import { url } from "../components/url";
@@ -187,7 +187,7 @@ export async function buildScriptByUrl(manager: IScriptManager, fileUrl: string,
         const funcRet = new Function(...Object.keys(globalArgs), `'use strict';${text || ""}`)
             .apply(globalThis, Object.values(globalArgs));
         amdTask == undefined
-            ? deferred.resolve(isNullOrUndefined(funcRet)
+            ? deferred.resolve(isNullish(funcRet)
                 ? globalThis[Object.keys(globalThis)[0]]
                 : funcRet)
             : amdTask.then(deferred.resolve, deferred.reject);
