@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "vue": "^3.5.14",
-    "snail.core": ">=2.0.22",
+    "snail.core": ">=2.0.24",
     "snail.view": ">=2.0.3",
-    "snail.vue": ">=2.0.11",
+    "snail.vue": ">=2.0.12",
     "sortablejs": ">=1.15.6",
     "zane-calendar": "2.2.8"
   },

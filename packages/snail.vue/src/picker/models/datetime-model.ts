@@ -1,4 +1,4 @@
-import { DateFormat, DateValue, IAsyncScope, ITimeValueManager, TimeValue } from "snail.core";
+import { DateFormat, DateValue, IAsyncScope, TimeValue } from "snail.core";
 import { DisabledOptions, ValueOptions } from "../../base/models/base-model";
 
 /**

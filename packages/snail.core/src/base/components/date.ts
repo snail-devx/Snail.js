@@ -41,7 +41,7 @@ export function correctDate(data: any, newValue: Date): Date {
  * - 如 `12:20` 补全值为：min- `12:20:00`,max-`12:20:59`
  * @returns 验证通过返回time自身；验证失败返回undefined
  */
-export function correctTimeValue(time: TimeValue, missing?: "min" | "max"): TimeValue | undefined {
+export function correctTimeValue(time: Partial<TimeValue>, missing?: "min" | "max"): TimeValue | undefined {
     if (time) {
         //  小时必须强制在0-23区间，否则无效；小时都需要补全的话，没有意义了、、、
         if (isNumberInRange(time.hour, 0, 23) == false) {
@@ -65,6 +65,7 @@ export function correctTimeValue(time: TimeValue, missing?: "min" | "max"): Time
             return undefined;
         }
     }
+    //  @ts-ignore 走到这里，要么为undefined，要么就是已经把缺失值补充完成了
     return time;
 }
 /**
@@ -169,7 +170,7 @@ export function formatDate(date: Date, format: DateFormat): string | undefined {
  * @param format 格式，默认为 "yyyy-MM-dd"
  * @returns 格式化后的日期字符串；dValue无效返回undefined
  */
-export function formatDateValue(value: DateValue, format: DateFormat): string | undefined {
+export function formatDateValue(value: Partial<DateValue>, format: DateFormat): string | undefined {
     const date = getDateByValue(value);
     return formatDate(date, format);
 }
@@ -179,7 +180,7 @@ export function formatDateValue(value: DateValue, format: DateFormat): string | 
  * @param format 格式，默认`HH:mm:ss`
  * @returns 格式化后的时间字符串；time无效返回undefined
  */
-export function formatTimeValue(time: TimeValue, format?: TimeFormat): string | undefined {
+export function formatTimeValue(time: Partial<TimeValue>, format?: TimeFormat): string | undefined {
     //  后续再考虑优化一下，有不少重复性的代码项
     time = correctTimeValue({ ...time });
     if (time) {
@@ -309,7 +310,7 @@ export function parseTimeValue(text: string, missing?: "min" | "max"): TimeValue
  * @param value 日期值
  * @returns 日期对象，dateValue无效返回undefined
  */
-export function getDateByValue(value: DateValue): Date | undefined {
+export function getDateByValue(value: Partial<DateValue>): Date | undefined {
     //  避免 0-99的年被处理成1900-1999，不能使用new Date做处理
     if (value && value.year != undefined) {
         const date = new Date("0000-01-01T00:00:00");

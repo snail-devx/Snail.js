@@ -1,7 +1,7 @@
 import { } from "snail.vue";
 import { IFormDesignerHandle, IFormRenderHandle } from "../../models/form-model";
 import { FieldContainerLocation, IFieldContainerHandle } from "../../models/field-container";
-import { RunResult, throwIfNullOrUndefined } from "snail.core";
+import { RunResult, throwIfNullish } from "snail.core";
 import { FieldActionOptions, FieldLocation, FieldOptions, FieldStatusOptions } from "../../models/field-base";
 import { IFieldGlobalContext } from "../../models/field-share";
 
@@ -17,7 +17,7 @@ import { IFieldGlobalContext } from "../../models/field-share";
  * @param gloabl 
  */
 export function useFormHandle(gloabl: IFieldGlobalContext): IFormDesignerHandle | IFormRenderHandle {
-    throwIfNullOrUndefined(gloabl, "gloabl");
+    throwIfNullish(gloabl, "gloabl");
 
     //#region *************************************实现接口：IFieldContainerContext 接口*************************************
     /**

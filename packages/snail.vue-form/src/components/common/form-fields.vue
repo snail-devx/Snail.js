@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { computed, inject, onUnmounted, shallowRef, ShallowRef, } from "vue";
-import { IScope, throwIfNullOrUndefined, } from "snail.core";
+import { IScope, throwIfNullish, } from "snail.core";
 import { components, SortEvent, useReactive } from "snail.vue";
 import { FieldOptions, } from "../../models/field-base";
 import { FieldContainerEvents, FieldContainerLocation, FieldContainerOptions } from "../../models/field-container";
@@ -127,7 +127,7 @@ function analysisDragItem(item: HTMLElement, fromControl: (type: string) => void
         case "field": {
             const field: FieldOptions<any> = item["_FIELD"];
             const remove: () => void = item["_DELETE"];
-            throwIfNullOrUndefined(field, "cannot find field info from drag item by item['_FIELD']");
+            throwIfNullish(field, "cannot find field info from drag item by item['_FIELD']");
             fromField && fromField(field, remove);
             break;
         }

@@ -2,7 +2,7 @@
  * 字段 容器相关接口、功能实现
  */
 
-import { isArrayNotEmpty, IScope, mountScope, moveFromArray, newId, RunResult, throwIfFalse, throwIfNullOrUndefined } from "snail.core";
+import { isArrayNotEmpty, IScope, mountScope, moveFromArray, newId, RunResult, throwIfFalse, throwIfNullish } from "snail.core";
 import { markRaw, Ref, ref, ShallowRef, shallowRef, toRaw } from "vue";
 import { EmitterType, EventsType, usePopup } from "snail.vue";
 import { FieldActionOptions, FieldChangeEvent, FieldEvents, FieldOptions, FieldStatusOptions, IFieldHandle } from "../../models/field-base";
@@ -24,9 +24,9 @@ export function useContainer(global: IFieldGlobalContext, options: FieldContaine
     emitter: EmitterType<FieldContainerEvents>): IFieldContainer & IScope {
 
     //#region ************************************* 验证和变量定义，配合进行字段信息维护 *************************************
-    throwIfNullOrUndefined(global, "global");
-    throwIfNullOrUndefined(options, "options");
-    throwIfNullOrUndefined(emitter, "emitter");
+    throwIfNullish(global, "global");
+    throwIfNullish(options, "options");
+    throwIfNullish(emitter, "emitter");
     /** 字段集合：已有字段强制复制，和以前脱离关系；设计时强制ref响应式，运行时等使用shallowRef响应式（为了保持.value语法，避免下面重复处理） */
     const fieldsRef: Ref<FieldOptions<any>[]> = global.mode == "design" ? ref() : shallowRef();
     fieldsRef.value = isArrayNotEmpty(options.fields)

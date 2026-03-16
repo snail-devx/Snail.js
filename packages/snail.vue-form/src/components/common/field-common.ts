@@ -3,7 +3,7 @@
  * - 字段相关的基础上下文、句柄等信息管理、接口实现
  * - 抽取.vue组件中相关实现出来，减少.vue组件中非界面相关逻辑代码
  */
-import { isArrayNotEmpty, isBoolean, IScope, isNumberNotNaN, isStringNotEmpty, mountScope, mustFunction, newId, RunResult, throwIfFalse, throwIfNullOrUndefined, useScope } from "snail.core";
+import { isArrayNotEmpty, isBoolean, IScope, isNumberNotNaN, isStringNotEmpty, mountScope, mustFunction, newId, RunResult, throwIfFalse, throwIfNullish, useScope } from "snail.core";
 import { InjectionKey, ref, Ref, shallowRef, ShallowRef, toRaw } from "vue";
 import { ControlOptions } from "../../models/control-model";
 import { FieldActionOptions, FieldOptions, FieldRenderOptions, FieldStatusOptions, FieldManagerOptions, IFieldHandle, IFieldManager, FieldValueSetResult, } from "../../models/field-base";
@@ -26,7 +26,7 @@ export function useGlobalContext(options: FieldContainerOptions & Pick<IFieldGlo
     const columns: number = Math.max(1, Math.min(options.columns || 4, 4))
 
     //#region ************************************* 验证和变量定义，配合进行字段信息维护 *************************************
-    throwIfNullOrUndefined(options, "options");
+    throwIfNullish(options, "options");
     //  控件处理，转成字典，方便后续直取；并冻结对象，避免外部再改动
     const controls: ControlOptions[] = [];
     const controlMap: Record<string, ControlOptions> = Object.create(null);
@@ -53,7 +53,7 @@ export function useGlobalContext(options: FieldContainerOptions & Pick<IFieldGlo
      * @returns 字段容器
      */
     function registerContainer(location: FieldContainerLocation | undefined, handle: IFieldContainerHandle): IScope {
-        throwIfNullOrUndefined(handle, "handle");
+        throwIfNullish(handle, "handle");
         if (getContainer(location) != undefined) {
             const message: string = `containerMap already has parentFieldId: ${JSON.stringify(location)}`;
             throw new Error(message);
@@ -197,9 +197,9 @@ function useFieldSetting(gloabl: Pick<IFieldGlobalContext, "getContainer">): IFi
  */
 export function useField(global: IFieldGlobalContext, props: FieldRenderOptions<any, any>, options: FieldManagerOptions): IFieldManager & IScope {
     //  基础验证初始化工作
-    throwIfNullOrUndefined(options, "options")
-    throwIfNullOrUndefined(props, "props")
-    throwIfNullOrUndefined(props.field, "props.field")
+    throwIfNullish(options, "options")
+    throwIfNullish(props, "props")
+    throwIfNullish(props.field, "props.field")
     mustFunction(options.getValue, "options.getValue");
     mustFunction(options.setValue, "options.setValue");
     props.field.settings || (props.field.settings = {});
