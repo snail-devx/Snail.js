@@ -46,6 +46,7 @@ export * from "./base/utils/icon-util";
 // *****************************************   👉  container 相关导出    ****************************************
 //  类型导出
 export * from "./container/models/component-model";
+export * from "./container/models/element-model";
 export * from "./container/models/fold-model";
 export * from "./container/models/layout-model";
 export * from "./container/models/scroll-model";
@@ -56,6 +57,7 @@ export * from "./container/models/tree-model";
 export * from "./container/models/wrapper-model";
 //  组件导出：赋值给 components
 import Dynamic from "./container/dynamic.vue";
+import Element from "./container/element.vue";
 import Fold from "./container/fold.vue";
 import Layout from "./container/layout.vue";
 import Scroll from "./container/scroll.vue";
@@ -98,7 +100,7 @@ export const components = {
     //  base下的组件
     Button, Choose, DatePicker, Footer, Header, Icon, Input, Number, Search, Select, Switch, Textarea,
     //  container 下的组件
-    Dynamic, Fold, Layout, Scroll, Sort, Table, TableRow, TableCol, Transitions, Tree, Wrapper,
+    Dynamic, Element, Fold, Layout, Scroll, Sort, Table, TableRow, TableCol, Transitions, Tree, Wrapper,
     //  prompt 下的组件
     DragVerify, Empty, Loading
 };

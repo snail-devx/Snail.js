@@ -11,6 +11,7 @@ export type TransitionOptions = {
     /**
      * 动画持续时间
      * - 单位ms，默认200ms
+     * - 为0则禁用动画
      */
     duration?: number;
 

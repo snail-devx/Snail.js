@@ -26,7 +26,7 @@
             }
   -->
 <template>
-    <component :is="group ? TransitionGroup : Transition" :="$attrs" appear :duration="duration"
+    <component :is="group ? TransitionGroup : Transition" appear :duration="duration"
         :enter-active-class="`${classNames} enter-active`" :enter-from-class="`${classNames} enter-from`"
         :enter-to-class="`${classNames} enter-to`" :leave-active-class="`${classNames} leave-active`"
         :leave-from-class="`${classNames} leave-from`" :leave-to-class="`${classNames} leave-to`">
@@ -54,7 +54,7 @@ const classNames = computed<string>(() => {
     else {
         array.push(props.effect as string || "fade")
     }
-    console.log(array);
+    props.duration === 0 && array.push("no-duration");
     return array.join(" ");
 });
 
@@ -71,6 +71,12 @@ const classNames = computed<string>(() => {
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-transition {
+
+    //  无动画时，做一下禁用操作
+    &.no-duration {
+        transition-duration: 0 !important;
+        transition-property: none !important;
+    }
 
     &.enter-active,
     &.leave-active {
