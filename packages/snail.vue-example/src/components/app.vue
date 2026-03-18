@@ -28,6 +28,7 @@ import DynamicTest from "./container/dynamic-test.vue";
 import ElementTest from "./container/element-test.vue";
 import FoldTest from "./container/fold-test.vue";
 import LayoutTest from "./container/layout-test.vue";
+import MotionTest from "./container/motion-test.vue";
 import ScrollTest from "./container/scroll-test.vue";
 import TableTest from "./container/table-test.vue";
 import TransitionsTest from "./container/transitions-test.vue";
@@ -47,6 +48,7 @@ import PopupTest from "./popup/popup-test.vue";
 import LoadingTest from "./prompt/loading-test.vue";
 import DragVerifyTest from "./prompt/drag-verify-test.vue";
 import EmptyTest from "./prompt/empty-test.vue";
+
 //#endregion
 
 // *****************************************   👉  组件定义    *****************************************
@@ -93,6 +95,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Element 元素组件", data: ElementTest, clickable: true, searchable: true, },
                 { text: "Fold 折叠组件", data: FoldTest, clickable: true, searchable: true, },
                 { text: "Layout 布局测试", data: LayoutTest, clickable: true, searchable: true, },
+                { text: "Motion 动画组件", data: MotionTest, clickable: true, searchable: true, },
                 { text: "Scroll 滚动组件", data: ScrollTest, clickable: true, searchable: true, },
                 { text: "Table 表格组件", data: TableTest, clickable: true, searchable: true, },
                 { text: "Transitions 动画组件", data: TransitionsTest, clickable: true, searchable: true },
@@ -147,7 +150,8 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[2].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
-    onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
+    // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
+    onTreeNodeClick(treeOptions.nodes[1].children[4], undefined);
 });
 </script>
 
