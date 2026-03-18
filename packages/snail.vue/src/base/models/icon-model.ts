@@ -10,6 +10,12 @@ export type IconOptions = TitleOptions & {
      */
     type: IconType;
 
+    /**
+     * 图形伸展
+     * - svg.viewBox 属性
+     * - 为空则默认“0 0 1024 1024”
+     */
+    viewBox?: string;
     /** 
      * 图标颜色 
      */

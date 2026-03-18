@@ -1,13 +1,55 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    Icon 示例还没实现
+    <article>
+        <section>
+            <Icon :type="'arrow'" />
+        </section>
+        <section>
+            <Icon :type="'close'" />
+        </section>
+        <section>
+            <Icon :type="'datepicker'" />
+        </section>
+        <section>
+            <Icon :type="'download'" />
+        </section>
+        <section>
+            <Icon :type="'edit'" />
+        </section>
+        <section>
+            <Icon :type="'error'" />
+        </section>
+        <section>
+            <Icon :type="'grip'" />
+        </section>
+        <section>
+            <Icon :type="'plus'" />
+        </section>
+        <section>
+            <Icon :type="'print'" />
+        </section>
+        <section>
+            <Icon :type="'subtract'" />
+        </section>
+        <section>
+            <Icon :type="'success'" />
+        </section>
+        <section>
+            <Icon :type="'trash'" />
+        </section>
+        <section>
+            <Icon :type="'warn'" />
+        </section>
+    </article>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { components } from "../../libraries/snail.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
+const { Icon } = components;
 //  2、可选配置选项
 defineOptions({ name: "IconTest", inheritAttrs: true, });
 

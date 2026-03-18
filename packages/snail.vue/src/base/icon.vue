@@ -3,7 +3,7 @@
     2、采用svg方式实现，不使用字体图片，按需引入
 -->
 <template>
-    <svg class="snail-icon" viewBox="0 0 1024 1024" :class="type"
+    <svg class="snail-icon" :viewBox="correctString(viewBox, '0 0 1024 1024', false)" :class="type"
         :style="rotate ? `transform: rotate(${rotate}deg);` : ''" :width="size || 24" :height="size || 24"
         @mouseenter="isMouseEnterRef = true" @mouseleave="isMouseEnterRef = false">
         <title v-text="title || ''" />
@@ -16,6 +16,7 @@
 import { computed, ref, ShallowRef, shallowRef } from "vue";
 import { IconOptions } from "./models/icon-model";
 import { getSvgDraw } from "./utils/icon-util";
+import { correctString } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data、event
