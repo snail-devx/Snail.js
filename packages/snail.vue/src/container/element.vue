@@ -1,7 +1,7 @@
 <!-- 组件介绍写到这里 -->
 <template>
     <Transitions :group="false" :="transition" :duration="transition ? transition.duration : 0">
-        <component :is="isStringNotEmpty(tag) ? tag : 'div'" v-if="showMode == 'vShow' ? true : show"
+        <component :is="correctString(tag, 'div', true)" v-if="showMode == 'vShow' ? true : show"
             v-show="showMode == 'vShow' ? show : true">
             <Transitions :="children" :duration="children ? children.duration : 0">
                 <slot />
@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { isStringNotEmpty } from "snail.core";
+import { correctString } from "snail.core";
 import { ElementOptions } from "./models/element-model";
 import Transitions from "./transitions.vue";
 
