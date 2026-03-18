@@ -72,6 +72,7 @@ import Tree from "./container/tree.vue";
 import Wrapper from "./container/wrapper.vue";
 //  方法导出
 export * from "./container/utils/component-util";
+export * from "./container/utils/motion-util";
 
 // *****************************************   👉  picker 相关导出    ****************************************
 //  类型导出

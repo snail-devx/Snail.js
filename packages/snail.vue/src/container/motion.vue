@@ -4,27 +4,56 @@
     3、使用animation组件进行动画样式控制
 -->
 <template>
-    <component :is="multiple ? TransitionGroup : Transition" appear :class="motion || 'snail-motion'"
-        :type="'animation'" :duration="correctNumber(duration, 200)" :mode="mode"
-        :enter-active-class="`${motion || 'snail-motion'} ${enter || 'fade'}`"
-        :leave-active-class="`${motion || 'snail-motion'} ${leave || enter || 'fade'}`">
+    <component :is="multiple ? TransitionGroup : Transition" appear :type="'animation'" :duration="duration"
+        :mode="mode" :enter-active-class="correctString(props.enter, 'fade-in', true)"
+        :leave-active-class="correctString(props.leave, 'fade-out', true)">
+        <!-- :enter-active-class="correctString(props.enter, 'fade-in', true)"
+        :leave-active-class="correctString(props.leave, 'fade-out', true)" -->
+        <!-- :css="false" @enter="onEnter" @leave="onLeave" -->
         <slot />
     </component>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, Transition, TransitionGroup } from "vue";
-import { MotionEffect, MotionOptions } from "./models/motion-model";
-import { correctNumber } from "snail.core";
+import { compile, computed, ref, shallowRef, Transition, TransitionGroup } from "vue";
+import { MotionEffectOptions, MotionOptions } from "./models/motion-model";
+import { correctNumber, correctString } from "snail.core";
+import { MOTION } from "./utils/motion-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-defineProps<MotionOptions>();
+const props = defineProps<MotionOptions>();
+const duration = correctNumber(props.duration, 200);
 
 //  2、组件交互变量、常量
 
-
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 元素入场进入时
+ * @param el 
+ * @param done 
+ */
+function onEnter(el: HTMLElement, done: () => void) {
+    const str = correctString(props.leave, 'fade-in', true);
+    el.classList.add(str);
+    setTimeout(() => {
+        el.classList.remove(str);
+        done();
+    }, duration)
+}
+/**
+ * 元素退场离开时
+ * @param el 
+ * @param done 
+ */
+function onLeave(el: HTMLElement, done: () => void) {
+    const str = correctString(props.leave, 'fade-out', true);
+    el.classList.add(str);
+    setTimeout(() => {
+        el.classList.remove(str);
+        done();
+    }, duration)
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
@@ -35,6 +64,4 @@ defineProps<MotionOptions>();
 <style lang="less">
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
-
-.snail-motion {}
 </style>
