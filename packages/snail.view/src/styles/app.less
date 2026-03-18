@@ -207,9 +207,9 @@
     //  淡入动画
     .fade-in {
         opacity: 1;
-        animation: snail-fade-in 0.2s ease-in-out;
+        animation: snail-fade 0.2s ease;
 
-        @keyframes snail-fade-in {
+        @keyframes snail-fade {
             0% {
                 opacity: 0;
             }
@@ -223,25 +223,15 @@
     //  淡出动画
     .fade-out {
         opacity: 0;
-        animation: snail-fade-out 0.2s ease-in-out;
-
-        @keyframes snail-fade-out {
-            0% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0;
-            }
-        }
+        animation: snail-fade 0.2s ease reverse;
     }
 
     //  放大进入
     .scale-in {
         scale: 1;
-        animation: snail-scale-in 0.2s ease-in-out;
+        animation: snail-scale 0.2s ease;
 
-        @keyframes snail-scale-in {
+        @keyframes snail-scale {
             0% {
                 scale: 0;
             }
@@ -255,16 +245,137 @@
     //  缩小退出
     .scale-out {
         scale: 0;
-        animation: snail-scale-out 0.2s ease-in-out;
+        animation: snail-scale 0.2s ease reverse;
+    }
 
-        @keyframes snail-scale-out {
+    //  旋转进入
+    .rotate-in {
+        transform: rotate(0);
+        opacity: 1;
+        animation: snail-rotate 0.2s ease-in-out;
+
+        @keyframes snail-rotate {
             0% {
-                scale: 1;
+                opacity: 0;
+                transform: rotate(0);
             }
 
             100% {
-                scale: 0;
+                opacity: 1;
+                transform: rotate(360deg);
             }
         }
+    }
+
+    //  旋转退出
+    .rotate-out {
+        opacity: 0;
+        transform: rotate(360deg);
+        animation: snail-rotate 0.2s ease-in-out reverse;
+    }
+
+    //  从上边进入
+    .top-in {
+        opacity: 1;
+        transform: translateY(0);
+        animation: snail-top-in 0.2s ease;
+
+        @keyframes snail-top-in {
+            0% {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    }
+
+    //  从上边退出
+    .top-out {
+        opacity: 0;
+        transform: translateY(-100%);
+        animation: snail-top-in 0.2s ease reverse;
+    }
+
+    //  从下边进入
+    .bottom-in {
+        opacity: 1;
+        transform: translateY(0);
+        animation: snail-bottom-in 0.2s ease;
+
+        @keyframes snail-bottom-in {
+            0% {
+                opacity: 0;
+                transform: translateY(100%);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    }
+
+    //  从下边退出
+    .bottom-out {
+        opacity: 0;
+        transform: translateY(100%);
+        animation: snail-bottom-in 0.2s ease reverse;
+    }
+
+    //  从左边进入
+    .left-in {
+        opacity: 1;
+        transform: translateX(0);
+        animation: snail-left-in 0.2s ease;
+
+        @keyframes snail-left-in {
+
+            0% {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    }
+
+    //  从左边退出
+    .left-out {
+        opacity: 0;
+        transform: translateX(-100%);
+        animation: snail-left-in 0.2s ease reverse;
+    }
+
+    //  从右边进入
+    .right-in {
+        opacity: 1;
+        transform: translateX(0);
+        animation: snail-right-in 0.2s ease;
+
+        @keyframes snail-right-in {
+            0% {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    }
+
+    //  从右边退出
+    .right-out {
+        opacity: 0;
+        transform: translateX(0);
+        animation: snail-right-in 0.2s ease reverse;
     }
 }
