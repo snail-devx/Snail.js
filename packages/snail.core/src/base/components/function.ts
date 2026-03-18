@@ -34,12 +34,13 @@ export function mustFunction(data: any, paramName: string): boolean {
 }
 
 /**
- * 整理Function
- * @param func 
- * @returns func不是Function时，返回undefined；否则自身
+ * 校正Function，若`func`不是Function，则返回新值
+ * @param func 要校正的方法
+ * @param newValue `func`无值时的新值
+ * @returns 校正后的方法
  */
-export function tidyFunction(func: any): Function | undefined {
-    return isFunction(func) ? func : undefined;
+export function correctFunction<T extends Function>(func: any, newValue?: T): T {
+    return isFunction(func) ? func : newValue;
 }
 //#endregion
 

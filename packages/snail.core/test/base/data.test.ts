@@ -7,11 +7,11 @@ import { assert, describe, expect, test } from 'vitest'
 import {
     drill, extract, hasAny, hasOwnProperty,
     getType, isString, isStringNotEmpty, isArray, isArrayNotEmpty, isBoolean, isDate, isFalsey, isFunction, isNumber, isNumberNotNaN,
-    isUndefined, isNull, isNullish, isObject, isPromise, isRegexp, isWindow,
-    tidyFunction, tidyString,
+    isUndefined, isNull, isNullish, isObject, isPromise, isRegexp, isWindow, tidyString,
     mustArray, mustFunction, mustString, mustObject,
     moveFromArray,
-    removeFromArray
+    removeFromArray,
+    correctFunction
 } from "../../src/base"
 
 //  getType、isXX测试
@@ -171,12 +171,12 @@ describe("tidyXXX", () => {
         expect(tidyString("111")).toBe("111");
     });
 
-    test("tidyFunction", () => {
-        expect(tidyFunction("")).toBe(undefined);
-        expect(tidyFunction(null)).toBe(undefined);
-        expect(tidyFunction(undefined)).toBe(undefined);
-        expect(tidyFunction(1)).toBe(undefined);
-        expect(tidyFunction(function () { }));
+    test("correctFunction", () => {
+        expect(correctFunction("")).toBe(undefined);
+        expect(correctFunction(null)).toBe(undefined);
+        expect(correctFunction(undefined)).toBe(undefined);
+        expect(correctFunction(1)).toBe(undefined);
+        expect(correctFunction(function () { }));
     });
 });
 

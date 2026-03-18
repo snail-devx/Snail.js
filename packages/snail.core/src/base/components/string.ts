@@ -37,11 +37,22 @@ export function mustString(data: any, paramName: string): boolean {
 }
 
 /**
+ * 校正字符串，若字符串无值，则返回新值
+ * - 字符串无值：非字符串，或者`.length == 0`
+ * @param str 要校正的字符串
+ * @param newValue `str`无值时的新值
+ * @returns 校正后的字符串
+ */
+export function correctString(str: any, newValue: string, trim: boolean): string {
+    return isStringNotEmpty(str) ? str : newValue;
+}
+/**
  * 整理字符串；去除前后空格，空或者非字符串强制undeined
  * @param str 要处理的字符串数据
  * @returns 去除前后空格的字符串
  */
 export function tidyString(str: any): string | undefined {
+    //  里面内置了trim逻辑，先保持现状；新的推荐 correctString
     str = isString(str) ? (str as string).trim() : undefined;
     return hasAny(str) ? str : undefined;
 }
