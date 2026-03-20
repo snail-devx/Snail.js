@@ -2,8 +2,8 @@
  * 日期/时间 选择器助手方法
  */
 
-import { correctNumber, correctTimeValue, DateFormat, DateValue, formatDateValue, getDateValue, TimeValue } from "snail.core";
-import { DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, TimePickerHourItem, TimePickerMinuteItem, TimePickerOptions, TimePickerSecondItem } from "../models/datetime-model";
+import { DateFormat, DateValue, formatDateValue, getDateByValue, getDateValue, getTimeNumber, parseDate, TimeValue } from "snail.core";
+import { DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, TimePickerHourItem, TimePickerMinuteItem, TimePickerSecondItem } from "../models/datetime-model";
 
 //#region *************************************        日期选择器相关        ***********************************
 /**
@@ -67,8 +67,8 @@ export function buildYearItems(year: number, min: DateValue, max: DateValue): Da
  * @returns 月份选择项目集合
  */
 export function buildMonthItems(yearItem: DatePickerYearItem, min: DateValue, max: DateValue): DatePickerMonthItem[] {
-    const minDate = new Date(formatDateValue(min, "yyyy-MM"));
-    const maxDate = new Date(formatDateValue(max, "yyyy-MM"));
+    const minDate = parseDate(formatDateValue(min, "yyyy-MM"), "min");
+    const maxDate = parseDate(formatDateValue(max, "yyyy-MM"), "max");
     const items = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
     return items.map<DatePickerMonthItem>((item, index) => {
         const mi: DatePickerMonthItem = {
@@ -78,7 +78,7 @@ export function buildMonthItems(yearItem: DatePickerYearItem, min: DateValue, ma
             disabled: yearItem.disabled
         };
         if (mi.disabled != true) {
-            const date = new Date(formatDateValue(mi, "yyyy-MM"));
+            const date = getDateByValue(mi);
             mi.disabled = (minDate != undefined && date < minDate) || (maxDate != undefined && date > maxDate);
         }
         return Object.freeze(mi);
@@ -97,9 +97,9 @@ export function buildDayItems(monthItem: DatePickerMonthItem, min: DateValue, ma
      * 1、一共42项，构建员额，尽量把当前月份、上一月份、下一页分都占一些，方便切换选择
      * 2、定位填充第一天的是本周几，若刚好为周日（0），则填充到下一周
      */
-    const minDate = new Date(formatDateValue(min, "yyyy-MM-dd"));
-    const maxDate = new Date(formatDateValue(max, "yyyy-MM-dd"));
-    const date = new Date(monthItem.year, monthItem.month - 1);
+    const minDate = parseDate(formatDateValue(min, "yyyy-MM-dd"), "min");
+    const maxDate = parseDate(formatDateValue(max, "yyyy-MM-dd"), "max");
+    const date = getDateByValue({ ...monthItem, day: 1 })
     date.setDate(date.getDate() - (date.getDay() || 7) - 1);
     //  遍历构建
     const items: DatePickerDayItem[] = new Array(42);
@@ -112,7 +112,7 @@ export function buildDayItems(monthItem: DatePickerMonthItem, min: DateValue, ma
             disabled: monthItem.disabled,
         };
         if (item.disabled != true) {
-            const date = new Date(formatDateValue(item, "yyyy-MM-dd"));
+            const date = getDateByValue(item);
             item.disabled = (minDate != undefined && date < minDate) || (maxDate != undefined && date > maxDate);
         }
         items[index] = Object.freeze(item);
@@ -120,7 +120,6 @@ export function buildDayItems(monthItem: DatePickerMonthItem, min: DateValue, ma
     return items;
 }
 //#endregion
-
 
 //#region *************************************        时间选择器相关        ***********************************
 /**
@@ -148,13 +147,13 @@ export function buildHourItems(min: TimeValue, max: TimeValue): TimePickerHourIt
  * @returns 分钟选择项集合
  */
 export function buildMinuteItems(hourItem: TimePickerHourItem, min: TimeValue, max: TimeValue): TimePickerMinuteItem[] {
-    const items: TimePickerMinuteItem[] = new Array(60);
     const minNumber = min && min.minute != undefined
         ? getTimeNumber(min.hour, min.minute, 0)
         : undefined;
     const maxNumber = max && max.minute != undefined
         ? getTimeNumber(max.hour, max.minute, 0)
         : undefined;
+    const items: TimePickerMinuteItem[] = new Array(60);
     for (let index = 0; index < items.length; index++) {
         const item: TimePickerMinuteItem = {
             minute: index,
@@ -165,7 +164,6 @@ export function buildMinuteItems(hourItem: TimePickerHourItem, min: TimeValue, m
             const number = getTimeNumber(item.hour, item.minute, 0);
             item.disabled = (minNumber != undefined && number < minNumber) || (maxNumber != undefined && number > maxNumber);
         }
-
         items[index] = Object.freeze(item);
     }
     return items;
@@ -199,48 +197,5 @@ export function buildSecondItems(minuteItem: TimePickerMinuteItem, min: TimeValu
         items[index] = Object.freeze(item);
     }
     return items;
-}
-
-/**
- * 获取时间数值
- * - 按照 HHmmss 组装出时间值
- * - 用于比较大小使用
- * @param hour 小时
- * @param minute 分钟
- * @param second 秒钟
- * @returns 组成的数值
- */
-export function getTimeNumber(hour: number, minute: number, second: number): number {
-    return (hour || 0) * 10000 + (minute || 0) * 100 + (second || 0);
-}
-/**
- * 是否是有效的时间值
- * @param format 时间格式
- * @param time 时间值
- * @param min 时间最小值
- * @param max 时间最大值
- * @returns 有效返回true，否则false
- */
-export function isValidTime(format: "HH:mm" | "HH:mm:ss", time: TimeValue, min: TimeValue, max: TimeValue): boolean {
-    time = correctTimeValue(time);
-    if (time) {
-        min = correctTimeValue({ ...min });
-        const timeNumber = getTimeNumber(time.hour, time.minute, format == "HH:mm" ? 0 : time.second);
-        if (min != undefined) {
-            const minNumber = getTimeNumber(min.hour, min.minute, format == "HH:mm" ? 0 : max.second);
-            if (timeNumber < minNumber) {
-                return false;
-            }
-        }
-        max = correctTimeValue({ ...max });
-        if (max != undefined) {
-            const maxNumber = getTimeNumber(max.hour, max.minute, format == "HH:mm" ? 0 : max.second);
-            if (timeNumber > maxNumber) {
-                return false;
-            }
-        }
-        return true;
-    }
-    return false;
 }
 //#endregion

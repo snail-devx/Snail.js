@@ -53,7 +53,7 @@
         <template #bottom v-if="endStep == stepRef && (toolbarDisabled != true || timeFormat != undefined)">
             <div class="time-area" ref="time-area" v-if="timeFormat != undefined"
                 :class="{ placeholder: dateRef.hour == undefined }"
-                v-text="formatTimeValue(dateRef as any, timeFormat) || '选择时间'" @click="onSelectTime" />
+                v-text="formatTimeValue(dateRef, timeFormat) || '选择时间'" @click="onSelectTime" />
             <template v-if="toolbarDisabled != true">
                 <Button :type="'link'" :size="'small'" v-if="clearDisabled != true" v-text="'清空'"
                     @click="emits('clear'), inPopup && closePopup('')" />
@@ -66,11 +66,12 @@
 </template>
 
 <script setup lang="ts">
-import { correctDateFormat, DateValue, formatDateValue, formatTimeValue, getDateByValue, getDateValue, getFromArray, parseDateValue, parseTimeValue, TimeValue } from "snail.core";
+import { DateValue, correctDateFormat, formatDateValue, getDateByValue, getDateValue, parseDateValue } from "snail.core";
+import { TimeValue, formatTimeValue, parseTimeValue, isValidTime, getFromArray, } from "snail.core";
 import { computed, Ref, ref, ShallowRef, shallowRef, useTemplateRef, } from "vue";
 import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
 import { DatePickerDayItem, DatePickerMonthItem, DatePickerOptions, DatePickerYearItem, DatetimePickerEvents } from "../models/datetime-model";
-import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initStepByFormat, isValidTime } from "../utils/datetime-util";
+import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initStepByFormat } from "../utils/datetime-util";
 import Layout from "../../container/layout.vue";
 import Icon from "../../base/icon.vue";
 import Button from "../../base/button.vue";
@@ -83,13 +84,13 @@ const emits = defineEmits<DatetimePickerEvents>();
 const { inPopup } = props;
 //  2、整理传入属性值
 /**   选择的日期值：年月日时分秒*/
-const dateRef: Ref<DateValue> = ref(parseDateValue(props.value));
+const dateRef: Ref<DateValue> = ref(parseDateValue(props.value, "min"));
 /**   日期格式 */
 const format = correctDateFormat(props.format, "yyyy-MM-dd");
 /**   最小日期值 */
-const min: DateValue = Object.freeze(parseDateValue(props.min));
+const min: DateValue = Object.freeze(parseDateValue(props.min, "min"));
 /**   最大日期值 */
-const max: DateValue = Object.freeze(parseDateValue(props.max));
+const max: DateValue = Object.freeze(parseDateValue(props.max, "max"));
 //  3、组件交互变量、常量
 /**   选择操作的最后是什么 */
 const endStep: "year" | "month" | "day" = initStepByFormat(format);
@@ -105,13 +106,15 @@ const dayItemsRef: ShallowRef<DatePickerDayItem[]> = shallowRef([]);
 const isValidDateRef = computed(validateDate);
 //  4、时间处理相关
 /**   最小选择时间值 */
-const minPickTime: TimeValue = Object.freeze(parseTimeValue(props.minPickTime));
+const minPickTime: TimeValue = Object.freeze(parseTimeValue(props.minPickTime, "min"));
 /**    最大选择时间值 */
-const maxPickTime: TimeValue = Object.freeze(parseTimeValue(props.maxPickTime));
+const maxPickTime: TimeValue = Object.freeze(parseTimeValue(props.maxPickTime, "max"));
 /**   时间格式 */
 const timeFormat: "HH:mm" | "HH:mm:ss" = format == "yyyy-MM-dd HH:mm"
     ? "HH:mm"
-    : format == "yyyy-MM-dd HH:mm:ss" ? "HH:mm:ss" : undefined;
+    : format == "yyyy-MM-dd HH:mm:ss"
+        ? "HH:mm:ss"
+        : undefined;
 /**   时间选择区域：显示已选使时间，并触发时间选择器 */
 const timeAreaDom = timeFormat ? useTemplateRef("time-area") : undefined;
 
@@ -137,7 +140,7 @@ function validateDate(): boolean {
         //  包含时间时，需要同步进行时间值验证
         case "yyyy-MM-dd HH:mm":
         case "yyyy-MM-dd HH:mm:ss": {
-            if (isValidTime(timeFormat, dateRef.value as any, minPickTime, maxPickTime) == true) {
+            if (isValidTime(timeFormat, dateRef.value, minPickTime, maxPickTime) == true) {
                 const date = getDateByValue(dateRef.value);
                 const disabled = (min && date < getDateByValue(min)) || (max && date > getDateByValue(max));
                 return disabled != true;
@@ -180,7 +183,7 @@ function buildPickerItems(step: typeof stepRef.value, basis: 0 | 1 | -1) {
         }
         //  选择天数：每次切换一个月
         case "day": {
-            const date = new Date(dateRef.value.year, dateRef.value.month - 1, 1);
+            const date = getDateByValue(dateRef.value);
             date.setMonth(date.getMonth() + basis);
             dateRef.value.year = date.getFullYear();
             dateRef.value.month = date.getMonth() + 1;
@@ -280,37 +283,38 @@ function onDayItemClick(item: DatePickerDayItem) {
  * @param evt 
  */
 async function onSelectTime() {
-    if (props.picker == undefined || timeAreaDom.value == undefined || props.pinned.value == true) {
-        return;
+    if (props.picker != undefined && timeAreaDom.value != undefined && props.pinned.value != true) {
+        props.pinned.value = true;
+        const task = props.picker.showTime(timeAreaDom.value, {
+            //  时间选择器相关配置
+            format: timeFormat,
+            value: formatTimeValue(dateRef.value, timeFormat),
+            min: props.minPickTime,
+            max: props.minPickTime,
+            nowDisabled: props.nowDisabled,
+            clearDisabled: props.clearDisabled,
+            toolbarDisabled: props.toolbarDisabled,
+            //  跟随效果
+            followX: "start",
+            followY: "before",
+            spaceX: -2,
+            spaceY: 4,
+        });
+        task.finally(() => setTimeout(() => props.pinned.value = false))
+            .then(
+                text => {
+                    if (text != undefined) {
+                        const time = parseTimeValue(text, "min") || Object.create(null);
+                        dateRef.value.hour = time.hour;
+                        dateRef.value.minute = time.minute;
+                        dateRef.value.second = time.second;
+                    }
+                },
+                reason => {
+                    console.error(reason);
+                }
+            );
     }
-    props.pinned.value = true;
-    const task = props.picker.showTime(timeAreaDom.value, {
-        format: timeFormat,
-        value: formatTimeValue(dateRef.value as any, timeFormat),
-        // min: formatTimeValue(min as any, timeFormat),
-        // max: formatTimeValue(max as any, timeFormat),
-        min: props.minPickTime,
-        max: props.minPickTime,
-        // toolbarDisabled: true,
-        //  跟随效果
-        followX: "start",
-        followY: "before",
-        spaceX: -2,
-        spaceY: 4,
-    });
-    task.finally(() => setTimeout(() => props.pinned.value = false)).then(
-        text => {
-            if (text != undefined) {
-                const time = parseTimeValue(text) || Object.create(null);
-                dateRef.value.hour = time.hour;
-                dateRef.value.minute = time.minute;
-                dateRef.value.second = time.second;
-            }
-        },
-        reason => {
-            console.error(reason);
-        }
-    );
 }
 /**
  * 【现在】按钮点击时

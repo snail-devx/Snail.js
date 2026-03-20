@@ -56,12 +56,12 @@ const emits = defineEmits<DatetimePickerEvents>();
 /**     时间格式 */
 const format = props.format == "HH:mm" ? "HH:mm" : "HH:mm:ss";
 /**     时间最小值 */
-const min = parseTimeValue(props.min);
+const min = parseTimeValue(props.min, "min");
 /**     时间最大值 */
-const max = parseTimeValue(props.max);
+const max = parseTimeValue(props.max, "max");
 //  2、组件交互变量、常量
 /**     已选择的时间值 */
-const timeRef: Ref<TimeValue> = ref(parseTimeValue(props.value) || getTimeValue(new Date()));
+const timeRef: Ref<TimeValue> = ref(parseTimeValue(props.value, "min") || getTimeValue(new Date()));
 /**     是否是有效的时间值 */
 const isValidTimeRef = computed(() => format == "HH:mm"
     ? minuteItems.value && minuteItems.value[timeRef.value.minute].disabled != true

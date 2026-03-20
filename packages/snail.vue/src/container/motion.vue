@@ -4,8 +4,8 @@
     3、使用animation组件进行动画样式控制
 -->
 <template>
-    <component :is="multiple ? TransitionGroup : Transition" appear :mode="mode" :duration="durationRef"
-        :="motionClassRef">
+    <component :is="multiple ? TransitionGroup : Transition" appear :duration="durationRef"
+        :="multiple ? undefined : { mode }" v-bind="motionClassRef">
         <slot />
     </component>
 </template>

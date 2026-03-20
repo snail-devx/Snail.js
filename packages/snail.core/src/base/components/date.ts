@@ -17,6 +17,39 @@ export function isDate(data: any): boolean {
     return getType(data) == "[object Date]";
 }
 /**
+ * 是否是有效的时间值
+ * - 验证时间本身是否有效
+ * - 验证是否在传入的最大值、最小值范围
+ * @param format 时间格式
+ * @param time 时间值，仅支持“时分秒”和“时分”，默认值“时分秒”
+ * @param min 时间最小值，undefined则不验证最小值
+ * @param max 时间最大值，undefinde不验证最大值
+ * @returns 有效返回true，否则false
+ */
+export function isValidTime(format: "HH:mm" | "HH:mm:ss", time: TimeValue, min: TimeValue, max: TimeValue): boolean {
+    time = correctTimeValue(time, "min");
+    if (time) {
+        const timeNumber = getTimeNumber(time.hour, time.minute, format == "HH:mm" ? 0 : time.second);
+        min = correctTimeValue({ ...min }, "min");
+        if (min != undefined) {
+            const minNumber = getTimeNumber(min.hour, min.minute, format == "HH:mm" ? 0 : min.second);
+            if (timeNumber < minNumber) {
+                return false;
+            }
+        }
+        max = correctTimeValue({ ...max }, "max");
+        if (max != undefined) {
+            const maxNumber = getTimeNumber(max.hour, max.minute, format == "HH:mm" ? 0 : max.second);
+            if (timeNumber > maxNumber) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+/**
  * 校正日期
  * - 1、data非有效日期时使用newValue返回
  * - 2、有效日期条件：是Date对象，且非 Invalid Date
@@ -357,6 +390,18 @@ export function getTimeValue(date: Date): TimeValue | undefined {
             second: date.getSeconds(),
         }
         : undefined;
+}
+/**
+ * 获取时间数值
+ * - 按照 HHmmss 组装出时间值
+ * - 用于比较大小使用
+ * @param hour 小时
+ * @param minute 分钟
+ * @param second 秒钟
+ * @returns 组成的数值
+ */
+export function getTimeNumber(hour: number, minute: number, second: number): number {
+    return (hour || 0) * 10000 + (minute || 0) * 100 + (second || 0);
 }
 
 /**
