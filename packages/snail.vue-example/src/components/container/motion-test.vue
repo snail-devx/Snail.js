@@ -19,7 +19,7 @@
     </div>
     <hr />
     <section style="overflow: hidden; height: 100px;">
-        <Motion :="effectRef">
+        <Motion :effect="effectRef">
             <div v-show="showRef" style="height: 100%;background-color: gray;">测试项目</div>
         </Motion>
     </section>
@@ -27,13 +27,13 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, } from "vue";
-import { components, MotionOptions, useReactive, MOTION } from "../../libraries/snail.vue";
+import { components, MotionOptions, useReactive, MOTION, MotionEffectOptions } from "../../libraries/snail.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const { Motion, Choose } = components;
 const showRef = shallowRef(true);
-const effectRef = shallowRef<Pick<MotionOptions, "enter" | "leave">>();
+const effectRef = shallowRef<MotionEffectOptions>();
 
 //  2、组件交互变量、常量
 

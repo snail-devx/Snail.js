@@ -71,7 +71,6 @@ import { computed, Ref, ref, ShallowRef, shallowRef, useTemplateRef, } from "vue
 import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
 import { DatePickerDayItem, DatePickerMonthItem, DatePickerOptions, DatePickerYearItem, DatetimePickerEvents } from "../models/datetime-model";
 import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initStepByFormat, isValidTime } from "../utils/datetime-util";
-import Transitions from "../../container/transitions.vue";
 import Layout from "../../container/layout.vue";
 import Icon from "../../base/icon.vue";
 import Button from "../../base/button.vue";

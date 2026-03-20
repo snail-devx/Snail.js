@@ -4,15 +4,18 @@
     3、支持插槽定制类容，插槽名称default
  -->
 <template>
-    <Transition :name="transition">
+    <Motion :effect="MOTION.fade">
         <div class="snail-loading" :class="{ 'show-mask': maskDisabled != true }" v-bind:class="rootClass" v-if="show">
             <slot v-bind="$attrs"></slot>
         </div>
-    </Transition>
+    </Motion>
 </template>
 
 <script setup lang="ts">
+import Motion from '../container/motion.vue';
+import { MOTION } from '../container/utils/motion-util';
 import { LoadingOptions } from './models/loading-model';
+
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -76,16 +79,5 @@ defineOptions({ name: "Loading", inheritAttrs: true });
     50% {
         transform: scale(2);
     }
-}
-
-//  进入和销毁时的动画效果：https://cn.vuejs.org/guide/built-ins/transition.html
-.snail-loading-enter-active,
-.snail-loading-leave-active {
-    transition: opacity 0.3s ease-in-out;
-}
-
-.snail-loading-enter-from,
-.snail-loading-leave-to {
-    opacity: 0;
 }
 </style>

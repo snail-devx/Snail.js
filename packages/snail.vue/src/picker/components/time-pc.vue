@@ -5,7 +5,7 @@
     <Layout class="time-picker pc" :class="{ 'second-disabled': format != 'HH:mm:ss' }" :mode="'vertical'">
         <!-- 时分秒选择区域-->
         <template #main>
-            <Transitions :group="true" :effect="'down-up'">
+            <Motion multiple :effect="MOTION.top">
                 <div class="tz-item" ref="hour-items">
                     <div class="tzi-number" v-for="item in hourItems" :key="item.hour"
                         :class="{ active: item.hour == timeRef.hour, disabled: item.disabled }"
@@ -22,7 +22,7 @@
                         :class="{ active: item.second == timeRef.second, disabled: item.disabled }"
                         v-text="padStart(item.second, 2, '0')" @click="onSecondClick(item)" />
                 </div>
-            </Transitions>
+            </Motion>
         </template>
         <!-- 操作区域 -->
         <template #bottom v-if="toolbarDisabled != true">
@@ -41,11 +41,13 @@ import { TimeValue, parseTimeValue, getTimeValue, padStart, TimeFormat, formatTi
 import { onMounted, ref, ShallowRef, shallowRef, useTemplateRef, nextTick, Ref, computed } from "vue";
 import { FollowExtend, FollowHandle } from "../../popup/manager";
 import { DatetimePickerEvents, TimePickerHourItem, TimePickerMinuteItem, TimePickerOptions, TimePickerSecondItem } from "../models/datetime-model";
+import Motion from "../../container/motion.vue";
+import { MOTION } from "../../container/utils/motion-util";
 import Button from "../../base/button.vue";
-import Transitions from "../../container/transitions.vue";
 import Layout from "../../container/layout.vue";
 import { PickerExtend } from "../models/picker-model";
 import { buildHourItems, buildMinuteItems, buildSecondItems } from "../utils/datetime-util";
+
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

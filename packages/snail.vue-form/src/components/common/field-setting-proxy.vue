@@ -1,6 +1,6 @@
 <!-- 字段设置代理组件 -->
 <template>
-    <Transitions :group="false">
+    <Motion :effect="MOTION.fade">
         <div class="field-setting-proxy">
             <!-- 字段类型配置、、、 -->
             <div class="setting-item divider">
@@ -15,20 +15,19 @@
             <!-- 插槽，进行字段详细配置 -->
             <slot />
         </div>
-    </Transitions>
+    </Motion>
 </template>
 
 <script setup lang="ts">
 import { inject, ref, shallowRef, } from "vue";
-import { components } from "snail.vue";
+import { components, MOTION } from "snail.vue";
 import { FieldSettingOptions } from "../../models/field-setting";
 import { INJECTKEY_GlobalContext } from "./field-common";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const { field, container } = defineProps<FieldSettingOptions<any>>();
-const emits = defineEmits<{ redn }>();
-const { Transitions } = components;
+const { Transitions, Motion, Element } = components;
 const global = inject(INJECTKEY_GlobalContext);
 const { name, type } = global.getControl(field.type);
 

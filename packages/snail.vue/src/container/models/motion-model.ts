@@ -1,28 +1,8 @@
 /**
- * 动画效果配置选项
- */
-export type MotionEffectOptions = {
-    /**
-     * 入场进入时的动画效果
-     * - 配合 `motion` 组合成 `${montion} ${enter}` 作为进入时的动画类样式
-     * - 最终映射成 Transition 组件的 `enter-active-class` 属性
-     * - 默认 `fade-in`；若内置动画效果无法满足需求，则使用string数组组合自定义class样式
-     */
-    enter?: string;
-    /**
-     * 退场离开时的动画效果
-     * - 配合 `motion` 组合成 `${montion} ${leave}` 作为离开时的动画类样式
-     * - 最终映射成 Transition 组件的 `leave-active-class` 属性
-     * - 默认 `fade-out`；若内置动画效果无法满足需求，则使用string数组组合自定义class样式
-     */
-    leave?: string;
-}
-
-/**
  * 动画组件配置选项
- * - 实现组件出/退场的动画效果
+ * - 实现组件入/退场的动画效果
  */
-export type MotionOptions = MotionEffectOptions & {
+export type MotionOptions = {
     /**
      * 是否是多元素模式
      * - 为true时，则使用 TransitionGroup 组件实现多元素间动画控制
@@ -31,8 +11,18 @@ export type MotionOptions = MotionEffectOptions & {
     multiple?: boolean;
 
     /**
+     * 动画效果
+     * - 为Object时，显式指定 `enter`和`leave`样式，此时应使用`animation`实现动画样式
+     * - - 可访问`MOTION`使用内置动画效果
+     * - 为string时，为动画的根样式，实现动画效果时：
+     * - - 入场动画：`${effect}.enter-active` `${effect}.enter-from` `${effect}.enter-to` 
+     * - - 退场动画：`${effect}.leave-active` `${effect}.leave-from` `${effect}.leave-to` 
+     * - 为空时，使用`MOTION.fade`值；
+     */
+    effect?: MotionEffectOptions | string;
+    /**
      * 动画持续时间，单位ms，默认200ms
-     * - 为0则禁用动画
+     * - `>0`时生效，否则禁用动画
      */
     duration?: number;
     /**
@@ -43,4 +33,19 @@ export type MotionOptions = MotionEffectOptions & {
      * - 在多个元素之间切换时生效，一个元素的显隐切换无效果
      */
     mode?: "in-out" | "out-in" | "default";
+};
+/**
+ * 动画效果配置选项
+ */
+export type MotionEffectOptions = {
+    /**
+     * 入场进入时的动画效果
+     * - 用于初始化入场动画；最终映射成 Transition 组件的 `enter-active-class` 属性
+     */
+    enter?: string;
+    /**
+     * 退场离开时的动画效果
+     * - 用于初始化退场动画；最终映射成 Transition 组件的 `leave-active-class` 属性
+     */
+    leave?: string;
 }

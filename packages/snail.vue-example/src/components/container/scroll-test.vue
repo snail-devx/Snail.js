@@ -26,7 +26,7 @@
             </Scroll>
         </section>
         <!-- 滚动条大小、样式等-->
-        <section style="width: 100%;height: 2px;">滚动条大小、样式等</section>
+        <section style="width: 100%;height: 20px;">滚动条大小、样式等</section>
         <section>
             <Scroll class="scroll-test" :scroll-x="true" :scroll-y="true" :bar-size="'normal'">
                 <div>
