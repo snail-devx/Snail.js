@@ -9,13 +9,14 @@
 </template>
 
 <script setup lang="ts">
-import { ShallowRef, shallowRef, useTemplateRef, } from "vue";
+import { onMounted, ShallowRef, shallowRef, useTemplateRef, } from "vue";
 import Icon from "../base/icon.vue";
 import { DatePickerOptions } from "./models/datetime-model";
 import { ReadonlyOptions } from "../base/models/base-model";
 import { ChangeEvents } from "../base/models/base-event";
 import { usePicker } from "./manager";
 import { formatDateValue, IAsyncScope, isStringNotEmpty, parseDateValue } from "snail.core";
+import { useReactive } from "../base/reactive";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -23,11 +24,20 @@ const props = defineProps<ReadonlyOptions & DatePickerOptions>();
 const emits = defineEmits<ChangeEvents<string>>();
 const pickerDom = useTemplateRef("datepicker");
 const { showDate } = usePicker();
+const { watcher } = useReactive();
 //  2、组件交互变量、常量
-const valueRef: ShallowRef<string> = shallowRef(props.value);
+const valueRef: ShallowRef<string> = shallowRef();
 let pickerScope: IAsyncScope<string>;
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 重新设置日期值
+ * @param value 
+ */
+function resetDateValue(value: string) {
+    const dateValue = parseDateValue(value, "min");
+    valueRef.value = formatDateValue(dateValue, props.format)
+}
 /**
  * 显示选择器
  */
@@ -56,10 +66,9 @@ async function showPicker(evt: MouseEvent) {
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
-if (isStringNotEmpty(valueRef.value) == true) {
-    const dateText = formatDateValue(parseDateValue(valueRef.value, "min"), props.format);
-    valueRef.value != dateText && (valueRef.value = dateText);
-}
+isStringNotEmpty(props.value) && resetDateValue(props.value);
+//  外部修改value值时,自动响应
+watcher(() => props.value, newValue => newValue !== valueRef.value && resetDateValue(newValue));
 //  2、生命周期响应
 </script>
 

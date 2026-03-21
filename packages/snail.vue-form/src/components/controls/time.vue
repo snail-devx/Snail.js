@@ -4,12 +4,12 @@
 <template>
     <FieldProxy :type="field.type" :title="field.title" :description="field.description"
         :="{ manager: manager, error: getError() }">
-        <TimePicker :="field.settings" />
+        <TimePicker :="field.settings" :readonly="isReadonly()" :value="valueRef" @change="onTimeChange" />
     </FieldProxy>
 </template>
 
 <script setup lang="ts">
-import { RunResult, } from "snail.core";
+import { correctString, RunResult, } from "snail.core";
 import { inject, onMounted, shallowRef, } from "vue";
 import { components, } from "snail.vue";
 import { TimeControlSettings } from "../../models/control-model";
@@ -51,10 +51,11 @@ const valueRef = shallowRef<string>();
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
- * 取显示时间选择器
- * @param evt 
+ * 时间值变化时
+ * @param newValue 
+ * @param oldValue 
  */
-function onTimeShow(evt) {
+function onTimeChange(newValue: string, oldValue: string) {
 
 }
 

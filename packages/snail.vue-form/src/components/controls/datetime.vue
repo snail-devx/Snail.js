@@ -6,7 +6,7 @@
     <FieldProxy :type="field.type" :title="field.title" :description="field.description"
         :="{ manager: manager, error: getError() }">
         <div class="date-select">
-            <DatePicker :="field.settings" />
+            <DatePicker :="field.settings" :readonly="isReadonly()" :value="valueRef" @change="onDateChange" />
         </div>
     </FieldProxy>
 </template>
@@ -53,6 +53,14 @@ const { handle, getError, updateError, isReadonly } = manager;
 const valueRef = shallowRef<string>();
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 日期值变化时
+ * @param newValue 
+ * @param oldValue 
+ */
+function onDateChange(newValue: string, oldValue: string) {
+
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听

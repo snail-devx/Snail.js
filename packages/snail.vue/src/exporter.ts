@@ -73,8 +73,8 @@ export * from "./container/utils/motion-util";
 export * from "./picker/models/datetime-model"
 export * from "./picker/models/picker-model"
 //  组件导出
-import DatePicker from "./picker/datepicker.vue";
-import TimePicker from "./picker/timepicker.vue";
+import DatePicker from "./picker/date-picker.vue";
+import TimePicker from "./picker/time-picker.vue";
 
 //  方法导出
 export * from "./picker/manager";

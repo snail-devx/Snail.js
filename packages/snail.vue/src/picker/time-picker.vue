@@ -16,6 +16,7 @@ import { ReadonlyOptions } from "../base/models/base-model";
 import { ChangeEvents } from "../base/models/base-event";
 import { usePicker } from "./manager";
 import Icon from "../base/icon.vue";
+import { useReactive } from "../base/reactive";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -23,11 +24,20 @@ const props = defineProps<ReadonlyOptions & TimePickerOptions>();
 const emits = defineEmits<ChangeEvents<string>>();
 const pickerDom = useTemplateRef("timepicker");
 const { showTime } = usePicker();
+const { watcher } = useReactive();
 //  2、组件交互变量、常量
-const valueRef: ShallowRef<string> = shallowRef(props.value);
+const valueRef: ShallowRef<string> = shallowRef();
 let pickerScope: IAsyncScope<string>;
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 重新设置日期值
+ * @param value 
+ */
+function resetTimeValue(value: string) {
+    const timeValue = parseTimeValue(value, "min");
+    valueRef.value = formatTimeValue(timeValue, props.format)
+}
 /**
  * 显示选择器
  */
@@ -56,10 +66,9 @@ async function showPicker(evt: MouseEvent) {
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
-if (isStringNotEmpty(valueRef.value) == true) {
-    const text = formatTimeValue(parseTimeValue(valueRef.value, "min"), props.format);
-    valueRef.value != text && (valueRef.value = text);
-}
+isStringNotEmpty(props.value) && resetTimeValue(props.value);
+//  外部修改value值时,自动响应
+watcher(() => props.value, newValue => newValue !== valueRef.value && resetTimeValue(newValue));
 //  2、生命周期响应
 </script>
 
