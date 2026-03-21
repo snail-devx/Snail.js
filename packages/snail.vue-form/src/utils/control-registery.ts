@@ -16,6 +16,7 @@ import NumberSetting from "../components/settings/number-setting.vue";
 import Datetime from "../components/controls/datetime.vue";
 import Time from "../components/controls/time.vue";
 import DatetimeSetting from "../components/settings/datetime-setting.vue";
+import TimeSetting from "../components/settings/time-setting.vue";
 //  👉 Radio、Checkbox、Combobox
 import Option from "../components/controls/option.vue";
 import OptionSetting from "../components/settings/option-setting.vue";
@@ -126,7 +127,7 @@ const defaultControls: ControlOptions[] = [
         ],
         iconSize: 20,
         renderComponent: wrapComponent(Time),
-        settingComponent: wrapComponent(DatetimeSetting)
+        settingComponent: wrapComponent(TimeSetting)
     },
     //  选项类控件
     {

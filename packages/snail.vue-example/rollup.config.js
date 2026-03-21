@@ -139,9 +139,7 @@ const components = builder.build([
         //  将三方库同步输出
         assets: [
             "libraries/vue.global.js",
-            "libraries/sortable.js",
-            "libraries/zane-calendar.js",
-            "libraries/zane-calendar.css",
+            "libraries/sortable.js"
         ],
         //  组件初始化，把自己注册为脚本，避免依赖组件重复加载
         init(component, options, context) {

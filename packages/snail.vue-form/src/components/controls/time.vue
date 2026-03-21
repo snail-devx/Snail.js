@@ -4,24 +4,24 @@
 <template>
     <FieldProxy :type="field.type" :title="field.title" :description="field.description"
         :="{ manager: manager, error: getError() }">
-        <div>时间控件</div>
+        <TimePicker :="field.settings" />
     </FieldProxy>
 </template>
 
 <script setup lang="ts">
-import { isNumberNotNaN, RunResult, } from "snail.core";
-import { inject, nextTick, onMounted, ShallowRef, shallowRef, useTemplateRef, } from "vue";
-import { components, DatepickerOptions, useReactive } from "snail.vue";
-import { DatetimeControlSettings, NumberControlSettings } from "../../models/control-model";
+import { RunResult, } from "snail.core";
+import { inject, onMounted, shallowRef, } from "vue";
+import { components, } from "snail.vue";
+import { TimeControlSettings } from "../../models/control-model";
 import { FieldEvents, FieldRenderOptions, FieldValueSetResult, IFieldHandle, IFieldManager, } from "../../models/field-base";
-import { INJECTKEY_GlobalContext, newTraces, useField } from "../common/field-common";
+import { INJECTKEY_GlobalContext, useField } from "../common/field-common";
 import FieldProxy from "../common/field-proxy.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<FieldRenderOptions<DatetimeControlSettings, string>>();
+const props = defineProps<FieldRenderOptions<TimeControlSettings, string>>();
 const emits = defineEmits<FieldEvents>();
-const { Icon } = components;
+const { TimePicker } = components;
 const global = inject(INJECTKEY_GlobalContext);
 const manager: IFieldManager = useField(global, props, {
     emitter: emits,
@@ -49,8 +49,14 @@ const { handle, getError, updateError, isReadonly } = manager;
 /**     已选选择项：field-proxy需要 */
 const valueRef = shallowRef<string>();
 
-
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 取显示时间选择器
+ * @param evt 
+ */
+function onTimeShow(evt) {
+
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听

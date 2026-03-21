@@ -12,8 +12,6 @@ script.register(
 );
 //  基础css处理
 import { link } from "snail.view";
-import calendarCssUrl from "./libraries/zane-calendar.css?url";
-link.register(calendarCssUrl);
 
 //  -------------------------------------------------- 初始化Vue app实例   ------------------------------------------------------------
 import vue, { createApp, getCurrentScope, onScopeDispose, ref } from "vue"

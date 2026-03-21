@@ -16,9 +16,10 @@
 <script setup lang="ts">
 import { ref, shallowRef, } from "vue";
 import {
-    components, FieldOptions, GroupControlSettings, IFieldContainerHandle, IFormDesignerHandle, IFormRenderHandle,
+    components, DatetimeControlSettings, FieldOptions, GroupControlSettings, IFieldContainerHandle, IFormDesignerHandle, IFormRenderHandle,
     NumberControlSettings,
-    OptionControlSettings, TextControlSettings
+    OptionControlSettings, TextControlSettings,
+    TimeControlSettings
 } from "../../libraries/snail.vue-form";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -29,14 +30,29 @@ let hidden: boolean = false;
 
 //  2、组件交互变量、常量
 // 测试时
-const testFields: FieldOptions<TextControlSettings | OptionControlSettings | NumberControlSettings | GroupControlSettings>[] = [
+const testFields: FieldOptions<TextControlSettings | OptionControlSettings | NumberControlSettings | GroupControlSettings | DatetimeControlSettings | TimeControlSettings>[] = [
     {
         "type": "Datetime",
         "id": "1772459703920",
         "title": "日期时间",
+        "width": 1,
+        "settings": {
+            "min": "2026-03-25",
+            "max": "2026-04-04",
+            "format": "yyyy-MM-dd HH:mm:ss",
+            // "minPickTime": "21:48:06",
+            "maxPickTime": "21:48:11"
+        }
+    },
+    {
+        "type": "Time",
+        "id": "1772886613807",
+        "title": "时间",
         "width": 2,
-        description: "xxxxxxxxxxxxxxxxx",
-        "settings": {}
+        "settings": {
+            // "min": "21:47:49",
+            "max": "21:47:54"
+        }
     },
     {
         "type": "Text",

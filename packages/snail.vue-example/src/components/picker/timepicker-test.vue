@@ -61,16 +61,28 @@
             <input type="text" @click="evt => onClick(evt, { format: 'HH:mm:ss', toolbarDisabled: true })" />
         </section>
     </article>
+    <article>
+        <h1>TimePicker组件测试</h1>
+        <section class="">
+            默认情况：
+            <TimePicker @change="console.log" />
+        </section>
+        <section class="">
+            时分秒，禁用工具条
+            <input type="text" @click="evt => onClick(evt, { format: 'HH:mm:ss', toolbarDisabled: true })" />
+        </section>
+    </article>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, } from "vue";
-import { TimePickerOptions, usePicker } from "../../libraries/snail.vue";
+import { TimePickerOptions, usePicker, components } from "../../libraries/snail.vue";
 import { IAsyncScope } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const { showTime } = usePicker();
+const { TimePicker } = components;
 //  2、组件交互变量、常量
 /** 选择器弹出组件 */
 let pickerScope: IAsyncScope<string>;

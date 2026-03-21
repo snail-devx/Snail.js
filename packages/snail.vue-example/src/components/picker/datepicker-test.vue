@@ -158,20 +158,33 @@
             <input type="text" @click="evt => onClick(evt, { format: 'yyyy-MM-dd HH:mm:ss', toolbarDisabled: true })" />
         </section>
     </article>
+    <article>
+        <h1>DatePicker组件测试</h1>
+        <section class="">
+            默认情况
+            <DatePicker :value="valueRef" @change="console.log" />
+        </section>
+        <section class="">
+            禁用操作按钮 :format="'yyyy-MM-dd HH:mm'"
+            <DatePicker :format="'yyyy-MM-dd HH:mm'" :value="valueRef" @change="console.log" style="width: 100px;" />
+        </section>
+    </article>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, } from "vue";
-import { usePicker, DatePickerOptions } from "../../libraries/snail.vue";
+import { usePicker, DatePickerOptions, components } from "../../libraries/snail.vue";
 import { IAsyncScope } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const { showDate } = usePicker();
+const { DatePicker } = components;
 //  2、组件交互变量、常量
 /** 选择器弹出组件 */
 let pickerScope: IAsyncScope<string>;
 let pickerTarget: HTMLInputElement;
+const valueRef = shallowRef();
 
 // *****************************************   👉  方法+事件    ****************************************
 async function onClick(evt: Event, options?: DatePickerOptions) {

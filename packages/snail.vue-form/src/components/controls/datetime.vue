@@ -6,10 +6,7 @@
     <FieldProxy :type="field.type" :title="field.title" :description="field.description"
         :="{ manager: manager, error: getError() }">
         <div class="date-select">
-            <DatePicker ref="data-picker" :="datePickerOptiions" @change="value => valueRef = value" />
-            <span class="date-text ellipsis" v-if="valueRef" v-text="valueRef" />
-            <Icon v-if="isReadonly() != true" :type="'datepicker'" :size="18" :color="'#8a9099'"
-                :hover-color="'#3292ea'" @click="dataPickerDom.showPicker(200)" />
+            <DatePicker :="field.settings" />
         </div>
     </FieldProxy>
 </template>
@@ -17,7 +14,7 @@
 <script setup lang="ts">
 import { isNumberNotNaN, RunResult, } from "snail.core";
 import { inject, nextTick, onMounted, ShallowRef, shallowRef, useTemplateRef, } from "vue";
-import { components, DatepickerOptions, useReactive } from "snail.vue";
+import { components, useReactive } from "snail.vue";
 import { DatetimeControlSettings, NumberControlSettings } from "../../models/control-model";
 import { FieldEvents, FieldRenderOptions, FieldValueSetResult, IFieldHandle, IFieldManager, } from "../../models/field-base";
 import { INJECTKEY_GlobalContext, newTraces, useField } from "../common/field-common";
@@ -52,12 +49,6 @@ const manager: IFieldManager = useField(global, props, {
 });
 const { handle, getError, updateError, isReadonly } = manager;
 //  2、组件交互变量、常量
-/**     日期选择组件引用 */
-const dataPickerDom = useTemplateRef('data-picker');
-/**     日志选择组件配置选项 */
-const datePickerOptiions: DatepickerOptions = {
-
-};
 /**     已选选择项：field-proxy需要 */
 const valueRef = shallowRef<string>();
 
@@ -73,29 +64,5 @@ onMounted(() => emits("rendered", handle));
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
 
-.field-item.datetime>.field-detail {
-    >.date-select {
-        position: relative;
-        height: 32px;
-        display: flex;
-        align-items: center;
-
-        //  真正的日期选择控件，在背后工作，z-index强制-100
-        >.snail-datepicker {
-            z-index: -100;
-        }
-
-        >span.date-text {
-            width: fit-content;
-            max-width: calc(100% - 30px);
-            // line-height: 32px;
-            margin-right: 4px;
-        }
-
-        >svg {
-            // transform: translateY(7px);
-        }
-    }
-
-}
+.field-item.datetime>.field-detail {}
 </style>

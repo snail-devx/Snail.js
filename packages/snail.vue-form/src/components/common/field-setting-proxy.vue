@@ -27,7 +27,7 @@ import { INJECTKEY_GlobalContext } from "./field-common";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const { field, container } = defineProps<FieldSettingOptions<any>>();
-const { Transitions, Motion, Element } = components;
+const { Motion, } = components;
 const global = inject(INJECTKEY_GlobalContext);
 const { name, type } = global.getControl(field.type);
 
@@ -136,10 +136,10 @@ function refresh() {
             height: 32px !important;
         }
 
-        input[readonly] {
-            border: none;
-            padding-left: 0;
-        }
+        // input[readonly] {
+        //     border: none;
+        //     padding-left: 0;
+        // }
 
         .snail-select {
             >.select-result {
@@ -147,13 +147,13 @@ function refresh() {
             }
 
             //  只读时的特定样式处理
-            &.readonly {
-                border: none;
+            // &.readonly {
+            //     border: none;
 
-                >.select-result {
-                    padding-left: 0;
-                }
-            }
+            //     >.select-result {
+            //         padding-left: 0;
+            //     }
+            // }
         }
 
         .snail-choose {
