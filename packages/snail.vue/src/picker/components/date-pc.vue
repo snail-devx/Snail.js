@@ -285,6 +285,7 @@ function onDayItemClick(item: DatePickerDayItem) {
 async function onSelectTime() {
     if (props.picker != undefined && timeAreaDom.value != undefined && props.pinned.value != true) {
         props.pinned.value = true;
+        //  这里后期需要优化一下,需要分析 日期的最大值/最小值中的时间值,然后和时间选择最大值/最小值比对,选出最贴切的最大值/最小值
         const task = props.picker.showTime(timeAreaDom.value,
             {
                 //  时间选择器相关配置
