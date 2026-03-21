@@ -10,7 +10,12 @@ import { PopupHandle, PopupOptions, PopupStatusOptions } from "./popup-model";
  * - 传入的组件，根据配置跟随 target 位置和大小；
  * @see ComponentBindOptions 了解 Props、Model 泛型参数的含义
  */
-export type FollowOptions<Props = void, Model = void> = PopupOptions<Props, Model> & {
+export type FollowOptions<Props = void, Model = void> = PopupOptions<Props, Model> & FollowPositionOptions;
+/**
+ * 跟随位置 配置选项
+ * - 基于此计算出最终的跟随效果
+ */
+export type FollowPositionOptions = {
     /**
      * 启用【宽度】跟随
      * - 为true则和 target 宽度保持一致

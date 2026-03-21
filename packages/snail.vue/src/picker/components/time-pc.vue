@@ -178,8 +178,8 @@ onMounted(rebuildItems);
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-layout.time-picker.pc {
-    width: 210px;
-    height: 240px;
+    width: 210px !important;
+    height: 240px !important;
     background-color: #fff;
     box-shadow: 0 0px 3px rgba(0, 0, 0, 0.12);
     border: 1px solid rgba(0, 0, 0, 0.12);

@@ -73,6 +73,7 @@ export type IconOptions = TitleOptions & {
  * - 指向类：
  * - - arrow        向右箭头
  * - - datepicker   日期选择器
+ * - - timepicker   时间选择器
  * - 其他类：
  * - - plus         加号
  * - - subtract     减号
@@ -81,6 +82,6 @@ export type IconOptions = TitleOptions & {
  */
 export type IconType = "success" | "error" | "warn"
     | "close" | "trash" | "download" | "print" | "edit"
-    | "arrow" | "datepicker"
+    | "arrow" | "datepicker" | "timepicker"
     | "plus" | "subtract" | "grip"
     | "custom";

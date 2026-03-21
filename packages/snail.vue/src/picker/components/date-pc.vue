@@ -285,21 +285,24 @@ function onDayItemClick(item: DatePickerDayItem) {
 async function onSelectTime() {
     if (props.picker != undefined && timeAreaDom.value != undefined && props.pinned.value != true) {
         props.pinned.value = true;
-        const task = props.picker.showTime(timeAreaDom.value, {
-            //  时间选择器相关配置
-            format: timeFormat,
-            value: formatTimeValue(dateRef.value, timeFormat),
-            min: props.minPickTime,
-            max: props.minPickTime,
-            nowDisabled: props.nowDisabled,
-            clearDisabled: props.clearDisabled,
-            toolbarDisabled: props.toolbarDisabled,
-            //  跟随效果
-            followX: "start",
-            followY: "before",
-            spaceX: -2,
-            spaceY: 4,
-        });
+        const task = props.picker.showTime(timeAreaDom.value,
+            {
+                //  时间选择器相关配置
+                format: timeFormat,
+                value: formatTimeValue(dateRef.value, timeFormat),
+                min: props.minPickTime,
+                max: props.minPickTime,
+                nowDisabled: props.nowDisabled,
+                clearDisabled: props.clearDisabled,
+                toolbarDisabled: props.toolbarDisabled,
+            },
+            {
+                followX: "start",
+                followY: "before",
+                spaceX: -2,
+                spaceY: 4,
+            }
+        );
         task.finally(() => setTimeout(() => props.pinned.value = false))
             .then(
                 text => {
@@ -348,8 +351,8 @@ buildPickerItems(stepRef.value, 0);
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-layout.date-picker.pc {
-    width: 280px;
-    height: 300px;
+    width: 280px !important;
+    height: 300px !important;
     background-color: #fff;
     box-shadow: 0 0px 3px rgba(0, 0, 0, 0.12);
     border: 1px solid rgba(0, 0, 0, 0.12);
