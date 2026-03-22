@@ -11,9 +11,9 @@
     "dev": "rollup --watch -c ./rollup.config.js"
   },
   "dependencies": {
-    "snail.core": ">=2.0.25",
+    "snail.core": ">=2.0.26",
     "snail.view": ">=2.0.4",
-    "snail.vue": ">=2.0.13",
+    "snail.vue": ">=2.0.15",
     "sortablejs": ">=1.15.6",
     "vue": "^3.5.14"
   },
