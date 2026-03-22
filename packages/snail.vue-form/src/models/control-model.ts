@@ -106,17 +106,17 @@ export type DatetimeControlSettings = Pick<DatePickerOptions, "format" | "min" |
      * 初始化当前日期时间
      * - 为true时，若值为空，则初始化当前日期时间
      */
-    initNow?: boolean;
+    initialDate?: boolean;
 }
 /**
  * 时间控件配置项
  */
 export type TimeControlSettings = Pick<TimePickerOptions, "format" | "min" | "max"> & {
     /**
-     * 初始化当前日期时间
+     * 初始化时间
      * - 为true时，若值为空，则初始化当前日期时间
      */
-    initNow?: boolean;
+    initialTime?: boolean;
 }
 
 /**

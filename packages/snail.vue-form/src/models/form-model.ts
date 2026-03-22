@@ -172,7 +172,7 @@ export type FormDesignerEvents = {
  * - 负责表单运行时、预览模式渲染
  */
 export type FormRenderOptions =
-    Pick<IFieldGlobalContext, "columns" | "controls"> &
+    Pick<IFieldGlobalContext, "columns" | "controls" | "initialDisabled"> &
     Pick<FieldContainerOptions, "readonly" | "fields" | "values"> & {
         /**
          * 渲染模式

@@ -19,8 +19,8 @@
             @change="value => proxy.update('hidden', false, value)" />
         <div class="setting-divider" />
         <!-- 日期格式、最小值、最大值 -->
-        <FieldLikeBoolean title="自动初始化" :readonly="readonly" :value="field.settings.initNow" :help="'为空时自动初始化当前日期时间'"
-            @change="value => proxy.update('initNow', true, value)" />
+        <FieldLikeBoolean title="自动初始化" :readonly="readonly" :value="field.settings.initialDate"
+            :help="'为空时自动初始化当前日期时间'" @change="value => proxy.update('initialDate', true, value)" />
         <div class="setting-item">
             <div class="item-title" v-text="'日期格式'" />
             <Select class="item-detail" :readonly="readonly" :search="undefined" :multiple="false" :items="formatItems"

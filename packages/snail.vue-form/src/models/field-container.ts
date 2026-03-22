@@ -13,18 +13,6 @@ import { FormFieldLayoutOptions } from "./form-model";
  * 字段容器配置选项
  */
 export type FieldContainerOptions = {
-    // /**
-    //  * 容器id
-    //  * - 用于日志、埋点、多表单区分
-    //  * - 不传入，则内部自动分配
-    //  */
-    // readonly id?: string;
-    // /**
-    //  * 容器名称
-    //  * - 用于日志、埋点、多表单区分
-    //  */
-    // readonly name?: string;
-
     /**
      * 容器归属的上级字段信息，顶级表单容器为null
      */

@@ -34,7 +34,7 @@ import { FieldSettingOptions } from "../models/field-setting";
 //  1、props、event、model、components
 defineOptions({ name: "FormDesigner" });
 const _ = defineProps<FormDesignerOptions>();
-const { Dynamic, Empty, Transitions } = components;
+const { Dynamic, Empty } = components;
 const { fields } = _;
 const emits = defineEmits<FormDesignerEvents>();
 /**     字段全局上下文：构建后注入方便子组件中直接使用 */
@@ -42,6 +42,7 @@ const global = useGlobalContext({
     ..._,
     controls: _.controls || DEFAULT_ControlRegistery,
     mode: "design",
+    initialDisabled: true,
     layout: "form"
 });
 provide(INJECTKEY_GlobalContext, global);

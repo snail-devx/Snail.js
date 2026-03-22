@@ -20,7 +20,7 @@ export const INJECTKEY_GlobalContext = Symbol() as InjectionKey<IFieldGlobalCont
  * 使用【字段全局上下文】
  * @param options 
  */
-export function useGlobalContext(options: FieldContainerOptions & Pick<IFieldGlobalContext, "mode" | "layout" | "layout" | "columns" | "defaultSpan" | "hook" | "controls">)
+export function useGlobalContext(options: FieldContainerOptions & Pick<IFieldGlobalContext, "mode" | "layout" | "layout" | "columns" | "defaultSpan" | "initialDisabled" | "hook" | "controls">)
     : IFieldGlobalContext & IScope {
     /** 总列数，1-4，后期考虑扩大 */
     const columns: number = Math.max(1, Math.min(options.columns || 4, 4))
@@ -97,6 +97,7 @@ export function useGlobalContext(options: FieldContainerOptions & Pick<IFieldGlo
             layout: options.layout || "form",
             columns: columns as any,
             defaultSpan: Math.max(1, Math.min(columns, parseInt(String(options.defaultSpan || columns / 2)))),
+            initialDisabled: options.initialDisabled == true,
 
             hook: options.hook || Object.create({}),
             controls: controls,

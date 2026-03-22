@@ -18,8 +18,8 @@
         <FieldLikeBoolean title="隐藏" :readonly="readonly" :value="field.hidden"
             @change="value => proxy.update('hidden', false, value)" />
         <div class="setting-divider" />
-        <FieldLikeBoolean title="自动初始化" :readonly="readonly" :value="field.settings.initNow" :help="'为空时自动初始化当前时间'"
-            @change="value => proxy.update('initNow', true, value)" />
+        <FieldLikeBoolean title="自动初始化" :readonly="readonly" :value="field.settings.initialTime" :help="'为空时自动初始化当前时间'"
+            @change="value => proxy.update('initialTime', true, value)" />
         <div class="setting-item">
             <div class="item-title" v-text="'时间格式'" />
             <Select class="item-detail" :readonly="readonly" :search="undefined" :multiple="false" :items="formatItems"

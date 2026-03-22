@@ -26,7 +26,6 @@ import { useFormHandle } from "./common/form-common";
 defineOptions({ name: "FormRenderer" });
 const _ = defineProps<FormRenderOptions>();
 const emits = defineEmits<FormRenderEvents>();
-const { Transitions } = components;
 const { fields, values } = _;
 //  2、组件交互变量、常量
 /**     字段全局上下文：构建后注入方便子组件中直接使用 */

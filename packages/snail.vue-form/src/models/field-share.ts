@@ -56,6 +56,12 @@ export interface IFieldGlobalContext {
      * - 若未指定，column/2
      */
     readonly defaultSpan: number;
+    /**
+     * 是否禁用【初始化】功能
+     * - 为true时，字段值为空时，设置的默认值不生效
+     * - 为false时，字段值为空时，设置的默认值生效
+     */
+    readonly initialDisabled: boolean;
 
     /**
      * 字段容器钩子
