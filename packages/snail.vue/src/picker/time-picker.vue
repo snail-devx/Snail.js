@@ -4,7 +4,7 @@
 <template>
     <div class="snail-timepicker" ref="timepicker" :class="{ readonly }" :title="valueRef" @click="showPicker">
         <input class="wh-fill" type="text" readonly v-model="valueRef" />
-        <Icon v-if="readonly != true" :type="'timepicker'" :color="'#aeb6c2'" :hover-color="'#279bf1'" :size="24" />
+        <Icon v-if="readonly != true" :type="'timepicker'" :color="'#aeb6c2'" :hover-color="'#279bf1'" :size="20" />
     </div>
 </template>
 
