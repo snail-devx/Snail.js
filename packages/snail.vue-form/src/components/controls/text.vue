@@ -92,9 +92,11 @@ function onTextChange() {
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
-//      运行时，初始化外部传入的字段值，强制默认值为空字符串
-if (global.mode == "runtime") {
-    valueRef.value = getValueString(props.value == undefined ? props.field.value : props.value);
+if (global.mode != "design") {
+    valueRef.value = getValueString(props.value);
+    if (valueRef.value === "" && global.initialDisabled != true) {
+        valueRef.value = getValueString(props.field.value);
+    }
     oldText = valueRef.value;
 }
 //  2、生命周期响应

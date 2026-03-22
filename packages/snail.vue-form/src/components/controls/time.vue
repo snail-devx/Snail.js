@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { correctString, RunResult, } from "snail.core";
+import { formatTimeValue, getTimeValue, parseTimeValue, RunResult, } from "snail.core";
 import { inject, onMounted, shallowRef, } from "vue";
 import { components, } from "snail.vue";
 import { TimeControlSettings } from "../../models/control-model";
@@ -23,33 +23,47 @@ const props = defineProps<FieldRenderOptions<TimeControlSettings, string>>();
 const emits = defineEmits<FieldEvents>();
 const { TimePicker } = components;
 const global = inject(INJECTKEY_GlobalContext);
-const manager: IFieldManager = useField(global, props, {
-    emitter: emits,
-    getValue: async (validate: boolean): Promise<RunResult<any>> => {
-        /** 这里有点问题，需要强制先让input失去焦点，完成自身逻辑处理，然后再得到值，一般来说事件触发的获取值，都会自动失去焦点，问题不大 */
-        // await nextTick();
-        // const success: boolean = validate ? doValidate(valueRef.value) : true;
-        // return success
-        //     ? { success: true, data: valueRef.value }
-        //     : { success: false, reason: getError() };
-        throw new Error("getValue method not implemented");
-    },
-    async setValue(value: number): Promise<FieldValueSetResult> {
-        // const oldNumber = valueRef.value;
-        // valueRef.value = value;
-        // await nextTick();
-        // return doValidate(valueRef.value)
-        //     ? { success: true, change: oldNumber != valueRef.value, newValue: valueRef.value, oldValue: oldNumber }
-        //     : { success: false, change: false };
-        throw new Error("setValue method not implemented");
-    },
-});
+const manager: IFieldManager = useField(global, props, { emitter: emits, getValue, setValue });
 const { handle, getError, updateError, isReadonly } = manager;
 //  2、组件交互变量、常量
 /**     已选选择项：field-proxy需要 */
 const valueRef = shallowRef<string>();
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 取值方法
+ * - 运行时，返回字段实际值；其他模式，返回字段配置的默认值
+ * - 代理组件内部响应 IFieledHandle.getValue 时，调用此方法
+ * @param validate 是否进行值验证
+ * @returns 取值成功返回具体值，若失败则将错误信息写入error中
+ */
+function getValue(validate: boolean): Promise<RunResult<any>> {
+    /** 这里有点问题，需要强制先让input失去焦点，完成自身逻辑处理，然后再得到值，一般来说事件触发的获取值，都会自动失去焦点，问题不大 */
+    // await nextTick();
+    // const success: boolean = validate ? doValidate(valueRef.value) : true;
+    // return success
+    //     ? { success: true, data: valueRef.value }
+    //     : { success: false, reason: getError() };
+    // throw new Error("getValue method not implemented");
+    const rt: RunResult<string> = { success: true, data: "" };
+    return Promise.resolve(rt);
+}
+/**
+ * 设置字段值
+ * - 代理组件内部响应 IFieledHandle.setValue 时，调用此方法
+ * - 此方法内部的改变，不用触发`valueChagne`事件，交给`IFieldHandle`句柄处理，这样才能保留追踪链路
+ * @returns 操作结果
+ */
+function setValue(value: string): Promise<FieldValueSetResult> {
+    // const oldNumber = valueRef.value;
+    // valueRef.value = value;
+    // await nextTick();
+    // return doValidate(valueRef.value)
+    //     ? { success: true, change: oldNumber != valueRef.value, newValue: valueRef.value, oldValue: oldNumber }
+    //     : { success: false, change: false };
+    throw new Error("setValue method not implemented");
+}
+
 /**
  * 时间值变化时
  * @param newValue 
@@ -61,6 +75,13 @@ function onTimeChange(newValue: string, oldValue: string) {
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
+if (global.mode != "design") {
+    let timeValue = parseTimeValue(props.value, "min");
+    if (timeValue == undefined && global.initialDisabled != true && props.field.settings.initialTime == true) {
+        timeValue = getTimeValue(new Date());
+    }
+    timeValue && (valueRef.value = formatTimeValue(timeValue, props.field.settings.format));
+}
 //  2、生命周期响应
 onMounted(() => emits("rendered", handle));
 </script>
