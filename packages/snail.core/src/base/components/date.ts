@@ -287,7 +287,7 @@ export function parseDateValue(text: string, missing?: "min" | "max"): DateValue
             return undefined;
         }
         //  日的解析，需要按照月份得到最大值，从而校正day是否在范围内
-        const maxDay = getLastDaynMonth(year, month);
+        const maxDay = getLastDayInMonth(year, month);
         if (day == undefined) {
             if (hmsText != undefined) {
                 return undefined;
@@ -410,11 +410,11 @@ export function getTimeNumber(hour: number, minute: number, second: number): num
  * @param month 月份，从1开始
  * @returns 最后一天的数值；若传入无效，则返回undefined
  */
-export function getLastDaynMonth(year: number, month: number): number | undefined {
+export function getLastDayInMonth(year: number, month: number): number | undefined {
     const date = new Date("0000-01-01T00:00:00");
     date.setFullYear(year);
     date.setMonth(month);
-    date.setDate(-1);
+    date.setDate(date.getDate() - 1);
     return correctDate(date, undefined)
         ? date.getDate()
         : undefined;
