@@ -158,14 +158,8 @@ export function runHttpRequest<T>(request: HttpRequest, defaultHeaders: Record<s
         //  超时时间：默认1分钟；传入0，不超时
         request.timeout = request.timeout >= 0 ? request.timeout : 60 * 1000;
         //  请求头headers：强制做默认处理
-        if (isObject(request.headers) == true) {
-            for (var key in request.headers) {
-                hasOwnProperty(request.headers, key)
-                    && headers.has(key) == false && headers.append(key, request.headers[key]);
-            }
-        }
         tryInitRequestHeaders(headers, request.headers);
-        tryInitRequestHeaders(headers, defaultHeaders);
+        request.defaultHeadersDisabled === true || tryInitRequestHeaders(headers, defaultHeaders);
         request.keepalive && headers.set("connection", "keep-alive");
     }
     catch (ex: any) {

@@ -138,6 +138,13 @@ export type HttpRequest = {
      * 是否保持练级
      */
     keepalive?: boolean;
+
+    /**
+     * 是否禁用默认Headers
+     * - true时，仅发送`headers`中的请求头
+     * - false时，将合并全局和http实例配置的请求头
+     */
+    defaultHeadersDisabled?: boolean;
 }
 
 /**
