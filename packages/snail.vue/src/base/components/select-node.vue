@@ -8,9 +8,9 @@
     <div class="select-node" :class="classRef" v-if="showRef" :title="item.text" ref="select-node"
         @mouseenter="emits('enter', rootDom, item)" @click="() => emits('click', item)">
         <div class="item-text ellipsis" v-text="item.text" />
-        <Icon v-if="item.type == 'group'" :type="'arrow'" :color="'#8a9099'" />
+        <Icon v-if="item.type == 'group'" type="arrow" />
         <div class="select-status" v-else-if="multiple == true">
-            <Icon type="success" color="white" :size="12" />
+            <Icon type="success" button :size="12" :color="'white'" />
         </div>
     </div>
     <SelectNode v-if="showRef" v-for="child in showChildrenRef" :key="context.getKey(child)" :multiple="multiple"
@@ -92,7 +92,6 @@ defineOptions({ name: "SelectNode", inheritAttrs: true, });
     }
 
     >svg.snail-icon {
-        cursor: default;
         display: none;
     }
 

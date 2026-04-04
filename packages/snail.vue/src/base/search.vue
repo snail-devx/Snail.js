@@ -4,8 +4,10 @@
         <input type="search" :placeholder="placeholder" :readonly="readonly" v-model.trim="textModel"
             @keyup="onSearch($event)" />
         <div>
-            <Icon class="search-button" :type="'custom'" :draw="searchIon" :size="24" :color="'#707070'"
-                @click="onSearch(undefined)" />
+            <Icon class="search-button" custom button color="#707070" @click="onSearch(undefined)">
+                <path
+                    d="M 860.16 824.32 l -163.84 -163.84 c 102.4 -120.32 97.28 -302.08 -17.92 -414.72 c -120.32 -120.32 -314.88 -120.32 -435.2 0 c -120.32 120.32 -120.32 314.88 0 435.2 c 112.64 112.64 294.4 120.32 414.72 17.92 l 163.84 163.84 c 10.24 10.24 25.6 10.24 35.84 0 c 12.8 -12.8 12.8 -28.16 2.56 -38.4 Z M 281.6 642.56 C 181.76 542.72 181.76 381.44 281.6 281.6 c 99.84 -99.84 261.12 -99.84 360.96 0 c 99.84 99.84 99.84 261.12 0 360.96 c -99.84 102.4 -261.12 102.4 -360.96 0 Z" />
+            </Icon>
         </div>
     </div>
 </template>
@@ -20,8 +22,6 @@ const props = defineProps<SearchOptions>();
 const emits = defineEmits<SearchEvents>();
 /**     搜索文本 */
 const textModel = defineModel<string>({ default: "" });
-/**     搜索图标 */
-const searchIon: string = "M 860.16 824.32 l -163.84 -163.84 c 102.4 -120.32 97.28 -302.08 -17.92 -414.72 c -120.32 -120.32 -314.88 -120.32 -435.2 0 c -120.32 120.32 -120.32 314.88 0 435.2 c 112.64 112.64 294.4 120.32 414.72 17.92 l 163.84 163.84 c 10.24 10.24 25.6 10.24 35.84 0 c 12.8 -12.8 12.8 -28.16 2.56 -38.4 Z M 281.6 642.56 C 181.76 542.72 181.76 381.44 281.6 281.6 c 99.84 -99.84 261.12 -99.84 360.96 0 c 99.84 99.84 99.84 261.12 0 360.96 c -99.84 102.4 -261.12 102.4 -360.96 0 Z";
 //      三方组件
 //  2、可选配置选项
 defineOptions({ name: "Search", inheritAttrs: true, });

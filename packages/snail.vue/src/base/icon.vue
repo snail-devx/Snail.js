@@ -3,34 +3,72 @@
     2、采用svg方式实现，不使用字体图片，按需引入
 -->
 <template>
-    <svg class="snail-icon" :viewBox="correctString(viewBox, '0 0 1024 1024', false)" :class="type"
-        :style="rotate ? `transform: rotate(${rotate}deg);` : ''" :width="size || 24" :height="size || 24"
+    <svg class="snail-icon" :class="type" v-bind:class="{ button: button }"
+        :viewBox="correctString(viewBox, '0 0 1024 1024', false)" :="sizeRef" :style="styleRef"
         @mouseenter="isMouseEnterRef = true" @mouseleave="isMouseEnterRef = false">
         <title v-text="title || ''" />
-        <path v-for="d in getSvgDraw(type, draw)" :fill="isMouseEnterRef ? (hoverColor || color) : color"
-            :stroke="stroke" :stroke-width="strokeWidth" :d="d" />
+        <!-- 定义图标绘制时 -->
+        <template v-if="custom == true">
+            <slot />
+        </template>
+        <!-- 内置图标绘制 -->
+        <path v-else v-for="d in getBuiltinIcon(type)" :d="d" />
     </svg>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, ShallowRef, shallowRef } from "vue";
 import { IconOptions } from "./models/icon-model";
-import { getSvgDraw } from "./utils/icon-util";
-import { correctString } from "snail.core";
+import { getBuiltinIcon } from "./utils/icon-util";
+import { correctNumber, correctString, isObject } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
-//  1、props、data、event
-defineProps<IconOptions>();
-/** 是否数据进入了 */
+//  1、props、event、model、components
+const props = defineProps<IconOptions>();
+//  2、组件交互变量、常量
+/**     是否是鼠标进入了 */
 const isMouseEnterRef: ShallowRef<boolean> = shallowRef(false);
-//  2、可选配置选项
-defineOptions({ name: "Icon", inheritAttrs: true, });
+/**     图标尺寸，包含高度、宽度值 */
+const sizeRef = computed(() => {
+    if (isObject(props.size) == true) {
+        return {
+            width: correctNumber((props.size as any).width, 24),
+            height: correctNumber((props.size as any).height, 24)
+        }
+    }
+    else {
+        const number = correctNumber(props.size, 24);
+        return {
+            width: number,
+            height: number
+        };
+    }
+});
+/**     图标样式变量：旋转，鼠标移入颜色 */
+const styleRef = computed(() => {
+    const style = Object.create(null);
+    //  fill样式
+    let fill = isMouseEnterRef.value ? correctString(props.hoverColor, props.color, true) : undefined;
+    fill == undefined && (fill = correctString(props.color, undefined, true));
+    fill && (style.fill = fill);
+    //  旋转样式
+    const rotate = correctNumber(props.rotate, 0);
+    rotate != 0 && (style.transform = `rotate(${rotate}deg)`);
+
+    return style;
+});
 
 // *****************************************   👉  方法事件    *****************************************
+
 </script>
 <style lang="less">
 .snail-icon {
-    cursor: pointer;
+    transition: all 0.2s linear;
+    fill: #8a8099;
     opacity: 1;
+
+    &.button {
+        cursor: pointer;
+    }
 }
 </style>

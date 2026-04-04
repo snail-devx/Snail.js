@@ -6,12 +6,11 @@ import { isArray, isArrayNotEmpty, isString, isStringNotEmpty, mustString, throw
 import { IconOptions, IconType } from "../models/icon-model";
 
 /**
- * 基于类型获取Svg图标绘制路径
+ * 获取内置图标绘制路径
  * @param iconType 图标类型
- * @param draw 绘制路径；自定义时生效
  * @returns 图标路径
  */
-export function getSvgDraw(iconType: IconType, draw: string[] | string): string[] {
+export function getBuiltinIcon(iconType: IconType): string[] {
     switch (iconType) {
         //#region --------------------------------- 状态类 图标 ---------------------------------
         case "success": return [
@@ -85,12 +84,6 @@ export function getSvgDraw(iconType: IconType, draw: string[] | string): string[
             "M 640 597.333 m -42.6667 0 a 42.6667 42.6667 0 1 0 85.3333 0 a 42.6667 42.6667 0 1 0 -85.3333 0 Z",
             "M 640 768 m -42.6667 0 a 42.6667 42.6667 0 1 0 85.3333 0 a 42.6667 42.6667 0 1 0 -85.3333 0 Z"
         ];
-        //  自定义图标：报错
-        case "custom": return isArrayNotEmpty(draw)
-            ? draw as string[]
-            : isStringNotEmpty(draw)
-                ? [draw as string]
-                : throwError("options.draw must be a non-empty string or string array") as any;
         //  默认不支持
         default: {
             throwError(`not support icon type: ${iconType}.`);

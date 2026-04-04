@@ -11,7 +11,8 @@
                 <div class="title ellipsis" v-text="title" />
                 <div class="subtitle ellipsis" v-if="!!subtitle" v-text="subtitle" />
                 <div class="status" v-if="disabled != true">
-                    <Icon :type="'arrow'" :title="statusModel == 'expand' ? '收起' : '展开'" @click="onStatusClick" />
+                    <Icon :custom="false" type="arrow" button :title="statusModel == 'expand' ? '收起' : '展开'"
+                        :rotate="statusModel == 'expand' ? -90 : 90" @click="onStatusClick" />
                 </div>
             </slot>
         </div>
@@ -131,30 +132,11 @@ function onStatusClick() {
             flex: 1;
             //  flex 布局：display: flex，align-items、justify-content 都为flex-end
             .flex-end();
-
-            //  展开、收起状态图标
-            >svg.snail-icon {
-                transition: transform 0.2s ease;
-            }
         }
     }
 
     >div.fold-body {
         padding-left: 20px;
-    }
-}
-
-// *****************************************   👉  特殊样式适配    *****************************************
-//  展开、收起状态适配
-.snail-fold.expand {
-    >div.fold-header>div.status>svg.snail-icon {
-        transform: rotate(-90deg);
-    }
-}
-
-.snail-fold.fold {
-    >div.fold-header>div.status>svg.snail-icon {
-        transform: rotate(90deg);
     }
 }
 </style>

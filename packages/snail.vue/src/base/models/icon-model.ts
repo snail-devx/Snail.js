@@ -5,17 +5,32 @@ import { TitleOptions } from "./base-model";
  * - title          作为鼠标移入图标时的提示
  */
 export type IconOptions = TitleOptions & {
-    /** 
-     * 图标类型
+    /**
+     * 是否为自定义图标
+     * - 为true时，外部通过插槽自己绘制图标
+     * - 为false时，使用`type`值绘制对应的内置图标
+     * - 默认false
      */
-    type: IconType;
+    custom?: boolean;
+    /** 
+     * 内置的图标类型
+     * - `custom`为false时生效
+     */
+    type?: IconType;
 
     /**
-     * 图形伸展
-     * - svg.viewBox 属性
-     * - 为空则默认“0 0 1024 1024”
+     * 是否是按钮图标
+     * - true时，鼠标移入时 cursor:pointer;
      */
-    viewBox?: string;
+    button?: boolean;
+
+    /** 
+     * 图标大小
+     * - 可指定对象，如 { width: 24, height: 24 }，则图标大小为 24 * 24
+     * - 可指定数字，如 24，则图标大小为 24 * 24
+     * - 默认 24
+     */
+    size?: number | { width?: number, height?: number };
     /** 
      * 图标颜色 
      */
@@ -24,38 +39,19 @@ export type IconOptions = TitleOptions & {
      * 鼠标移入时的图标颜色
      */
     hoverColor?: string;
-    /** 
-     * 图标大小：默认24 
-     */
-    size?: number;
-
-    /**
-     * 轮廓描边颜色
-     * - 配合 strokeWidth 使用，完成图标加粗效果等
-     * @see https://developer.mozilla.org/zh-CN/docs/Web/SVG/Reference/Attribute/stroke
-     */
-    stroke?: string;
-    /**
-     * 轮廓宽度
-     * - 配合 stroke 使用，完成图标加粗效果等
-     * @see https://developer.mozilla.org/zh-CN/docs/Web/SVG/Reference/Attribute/stroke-width
-     */
-    strokeWidth?: number;
-
-    /**
-     * 图标绘制路径
-     * - 等效 svg-path的d属性
-     * - 仅在type为 custom 时生效
-     * - 若为数组，则表示多条绘制路径
-     */
-    draw?: string | string[];
-
     /**
      * 旋转角度
      * - 默认0
      * - 通过：transform: rotate(1.06); 实现
      */
     rotate?: number;
+
+    /**
+     * 图形伸展
+     * - svg.viewBox 属性
+     * - 为空则默认“0 0 1024 1024”
+     */
+    viewBox?: string;
 }
 
 /**
@@ -78,10 +74,8 @@ export type IconOptions = TitleOptions & {
  * - - plus         加号
  * - - subtract     减号
  * - - grip         紧握图标，垂直方向，一般用于拖动句柄
- * - - custom       自定义图标：此时IconOptions.draw属性传入绘制路径
  */
 export type IconType = "success" | "error" | "warn"
     | "close" | "trash" | "download" | "print" | "edit"
     | "arrow" | "datepicker" | "timepicker"
-    | "plus" | "subtract" | "grip"
-    | "custom";
+    | "plus" | "subtract" | "grip";

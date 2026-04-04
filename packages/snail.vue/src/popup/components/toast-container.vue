@@ -5,10 +5,10 @@
 <template>
     <div class="snail-toast" :class="[popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
         @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
-        <Icon class="close-icon" v-if="props.closeDisabled != true" type="close" :fill="closeFillRef" :size="20"
-            @mouseenter="closeFillRef = 'red'" @mouseleave="closeFillRef = '#707070'" @click="closePopup();" />
+        <Icon class="close-icon" v-if="props.closeDisabled != true" type="close" button :size="20" :color="'#707070'"
+            :hover-color="'red'" @click="closePopup();" />
         <div class="icon" v-if="props.type">
-            <Icon :type="props.type" fill="#707070" :size="20" />
+            <Icon :type="props.type" :color="'#707070'" :size="20" />
         </div>
         <div class="message" v-html="props.message" />
     </div>
@@ -28,8 +28,6 @@ const props: ToastOptions = options.props;
 const { closePopup } = extOptions;
 /** 显示时长，默认1500ms */
 const duration = props.duration > 0 ? props.duration : 1500;
-/** 计算出来的填充颜色 */
-const closeFillRef = ref("#707070");
 /** 自动销毁时的定时器 */
 var destroyTimer: IScope;
 //  2、可选配置选项

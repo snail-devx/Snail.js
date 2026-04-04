@@ -46,6 +46,7 @@ defineOptions({ name: "Tree", inheritAttrs: true, });
  * @param text 
  */
 function onSearch(text: string) {
+    debugger;
     context.doSearch(text);
     emits("searched", text);
 }

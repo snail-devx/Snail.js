@@ -10,7 +10,7 @@
         <!-- 插槽区域，自定义内容 -->
         <slot />
         <!-- 关闭按钮区域 -->
-        <Icon :type="'close'" :size="22" :color="useTo == 'page' ? '#2e3033' : '#464953'" class="close-icon"
+        <Icon class="close-icon" type="close" button :size="22" :color="useTo == 'page' ? '#2e3033' : '#464953'"
             v-if="closeDisabled != true" @click="emits('close')" />
     </header>
 </template>

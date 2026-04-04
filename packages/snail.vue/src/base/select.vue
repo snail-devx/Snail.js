@@ -15,7 +15,7 @@
             </div>
             <div v-else class="placeholder" v-text="readonly ? '' : (placeholder || '请选择')" />
             <!-- 下拉选择图标，非只读时才显示 -->
-            <Icon v-if="readonly != true" type="arrow" :size="24" color="#8a9099" style="transform: rotate(90deg);" />
+            <Icon v-if="readonly != true" type="arrow" button :size="24" :rotate="90" />
         </template>
         <!-- 无可选项时，直接给出提示 -->
         <div v-else class="placeholder">暂无可选项</div>

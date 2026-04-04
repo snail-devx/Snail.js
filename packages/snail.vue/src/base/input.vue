@@ -16,7 +16,7 @@
             <input ref="input-el" :type="type || 'text'" :value="inputModel" :readonly="readonly == true"
                 :placeholder="placeholder" :title="inputModel" @change="onValueChange" @click="emits('click')" />
             <span class="validate" v-if="!!validateRef" :title="validateRef">
-                <Icon :type="'error'" :size="16" :color="'red'" />
+                <Icon type="error" button :size="16" :color="'red'" />
             </span>
         </div>
     </div>

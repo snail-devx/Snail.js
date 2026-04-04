@@ -5,8 +5,11 @@
         <div class="verify-message" v-text="dragInfoRef.status == 'success' ? '验证成功' : message" />
         <div class="drag-handle" ref="dragHandle" :style="{ left: `${dragInfoRef.distance}px` }"
             @mousedown="onStartDrag" @touchstart="onStartDrag" @touchmove="onDragMove" @touchend="onDragEnd">
-            <Icon type="success" :size="20" color="white" v-if="dragInfoRef.status == 'success'" />
-            <Icon type="custom" :size="20" color="#948D8D" :draw="towArrowIcon" v-else />
+            <Icon v-if="dragInfoRef.status == 'success'" type="success" :size="20" :color="'white'" />
+            <Icon v-else custom :size="20" :color="'#948d8d'" style="cursor: move;">
+                <path
+                    d="M759.467 533.333L469.333 243.2l29.867-29.867 320 320-320 320-29.867-29.866 290.134-290.134z m-298.667 0L170.667 243.2l29.866-29.867 320 320-320 320-29.866-29.866L460.8 533.333z" />
+            </Icon>
         </div>
     </div>
 </template>
@@ -139,7 +142,6 @@ isTouch || onMounted(function () {
     }
 
     >.drag-handle {
-        cursor: move;
         width: 40px;
         border-right: 1px solid #dddfed;
         // 可拖拽标记，通过背景实现

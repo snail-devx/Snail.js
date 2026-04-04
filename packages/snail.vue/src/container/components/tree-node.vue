@@ -3,7 +3,8 @@
     2、支持插槽，由外部自定义展示内容；根据配置插槽可完全重写 树节点
 -->
 <template>
-    <div v-if="showRef" :class="['snail-tree-node', node.clickable ? 'clickable' : '', `level-${level}`]"
+    <div class="snail-tree-node" v-show="showRef" :class="`level-${level}`"
+        v-bind:class="{ clickable: node.clickable, hovered: isHoveredRef, actived: context.isActived(node) }"
         ref="tree-node" @mouseenter="isHoveredRef = true" @mouseleave="isHoveredRef = false" @click="onNodeClick(node)"
         @dblclick="onNodeDoubleClick">
         <template v-if="options.rewrite == true">
@@ -12,8 +13,9 @@
         <template v-else>
             <div class="indent" />
             <div class="node-fold" v-if="options.foldDisabled != true">
-                <Icon v-if="showChildrenRef" :class="statusRef" :type="'custom'" :size="24" :color="'#8a8099'"
-                    :draw="'M 298.667 426.667 l 213.333 256 l 213.333 -256 Z'" @click="toggleFold" />
+                <Icon v-if="showChildrenRef" :class="statusRef" custom button @click="toggleFold">
+                    <path d="M 298.667 426.667 l 213.333 256 l 213.333 -256 Z" />
+                </Icon>
             </div>
             <div class="node-text ellipsis" :title="node.text" v-text="node.text" />
             <div class="node-slot ellipsis">
@@ -21,7 +23,7 @@
             </div>
         </template>
     </div>
-    <div class="snail-tree-children hidden" v-if="showRef && showChildrenRef" ref="children">
+    <div class="snail-tree-children" v-show="showRef && showChildrenRef" ref="children">
         <TreeNode v-for="child in node.children" :key="context.getKey(child)" :node="child" :parent="node"
             :level="nextLevel" :options="options" :context="context"
             @click="(node, parents) => onChildNodeClick(node, parents)">
@@ -35,8 +37,7 @@
 <script setup lang="ts">
 import { newId, throwIfTrue } from "snail.core";
 import { useAnimation } from "snail.view";
-import { useReactive } from "../../base/reactive";
-import { shallowRef, computed, useTemplateRef, ShallowRef, onMounted, nextTick } from "vue";
+import { shallowRef, computed, useTemplateRef, ShallowRef, onMounted, nextTick, onActivated } from "vue";
 import { TreeNodeEvents, TreeNodeModel, TreeNodeOptions, TreeNodeSlotOptions } from "../models/tree-model";
 import Icon from "../../base/icon.vue";
 
@@ -46,9 +47,6 @@ const { node, parent, options = {}, level, context } = defineProps<TreeNodeOptio
 throwIfTrue(level > 10, "tree node level cannot exceed 10.");
 const emits = defineEmits<TreeNodeEvents<any>>();
 const { transition } = useAnimation();
-const { watcher } = useReactive();
-/**     树节点自身Dom */
-const treeNodeDom = useTemplateRef("tree-node");
 /**     节点是否鼠标悬浮上面了 */
 const isHoveredRef: ShallowRef<boolean> = shallowRef(false);
 /**     节点是否显示：需要补丁节点 */
@@ -127,26 +125,17 @@ function onChildNodeClick(child: TreeNodeModel<any>, parents: TreeNodeModel<any>
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
-//      监听变化，操作【树节点】自身的class样式，使用原生方式，避免触发vue的组件重绘
-watcher(isHoveredRef, (newValue) => {
-    treeNodeDom.value.classList.remove("hovered");
-    newValue && treeNodeDom.value.classList.add("hovered");
-});
-watcher(() => context.isActived(node), (newValue: boolean) => {
-    if (treeNodeDom.value) {
-        treeNodeDom.value.classList.remove("actived");
-        newValue && treeNodeDom.value.classList.add("actived");
-    }
-});
 //  2、生命周期响应
-onMounted(() => {
+onMounted(async () => {
+    await nextTick();
     //  有子节点的时候，折叠不用展开的层级
     if (childrenDom.value) {
         options.expandLevel != undefined && options.expandLevel < nextLevel && toggleFold();
-        childrenDom.value && childrenDom.value.classList.remove("hidden");
         nodeEmitsDisabled = false;
     }
 })
+onActivated(() => {
+});
 </script>
 
 <style lang="less">
