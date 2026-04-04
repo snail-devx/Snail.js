@@ -13,7 +13,7 @@
   "dependencies": {
     "snail.core": ">=2.0.28",
     "snail.view": ">=2.0.4",
-    "snail.vue": ">=2.0.15",
+    "snail.vue": ">=2.0.16",
     "sortablejs": ">=1.15.6",
     "vue": "^3.5.14"
   },

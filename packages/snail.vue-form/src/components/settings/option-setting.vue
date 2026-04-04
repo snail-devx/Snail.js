@@ -52,8 +52,8 @@
                             v-model.trim="item.code" v-if="codeEnabledRef" @change="syncFieldSetting" />
                         <!-- 非只读模式时显示操作按钮 -->
                         <template v-if="readonly != true">
-                            <Icon :type="'grip'" :size="20" class="option-move" />
-                            <Icon :type="'trash'" :size="20" @click="onDeleteItem" />
+                            <Icon type="grip" :size="20" class="option-move" />
+                            <Icon type="trash" button :size="20" @click="onDeleteItem" />
                         </template>
                     </div>
                 </Sort>

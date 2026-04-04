@@ -6,7 +6,8 @@
     "compilerOptions": {
         "allowJs": true,
         "checkJs": true,
-        "outDir": "./temp"
+        "outDir": "./temp",
+        "ignoreDeprecations": "6.0"
     },
     "exclude": [
         "node_modules",

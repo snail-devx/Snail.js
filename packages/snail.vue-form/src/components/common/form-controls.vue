@@ -12,8 +12,10 @@
                     v-show="control.name.indexOf(searchTextRef || '') != -1" :data-type="'control'"
                     :data-tag="control.type" @click="emits('click', control.type)">
                     <span>
-                        <Icon :type="'custom'" :size="control.iconSize || 20" :color="'#65698f'"
-                            :draw="control.icon || defaultIcon" />
+                        <Icon custom :size="control.iconSize || 20" :color="'#65698f'">
+                            <path v-if="isArrayNotEmpty(control.icon)" v-for="path in control.icon" :d="path" />
+                            <path v-else :d="defaultIcon" />
+                        </Icon>
                     </span>
                     <span class="ellipsis" v-text="control.name" />
                 </div>

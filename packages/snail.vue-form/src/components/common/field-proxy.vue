@@ -19,9 +19,9 @@
     <!-- 字段工具栏：拖拽、复制、删除 -->
     <div class="field-toolbar" v-if="global.mode == 'design'"
         @click="isButtonClickInCover ? (isButtonClickInCover = false) : emitter('activateField')">
-        <Icon v-if="isReadonly() != true" type="plus" color="#aeb6c2" hover-color="#279bf1" title="复制"
+        <Icon v-if="isReadonly() != true" type="plus" button color="#aeb6c2" hover-color="#279bf1" title="复制"
             @click="isButtonClickInCover = true, emitter('copyField')" />
-        <Icon v-if="isReadonly() != true" type="trash" color="#aeb6c2" hover-color="#279bf1" title="删除"
+        <Icon v-if="isReadonly() != true" type="trash" button color="#aeb6c2" hover-color="#279bf1" title="删除"
             @click="isButtonClickInCover = true, emitter('deleteField')" />
     </div>
 </template>

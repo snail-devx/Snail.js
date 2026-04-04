@@ -41,7 +41,7 @@ export type ControlOptions = {
      * 控件图标，svg的绘制路径
      * - 不传入则采用默认图标
      */
-    icon?: string | string[];
+    icon?: string[];
     /**
      * 控件图标大小
      * - 默认22

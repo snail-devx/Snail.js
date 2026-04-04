@@ -11,16 +11,16 @@
                 <span class="item-title ellipsis" v-else v-text="`${field.title}(${rowIndex + 1})`" />
                 <!-- 操作按钮：非设计时、 非只读时才显示：添加、删除、上移、下移-->
                 <template v-if="global.mode != 'design' && isReadonly() != true">
-                    <Icon :type="'arrow'" :="{ size: 24, title: '下移', rotate: 90 }"
+                    <Icon type="arrow" button :="{ size: 24, title: '下移', rotate: 90 }"
                         v-if="rowIndex != group.children.length - 1 && field.settings.disableSort != true"
                         @click="moveItem(rowIndex, rowIndex + 1)" />
-                    <Icon :type="'arrow'" :="{ size: 24, title: '上移', rotate: 270 }"
+                    <Icon type="arrow" button :="{ size: 24, title: '上移', rotate: 270 }"
                         v-if="rowIndex != 0 && field.settings.disableSort != true"
                         @click="moveItem(rowIndex, rowIndex - 1)" />
-                    <Icon :type="'plus'" :="{ size: 22, title: field.settings.addActionName || '添加', }"
+                    <Icon type="plus" button :="{ size: 22, title: field.settings.addActionName || '添加', }"
                         v-if="needAddRef" @click="addNewItem(rowIndex + 1)" />
-                    <Icon :type="'subtract'" :="{ size: 22, title: '删除', }" v-if="field.settings.disableDelete != true"
-                        @click="onDeleteItem(rowIndex, gv);" />
+                    <Icon type="subtract" button :="{ size: 22, title: '删除', }"
+                        v-if="field.settings.disableDelete != true" @click="onDeleteItem(rowIndex, gv);" />
                 </template>
             </div>
             <FormFields :readonly="isReadonly()" :parent="field" :row-index="rowIndex" :fields="fields" :values="gv"
@@ -29,7 +29,7 @@
         <!-- 分组控件的工具栏：显示添加按钮、总计等；若无任何内容，则加一条白线，用于占位盖住表单字段行的最后一条边框线 -->
         <div class="group-toolbar" v-if="isReadonly() != true && needAddRef">
             <Button :type="'link'" :size="'small'" @click="addNewItem()">
-                <Icon :type="'plus'" :size="22" :color="'#4c9aff'" />
+                <Icon type="plus" button :size="22" :color="'#4c9aff'" />
                 <span v-text="field.settings.addActionName || '添加'" />
             </Button>
         </div>
