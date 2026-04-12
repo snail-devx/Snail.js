@@ -11,7 +11,7 @@
         </Scroll>
     </div> -->
     <section style="height: 300px;margin-right: 10px;border: 1px solid red;">
-        <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'both'" :down-refresh="true">
+        <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'both'">
             <template #>
                 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
                 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
@@ -38,16 +38,26 @@
             </template>
         </Elastic>
     </section>
-
-    <section style="height: 300px;margin-right: 10px;border: 1px solid red;overflow: hidden;">
-        <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'both'" :down-refresh="true">
+    <section style="height: 300px;margin-right: 10px;border: 1px solid red;">
+        <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'both'" :down-refresh="true"
+            :up-more="true">
             <template #>
-                <div style="background-color: gray;width: 120%;height: 400px;" />
+                顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
             </template>
         </Elastic>
     </section>
 
+    <section style="height: 300px;margin-right: 10px;border: 1px solid red;overflow: hidden;">
+        <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'both'">
+            <template #>
+                <div style="background-color: gray;width: 520px;height: 400px;" />
+            </template>
+        </Elastic>
+    </section>
+    <br />
+    <div style="width: 100%;height: 200px;" id="log_panel">
 
+    </div>
     <!-- 
     <div style="width: 300px;height: 300px;">
         <Scroll class="wh-fill" :bar-size="'mini'" :scroll-y="true" :elastic="'y'">
@@ -62,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, } from "vue";
+import { onMounted, ref, shallowRef, } from "vue";
 import { components } from "../../libraries/snail.vue";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -77,6 +87,12 @@ const { Elastic } = components;
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
+onMounted(() => {
+    // console.log = function (...args) {
+    //     const log_panel = document.getElementById("log_panel");
+    //     log_panel.innerHTML = `${args.join(" xh ")}---<br />` + log_panel.innerHTML;
+    // }
+});
 
 </script>
 

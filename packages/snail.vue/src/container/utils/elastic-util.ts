@@ -36,8 +36,8 @@ export function getScrollStatus(root: HTMLElement): ElasticScrollStatus {
  * @returns 
  */
 export function isRight(root: HTMLElement): boolean {
-    //  不管是否存在滚动条，滚动条是否存在单独判断
-    return (root.scrollLeft + root.clientWidth) == root.scrollWidth
+    //  不管是否存在滚动条，滚动条是否存在单独判断：移动端特定情况下，有些极端情况下存在小数位置，加起来微超过，没查具体原因，先兼容一下
+    return (root.scrollLeft + root.clientWidth) >= root.scrollWidth
 }
 /**
  * 是否到最底了
@@ -45,6 +45,6 @@ export function isRight(root: HTMLElement): boolean {
  * @returns 
  */
 export function isBottom(root: HTMLElement): boolean {
-    //  不管是否存在滚动条，滚动条是否存在单独判断
-    return (root.scrollTop + root.clientHeight) == root.scrollHeight;
+    //  不管是否存在滚动条，滚动条是否存在单独判断：移动端特定情况下，有些极端情况下存在小数位置，加起来微超过，没查具体原因，先兼容一下
+    return (root.scrollTop + root.clientHeight) >= root.scrollHeight;
 }

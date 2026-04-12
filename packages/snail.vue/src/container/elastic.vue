@@ -59,7 +59,9 @@ const isMovingRef = ref(false);
 /** 弹簧状态信息 */
 const springStatusRef = ref<ElasticSpringStatus>(undefined);
 /** 弹簧开始状态信息:x和y轴位置 */
-const startPointerRef = ref<{ id: number, clientX: number, clientY: number }>(undefined);
+const startPointerRef = ref<{ clientX: number, clientY: number }>(undefined);
+/** 是否是由触摸启动的弹簧效果*/
+let isStartByTouch: boolean = false;
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -108,85 +110,88 @@ function buildSpringStyle(): Record<string, string> {
     const style = Object.create(null);
     if (springStatusRef.value != undefined) {
         const { x, y } = springStatusRef.value;
-        const transforms: string[] = [];
-        x != undefined && transforms.push(`translateX(${x}px)`);
-        y != undefined && transforms.push(`translateY(${y}px)`);
-        transforms.length && (style["--transform"] = transforms.join(" "));
+        // const transforms: string[] = [];
+        // x != undefined && transforms.push(`translateX(${x}px)`);
+        // y != undefined && transforms.push(`translateY(${y}px)`);
+        // transforms.push("translateZ(0)");
+        // transforms.length && (style["--transform"] = transforms.join(" "));
+
+        x != undefined && (style["--x"] = `${x}px`);
+        y != undefined && (style["--y"] = `${y}px`);
     }
     return style;
 }
 
 /**
- * 鼠标/触摸开始时
- * @param evt 
+ * 弹簧效果启动时
+ * @param isTouch 是触摸启动的吗；true时 touchstart；false时，则是mouseDown
+ * @param position 点击/触摸位置
  */
-function onPointerDown(evt: PointerEvent) {
-    //  仅启用[弹簧效果]时生效
-    document.body.setPointerCapture(evt.pointerId);
+function onSpringStart(isTouch: boolean, position: { clientX: number, clientY: number }) {
+    //  非触摸启动时，若已经isTouching，则不再启动了；避免touchstart和mousedown同时多次触发
+    if (isTouch != true && isStartByTouch == true) {
+        return;
+    }
+    isTouch && (isStartByTouch = true);
     if (springXRef.value == true || springYRef.value == true) {
         isMovingRef.value = true;
         springStatusRef.value = Object.create(null);
         startPointerRef.value = {
-            id: evt.pointerId,
-            clientX: evt.clientX,
-            clientY: evt.clientY,
+            clientX: position.clientX,
+            clientY: position.clientY,
         }
     }
 }
 /**
  * 鼠标/触摸移动时
- * @param evt 
+ * @param isTouch 是触摸移动的吗；true时 touchmove；false时，则是mouseMove
+ * @param position 移动位置
  */
-function onPointerMove(evt: PointerEvent) {
-    if (startPointerRef.value == undefined || evt.pointerId != startPointerRef.value.id) {
+function onSpringMove(isTouch: boolean, position: { clientX: number, clientY: number }) {
+    if (startPointerRef.value == undefined || (isTouch != true && isStartByTouch == true)) {
         return;
     }
     //  水平方向的橡皮筋效果
     if (springXRef.value == true) {
-        const distance = evt.clientX - startPointerRef.value.clientX;
+        // console.log("isRight", isRight(rootDom.value), rootDom.value.scrollLeft);
+        const distance = position.clientX - startPointerRef.value.clientX;
         //  向右滑动：修正左侧位置
         if (distance >= 0 && rootDom.value.scrollLeft == 0) {
-            springStatusRef.value.x = Math.pow(distance, 0.9);
-            // console.log(springStatusRef.value.left);
+            springStatusRef.value.x = Math.pow(distance, 0.7);
         }
         //  向左滑动
         else if (distance <= 0 && isRight(rootDom.value)) {
-            springStatusRef.value.x = -Math.pow(-distance, 0.9);
+            springStatusRef.value.x = -Math.pow(-distance, 0.8);
         }
     }
     //  垂直方向的橡皮筋效果
     if (springYRef.value == true) {
-        const distance = Math.pow(evt.clientY - startPointerRef.value.clientY, 0.9);
+        // console.log("isBottom:", isBottom(rootDom.value), rootDom.value.scrollTop);
+        // console.log(rootDom.value.scrollTop, rootDom.value.clientHeight, rootDom.value.scrollHeight);
+        const distance = position.clientY - startPointerRef.value.clientY;
         if (rootDom.value.scrollTop == 0 && distance >= 0) {
-            springStatusRef.value.y = Math.pow(distance, 0.9);
+            springStatusRef.value.y = Math.pow(distance, 0.8);
         }
         else if (distance <= 0 && isBottom(rootDom.value) == true) {
-            springStatusRef.value.y = -Math.pow(-distance, 0.9);
+            springStatusRef.value.y = -Math.pow(-distance, 0.8);
         }
     }
 }
 /**
  * 鼠标/触摸结束时
- * @param evt 
+ * @param isTouch 是触摸移动的吗；true时 touchend/touchcancel；false时，则是mouseUp
+ * @param isCancel 是否时取消触摸导致的结束 
  */
-function onPointerUp(evt: PointerEvent) {
-    startPointerRef.value && document.body.releasePointerCapture(startPointerRef.value.id);
-    if (startPointerRef.value != undefined && evt.pointerId == startPointerRef.value.id) {
+function onSpringEnd(isTouch: boolean, isCancel: boolean) {
+    if (startPointerRef.value != undefined) {
+        // if (springStatusRef.value.x < 0) {
+        //     setTimeout(() => rootDom.value.scrollLeft = 100000, 400);
+        // }
+
         springStatusRef.value = Object.create(null);
         isMovingRef.value = false;
         startPointerRef.value = undefined;
-    }
-}
-/**
- * 鼠标/触摸取消时
- * @param evt 
- */
-function onPointerCancel(evt: PointerEvent) {
-    startPointerRef.value && document.body.releasePointerCapture(startPointerRef.value.id);
-    if (startPointerRef.value != undefined && evt.pointerId == startPointerRef.value.id) {
-        springStatusRef.value = Object.create(null);
-        isMovingRef.value = false;
-        startPointerRef.value = undefined;
+        isStartByTouch = false;
     }
 }
 
@@ -194,11 +199,17 @@ function onPointerCancel(evt: PointerEvent) {
 //  1、数据初始化、变化监听
 //  2、生命周期响应
 onMounted(() => {
-    //  这个事件有点问题，在移动端效果不正常、、、
-    onEvent(document.body, "pointerdown", onPointerDown);
-    onEvent(document.body, "pointermove", onPointerMove);
-    onEvent(document.body, "pointerup", onPointerUp);
-    onEvent(document.body, "pointercancel", onPointerCancel);
+    if ("ontouchstart" in window) {
+        onEvent(rootDom.value, "touchstart", (evt: TouchEvent) => onSpringStart(true, evt.touches[0]));
+        onEvent(window, "touchmove", (evt: TouchEvent) => onSpringMove(true, evt.touches[0]));
+        onEvent(window, "touchend", () => onSpringEnd(true, false));
+        onEvent(window, "touchcancel", () => onSpringEnd(true, true));
+    }
+    if ("onmousedown" in window) {
+        onEvent(rootDom.value, "mousedown", (evt: MouseEvent) => onSpringStart(false, evt));
+        onEvent(window, "mousemove", (evt: MouseEvent) => onSpringMove(false, evt));
+        onEvent(window, "mouseup", () => onSpringEnd(false, false));
+    }
 });
 </script>
 
@@ -210,6 +221,7 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     user-select: none;
+    overflow-anchor: none;
     //  平滑滚动;暂时不支持
     // scroll-behavior: smooth;
     //  支持变量 --overflow 是否出滚动条，默认hidden；--bar-size ：滚动条尺寸，默认10px
@@ -224,15 +236,19 @@ onMounted(() => {
     }
 
     >div {
+        position: relative;
         flex-shrink: 0;
-        transform: var(--transform, none); // translateY(var(--translateY, none));
+        // transform: var(--transform, none); // translateY(var(--translateY, none));
+        left: var(--x, unset);
+        top: var(--y, unset);
+
     }
 
     //  使用transform控制弹性效果,给出线性动画效果
     &.spring>div {
         // transition: transform 0.4s linear;
         // transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        transition: transform 0.4s ease-in-out;
+        transition: transform 0.3s ease-out;
     }
 
     //  开始移动时，不使用动画，避免不跟手
