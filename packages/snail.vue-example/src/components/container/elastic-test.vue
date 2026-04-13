@@ -39,8 +39,7 @@
         </Elastic>
     </section>
     <section style="height: 300px;margin-right: 10px;border: 1px solid red;">
-        <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'both'" :down-refresh="true"
-            :up-more="true">
+        <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'y'" :down-refresh="true" :up-more="true">
             <template #>
                 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
             </template>

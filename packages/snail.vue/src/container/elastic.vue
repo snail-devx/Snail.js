@@ -110,14 +110,10 @@ function buildSpringStyle(): Record<string, string> {
     const style = Object.create(null);
     if (springStatusRef.value != undefined) {
         const { x, y } = springStatusRef.value;
-        // const transforms: string[] = [];
-        // x != undefined && transforms.push(`translateX(${x}px)`);
-        // y != undefined && transforms.push(`translateY(${y}px)`);
-        // transforms.push("translateZ(0)");
-        // transforms.length && (style["--transform"] = transforms.join(" "));
-
-        x != undefined && (style["--x"] = `${x}px`);
-        y != undefined && (style["--y"] = `${y}px`);
+        const transforms: string[] = [];
+        x != undefined && transforms.push(`translateX(${x}px)`);
+        y != undefined && transforms.push(`translateY(${y}px)`);
+        transforms.length && (style["--spring-transform"] = transforms.join(" "));
     }
     return style;
 }
@@ -184,10 +180,6 @@ function onSpringMove(isTouch: boolean, position: { clientX: number, clientY: nu
  */
 function onSpringEnd(isTouch: boolean, isCancel: boolean) {
     if (startPointerRef.value != undefined) {
-        // if (springStatusRef.value.x < 0) {
-        //     setTimeout(() => rootDom.value.scrollLeft = 100000, 400);
-        // }
-
         springStatusRef.value = Object.create(null);
         isMovingRef.value = false;
         startPointerRef.value = undefined;
@@ -218,8 +210,6 @@ onMounted(() => {
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-elastic {
-    display: flex;
-    flex-direction: column;
     user-select: none;
     overflow-anchor: none;
     //  平滑滚动;暂时不支持
@@ -236,19 +226,15 @@ onMounted(() => {
     }
 
     >div {
-        position: relative;
         flex-shrink: 0;
-        // transform: var(--transform, none); // translateY(var(--translateY, none));
-        left: var(--x, unset);
-        top: var(--y, unset);
-
+        transform: var(--spring-transform, none); // translateY(var(--translateY, none));
     }
 
     //  使用transform控制弹性效果,给出线性动画效果
     &.spring>div {
         // transition: transform 0.4s linear;
         // transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        transition: transform 0.3s ease-out;
+        transition: transform 0.4s ease-out;
     }
 
     //  开始移动时，不使用动画，避免不跟手
@@ -258,9 +244,10 @@ onMounted(() => {
 
     //  主内容区域样式:给个最小高度,避免被缩放没了
     >div.main-body {
-        // flex: 1;
         min-height: 10px;
         height: fit-content;
+        min-width: 100%;
+        width: fit-content;
     }
 }
 
