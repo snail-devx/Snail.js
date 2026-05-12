@@ -225,7 +225,11 @@ export function runHttpRequest<T>(request: HttpRequest, defaultHeaders: Record<s
             const resolve = (data: any) => {
                 deferred.resolve({ data, status: hr.status, body: hr.body, headers: hr.headers });
             }
-            if (/application\/json/i.test(contentType) == true) {
+            //  流式请求时，直接把hr返回，方便外部分析出来；其他情况先做一下解析再处理
+            if (/text\/event\-stream/.test(contentType) == true) {
+                resolve(hr);
+            }
+            else if (/application\/json/i.test(contentType) == true) {
                 hr.json().then(resolve);
             }
             else if (isTextResponse(contentType)) {

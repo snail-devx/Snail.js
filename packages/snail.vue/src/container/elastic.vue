@@ -153,7 +153,7 @@ function onSpringMove(isTouch: boolean, position: { clientX: number, clientY: nu
         const distance = position.clientX - startPointerRef.value.clientX;
         //  向右滑动：修正左侧位置
         if (distance >= 0 && rootDom.value.scrollLeft == 0) {
-            springStatusRef.value.x = Math.pow(distance, 0.7);
+            springStatusRef.value.x = Math.pow(distance, 0.8);
         }
         //  向左滑动
         else if (distance <= 0 && isRight(rootDom.value)) {
@@ -165,8 +165,13 @@ function onSpringMove(isTouch: boolean, position: { clientX: number, clientY: nu
         // console.log("isBottom:", isBottom(rootDom.value), rootDom.value.scrollTop);
         // console.log(rootDom.value.scrollTop, rootDom.value.clientHeight, rootDom.value.scrollHeight);
         const distance = position.clientY - startPointerRef.value.clientY;
-        if (rootDom.value.scrollTop == 0 && distance >= 0) {
-            springStatusRef.value.y = Math.pow(distance, 0.8);
+        if (distance >= 0) {
+            if (rootDom.value.scrollTop == 0) {
+                springStatusRef.value.y = Math.pow(distance, 0.8);
+            }
+            else {
+                startPointerRef.value.clientY = position.clientY;
+            }
         }
         else if (distance <= 0 && isBottom(rootDom.value) == true) {
             springStatusRef.value.y = -Math.pow(-distance, 0.8);
@@ -212,6 +217,9 @@ onMounted(() => {
 .snail-elastic {
     user-select: none;
     overflow-anchor: none;
+    /* 可滚动区域 */
+    will-change: transform;
+    scroll-behavior: smooth;
     //  平滑滚动;暂时不支持
     // scroll-behavior: smooth;
     //  支持变量 --overflow 是否出滚动条，默认hidden；--bar-size ：滚动条尺寸，默认10px
