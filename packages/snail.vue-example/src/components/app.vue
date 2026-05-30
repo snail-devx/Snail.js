@@ -25,6 +25,7 @@ import TextareaTest from "./base/textarea-test.vue";
 //  👉 容器组件
 import DynamicTest from "./container/dynamic-test.vue";
 import ElasticTest from "./container/elastic-test.vue";
+import FlexTest from "./container/flex-test.vue";
 import FoldTest from "./container/fold-test.vue";
 import LayoutTest from "./container/layout-test.vue";
 import MotionTest from "./container/motion-test.vue";
@@ -90,6 +91,7 @@ const treeOptions: TreeOptions<Component> = {
             children: [
                 { text: "Dynamic 动态组件", data: DynamicTest, clickable: true, searchable: true, },
                 { text: "Elastic 弹性组件", data: ElasticTest, clickable: true, searchable: true, },
+                { text: "Flex 弹性布局", data: FlexTest, clickable: true, searchable: true, },
                 { text: "Fold 折叠组件", data: FoldTest, clickable: true, searchable: true, },
                 { text: "Layout 布局测试", data: LayoutTest, clickable: true, searchable: true, },
                 { text: "Motion 动画组件", data: MotionTest, clickable: true, searchable: true, },
