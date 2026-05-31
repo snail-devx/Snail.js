@@ -66,12 +66,12 @@ export type FlexOptions = {
     alignContent?: "start" | "end" | "center" | "stretch" | "space-between" | "space-around" | "space-evenly";
 
     /**
-     * 启用空间修复
+     * 启用子项修复
      * - 在`justify-content`启用`space-`相关属性时，子项之间会有间隔，当子项数量较少时，可能出现空间过大的问题，特别时多行的最后一样时
      * - 启动后，会基于子项数量补全最后一行缺失的子项数量，来修复空间过大的问题
      * - 推荐仅在所有子项主轴方向尺寸一样时，否则修复可能不准确
      */
-    repairSpace?: boolean;
+    repairItem?: boolean;
     /**
      * flex容器的子项数量
      * - 配合 `repairSpace` 构建修复空间的子项数量

@@ -73,7 +73,7 @@ function buildStyleVar() {
  */
 function repairSpace() {
     repairItemsRef.value = 0;
-    const needRepair = props.repairSpace == true
+    const needRepair = props.repairItem == true
         && (props.justifyContent && props.justifyContent.startsWith("space-"))
         && props.itemCount > 0
         && rootDom.value.children.length > 0;
@@ -138,7 +138,7 @@ function repairSpace() {
 onMounted(() => {
     repairSpace();
     //  监听响应式处理，后续看情况增加其他属性监听，实现更精细化的控制
-    watcher<boolean>(() => props.repairSpace, repairSpace);
+    watcher<boolean>(() => props.repairItem, repairSpace);
     watcher<number>(() => props.itemCount, repairSpace);
     //  容器大小发生变化时，重新计算修复空间
     onSize(rootDom.value, repairSpace);
