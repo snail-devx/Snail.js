@@ -47,6 +47,9 @@ import PopupTest from "./popup/popup-test.vue";
 import LoadingTest from "./prompt/loading-test.vue";
 import DragVerifyTest from "./prompt/drag-verify-test.vue";
 import EmptyTest from "./prompt/empty-test.vue";
+//  👉 其他组件
+import FlashNumberTest from "./other/flash-number-test.vue";
+
 
 //#endregion
 
@@ -129,6 +132,12 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Empty 空状态", data: EmptyTest, clickable: true, searchable: true, },
                 { text: "Loading 加载状态", data: LoadingTest, clickable: true, searchable: true, },
             ]
+        },
+        {
+            text: "其他组件",
+            children: [
+                { text: "FlashNumber", data: FlashNumberTest, clickable: true, searchable: true }
+            ],
         }
     ],
 }
@@ -146,10 +155,12 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 }
 
 onMounted(() => {
-    onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
+    // onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[2].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
+    onTreeNodeClick(treeOptions.nodes[6].children[0], undefined);
+
 });
 </script>
 

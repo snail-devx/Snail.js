@@ -72,6 +72,9 @@ import Wrapper from "./container/wrapper.vue";
 export * from "./container/utils/component-util";
 export * from "./container/utils/motion-util";
 
+// *****************************************   👉  other 相关导出    ****************************************
+import FlashNumber from "./other/flash-number.vue";
+
 // *****************************************   👉  picker 相关导出    ****************************************
 //  类型导出
 export * from "./picker/models/datetime-model"
@@ -106,6 +109,7 @@ export const components = {
     Button, Choose, Footer, Header, Icon, Input, Number, Search, Select, Switch, Textarea,
     //  container 下的组件
     Dynamic, Elastic, Flex, Fold, Motion, Layout, Scroll, Sort, Table, TableRow, TableCol, Tree, Wrapper,
+    FlashNumber,
     //  picker    下的组件
     DatePicker, TimePicker,
     //  prompt 下的组件

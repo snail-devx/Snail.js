@@ -1,0 +1,31 @@
+<!-- 组件介绍写到这里 -->
+<template>
+    <FlashNumber :value="'1020.333'" />
+    <FlashNumber :value="'98114.03元'" />
+    <FlashNumber :value="'123456789.03元'" />
+    <FlashNumber :value="'987654321.03元'" />
+</template>
+
+<script setup lang="ts">
+import { ref, shallowRef, } from "vue";
+import { components } from "../../libraries/snail.vue";
+
+// *****************************************   👉  组件定义    *****************************************
+//  1、props、event、model、components
+const { FlashNumber } = components;
+
+//  2、组件交互变量、常量
+
+
+// *****************************************   👉  方法+事件    ****************************************
+
+// *****************************************   👉  组件渲染    *****************************************
+//  1、数据初始化、变化监听
+//  2、生命周期响应
+
+</script>
+
+<style lang="less">
+// 引入基础Mixins样式
+@import "snail.view/dist/styles/mixins.less";
+</style>
