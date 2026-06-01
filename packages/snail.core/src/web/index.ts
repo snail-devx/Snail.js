@@ -4,6 +4,7 @@
 
 //  components组件导出
 export * from "./components/http";
+export * from "./components/navigator";
 export * from "./components/script";
 export * from "./components/server";
 export * from "./components/url";
@@ -11,6 +12,7 @@ export * from "./components/version";
 
 //  models 类型导出
 export * from "./models/http-model";
+export * from "./models/navigator-model";
 export * from "./models/script-model";
 export * from "./models/server-model";
 export * from "./models/url-model";
