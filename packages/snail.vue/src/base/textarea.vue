@@ -1,9 +1,9 @@
 <!-- 文本输入框，支持单行和多行文本框效果 
-    1、对外属性和事件，先仅支持用得上的，其余属性、事件外部需要时，通过属性绑定即可，内部通过  :="$attrs" 做绑定
+    1、对外属性和事件，先仅支持用得上的，其余属性、事件外部需要时，通过属性绑定即可
  -->
 <template>
-    <textarea class="snail-textarea" ref="textarea" :="$attrs" :readonly="readonly" :placeholder="placeholder"
-        :rows="rowsRef" v-model="valueModel" @focus="emits('focus')" @input="emits('input', textareaDom.value)"
+    <textarea class="snail-textarea" ref="textarea" :readonly="readonly" :placeholder="placeholder" :rows="rowsRef"
+        v-model="valueModel" @focus="emits('focus')" @input="emits('input', textareaDom.value)"
         @blur="emits('blur', textareaDom.value)" @change="emits('change', textareaDom.value)" />
 </template>
 
@@ -13,7 +13,7 @@ import { TextareaEvents, TextareaOptions } from "./models/textarea-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-defineOptions({ name: "Textarea" });
+defineOptions({ name: "Textarea", inheritAttrs: true, });
 const props = defineProps<TextareaOptions>();
 const emits = defineEmits<TextareaEvents>();
 const valueModel = defineModel<string>({ default: undefined });
