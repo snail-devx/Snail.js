@@ -35,7 +35,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, } from "vue";
 import { components } from "../../libraries/snail.vue";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -43,7 +42,6 @@ import { components } from "../../libraries/snail.vue";
 const { Flex } = components;
 
 //  2、组件交互变量、常量
-
 
 // *****************************************   👉  方法+事件    ****************************************
 
@@ -61,7 +59,7 @@ const { Flex } = components;
     border: 1px solid gray;
 
     >.item {
-        flex: 1;
+        // flex: 1;
         flex-shrink: 0;
         min-width: 300px;
         height: 100px;

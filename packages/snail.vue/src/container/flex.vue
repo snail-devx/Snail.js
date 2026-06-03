@@ -4,7 +4,7 @@
     3、针对多行项目等宽、等高时，最后一行自动填充占位项，实现均分布局，特别时在space-between、space-around布局方式时，最后一行子项不够时展示补全的问题
 -->
 <template>
-    <div class="snail-flex" :class="{ 'column': isColumnDirection(props.direction) }" :style="styleRef" ref="root-flex">
+    <div :="$attrs" class="snail-flex" :class="classRef" :style="styleRef" ref="root-flex">
         <slot />
         <!-- 空间修复组件，遍历需要修复的数量 -->
         <component :class="[props.itemClass || '', 'repair-item']" :is="correctString(props.itemTag, 'div', true)"
@@ -21,39 +21,41 @@ import { FlexOptions } from "./models/flex-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
+defineOptions({ name: "Flex", inheritAttrs: false });
 const props = defineProps<FlexOptions>();
 const rootDom = useTemplateRef("root-flex");
 const { onSize } = useObserver();
 const { watcher } = useReactive();
 //  2、组件交互变量、常量
-/** 样式变量 */
-const styleRef: ComputedRef<Record<string, string>> = computed(buildStyleVar);
+/** 自定义类样式 */
+const classRef = computed(buildClass);
+/** 自定义行内样式 */
+const styleRef = computed(buildStyle);
 /** 修补的占位空元素个数 */
 const repairItemsRef: ShallowRef<number> = shallowRef(0);
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
- * 是否是列方向的布局
- * @param direction 
+ * 构建类样式
+ * - drirection和wrap
  */
-function isColumnDirection(direction: FlexOptions["direction"]): boolean {
-    switch (direction) {
-        case "column":
-        case "column-reverse":
-            return true;
-        default:
-            return false;
-    }
+function buildClass() {
+    const items: string[] = [];
+    //  direction给默认值，方便后续处理
+    items.push(props.direction || "row");
+    props.wrap && items.push(props.wrap);
+    //  justifyContent：直接使用属性值作为样式名，相当于默认对齐方式
+    props.justifyContent && items.push(props.justifyContent);
+
+    return items;
 }
 /**
- * 构建样式变量
+ * 构建行内样式
  * - 仅构建有值的数据
  */
-function buildStyleVar() {
+function buildStyle() {
     const styleVar: Record<string, string> = Object.create(null);
-    isStringNotEmpty(props.direction) && (styleVar["flex-direction"] = props.direction);
-    isStringNotEmpty(props.wrap) && (styleVar["flex-wrap"] = props.wrap);
-    isStringNotEmpty(props.gap) && (styleVar["gap"] = props.gap);
+    isStringNotEmpty(props.gap) && (styleVar["--gap"] = props.gap);
     //  justifyContent、alignItems、alignContent 需要将 start和end转换成 flex-start、flex-end
     const tmpFunc = (value) => {
         switch (value) {
@@ -62,9 +64,8 @@ function buildStyleVar() {
             default: return value;
         }
     }
-    isStringNotEmpty(props.justifyContent) && (styleVar["justify-content"] = tmpFunc(props.justifyContent));
-    isStringNotEmpty(props.alignItems) && (styleVar["align-items"] = tmpFunc(props.alignItems));
-    isStringNotEmpty(props.alignContent) && (styleVar["align-content"] = tmpFunc(props.alignContent));
+    isStringNotEmpty(props.alignItems) && (styleVar["--align-items"] = tmpFunc(props.alignItems));
+    isStringNotEmpty(props.alignContent) && (styleVar["--align-content"] = tmpFunc(props.alignContent));
 
     return styleVar;
 }
@@ -151,20 +152,92 @@ onMounted(() => {
 
 .snail-flex {
     display: flex;
+    //  内置变量
+    --gap: 0;
+    --align-items: stretch;
+    --align-content: stretch;
+    gap: var(--gap);
+    align-items: var(--align-items);
+    align-content: var(--align-content);
+}
 
-    //  列布局时的空间修补子项特例样式：不显示，无宽度
-    &.column>.repair-item {
-        width: 0 !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        visibility: hidden !important;
+//  flex的方向和换行配置
+.snail-flex {
+
+    &.row {
+        flex-direction: row;
     }
 
+    &.row-reverse {
+        flex-direction: row-reverse;
+    }
+
+    &.column {
+        flex-direction: column;
+    }
+
+    &.column-reverse {
+        flex-direction: column-reverse;
+    }
+
+    &.nowrap {
+        flex-wrap: nowrap;
+    }
+
+    &.wrap {
+        flex-wrap: wrap;
+    }
+
+    &.wrap-reverse {
+        flex-wrap: wrap-reverse;
+    }
+}
+
+//  主轴对齐方式  justify-content
+.snail-flex {
+    &.start {
+        justify-content: flex-start;
+    }
+
+    &.center {
+        justify-content: center;
+    }
+
+    &.end {
+        justify-content: flex-end;
+    }
+
+    &.space-between {
+        justify-content: space-between;
+    }
+
+    &.space-around {
+        justify-content: space-around;
+    }
+
+    &.space-evenly {
+        justify-content: space-evenly;
+    }
+}
+
+//  修复空间时的特殊样式
+.snail-flex {
+
     //  行布局时的空间修补子项特例样式：不显示，无高度
-    &:not(.column)>.repair-item {
+    &.row>.repair-item,
+    &.row-reverse>.repair-item {
         height: 0 !important;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
+        visibility: hidden !important;
+    }
+
+    //  列布局时的空间修补子项特例样式：不显示，无宽度
+    &.column>.repair-item,
+    &.column-reverse {
+        width: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
         visibility: hidden !important;
     }
 }
