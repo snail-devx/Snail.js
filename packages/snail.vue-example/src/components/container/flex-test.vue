@@ -1,7 +1,7 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <Flex class="flex-test" :justify-content="'space-between'" :wrap="'wrap'" :gap="'10px'" :repairItem="true"
-        :item-count="7" :item-class="'item'">
+    <Flex class="flex-test" :main="'between'" :wrap="'wrap'" :gap="'10px'" :repairItem="true" :item-count="7"
+        :item-class="'item'">
         <div class="item">1</div>
         <div class="item">2</div>
         <div class="item">3</div>
@@ -11,8 +11,8 @@
         <div class="item">7</div>
     </Flex>
     <hr />
-    <Flex class="flex-test" :justify-content="'space-around'" :wrap="'wrap'" :gap="'10px'" :repairItem="true"
-        :item-count="7" :item-class="'item'">
+    <Flex class="flex-test" :main="'around'" :wrap="'wrap'" :gap="'10px'" :repairItem="true" :item-count="7"
+        :item-class="'item'">
         <div class="item">1</div>
         <div class="item">2</div>
         <div class="item">3</div>
@@ -22,7 +22,18 @@
         <div class="item">7</div>
     </Flex>
     <hr />
-    <Flex class="flex-test" :justify-content="'space-evenly'" :wrap="'wrap'" :gap="'10px'" :repairItem="true"
+    <Flex class="flex-test" :main="'evenly'" :wrap="'wrap'" :gap="'10px'" :repairItem="true" :item-count="7"
+        :item-class="'item'">
+        <div class="item">1</div>
+        <div class="item">2</div>
+        <div class="item">3</div>
+        <div class="item">4</div>
+        <div class="item">5</div>
+        <div class="item">6</div>
+        <div class="item">7</div>
+    </Flex>
+    <hr />
+    <Flex class="flex-test" :direction="'column'" :main="'evenly'" :wrap="'wrap'" :gap="'10px'" :repairItem="true"
         :item-count="7" :item-class="'item'">
         <div class="item">1</div>
         <div class="item">2</div>

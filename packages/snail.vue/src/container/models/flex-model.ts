@@ -35,11 +35,11 @@ export type FlexOptions = {
      * - - start（默认值） 主轴起点对齐
      * - - end 主轴终点对齐
      * - - center 主轴居中对齐
-     * - - space-between 主轴两端对齐，项目之间间隔平均分布
-     * - - space-around 主轴每个项目两侧间隔平均分布
-     * - - space-evenly 主轴每个项目之间间隔平均分布
+     * - - between 主轴两端对齐，项目之间间隔平均分布
+     * - - around 主轴每个项目两侧间隔平均分布
+     * - - evenly 主轴每个项目之间间隔平均分布
      */
-    justifyContent?: "start" | "end" | "center" | "space-between" | "space-around" | "space-evenly";
+    main?: "start" | "end" | "center" | "between" | "around" | "evenly";
     /**
      * 交叉轴对齐方式
      * - css属性：align-items
@@ -50,7 +50,7 @@ export type FlexOptions = {
      * - - center 交叉轴居中对齐
      * - - baseline 交叉轴第一行文字基线对齐
      */
-    alignItems?: "start" | "end" | "center" | "stretch" | "baseline";
+    cross?: "start" | "end" | "center" | "stretch" | "baseline";
     /**
      * 多行时的交叉轴对齐方式
      * - css属性：align-content
@@ -59,11 +59,11 @@ export type FlexOptions = {
      * - - start 交叉轴起点对齐
      * - - end 交叉轴终点对齐
      * - - center 交叉轴居中对齐
-     * - - space-between 交叉轴两端对齐，行之间间隔平均分布
-     * - - space-around 交叉轴每行两侧间隔平均分布
-     * - - space-evenly 交叉轴每行之间间隔平均分布
+     * - - between 交叉轴两端对齐，行之间间隔平均分布
+     * - - around 交叉轴每行两侧间隔平均分布
+     * - - evenly 交叉轴每行之间间隔平均分布
      */
-    alignContent?: "start" | "end" | "center" | "stretch" | "space-between" | "space-around" | "space-evenly";
+    content?: "start" | "end" | "center" | "stretch" | "between" | "around" | "evenly";
 
     /**
      * 启用子项修复

@@ -1,10 +1,11 @@
 <!-- 弹性布局组件
     1、使用 flex 布局；支持row、column、row-reverse、column-reverse布局方式
     2、支持设置主轴、交叉之换行方式，支持换行
-    3、针对多行项目等宽、等高时，最后一行自动填充占位项，实现均分布局，特别时在space-between、space-around布局方式时，最后一行子项不够时展示补全的问题
+    3、针对多行项目等宽、等高时，最后一行自动填充占位项，实现均分布局，特别是在space-between、space-around布局方式时，最后一行子项不够时展示补全的问题
 -->
 <template>
-    <div :="$attrs" class="snail-flex" :class="classRef" :style="styleRef" ref="root-flex">
+    <div :="$attrs" class="snail-flex" :class="classRef" :style="isStringNotEmpty(gap) ? { '--gap': gap } : undefined"
+        ref="root-flex">
         <slot />
         <!-- 空间修复组件，遍历需要修复的数量 -->
         <component :class="[props.itemClass || '', 'repair-item']" :is="correctString(props.itemTag, 'div', true)"
@@ -15,7 +16,7 @@
 <script setup lang="ts">
 import { correctString, isStringNotEmpty } from "snail.core";
 import { useObserver } from "snail.view";
-import { computed, ComputedRef, onMounted, ref, ShallowRef, shallowRef, useTemplateRef, } from "vue";
+import { computed, onMounted, ShallowRef, shallowRef, useTemplateRef, } from "vue";
 import { useReactive } from "../base/reactive";
 import { FlexOptions } from "./models/flex-model";
 
@@ -29,8 +30,6 @@ const { watcher } = useReactive();
 //  2、组件交互变量、常量
 /** 自定义类样式 */
 const classRef = computed(buildClass);
-/** 自定义行内样式 */
-const styleRef = computed(buildStyle);
 /** 修补的占位空元素个数 */
 const repairItemsRef: ShallowRef<number> = shallowRef(0);
 
@@ -41,41 +40,27 @@ const repairItemsRef: ShallowRef<number> = shallowRef(0);
  */
 function buildClass() {
     const items: string[] = [];
-    //  direction给默认值，方便后续处理
-    items.push(props.direction || "row");
+    //  direction给默认值，若需要计算修复，则强制给 row值
+    let direction: string = props.direction;
+    props.repairItem == true && isStringNotEmpty(direction) == false && (direction = "row");
+    direction && items.push(direction);
+
     props.wrap && items.push(props.wrap);
-    //  justifyContent：直接使用属性值作为样式名，相当于默认对齐方式
-    props.justifyContent && items.push(props.justifyContent);
+    //  对齐方式
+    isStringNotEmpty(props.main) && items.push(`justify-${props.main}`);
+    isStringNotEmpty(props.cross) && items.push(`items-${props.cross}`);
+    isStringNotEmpty(props.content) && items.push(`content-${props.content}`);
 
     return items;
 }
-/**
- * 构建行内样式
- * - 仅构建有值的数据
- */
-function buildStyle() {
-    const styleVar: Record<string, string> = Object.create(null);
-    isStringNotEmpty(props.gap) && (styleVar["--gap"] = props.gap);
-    //  justifyContent、alignItems、alignContent 需要将 start和end转换成 flex-start、flex-end
-    const tmpFunc = (value) => {
-        switch (value) {
-            case "start": return "flex-start";
-            case "end": return "flex-end";
-            default: return value;
-        }
-    }
-    isStringNotEmpty(props.alignItems) && (styleVar["--align-items"] = tmpFunc(props.alignItems));
-    isStringNotEmpty(props.alignContent) && (styleVar["--align-content"] = tmpFunc(props.alignContent));
 
-    return styleVar;
-}
 /**
  * 构建修复子项空间
  */
 function repairSpace() {
     repairItemsRef.value = 0;
     const needRepair = props.repairItem == true
-        && (props.justifyContent && props.justifyContent.startsWith("space-"))
+        && (props.main == "between" || props.main == "around" || props.main == "evenly")
         && props.itemCount > 0
         && rootDom.value.children.length > 0;
     if (needRepair == true) {
@@ -105,26 +90,25 @@ function repairSpace() {
          *           x*size+(x-1)*gap=totalSize  -> x*size+x*gap=totalSize+gap;
          *          itemCountPer = Math.floor((containerSize + itemGap) / (itemSize + itemGap));
          *   2、备份代码：
-         *      // switch (parseFloat(itemStyle.flexGrow) > 0 ? "space-between" : props.justifyContent) {
+         *      // switch (parseFloat(itemStyle.flexGrow) > 0 ? "between" : props.main) {
          *      //     //  x*size+(x-1)*gap=totalSize  -> x*size+x*gap=totalSize+gap;
-         *      //     case "space-between": {
+         *      //     case "between": {
          *      //         itemCountPer = Math.floor((containerSize + itemGap) / (itemSize + itemGap));
          *      //         break;
          *      //     }
          *      //     //  x*size+x*2*gap=totalSize  
-         *      //     case "space-around": {
+         *      //     case "around": {
          *      //         itemCountPer = Math.floor(containerSize / (itemSize + 2 * itemGap));
          *      //         break;
          *      //     }
          *      //     //  x*size+(x+1)*gap=totalSize
-         *      //     case "space-evenly": {
+         *      //     case "evenly": {
          *      //         itemCountPer = Math.floor((containerSize - itemGap) / (itemSize + itemGap));
          *      //         break;
          *      //     }
          *      // }
          */
-        let itemCountPer: number;
-        itemCountPer = Math.floor((containerSize + itemGap) / (itemSize + itemGap));
+        let itemCountPer: number = Math.floor((containerSize + itemGap) / (itemSize + itemGap));
         //  计算最后一行需要补充的子项：每行仅显示1个的话，没有修复的意义，忽略
         if (itemCountPer > 1) {
             const mode = props.itemCount % itemCountPer;
@@ -150,19 +134,13 @@ onMounted(() => {
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
 
+//  flex基础信息：方向、换行、间距等
 .snail-flex {
     display: flex;
-    //  内置变量
     --gap: 0;
-    --align-items: stretch;
-    --align-content: stretch;
     gap: var(--gap);
-    align-items: var(--align-items);
-    align-content: var(--align-content);
-}
 
-//  flex的方向和换行配置
-.snail-flex {
+    //  1️⃣ flex的方向  flex-direction
 
     &.row {
         flex-direction: row;
@@ -180,6 +158,8 @@ onMounted(() => {
         flex-direction: column-reverse;
     }
 
+    //  2️⃣ 换行配置    flex-wrap
+
     &.nowrap {
         flex-wrap: nowrap;
     }
@@ -193,30 +173,85 @@ onMounted(() => {
     }
 }
 
-//  主轴对齐方式  justify-content
+//  对齐方式：主轴、交叉轴、多行对齐
 .snail-flex {
-    &.start {
+
+    //  1️⃣ 主轴对齐方式    justify-content
+
+    &.justify-start {
         justify-content: flex-start;
     }
 
-    &.center {
+    &.justify-center {
         justify-content: center;
     }
 
-    &.end {
+    &.justify-end {
         justify-content: flex-end;
     }
 
-    &.space-between {
+    &.justify-between {
         justify-content: space-between;
     }
 
-    &.space-around {
+    &.justify-around {
         justify-content: space-around;
     }
 
-    &.space-evenly {
+    &.justify-evenly {
         justify-content: space-evenly;
+    }
+
+    //  2️⃣ 交叉轴对齐方式   align-items
+
+    &.items-start {
+        align-items: flex-start;
+    }
+
+    &.items-center {
+        align-items: center;
+    }
+
+    &.items-end {
+        align-items: flex-end;
+    }
+
+    &.items-stretch {
+        align-items: stretch;
+    }
+
+    &.items-baseline {
+        align-items: baseline;
+    }
+
+    //  3️⃣ 多行时交叉轴对齐方式    align-content
+
+    &.content-start {
+        align-content: flex-start;
+    }
+
+    &.content-center {
+        align-content: center;
+    }
+
+    &.content-end {
+        align-content: flex-end;
+    }
+
+    &.content-stretch {
+        align-content: stretch;
+    }
+
+    &.content-between {
+        align-content: space-between;
+    }
+
+    &.content-around {
+        align-content: space-around;
+    }
+
+    &.content-evenly {
+        align-content: space-evenly;
     }
 }
 
