@@ -44,33 +44,33 @@ export type ElasticOptions = {
  * 弹性容器组件 事件监听
  */
 export type ElasticEvents = {
-    /**
-     * 【x轴方向】滚动条变化时
-     * @param show 是否显示。true 滚动条显示；false 滚动条隐藏
-     */
-    xbar: [show: boolean];
-    /**
-     * 【y轴方向】滚动条变化时
-     * @param show 是否显示。true 滚动条显示；false 滚动条隐藏
-     */
-    ybar: [show: boolean];
+    // /**
+    //  * 【x轴方向】滚动条变化时
+    //  * @param show 是否显示。true 滚动条显示；false 滚动条隐藏
+    //  */
+    // xbar: [show: boolean];
+    // /**
+    //  * 【y轴方向】滚动条变化时
+    //  * @param show 是否显示。true 滚动条显示；false 滚动条隐藏
+    //  */
+    // ybar: [show: boolean];
 
-    /**
-     * 【y轴方向】滚到【最顶部】了
-     */
-    top: [];
-    /**
-     * 【x轴方向】滚到【最右侧】了
-     */
-    right: [];
-    /**
-     * 【y轴方向】滚到【最底部】了
-     */
-    bottom: [];
-    /**
-     * 【x轴方向】滚到【最左侧】了
-     */
-    left: [];
+    // /**
+    //  * 【y轴方向】滚到【最顶部】了
+    //  */
+    // top: [];
+    // /**
+    //  * 【x轴方向】滚到【最右侧】了
+    //  */
+    // right: [];
+    // /**
+    //  * 【y轴方向】滚到【最底部】了
+    //  */
+    // bottom: [];
+    // /**
+    //  * 【x轴方向】滚到【最左侧】了
+    //  */
+    // left: [];
 
     /**
      * 刷新数据
@@ -86,46 +86,46 @@ export type ElasticEvents = {
     more: [resolve: () => void];
 }
 
-/**
- * 弹性组件的滚动状态信息
- * - 缓存滚动状态 和下次做比对，触发对应事件
- */
-export type ElasticScrollStatus = {
-    /**
-     * 水平滚动条是否显示
-     */
-    xbar: boolean;
-    /**
-     * 垂直滚动条是否显示
-     */
-    ybar: boolean;
+// /**
+//  * 弹性组件的滚动状态信息
+//  * - 缓存滚动状态 和下次做比对，触发对应事件
+//  */
+// export type ElasticScrollStatus = {
+//     /**
+//      * 水平滚动条是否显示
+//      */
+//     xbar: boolean;
+//     /**
+//      * 垂直滚动条是否显示
+//      */
+//     ybar: boolean;
 
-    /**
-     * 滚动到【左侧】了
-     */
-    left: boolean;
-    /**
-     * 滚动到【右侧】了
-     */
-    right: boolean;
-    /**
-     * 滚动到【顶部】了
-     */
-    top: boolean;
-    /**
-     * 滚动到【底部】了
-     */
-    bottom: boolean;
+//     /**
+//      * 滚动到【左侧】了
+//      */
+//     left: boolean;
+//     /**
+//      * 滚动到【右侧】了
+//      */
+//     right: boolean;
+//     /**
+//      * 滚动到【顶部】了
+//      */
+//     top: boolean;
+//     /**
+//      * 滚动到【底部】了
+//      */
+//     bottom: boolean;
 
-    /**
-     * 滚动视图宽度
-     */
-    scrollwidth: number;
-    /**
-     * 滚动视图高度
-     */
-    scrollheight: number;
-}
+//     /**
+//      * 滚动视图宽度
+//      */
+//     scrollwidth: number;
+//     /**
+//      * 滚动视图高度
+//      */
+//     scrollheight: number;
+// }
 /**
  * 弹性组件的弹簧状态信息
  */

@@ -1,15 +1,5 @@
 <!-- Scroll 滚动视图组件测试，测试弹簧效果和上拉加载、下拉刷新等功能 -->
 <template>
-    <!-- <div style="width: 300px;height: 300px;">
-        <Scroll class="wh-fill" :bar-size="'mini'" :scroll-y="true" :elastic="'y'">
-            <div class="scroll-content">
-                <div class="header">头部</div>
-                <div class="content">内容区域</div>
-                <div class="footer">底部区域</div>
-            </div>
-            <div class="scroll-elastic">弹性区域</div>
-        </Scroll>
-    </div> -->
     <section style="height: 300px;margin-right: 10px;border: 1px solid red;">
         <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'both'">
             <template #>
@@ -24,36 +14,22 @@
             </template>
         </Elastic>
     </section>
-    <section style="height: 300px;margin-right: 10px;border: 1px solid red;">
-        <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'y'" :down-refresh="true">
-            <template #>
-                顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
-                顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
-                顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
-                顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
-                顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
-                顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
-                顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
-                顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶
-            </template>
+    <br />
+    <section style="height: 400px;width: 100%;margin-right: 10px;border: 1px solid red;overflow: hidden;">
+        <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'y'" :down-refresh="true" :up-more="true"
+            @refresh="onLoadData" @more="onLoadData">
+            <ElasticTestBody />
         </Elastic>
     </section>
-    <section style="height: 300px;margin-right: 10px;border: 1px solid red;">
-        <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'y'" :down-refresh="true" :up-more="true">
-            <template #>
-                顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
-            </template>
-        </Elastic>
-    </section>
-
-    <section style="height: 300px;margin-right: 10px;border: 1px solid red;overflow: hidden;">
+    <br />
+    <!-- <section style="height: 300px;margin-right: 10px;border: 1px solid red;overflow: hidden;">
         <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'both'">
             <template #>
                 <div style="background-color: gray;width: 520px;height: 400px;" />
             </template>
         </Elastic>
-    </section>
-    <br />
+    </section> -->
+
     <div style="width: 100%;height: 200px;" id="log_panel">
 
     </div>
@@ -71,8 +47,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, shallowRef, } from "vue";
-import { components } from "../../libraries/snail.vue";
+import { onMounted, ref, ShallowRef, shallowRef, } from "vue";
+import { components, useReactive } from "../../libraries/snail.vue";
+import { useTimer } from "snail.core";
+import ElasticTestBody from "./elastic-test-body.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -92,6 +70,11 @@ onMounted(() => {
     //     log_panel.innerHTML = `${args.join(" xh ")}---<br />` + log_panel.innerHTML;
     // }
 });
+
+function onLoadData(done) {
+    //  延迟一秒后，通知完成
+    setTimeout(done, 10000);
+}
 
 </script>
 
