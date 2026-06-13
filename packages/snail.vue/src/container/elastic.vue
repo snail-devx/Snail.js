@@ -165,7 +165,7 @@ function keepLoadDomPosition() {
  * 计算【上拉加载更多】元素的Bottom值，确保始终在最后
  */
 function calculateUpMoreDomBottom() {
-    const needUpMore = props.upMore == true && rootDom.value && mainBodyDom.value && rootDom.value.clientHeight <= mainBodyDom.value.clientHeight;
+    const needUpMore = rootDom.value && upMoreDom.value && mainBodyDom.value && rootDom.value.clientHeight <= mainBodyDom.value.clientHeight;
     upMoreDomBottomRef.value = needUpMore
         ? `-${mainBodyDom.value.clientHeight - rootDom.value.clientHeight}px`
         : undefined;
