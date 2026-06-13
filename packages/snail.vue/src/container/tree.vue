@@ -6,7 +6,7 @@
 <template>
     <div class="snail-tree">
         <Search v-if="search" :="search" @search="onSearch" />
-        <Scroll :scroll-y="true">
+        <Scroll :scroll="'y'">
             <TreeNode v-for="node in nodes || []" :key="context.getKey(node)" :node="node" :parent="undefined"
                 :level="1" :options="nodeOptions" :context="context" @click="onTreeNodeClick">
                 <template #="slotProps: TreeNodeSlotOptions<any>">

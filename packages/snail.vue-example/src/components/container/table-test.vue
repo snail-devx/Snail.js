@@ -1,6 +1,6 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <Table :header-style="{ height: '100px', backgroundColor: 'gray' }" :scroll-y="true"
+    <Table :header-style="{ height: '100px', backgroundColor: 'gray' }" :scroll="'y'"
         style="height: 80%;border: 1px solid red;">
         <template #header>
             <TableCol width="100px">1111</TableCol>
@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components } from "snail.vue";
+import { components } from "../../libraries/snail.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data

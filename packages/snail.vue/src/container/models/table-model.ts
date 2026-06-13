@@ -4,7 +4,7 @@ import { ScrollOptions } from "./scroll-model";
 /**
  * Table配置选项
  */
-export type TableOptions = ScrollOptions & {
+export type TableOptions = Pick<ScrollOptions, "scroll" | "barSize"> & {
     /**
      * 是否启用表格边框
      */

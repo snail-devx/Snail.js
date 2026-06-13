@@ -1,85 +1,85 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <Scroll style="width: 100%;height: 100%;" :scroll-y="true">
+    <Scroll style="width: 100%;height: 100%;" :scroll="'y'">
         <section>
-            <Scroll class="scroll-test" :scroll-x="false" :scroll-y="false">
+            <Scroll class="scroll-test" :scroll="'none'">
                 <div>
                     x、y都不滚动
-                    <code>:scroll-x="false" :scroll-y="false"</code>
+                    <code>:scroll="'none'"</code>
                 </div>
             </Scroll>
         </section>
         <section>
-            <Scroll class="scroll-test" :scroll-x="true" :scroll-y="false">
+            <Scroll class="scroll-test" scroll="x">
                 <div>
                     x轴滚动
-                    <code>:scroll-x="true" :scroll-y="false"</code>
+                    <code>:scroll="x"</code>
                 </div>
             </Scroll>
         </section>
         <section>
-            <Scroll class="scroll-test" :scroll-x="false" :scroll-y="true">
+            <Scroll class="scroll-test" scroll="y">
                 <div>
                     y轴滚动
-                    <code>:scroll-x="false" :scroll-y="true"</code>
+                    <code>:scroll="y"</code>
                 </div>
             </Scroll>
         </section>
         <!-- 滚动条大小、样式等-->
         <section style="width: 100%;height: 20px;">滚动条大小、样式等</section>
         <section>
-            <Scroll class="scroll-test" :scroll-x="true" :scroll-y="true" :bar-size="'normal'">
+            <Scroll class="scroll-test" :scroll="'both'" :bar-size="'normal'">
                 <div>
                     都滚动，滚动条尺寸 ：normal
-                    <code>:scroll-x="true" :scroll-y="true" :bar-size="'normal'"</code>
+                    <code>:scroll="'both'" :bar-size="'normal'"</code>
                 </div>
             </Scroll>
         </section>
         <section>
-            <Scroll class="scroll-test" :scroll-x="true" :scroll-y="true" :bar-size="'small'">
+            <Scroll class="scroll-test" :scroll="'both'" :bar-size="'small'">
                 <div>
                     都滚动，滚动条尺寸 ：small
-                    <code>:scroll-x="true" :scroll-y="true" :bar-size="'small'"</code>
+                    <code>:scroll="'both'" :bar-size="'small'"</code>
                 </div>
             </Scroll>
         </section>
         <section>
-            <Scroll class="scroll-test" :scroll-x="true" :scroll-y="true" :bar-size="'mini'">
+            <Scroll class="scroll-test" :scroll="'both'" :bar-size="'mini'">
                 <div>
                     都滚动，滚动条尺寸 ：mini
-                    <code>:scroll-x="true" :scroll-y="true" :bar-size="'mini'"</code>
+                    <code>:scroll="'both'" :bar-size="'mini'"</code>
                 </div>
             </Scroll>
         </section>
         <section>
-            <Scroll class="scroll-test" :scroll-x="true" :scroll-y="true" :bar-size="'none'">
+            <Scroll class="scroll-test" :scroll="'both'" :bar-size="'none'">
                 <div>
                     都滚动，滚动条尺寸 ：none
-                    <code>:scroll-x="true" :scroll-y="true" :bar-size="'none'"</code>
+                    <code>:scroll="'both'" :bar-size="'none'"</code>
                 </div>
             </Scroll>
         </section>
         <!-- 滚动条显示时机：Scroll移除此属性，暂时不对外开放
         <section>
-            <Scroll class="scroll-test" :scroll-x="true" :scroll-y="true" :bar-size="'mini'" :bar-mode="'hover'">
+            <Scroll class="scroll-test" :scroll="'both'" :bar-size="'mini'" :bar-mode="'hover'">
                 <div>
                     都滚动，滚动条尺寸 ：mini，鼠标移入才显示滚动条
-                    <code>:scroll-x="true" :scroll-y="true" :bar-size="'mini'" :bar-mode="'hover'"</code>
+                    <code>:scroll="'both'" :bar-size="'mini'" :bar-mode="'hover'"</code>
                 </div>
             </Scroll>
         </section>
         <section>
-            <Scroll class="scroll-test" :scroll-x="true" :scroll-y="true" :bar-size="'small'" :bar-mode="'hover'">
+            <Scroll class="scroll-test" :scroll="'both'" :bar-size="'small'" :bar-mode="'hover'">
                 <div>
                     都滚动，滚动条尺寸 ：small，鼠标移入才显示滚动条
-                    <code>:scroll-x="true" :scroll-y="true" :bar-size="'small'" :bar-mode="'hover'"</code>
+                    <code>:scroll="'both'" :bar-size="'small'" :bar-mode="'hover'"</code>
                 </div>
             </Scroll>
         </section>-->
         <!-- 事件相关 -->
         <section style="width: 100%;height: 2px;">事件相关：看控制台输出</section>
         <section>
-            <Scroll class="scroll-test" :scroll-x="true" :scroll-y="true" @xbar="console.log" @ybar="console.log"
+            <Scroll class="scroll-test" :scroll="'both'" @xbar="console.log" @ybar="console.log"
                 @left="console.log('滚动到最左侧')" @right="console.log('滚动到最右侧')" @top="console.log('滚动到最顶部')"
                 @bottom="console.log('滚动到最底部')">
                 <div style="background-color: gray;">

@@ -4,7 +4,7 @@
         <!-- 搜索组件 -->
         <Search placeholder="请输入控件名称搜索" :auto-complete="true" @search="text => searchTextRef = text" />
         <!-- 控件列表：暂时不做分组，后期再考虑，符合搜索值的控件才显示出来 -->
-        <Scroll :scroll-y="true" class="control-list">
+        <Scroll :scroll="'y'" class="control-list">
             <Empty v-if="hasControls != true" message="无可用控件" />
             <Sort v-else draggable=".control-item" changer="1" :disabled="global.readonly" :sortDisabled="true"
                 :group="{ name: global.global, pull: 'clone', put: false }" @remove="onControlItemRemove">

@@ -20,16 +20,24 @@ export function getScrollStatus(root: HTMLElement): ElasticScrollStatus {
         scrollheight: root.scrollHeight,
     };
     if (status.xbar == true) {
-        status.left = root.scrollLeft == 0;
+        status.left = isLeft(root);
         status.right = isRight(root);
     }
     if (status.ybar == true) {
-        status.top = root.scrollTop == 0;
+        status.top = isTop(root);
         status.bottom = isBottom(root);
     }
     return status;
 }
 
+/**
+ * 是否到最左了
+ * @param root 
+ * @returns 
+ */
+export function isLeft(root: HTMLElement): boolean {
+    return root.scrollLeft == 0;
+}
 /**
  * 是否到最右了
  * @param root 
@@ -37,7 +45,16 @@ export function getScrollStatus(root: HTMLElement): ElasticScrollStatus {
  */
 export function isRight(root: HTMLElement): boolean {
     //  不管是否存在滚动条，滚动条是否存在单独判断：移动端特定情况下，有些极端情况下存在小数位置，加起来微超过，没查具体原因，先兼容一下
-    return (root.scrollLeft + root.clientWidth) >= root.scrollWidth
+    // return (root.scrollLeft + root.clientWidth) >= root.scrollWidth
+    return Math.abs(root.scrollWidth - root.clientWidth - root.scrollLeft) < 1;
+}
+/**
+ * 是否到最顶了
+ * @param root 
+ * @returns 
+ */
+export function isTop(root: HTMLElement): boolean {
+    return root.scrollTop == 0;
 }
 /**
  * 是否到最底了
@@ -46,5 +63,6 @@ export function isRight(root: HTMLElement): boolean {
  */
 export function isBottom(root: HTMLElement): boolean {
     //  不管是否存在滚动条，滚动条是否存在单独判断：移动端特定情况下，有些极端情况下存在小数位置，加起来微超过，没查具体原因，先兼容一下
-    return (root.scrollTop + root.clientHeight) >= root.scrollHeight;
+    // return (root.scrollTop + root.clientHeight) >= root.scrollHeight;
+    return Math.abs(root.scrollHeight - root.clientHeight - root.scrollTop) < 1;
 }

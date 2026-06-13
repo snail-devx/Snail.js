@@ -4,12 +4,11 @@
     3、支持移动端橡皮筋效果，支持上拉加载更多、下拉刷新数据等功能
   -->
 <template>
-    <div class="snail-elastic" :class="{ 'spring': springXRef || springYRef, 'moving': isMovingRef }"
-        :style="scrollStyleRef" v-bind:style="springStyleRef" ref="root-dom" :key="'root-dom'">
+    <div class="snail-elastic">
         <!-- 下拉刷新区域：若不是向下滑动，则不显示，避免main-body内容太少，向上滑动时把下拉刷新展示出来了 -->
-        <template v-if="downRefreshRef" key="down-refresh">
-            <div class="down-refresh" :class="{ 'running': loadingRef == 'refresh' }" v-show="loadingRef != 'more'"
-                ref="down-refresh">
+        <template v-if="springYRef == true && downRefresh == true" key="down-refresh">
+            <div class="down-refresh" ref="down-refresh" :class="{ 'running': loadingRef == 'refresh' }"
+                v-show="loadingRef != 'more'">
                 <slot name="down-refresh">
                     <div class="flex-center default-loading">
                         <span />
@@ -19,14 +18,15 @@
                 </slot>
             </div>
         </template>
-        <!-- 主内容区域 -->
-        <div class="main-body" key="main-body" ref="main-body">
+        <!-- 主内容区域:根据需要出滚动条 -->
+        <div class="main-body wh-fill" ref="main-body" key="main-body"
+            :class="[barSize ? `${barSize}-scrollbar` : '', isMovingRef ? 'moving' : '']" :style="buildMainBodyStyle()">
             <slot />
         </div>
         <!-- 上拉加载更多区域：至少得main-body的内容高度填充满父容器才生效，否则加载更多无意义 -->
-        <template v-if="upMoreRef" key="up-more">
-            <div class="up-more" :class="{ 'running': loadingRef == 'more' }" :style="{ bottom: upMoreDomBottomRef }"
-                v-show="upMoreDomBottomRef && loadingRef != 'refresh'" ref="up-more">
+        <template v-if="springYRef == true && upMore == true" key="up-more">
+            <div class="up-more" ref="up-more" :class="{ 'running': loadingRef == 'more' }"
+                v-show="loadingRef != 'refresh'">
                 <slot name="up-more">
                     <div class="flex-center default-loading">
                         <span />
@@ -42,9 +42,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, ShallowRef, shallowRef, useTemplateRef, } from "vue";
 import { ElasticEvents, ElasticOptions, ElasticSpringStatus } from "./models/elastic-model";
+import { isBottom, isLeft, isRight, isTop } from "./utils/elastic-util";
+import { useObserver, useScroll } from "snail.view";
 import { useReactive } from "../base/reactive";
-import { useObserver } from "snail.view";
-import { isBottom, isRight } from "./utils/elastic-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -52,8 +52,6 @@ const props = defineProps<ElasticOptions>();
 const emits = defineEmits<ElasticEvents>();
 const { onEvent, onSize } = useObserver();
 const { watcher } = useReactive();
-/** 弹性容器元素 */
-const rootDom = useTemplateRef("root-dom");
 /** 下拉刷新的根元素 */
 const downRefreshDom = useTemplateRef("down-refresh");
 /** 主内容区域 */
@@ -61,8 +59,6 @@ const mainBodyDom = useTemplateRef("main-body");
 /** 上拉加载的根元素 */
 const upMoreDom = useTemplateRef("up-more");
 //  2、触摸移动位置相关
-/** 滚动相关样式 */
-const scrollStyleRef = computed(buildScrollStyle);/** 是否正在移动 */
 /** 是否是由触摸启动的移动*/
 let isStartByTouch: boolean = false;
 /** 移动开始时的位置信息:x和y轴位置 */
@@ -70,106 +66,49 @@ const startPointerRef = ref<{ clientX: number, clientY: number }>(undefined);
 /** 是否正在移动中 */
 const isMovingRef: ShallowRef<boolean> = shallowRef(false);
 //  3、弹簧效果相关
-/** 弹簧效果样式 */
-const springStyleRef = computed(buildSpringStyle);
+/** 弹簧状态信息 */
+const springStatusRef = ref<ElasticSpringStatus>(Object.create(null));
 /** x轴弹簧效果是否启用 */
 const springXRef = computed(() => props.spring == "x" || props.spring == "both");
 /** y弹簧效果是否启用 */
 const springYRef = computed(() => props.spring == "y" || props.spring == "both");
-/** 弹簧状态信息 */
-const springStatusRef = ref<ElasticSpringStatus>(Object.create(null));
 //  4、下拉刷新和上拉加载控制相关
-/** 下拉刷新是否可用 */
-const downRefreshRef = computed(() => springYRef.value == true && props.downRefresh == true);
-/** 上拉加载是否可用 */
-const upMoreRef = computed(() => springYRef.value == true && props.upMore == true);
-/** 上拉加载的元素Bottom位置值 */
-const upMoreDomBottomRef = shallowRef<string>();
 /** 是否正在加载数据，下拉刷新、上拉加载事件执行中 */
 const loadingRef: ShallowRef<"refresh" | "more"> = shallowRef();
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
- * 构建滚动样式
+ * 构建主内容区域样式
+ * - 滚动和弹簧效果
  * @returns 样式变量字典
  */
-function buildScrollStyle(): Record<string, string> {
-    const vars = Object.create(null);
+function buildMainBodyStyle(): Record<string, string> {
+    const style = Object.create(null);
     //  哪些地方出现滚动条
     switch (props.scroll) {
         case "x":
-            vars["--overflow"] = "auto hidden";
+            style["overflow"] = "auto hidden";
             break;
         case "y":
-            vars["--overflow"] = "hidden auto";
+            style["overflow"] = "hidden auto";
             break;
-        case "both":
-            vars["--overflow"] = "auto";
-            break;
-    }
-    //  滚动条大小
-    switch (props.barSize) {
-        case "normal":
-            vars["--bar-size"] = "10px";
-            break;
-        case "small":
-            vars["--bar-size"] = "6px";
-            break;
-        case "mini":
-            vars["--bar-size"] = "4px";
-            break;
+        //  作为默认值
+        // case "both":
+        //     style["overflow"] = "auto";
+        //     break;
         case "none":
-            vars["--bar-size"] = "0";
+            style["overflow"] = "none";
             break;
     }
-    //  弹簧效果偏移量
-    // if (springStatusRef.value != undefined) {
-
-    // }
-    return vars;
-}
-/**构建弹簧效果样式
- * @returns 弹簧效果样式
- */
-function buildSpringStyle(): Record<string, string> {
-    const style = Object.create(null);
+    //  弹簧效果偏移量  --transform
     if (springStatusRef.value != undefined) {
         const { x, y } = springStatusRef.value;
         const transforms: string[] = [];
         x != undefined && transforms.push(`translateX(${x}px)`);
         y != undefined && transforms.push(`translateY(${y}px)`);
-        transforms.length && (style["--spring-transform"] = transforms.join(" "));
+        transforms.length && (style["transform"] = transforms.join(" "));
     }
     return style;
-}
-
-/**
- * 保持加载相关dom的位置
- * - 【下拉刷新】始终在顶部位置
- * - 【上拉加载】始终在最底部
- */
-function keepLoadDomPosition() {
-    // window.requestAnimationFrame(keepLoadDomPosition);
-    // //  下拉刷新位置
-    // if (downRefreshDom.value) {
-    //     console.log(rootDom.value.scrollTop);
-    //     // downRefreshDom.value.style.top = `${rootDom.value.scrollTop}px`;
-    // }
-    // //  上拉加载位置
-    // if (upMoreDom.value) {
-
-    // }
-}
-
-/**
- * 计算【上拉加载更多】元素的Bottom值，确保始终在最后
- */
-function calculateUpMoreDomBottom() {
-    const needUpMore = rootDom.value && upMoreDom.value && mainBodyDom.value && rootDom.value.clientHeight <= mainBodyDom.value.clientHeight;
-    upMoreDomBottomRef.value = needUpMore
-        ? `-${mainBodyDom.value.clientHeight - rootDom.value.clientHeight}px`
-        : undefined;
-    console.log(upMoreDomBottomRef.value);
 }
 
 /**
@@ -178,7 +117,7 @@ function calculateUpMoreDomBottom() {
  * @param position 点击/触摸位置
  */
 function onSpringStart(isTouch: boolean, position: { clientX: number, clientY: number }) {
-    console.log(position);
+    // console.log(position);
     //  若当前正处理加载状态，则不进行弹簧效果处理，避免来回异步等操作，导致变量状态冲突影响效果
     if (loadingRef.value != undefined) {
         return;
@@ -212,11 +151,11 @@ function onSpringMove(isTouch: boolean, position: { clientX: number, clientY: nu
         // console.log("isRight", isRight(rootDom.value), rootDom.value.scrollLeft);
         const distance = position.clientX - startPointerRef.value.clientX;
         //  向右滑动：修正左侧位置
-        if (distance >= 0 && rootDom.value.scrollLeft == 0) {
+        if (distance >= 0 && isLeft(mainBodyDom.value)) {
             springStatusRef.value.x = Math.pow(distance, 0.8);
         }
         //  向左滑动
-        else if (distance <= 0 && isRight(rootDom.value)) {
+        else if (distance <= 0 && isRight(mainBodyDom.value)) {
             springStatusRef.value.x = -Math.pow(-distance, 0.8);
         }
     }
@@ -237,13 +176,15 @@ function onSpringMove(isTouch: boolean, position: { clientX: number, clientY: nu
             default: {
                 //  向下移动时：若已经滚动到顶部了，则触发橡皮筋效果，否则当前坐标为起始坐标
                 if (distance >= 0) {
-                    rootDom.value.scrollTop == 0
+                    isTop(mainBodyDom.value)
                         ? (springStatusRef.value.y = Math.pow(distance, 0.8))
                         : (startPointerRef.value.clientY = position.clientY);
                 }
                 //  向上移动式，若已经滚动到底部了，则触发橡皮经效果
                 else {
-                    isBottom(rootDom.value)
+                    // (root.scrollTop + root.clientHeight) >= root.scrollHeight;
+                    console.log("isBottom", mainBodyDom.value.scrollTop + mainBodyDom.value.clientHeight, "---", mainBodyDom.value.scrollHeight)
+                    isBottom(mainBodyDom.value)
                         ? (springStatusRef.value.y = - Math.pow(-distance, 0.8))
                         : (startPointerRef.value.clientY = position.clientY);
                 }
@@ -273,7 +214,7 @@ function onSpringEnd(isTouch: boolean, isCancel: boolean) {
             resetAfterEnd();
             loadingRef.value = "refresh";
             springStatusRef.value.y = downRefreshDom.value.clientHeight;
-            emits("refresh", () => resetAfterEnd());
+            emits("refresh", resetAfterEnd);
             return;
         }
         //  上拉加载判断
@@ -281,7 +222,7 @@ function onSpringEnd(isTouch: boolean, isCancel: boolean) {
             resetAfterEnd();
             loadingRef.value = "more";
             springStatusRef.value.y = -upMoreDom.value.clientHeight;
-            emits("more", () => resetAfterEnd());
+            emits("more", resetAfterEnd);
             return;
         }
     }
@@ -299,12 +240,15 @@ function resetAfterEnd() {
     isStartByTouch = false;
 }
 
+
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
 onMounted(() => {
+    // const manager = useScroll(mainBodyDom.value, props);
+
     if ("ontouchstart" in window) {
-        onEvent(rootDom.value, "touchstart", (evt: TouchEvent) => onSpringStart(true, evt.touches[0]));
+        onEvent(mainBodyDom.value, "touchstart", (evt: TouchEvent) => onSpringStart(true, evt.touches[0]));
         onEvent(window, "touchmove", (evt: TouchEvent) => onSpringMove(true, evt.touches[0]));
         onEvent(window, "touchend", () => onSpringEnd(true, false));
         onEvent(window, "touchcancel", () => onSpringEnd(true, true));
@@ -312,17 +256,10 @@ onMounted(() => {
         // onEvent(rootDom.value, "touchmove", (evt: TouchEvent) => loadingRef.value && (evt.stopPropagation(), evt.preventDefault()));
     }
     if ("onmousedown" in window) {
-        onEvent(rootDom.value, "mousedown", (evt: MouseEvent) => onSpringStart(false, evt));
+        onEvent(mainBodyDom.value, "mousedown", (evt: MouseEvent) => onSpringStart(false, evt));
         onEvent(window, "mousemove", (evt: MouseEvent) => onSpringMove(false, evt));
         onEvent(window, "mouseup", () => onSpringEnd(false, false));
     }
-    //  进行【下拉加载】监听
-    setTimeout(calculateUpMoreDomBottom, 0);
-    onSize(rootDom.value, calculateUpMoreDomBottom);
-    onSize(mainBodyDom.value, calculateUpMoreDomBottom);
-    watcher(() => props.upMore, calculateUpMoreDomBottom);
-    //  启动监听
-    window.requestAnimationFrame(keepLoadDomPosition);
 });
 </script>
 
@@ -332,48 +269,33 @@ onMounted(() => {
 
 .snail-elastic {
     position: relative;
-    user-select: none;
-    overflow-anchor: none;
     background-color: #F6F8FF;
-    /* 可滚动区域 */
-    will-change: transform;
-    scroll-behavior: smooth;
-    //  平滑滚动;暂时不支持
-    scroll-behavior: smooth;
-    //  支持变量 --overflow 是否出滚动条，默认hidden；--bar-size ：滚动条尺寸，默认10px
-    overflow: var(--overflow, hidden);
-    //  弹簧效果变量：默认值
-    --transform: none;
-
-    //  滚动条尺寸
-    &::-webkit-scrollbar {
-        width: var(--bar-size, 10px);
-        height: var(--bar-size, 10px);
-    }
-
-    >div {
-        position: relative;
-        height: fit-content;
-    }
+    overflow: hidden;
 }
 
-//  主内容区域：主内容区域样式:给个最小高度,避免被缩放没了
+//  主内容区域样式
 .snail-elastic {
     >div.main-body {
+        position: relative;
         z-index: 1;
         background-color: white;
-        min-height: 40px;
-        min-width: 100%;
-        width: fit-content;
-        flex-shrink: 0;
-        //  弹性动画效果
+        user-select: none;
+        //  滚动和滚动条尺寸相关
+        will-change: transform;
+        scroll-behavior: smooth;
+        overflow: auto;
+        overflow-anchor: none;
+        //  弹性效果相关
         transition: transform 0.4s ease-out;
-        transform: var(--spring-transform, none); // translateY(var(--translateY, none));
-    }
 
-    //  开始移动时，不使用动画，避免不跟手
-    &.moving>div.main-body {
-        transition-property: none !important;
+        //  开始移动时，不使用动画，避免不跟手
+        &.moving {
+            transition-property: none !important;
+
+            // &::-webkit-scrollbar-thumb {
+            //     background-color: transparent;
+            // }
+        }
     }
 }
 
@@ -385,7 +307,6 @@ onMounted(() => {
         position: absolute;
         left: 0;
         width: 100%;
-        z-index: -1;
         overflow: hidden;
 
         //  默认的加载动画；三个点的loading效果
@@ -439,6 +360,8 @@ onMounted(() => {
     }
 
     //  上拉加载更多的bottom需要动态计算
-    >div.up-more {}
+    >div.up-more {
+        bottom: 0;
+    }
 }
 </style>

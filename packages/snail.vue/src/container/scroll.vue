@@ -3,7 +3,8 @@
     2、支持PC、移动端；移动端为上下加载、下拉刷新
 -->
 <template>
-    <div class="snail-scroll" ref="scroll-root" :style="styleRef" @scroll="refreshScrollInfo">
+    <div class="snail-scroll" ref="scroll-root" :class="barSize ? `${barSize}-scrollbar` : ''" :style="buildStyle()"
+        @scroll="refreshScrollInfo">
         <slot></slot>
     </div>
 </template>
@@ -21,31 +22,6 @@ const emits = defineEmits<ScrollEvents>();
 const rootDom = useTemplateRef("scroll-root");
 const { onSize } = useObserver();
 const { onInterval } = useTimer();
-/** 自定义style样式 */
-const styleRef = computed(() => {
-    const style = Object.create(null);
-    //  滚动条overflow
-    (props.scrollX || props.scrollY) && (style["--scroll-overflow"] = `${props.scrollX == true ? 'auto' : 'hidden'} ${props.scrollY == true ? 'auto' : 'hidden'}`);
-    //  滚动条 尺寸
-    if (props.barSize) {
-        switch (props.barSize) {
-            case "normal":
-                style["--scroll-bar-size"] = "10px";
-                break;
-            case "small":
-                style["--scroll-bar-size"] = "6px";
-                break;
-            case "mini":
-                style["--scroll-bar-size"] = "4px";
-                break;
-            case "none":
-                style["--scroll-bar-size"] = "0";
-                break;
-        }
-    }
-
-    return style;
-});
 /** 备份滚动条状态信息 */
 var preStatus: ScrollStatus = undefined;
 //  2、可选配置选项
@@ -53,6 +29,31 @@ defineOptions({ name: "Scroll", inheritAttrs: true, });
 defineExpose({ scroll, scrollTo });
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 构建滚动样式
+ */
+function buildStyle() {
+    const style = Object.create(null);
+    //  哪些地方出现滚动条
+    switch (props.scroll) {
+        case "x":
+            style["overflow"] = "auto hidden";
+            break;
+        case "y":
+            style["overflow"] = "hidden auto";
+            break;
+        //  作为默认值
+        // case "both":
+        //     style["overflow"] = "auto";
+        //     break;
+        case "none":
+            style["overflow"] = "none";
+            break;
+    }
+
+    return style;
+}
+
 /**
  * 进行滚动操作
  * - 在当前的滚动条位置基础上，滚动指定单位
@@ -144,14 +145,6 @@ onMounted(() => {
 
 <style lang="less">
 .snail-scroll {
-    //  支持变量 --scroll-overflow 是否出滚动条，默认hidden；--scroll-bar-size ：滚动条尺寸，默认10px
-    --scroll-overflow: hidden;
-    overflow: var(--scroll-overflow, hidden);
-
-    //  滚动条尺寸
-    &::-webkit-scrollbar {
-        width: var(--scroll-bar-size, 10px);
-        height: var(--scroll-bar-size, 10px);
-    }
+    overflow: auto;
 }
 </style>

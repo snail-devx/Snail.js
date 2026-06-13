@@ -1,28 +1,12 @@
+// import { ScrollbarOptions } from "";
+
+import { ScrollbarOptions } from "snail.view";
+
 /**
  * 滚动视图配置选项
  */
-export type ScrollOptions = {
-    /**
-     * x轴是否支持滚动
-     * - false（默认值）不支持
-     * - true 支持滚动
-     */
-    scrollX?: boolean;
-    /**
-     * y轴是否支持滚动
-     * - false（默认值）不支持
-     * - true 支持滚动
-     */
-    scrollY?: boolean;
-
-    /**
-     * 滚动条尺寸
-     * - normal ：常规，10px
-     * - small ：小尺寸，宽度 6px
-     * - mini ：迷你尺寸，宽度 4px
-     * - none ：无，不显示滚动条，但仍然能够滚动
-     */
-    barSize?: "normal" | "small" | "mini" | "none";
+export type ScrollOptions = ScrollbarOptions & {
+    //  后期增加其他配置
 }
 
 /**

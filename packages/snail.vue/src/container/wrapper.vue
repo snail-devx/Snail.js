@@ -7,7 +7,7 @@
     <div class="snail-wrapper" :class="inPopup ? 'in-popup' : 'in-normal'">
         <Header v-if="header && header.disabled != true" :="header || { useTo: 'dialog', title: '对话框' }"
             @close="emits('cancel')" />
-        <Scroll class="wrapper-body" :="content || { scrollX: false, scrollY: false }">
+        <Scroll class="wrapper-body" :="content || { scroll: 'none' }">
             <slot />
         </Scroll>
         <Footer v-if="footer && readonly != true && footer.disabled != true" :="footer || {}" @cancel="emits('cancel')"

@@ -91,8 +91,8 @@ importers:
         specifier: '>=2.0.29'
         version: 2.0.29(typescript@5.9.3)
       snail.view:
-        specifier: '>=2.0.4'
-        version: 2.0.4(typescript@5.9.3)
+        specifier: '>=2.0.6'
+        version: 2.0.6(typescript@5.9.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -134,8 +134,8 @@ importers:
         specifier: '>=2.0.29'
         version: 2.0.29(typescript@5.9.3)
       snail.view:
-        specifier: '>=2.0.4'
-        version: 2.0.4(typescript@5.9.3)
+        specifier: '>=2.0.6'
+        version: 2.0.6(typescript@5.9.3)
       snail.vue:
         specifier: '>=2.0.18'
         version: 2.0.18(typescript@5.9.3)
@@ -219,8 +219,8 @@ importers:
         specifier: '>=2.0.29'
         version: 2.0.29(typescript@5.9.3)
       snail.view:
-        specifier: '>=2.0.4'
-        version: 2.0.4(typescript@5.9.3)
+        specifier: '>=2.0.6'
+        version: 2.0.6(typescript@5.9.3)
       snail.vue:
         specifier: '>=2.0.18'
         version: 2.0.18(typescript@5.9.3)
@@ -2378,8 +2378,8 @@ packages:
   snail.rollup@2.0.0:
     resolution: {integrity: sha512-T1LY21fzc5LZ+zIBVLTfcHgbNq16gJhtb/BWeW5dKJYe+WPAgNU7+1KLwdrBlNpEa5dJeeF0LnFT1+VMw0o5ag==}
 
-  snail.view@2.0.4:
-    resolution: {integrity: sha512-7Qcvcmd6Ad7yX7kQ7UMufW9ZnnJsHri72v2zKi3l8QiCHwmi+NMCXJUbUV7XyQEyDwbMq3paVd5M/kihDukbuQ==}
+  snail.view@2.0.6:
+    resolution: {integrity: sha512-JAPz1E2ZCQCM4zDEvui23AtNDkztF4aiV+Zg16zSnbEOh9Uyx0UhvEfMWJC5n5uDm5kNZXMGbAARQ5/4fM9blw==}
 
   snail.vue@2.0.18:
     resolution: {integrity: sha512-3U6FIXKLPwlmyuH/84D+1hX+CPJ7goPRF2rzb3GO6W1kVCXi3P5FSVGSrEzZu1aRuY/oYJ52UFajhqHn6KrRWw==}
@@ -4868,7 +4868,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  snail.view@2.0.4(typescript@5.9.3):
+  snail.view@2.0.6(typescript@5.9.3):
     dependencies:
       snail.core: 2.0.29(typescript@5.9.3)
     transitivePeerDependencies:
@@ -4877,7 +4877,7 @@ snapshots:
   snail.vue@2.0.18(typescript@5.9.3):
     dependencies:
       snail.core: 2.0.29(typescript@5.9.3)
-      snail.view: 2.0.4(typescript@5.9.3)
+      snail.view: 2.0.6(typescript@5.9.3)
       sortablejs: 1.15.6
       vue: 3.5.24(typescript@5.9.3)
     transitivePeerDependencies:
