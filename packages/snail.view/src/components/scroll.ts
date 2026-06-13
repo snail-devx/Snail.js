@@ -5,6 +5,9 @@
 import { correctString, IScope, mountScope, throwIfNullish, useScope } from "snail.core";
 import { IScrollManager, ScrollbarOptions, ScrollStatus } from "../models/scroll-model";
 
+// 把自己的类型共享出去
+export * from "../models/scroll-model";
+
 /**
  * 使用滚动视图
  * @param root 滚动视图根节点
