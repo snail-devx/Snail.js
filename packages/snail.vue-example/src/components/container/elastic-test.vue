@@ -72,7 +72,6 @@ import ElasticTestBody from "./elastic-test-body.vue";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const { Elastic } = components;
-
 //  2、组件交互变量、常量
 
 
@@ -82,6 +81,7 @@ const { Elastic } = components;
 //  1、数据初始化、变化监听
 //  2、生命周期响应
 onMounted(() => {
+
     // console.log = function (...args) {
     //     const log_panel = document.getElementById("log_panel");
     //     log_panel.innerHTML = `${args.join(" xh ")}---<br />` + log_panel.innerHTML;

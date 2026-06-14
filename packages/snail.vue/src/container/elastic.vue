@@ -4,7 +4,7 @@
     3、支持移动端橡皮筋效果，支持上拉加载更多、下拉刷新数据等功能
   -->
 <template>
-    <div class="snail-elastic">
+    <div :="$attrs" class="snail-elastic">
         <!-- 下拉刷新区域：若不是向下滑动，则不显示，避免main-body内容太少，向上滑动时把下拉刷新展示出来了 -->
         <template v-if="springYRef == true && downRefresh == true" key="down-refresh">
             <div class="down-refresh" ref="down-refresh" :class="{ 'running': loadingRef == 'refresh' }"
@@ -19,8 +19,8 @@
             </div>
         </template>
         <!-- 主内容区域:根据需要出滚动条 -->
-        <div class="main-body wh-fill" ref="main-body" key="main-body"
-            :class="[barSize ? `${barSize}-scrollbar` : '', isMovingRef ? 'moving' : '']" :style="buildMainBodyStyle()">
+        <div class="main-body wh-fill" ref="main-body" key="main-body" :class="classStyleRef"
+            v-bind:class="{ 'moving': isMovingRef }" :style="buildMainBodyStyle()">
             <slot />
         </div>
         <!-- 上拉加载更多区域：至少得main-body的内容高度填充满父容器才生效，否则加载更多无意义 -->
@@ -41,24 +41,28 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, ShallowRef, shallowRef, useTemplateRef, } from "vue";
-import { ElasticEvents, ElasticOptions, ElasticSpringStatus } from "./models/elastic-model";
-import { isBottom, isLeft, isRight, isTop } from "./utils/elastic-util";
+import { ElasticEvents, ElasticExpose, ElasticOptions, ElasticSpringStatus } from "./models/elastic-model";
 import { useObserver, useScroll } from "snail.view";
-import { useReactive } from "../base/reactive";
+import { defer } from "snail.core";
+import { monitScroll } from "./utils/scroll-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
+defineOptions({ name: "Elastic", inheritAttrs: false });
+defineExpose<ElasticExpose>({ loadRefresh, loadMore });
 const props = defineProps<ElasticOptions>();
 const emits = defineEmits<ElasticEvents>();
-const { onEvent, onSize } = useObserver();
-const { watcher } = useReactive();
+const { onEvent } = useObserver();
+const manager = useScroll();
 /** 下拉刷新的根元素 */
 const downRefreshDom = useTemplateRef("down-refresh");
 /** 主内容区域 */
 const mainBodyDom = useTemplateRef("main-body");
 /** 上拉加载的根元素 */
 const upMoreDom = useTemplateRef("up-more");
-//  2、触摸移动位置相关
+//  2、触摸滚动位置相关
+/** 自定义类样式 */
+const classStyleRef: ShallowRef<string[]> = shallowRef<string[]>();
 /** 是否是由触摸启动的移动*/
 let isStartByTouch: boolean = false;
 /** 移动开始时的位置信息:x和y轴位置 */
@@ -84,22 +88,6 @@ const loadingRef: ShallowRef<"refresh" | "more"> = shallowRef();
  */
 function buildMainBodyStyle(): Record<string, string> {
     const style = Object.create(null);
-    //  哪些地方出现滚动条
-    switch (props.scroll) {
-        case "x":
-            style["overflow"] = "auto hidden";
-            break;
-        case "y":
-            style["overflow"] = "hidden auto";
-            break;
-        //  作为默认值
-        // case "both":
-        //     style["overflow"] = "auto";
-        //     break;
-        case "none":
-            style["overflow"] = "none";
-            break;
-    }
     //  弹簧效果偏移量  --transform
     if (springStatusRef.value != undefined) {
         const { x, y } = springStatusRef.value;
@@ -109,6 +97,56 @@ function buildMainBodyStyle(): Record<string, string> {
         transforms.length && (style["transform"] = transforms.join(" "));
     }
     return style;
+}
+
+/**
+ * 加载刷新数据
+ * - 触发下拉刷新数据
+ * @returns 异步任务对象，外部感知任务执行完成
+ */
+function loadRefresh(): Promise<void> {
+    const deferred = defer<void>();
+    if (downRefreshDom.value == undefined) {
+        deferred.reject("not support pullRefresh feature!");
+    }
+    else if (loadingRef.value != undefined) {
+        deferred.reject(`pre load task[${loadingRef.value}] is running!`);
+    }
+    else {
+        resetAfterEnd();
+        loadingRef.value = "refresh";
+        springStatusRef.value.y = downRefreshDom.value.clientHeight;
+        emits("refresh", () => {
+            resetAfterEnd();
+            deferred.resolve();
+        });
+    }
+    return deferred.promise;
+}
+/**
+ * 加载更多数据
+ * - 触发上拉加载更多数据
+ * @returns 异步任务对象，外部感知任务执行完成
+ */
+function loadMore(): Promise<void> {
+    const deferred = defer<void>();
+    if (downRefreshDom.value == undefined) {
+        deferred.reject("not support upMore feature!");
+    }
+    else if (loadingRef.value != undefined) {
+        deferred.reject(`pre load task[${loadingRef.value}] is running!`);
+    }
+    else {
+        resetAfterEnd();
+        loadingRef.value = "more";
+        springStatusRef.value.y = -upMoreDom.value.clientHeight;
+        emits("more", () => {
+            resetAfterEnd();
+            deferred.resolve();
+        });
+        return;
+    }
+    return deferred.promise;
 }
 
 /**
@@ -151,11 +189,11 @@ function onSpringMove(isTouch: boolean, position: { clientX: number, clientY: nu
         // console.log("isRight", isRight(rootDom.value), rootDom.value.scrollLeft);
         const distance = position.clientX - startPointerRef.value.clientX;
         //  向右滑动：修正左侧位置
-        if (distance >= 0 && isLeft(mainBodyDom.value)) {
+        if (distance >= 0 && manager.isLeft(mainBodyDom.value)) {
             springStatusRef.value.x = Math.pow(distance, 0.8);
         }
         //  向左滑动
-        else if (distance <= 0 && isRight(mainBodyDom.value)) {
+        else if (distance <= 0 && manager.isRight(mainBodyDom.value)) {
             springStatusRef.value.x = -Math.pow(-distance, 0.8);
         }
     }
@@ -176,7 +214,7 @@ function onSpringMove(isTouch: boolean, position: { clientX: number, clientY: nu
             default: {
                 //  向下移动时：若已经滚动到顶部了，则触发橡皮筋效果，否则当前坐标为起始坐标
                 if (distance >= 0) {
-                    isTop(mainBodyDom.value)
+                    manager.isTop(mainBodyDom.value)
                         ? (springStatusRef.value.y = Math.pow(distance, 0.8))
                         : (startPointerRef.value.clientY = position.clientY);
                 }
@@ -184,7 +222,7 @@ function onSpringMove(isTouch: boolean, position: { clientX: number, clientY: nu
                 else {
                     // (root.scrollTop + root.clientHeight) >= root.scrollHeight;
                     console.log("isBottom", mainBodyDom.value.scrollTop + mainBodyDom.value.clientHeight, "---", mainBodyDom.value.scrollHeight)
-                    isBottom(mainBodyDom.value)
+                    manager.isBottom(mainBodyDom.value)
                         ? (springStatusRef.value.y = - Math.pow(-distance, 0.8))
                         : (startPointerRef.value.clientY = position.clientY);
                 }
@@ -211,19 +249,11 @@ function onSpringEnd(isTouch: boolean, isCancel: boolean) {
     if (loadingRef.value == undefined) {
         //  下拉刷新判断
         if (downRefreshDom.value && springStatusRef.value.y > downRefreshDom.value.clientHeight) {
-            resetAfterEnd();
-            loadingRef.value = "refresh";
-            springStatusRef.value.y = downRefreshDom.value.clientHeight;
-            emits("refresh", resetAfterEnd);
-            return;
+            return loadRefresh();
         }
         //  上拉加载判断
         if (upMoreDom.value && springStatusRef.value.y <= -upMoreDom.value.clientHeight) {
-            resetAfterEnd();
-            loadingRef.value = "more";
-            springStatusRef.value.y = -upMoreDom.value.clientHeight;
-            emits("more", resetAfterEnd);
-            return;
+            return loadMore();
         }
     }
     //  最后兜底
@@ -240,12 +270,11 @@ function resetAfterEnd() {
     isStartByTouch = false;
 }
 
-
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
 onMounted(() => {
-    // const manager = useScroll(mainBodyDom.value, props);
+    monitScroll(manager, mainBodyDom.value, props, emits, classStyleRef);
 
     if ("ontouchstart" in window) {
         onEvent(mainBodyDom.value, "touchstart", (evt: TouchEvent) => onSpringStart(true, evt.touches[0]));

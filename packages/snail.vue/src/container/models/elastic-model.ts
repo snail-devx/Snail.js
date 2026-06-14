@@ -1,5 +1,5 @@
 
-import { ScrollOptions } from "./scroll-model";
+import { ScrollEvents, ScrollOptions } from "./scroll-model";
 
 /**
  * 弹性容器组件 配置选项
@@ -29,35 +29,7 @@ export type ElasticOptions = ScrollOptions & {
 /**
  * 弹性容器组件 事件监听
  */
-export type ElasticEvents = {
-    // /**
-    //  * 【x轴方向】滚动条变化时
-    //  * @param show 是否显示。true 滚动条显示；false 滚动条隐藏
-    //  */
-    // xbar: [show: boolean];
-    // /**
-    //  * 【y轴方向】滚动条变化时
-    //  * @param show 是否显示。true 滚动条显示；false 滚动条隐藏
-    //  */
-    // ybar: [show: boolean];
-
-    // /**
-    //  * 【y轴方向】滚到【最顶部】了
-    //  */
-    // top: [];
-    // /**
-    //  * 【x轴方向】滚到【最右侧】了
-    //  */
-    // right: [];
-    // /**
-    //  * 【y轴方向】滚到【最底部】了
-    //  */
-    // bottom: [];
-    // /**
-    //  * 【x轴方向】滚到【最左侧】了
-    //  */
-    // left: [];
-
+export type ElasticEvents = ScrollEvents & {
     /**
      * 刷新数据
      * - 配合 `downRefresh`实现下拉刷新功能
@@ -73,45 +45,23 @@ export type ElasticEvents = {
 }
 
 /**
- * 弹性组件的滚动状态信息
- * - 缓存滚动状态 和下次做比对，触发对应事件
+ * 弹性组件 对外暴露属性接口
  */
-export type ElasticScrollStatus = {
+export type ElasticExpose = {
     /**
-     * 水平滚动条是否显示
+     * 加载刷新数据
+     * - 触发下拉刷新数据
+     * @returns 异步任务对象，外部感知任务执行完成
      */
-    xbar: boolean;
+    loadRefresh(): Promise<void>;
     /**
-     * 垂直滚动条是否显示
+     * 加载更多数据
+     * - 触发上拉加载更多数据
+     * @returns 异步任务对象，外部感知任务执行完成
      */
-    ybar: boolean;
-
-    /**
-     * 滚动到【左侧】了
-     */
-    left: boolean;
-    /**
-     * 滚动到【右侧】了
-     */
-    right: boolean;
-    /**
-     * 滚动到【顶部】了
-     */
-    top: boolean;
-    /**
-     * 滚动到【底部】了
-     */
-    bottom: boolean;
-
-    /**
-     * 滚动视图宽度
-     */
-    scrollwidth: number;
-    /**
-     * 滚动视图高度
-     */
-    scrollheight: number;
+    loadMore(): Promise<void>;
 }
+
 /**
  * 弹性组件的弹簧状态信息
  */

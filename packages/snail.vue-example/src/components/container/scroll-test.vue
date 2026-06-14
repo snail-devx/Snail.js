@@ -79,9 +79,9 @@
         <!-- 事件相关 -->
         <section style="width: 100%;height: 2px;">事件相关：看控制台输出</section>
         <section>
-            <Scroll class="scroll-test" :scroll="'both'" @xbar="console.log" @ybar="console.log"
-                @left="console.log('滚动到最左侧')" @right="console.log('滚动到最右侧')" @top="console.log('滚动到最顶部')"
-                @bottom="console.log('滚动到最底部')">
+            <Scroll class="scroll-test" :class="tmpClassStyleRef" :scroll="'both'" @xbar="console.log"
+                @ybar="console.log" @left="console.log('滚动到最左侧')" @right="console.log('滚动到最右侧')"
+                @top="console.log('滚动到最顶部')" @bottom="console.log('滚动到最底部')">
                 <div style="background-color: gray;">
                     200px;
                     顶顶顶顶
@@ -92,12 +92,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { ref, shallowRef, watch, onActivated, onDeactivated, onMounted } from "vue";
 import { components } from "../../libraries/snail.vue"
+import { useTimer } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const { Scroll } = components;
+const tmpClassStyleRef = shallowRef<string>();
+const { onInterval } = useTimer();
 //  2、可选配置选项
 defineOptions({ name: "ScrollTest", inheritAttrs: true, });
 
@@ -106,7 +109,9 @@ defineOptions({ name: "ScrollTest", inheritAttrs: true, });
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
-
+onMounted(() => {
+    onInterval(() => tmpClassStyleRef.value = new Date().toString(), 1000);
+})
 //      监听组件激活和卸载，适配KeepAlive组件内使用
 onActivated(() => console.log("onActivated"));
 onDeactivated(() => console.log("onDeactivated"));
