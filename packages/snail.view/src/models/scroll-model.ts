@@ -6,32 +6,42 @@
 export interface IScrollManager {
     /**
      * 是否到最左了
+     * @param root 视图根节点
      * @returns 
      */
-    isLeft(): boolean;
+    isLeft(root: HTMLElement): boolean;
     /**
      * 是否到最右了
+     * @param root 视图根节点
+     * @returns 
      */
-    isRight(): boolean;
+    isRight(root: HTMLElement): boolean;
     /**
      * 是否到最顶了
+     * @param root 视图根节点
+     * @returns 
      */
-    isTop(): boolean;
+    isTop(root: HTMLElement): boolean;
     /**
      * 是否到最底了
+     * @param root 视图根节点
+     * @returns 
      */
-    isBottom(): boolean;
+    isBottom(root: HTMLElement): boolean;
 
     /**
      * 获取滚动状态
+     * @param root 视图根节点
+     * @returns 
      */
-    getStatus(): ScrollStatus;
+    getStatus(root: HTMLElement): ScrollStatus;
 
     /**
-     * 刷新滚动视图
-     * - 更新滚动条配置、、、
+     * 构建滚动视图的自定义样式
+     * @param options 滚动视图配置选项
+     * @returns 类样式数组 
      */
-    refresh(): void;
+    buildClassStyle(options: ScrollbarOptions): string[];
 }
 
 /**
@@ -93,9 +103,18 @@ export type ScrollStatus = {
     /**
      * 滚动视图宽度
      */
-    scrollwidth: number;
+    scrollWidth: number;
     /**
      * 滚动视图高度
      */
-    scrollheight: number;
+    scrollHeight: number;
+
+    /**
+     * x轴滚动条的位置
+     */
+    scrollLeft: number;
+    /**
+     * y轴滚动条的位置
+     */
+    scrollTop: number;
 }
