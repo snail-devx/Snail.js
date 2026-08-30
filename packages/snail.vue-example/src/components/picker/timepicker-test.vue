@@ -69,7 +69,7 @@
         </section>
         <section class="">
             时分秒，禁用工具条
-            <input type="text" @click="evt => onClick(evt, { format: 'HH:mm:ss', toolbarDisabled: true })" />
+            <TimePicker @change="console.log" :="{ format: 'HH:mm:ss', toolbarDisabled: true }" />
         </section>
     </article>
 </template>

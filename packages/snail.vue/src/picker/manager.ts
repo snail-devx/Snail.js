@@ -53,7 +53,7 @@ export function usePicker(): IPickerManager & IScope {
         //  判断弹出PC还是移动端选择；后期判断target是否存在，不存在则使用模态弹窗
         {
             popupOptions = { ...popupOptions, }
-            popupOptions.followX = popupOptions.followX || ["start", "end", "center"];
+            popupOptions.followX = popupOptions.followX || ["start", "end", "center", "before", "after"];
             popupOptions.spaceX = correctNumber(popupOptions.spaceX, 2);
             popupOptions.spaceY = correctNumber(popupOptions.spaceY, 2);
             popupOptions.spaceClient = correctNumber(popupOptions.spaceClient, 10);
