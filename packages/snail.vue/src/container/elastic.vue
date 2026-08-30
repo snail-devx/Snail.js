@@ -6,36 +6,32 @@
 <template>
     <div :="$attrs" class="snail-elastic">
         <!-- 下拉刷新区域：若不是向下滑动，则不显示，避免main-body内容太少，向上滑动时把下拉刷新展示出来了 -->
-        <template v-if="springYRef == true && downRefresh == true" key="down-refresh">
-            <div class="down-refresh" ref="down-refresh" :class="{ 'running': loadingRef == 'refresh' }"
-                v-show="loadingRef != 'more'">
-                <slot name="down-refresh">
-                    <div class="flex-center default-loading">
-                        <span />
-                        <span />
-                        <span />
-                    </div>
-                </slot>
-            </div>
-        </template>
+        <div class="down-refresh" :class="{ 'running': loadingRef == 'refresh' }" key="down-refresh"
+            v-if="springYRef == true && downRefresh == true" v-show="loadingRef != 'more'" ref="down-refresh">
+            <slot name="down-refresh">
+                <div class="flex-center default-loading">
+                    <span />
+                    <span />
+                    <span />
+                </div>
+            </slot>
+        </div>
         <!-- 主内容区域:根据需要出滚动条 -->
         <div class="main-body wh-fill" ref="main-body" key="main-body" :class="classStyleRef"
             v-bind:class="{ 'moving': isMovingRef }" :style="buildMainBodyStyle()">
             <slot />
         </div>
         <!-- 上拉加载更多区域：至少得main-body的内容高度填充满父容器才生效，否则加载更多无意义 -->
-        <template v-if="springYRef == true && upMore == true" key="up-more">
-            <div class="up-more" ref="up-more" :class="{ 'running': loadingRef == 'more' }"
-                v-show="loadingRef != 'refresh'">
-                <slot name="up-more">
-                    <div class="flex-center default-loading">
-                        <span />
-                        <span />
-                        <span />
-                    </div>
-                </slot>
-            </div>
-        </template>
+        <div class="up-more" :class="{ 'running': loadingRef == 'more' }" key="up-more"
+            v-if="springYRef == true && upMore == true" v-show="loadingRef != 'refresh'" ref="up-more">
+            <slot name="up-more">
+                <div class="flex-center default-loading">
+                    <span />
+                    <span />
+                    <span />
+                </div>
+            </slot>
+        </div>
     </div>
 </template>
 
