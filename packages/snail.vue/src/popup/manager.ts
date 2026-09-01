@@ -102,9 +102,9 @@ export function usePopup(): IPopupManager & IScope {
     * @param options 跟随配置选项
     * @returns 弹窗异步作用域，外部可手动关闭弹窗
     */
-    function follow<T, Props = void, Model = void>(target: HTMLElement, options: FollowOptions<Props, Model>): IAsyncScope<T> {
+    function follow<T, Props = void, Model = void>(target: Element, options: FollowOptions<Props, Model>): IAsyncScope<T> {
         var scope: IAsyncScope<T> = undefined;
-        if (target instanceof HTMLElement == false) {
+        if (target instanceof Element == false) {
             const deferred = defer<T>();
             deferred.reject("follow: target must be an HTMLElement.");
             scope = useAsyncScope(deferred.promise);

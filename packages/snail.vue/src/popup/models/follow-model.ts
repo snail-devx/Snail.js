@@ -119,7 +119,7 @@ export type FollowExtend = PopupStatusOptions & {
     /**
      * 跟随的目标元素
      */
-    target: HTMLElement;
+    target: Element;
 
     /**
      * x轴方向的跟随策略：响应式

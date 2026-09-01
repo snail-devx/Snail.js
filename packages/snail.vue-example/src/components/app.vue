@@ -23,6 +23,7 @@ import SelectTest from "./base/select-test.vue";
 import SwitchTest from "./base/switch-test.vue";
 import TextareaTest from "./base/textarea-test.vue";
 //  👉 容器组件
+import ActionTest from "./container/action-test.vue";
 import DynamicTest from "./container/dynamic-test.vue";
 import ElasticTest from "./container/elastic-test.vue";
 import FlexTest from "./container/flex-test.vue";
@@ -92,6 +93,7 @@ const treeOptions: TreeOptions<Component> = {
         {
             text: "容器组件",
             children: [
+                { text: "Action 操作项", data: ActionTest, clickable: true, searchable: true },
                 { text: "Dynamic 动态组件", data: DynamicTest, clickable: true, searchable: true, },
                 { text: "Elastic 弹性组件", data: ElasticTest, clickable: true, searchable: true, },
                 { text: "Flex 弹性布局", data: FlexTest, clickable: true, searchable: true, },
@@ -155,7 +157,8 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 }
 
 onMounted(() => {
-    onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
+    onTreeNodeClick(treeOptions.nodes[1].children[0], undefined);
+    // onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[2].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
