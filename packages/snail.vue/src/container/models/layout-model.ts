@@ -23,7 +23,7 @@ export type LayoutOptions = {
      * - 对应插槽名：main；主要内容显示区域，处于布局中的【中】区域
      * - 配置主内容区域的滚动条配置
      */
-    main?: Pick<LayoutAraeOptions<void>, "scroll">;
+    main?: Pick<LayoutAraeOptions<void>, "scroll" | "class">;
     /**
      * 【左侧】区域配置
      * - 对应插槽名`left` ；`mode` 为 `horizontal` 时生效
@@ -55,6 +55,12 @@ export type LayoutOptions = {
  * 布局组件子区域 配置选项
  */
 export type LayoutAraeOptions<Style extends WidthStyle | HeightStyle | void> = Style & {
+    /**
+     * 子区域自定义类样式
+     * - 多个类样式，使用“ ”隔开
+     */
+    class?: string;
+
     /**
      * 滚动视图配置
      * - 视图属性：滚动条大小、显示时机

@@ -9,7 +9,7 @@
  -->
 <template>
     <div class="snail-action flex-cross-center" ref="snail-action">
-        <div class="action-slot flex-cross-center" :title="String(trigger == 'hover')">
+        <div class="action-slot flex-cross-center">
             <slot />
         </div>
         <!-- 鼠标引入时显示时 -->

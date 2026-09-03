@@ -25,6 +25,7 @@ import { LayoutAreaItem, LayoutOptions } from "./models/layout-model";
 import Scroll from "./scroll.vue";
 import { css, HeightStyle, WidthStyle, } from "snail.view";
 import { SlotsType } from "./models/component-model";
+import { isStringNotEmpty } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -36,19 +37,25 @@ const areaMap = computed(() => {
     const map: Record<"main" | "top" | "bottom" | "left" | "right", LayoutAreaItem> = Object.create(null);
     map.main = {
         scrollable: props.main && props.main.scroll != undefined,
-        class: "main-area",
+        class: props.main && isStringNotEmpty(props.main.class)
+            ? `main-area ${props.main.class}`
+            : "main-area",
         style: undefined,
     };
     //  垂直布局时，顶部、底部区域
     if (props.mode == "vertical") {
         map.top = {
             scrollable: props.top && props.top.scroll != undefined,
-            class: "top-area",
+            class: props.top && isStringNotEmpty(props.top.class)
+                ? `top-area ${props.top.class}`
+                : "top-area",
             style: buildHeightStyle(props.top),
         };
         map.bottom = {
             scrollable: props.bottom && props.bottom.scroll != undefined,
-            class: "bottom-area",
+            class: props.bottom && isStringNotEmpty(props.bottom.class)
+                ? `bottom-area ${props.bottom.class}`
+                : "bottom-area",
             style: buildHeightStyle(props.bottom),
         }
     }
@@ -56,12 +63,16 @@ const areaMap = computed(() => {
     else {
         map.left = {
             scrollable: props.left && props.left.scroll != undefined,
-            class: "left-area",
+            class: props.left && isStringNotEmpty(props.left.class)
+                ? `left-area ${props.left.class}`
+                : "left-area",
             style: buildWidthStyle(props.left),
         };
         map.right = {
             scrollable: props.right && props.right.scroll != undefined,
-            class: "right-area",
+            class: props.right && isStringNotEmpty(props.right.class)
+                ? `right-area ${props.right.class}`
+                : "right-area",
             style: buildWidthStyle(props.right),
         }
     }
