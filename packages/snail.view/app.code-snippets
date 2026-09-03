@@ -75,6 +75,18 @@
 		"description": "flex布局，列 为主轴",
 		"body": "flex-column"
 	},
+	".flex-0": {
+		"prefix": ".flex-0",
+		"scope": "html",
+		"description": "不自动放大缩小；flex:none",
+		"body": "flex-0"
+	},
+	".flex-1": {
+		"prefix": ".flex-1",
+		"scope": "html",
+		"description": "自动放大缩小；flex:1",
+		"body": "flex-1"
+	},
 	// *****************************************   👉  文本输入渲染    *****************************************
 	".ellipsis": {
 		"prefix": ".ellipsis",
@@ -112,5 +124,54 @@
 		"scope": "html",
 		"description": "缩小退出",
 		"body": "scale-out"
+	},
+	// *****************************************   👉  滚动条    *****************************************
+	".normal-scrollbar": {
+		"prefix": ".normal-scrollbar",
+		"scope": "html",
+		"description": "滚动条 10px 大小",
+		"body": "normal-scrollbar"
+	},
+	".small-scrollbar": {
+		"prefix": ".small-scrollbar",
+		"scope": "html",
+		"description": "滚动条 6px 大小",
+		"body": "small-scrollbar"
+	},
+	".mini-scrollbar": {
+		"prefix": ".mini-scrollbar",
+		"scope": "html",
+		"description": "滚动条 4px 大小",
+		"body": "mini-scrollbar"
+	},
+	".none-scrollbar": {
+		"prefix": ".none-scrollbar",
+		"scope": "html",
+		"description": "滚动条 0px 大小",
+		"body": "none-scrollbar"
+	},
+	".scroll-x": {
+		"prefix": ".scroll-x",
+		"scope": "html",
+		"description": "溢出时，x轴出滚动条，y轴隐藏；overflow: auto hidden",
+		"body": "scroll-x"
+	},
+	".scroll-y": {
+		"prefix": ".scroll-y",
+		"scope": "html",
+		"description": "溢出时，y轴出滚动条，x轴隐藏；overflow: hidden auto;",
+		"body": "scroll-y"
+	},
+	".scroll-xy": {
+		"prefix": ".scroll-xy",
+		"scope": "html",
+		"description": "溢出时，x、y轴都出滚动条；overflow: auto;",
+		"body": "scroll-xy"
+	},
+	".scroll-none": {
+		"prefix": ".scroll-none",
+		"scope": "html",
+		"description": "溢出时，x、y轴都隐藏；overflow: hidden;",
+		"body": "scroll-none"
 	},
 }
