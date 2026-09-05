@@ -53,6 +53,19 @@ export type CSSDescriptor = {
     style?: Partial<CSSStyleDeclaration>;
 }
 
+/**
+ * css类样式配置选项
+ */
+export type CSSClassOptions = {
+    /**
+     * 类样式名
+     * - string 时，多个类样式用 空格 分割
+     * - string[] 时，每个类样式为一个数组元素
+     */
+    class: string | string[];
+}
+
+
 //#region *****************************************   style 样式构建  ****************************************
 /**
  * 所有的样式属性
