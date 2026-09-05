@@ -19,7 +19,9 @@ export function isPromise(data: any): boolean {
     // return getType(data) == "[object Promise]"
     //     ? true
     //     : likeAs === true && hasOwnProperty(data, "then") && isFunction(data["then"]);
-    return getType(data) == "[object Promise]";
+    //  支持一些原型链修改后的Promise对象，如 IAsyncScope对象
+    // return getType(data) == "[object Promise]";
+    return data instanceof Promise || getType(data) == "[object Promise]";
 }
 //#endregion
 
