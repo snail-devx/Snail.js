@@ -23,9 +23,9 @@
 import { computed, ref, shallowRef, useSlots, } from "vue";
 import { LayoutAreaItem, LayoutOptions } from "./models/layout-model";
 import Scroll from "./scroll.vue";
-import { css, HeightStyle, WidthStyle, } from "snail.view";
+import { css, CSSClassOptions, HeightStyle, WidthStyle, } from "snail.view";
 import { SlotsType } from "./models/component-model";
-import { isStringNotEmpty } from "snail.core";
+import { isArray, isStringNotEmpty } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -35,27 +35,22 @@ defineSlots<SlotsType<Pick<LayoutOptions, "main" | "top" | "bottom" | "left" | "
 /** 布局区域映射，key为插槽名称，value为对应的布局配置项相关信息 */
 const areaMap = computed(() => {
     const map: Record<"main" | "top" | "bottom" | "left" | "right", LayoutAreaItem> = Object.create(null);
+
     map.main = {
         scrollable: props.main && props.main.scroll != undefined,
-        class: props.main && isStringNotEmpty(props.main.class)
-            ? `main-area ${props.main.class}`
-            : "main-area",
+        class: buildAreaClass("main-area", props.main),
         style: undefined,
     };
     //  垂直布局时，顶部、底部区域
     if (props.mode == "vertical") {
         map.top = {
             scrollable: props.top && props.top.scroll != undefined,
-            class: props.top && isStringNotEmpty(props.top.class)
-                ? `top-area ${props.top.class}`
-                : "top-area",
+            class: buildAreaClass("top-area", props.top),
             style: buildHeightStyle(props.top),
         };
         map.bottom = {
             scrollable: props.bottom && props.bottom.scroll != undefined,
-            class: props.bottom && isStringNotEmpty(props.bottom.class)
-                ? `bottom-area ${props.bottom.class}`
-                : "bottom-area",
+            class: buildAreaClass("bottom-area", props.bottom),
             style: buildHeightStyle(props.bottom),
         }
     }
@@ -63,16 +58,12 @@ const areaMap = computed(() => {
     else {
         map.left = {
             scrollable: props.left && props.left.scroll != undefined,
-            class: props.left && isStringNotEmpty(props.left.class)
-                ? `left-area ${props.left.class}`
-                : "left-area",
+            class: buildAreaClass("left-area", props.left),
             style: buildWidthStyle(props.left),
         };
         map.right = {
             scrollable: props.right && props.right.scroll != undefined,
-            class: props.right && isStringNotEmpty(props.right.class)
-                ? `right-area ${props.right.class}`
-                : "right-area",
+            class: buildAreaClass("right-area", props.right),
             style: buildWidthStyle(props.right),
         }
     }
@@ -80,6 +71,24 @@ const areaMap = computed(() => {
 });
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 构建布局区域的class类样式
+ * @param fixedClass 
+ * @param cssClass 
+ */
+function buildAreaClass(fixedClass: string, cssClass: CSSClassOptions): string[] {
+    const classArray: string[] = [fixedClass];
+    if (cssClass != undefined) {
+        if (isArray(cssClass.class) == true) {
+            classArray.push(...cssClass.class);
+        }
+        else if (isStringNotEmpty(cssClass.class) == true) {
+            classArray.push(cssClass.class as any);
+        }
+    }
+    return classArray;
+}
+
 /**
  * 构建宽度样式
  * @param style 

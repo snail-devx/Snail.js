@@ -2,7 +2,7 @@
  * 布局组件 数据结构
  */
 
-import { HeightStyle, WidthStyle } from "snail.view";
+import { CSSClassOptions, HeightStyle, WidthStyle } from "snail.view";
 import { ScrollEvents, ScrollOptions } from "./scroll-model";
 import { EventsType } from "./component-model";
 
@@ -54,13 +54,7 @@ export type LayoutOptions = {
 /**
  * 布局组件子区域 配置选项
  */
-export type LayoutAraeOptions<Style extends WidthStyle | HeightStyle | void> = Style & {
-    /**
-     * 子区域自定义类样式
-     * - 多个类样式，使用“ ”隔开
-     */
-    class?: string;
-
+export type LayoutAraeOptions<Style extends WidthStyle | HeightStyle | void> = Style & CSSClassOptions & {
     /**
      * 滚动视图配置
      * - 视图属性：滚动条大小、显示时机
@@ -93,7 +87,7 @@ export type LayoutAreaItem = {
     /**
      * 内容区域元素的类样式名
      */
-    class: string,
+    class: string[],
     /**
      * css样式
      */
