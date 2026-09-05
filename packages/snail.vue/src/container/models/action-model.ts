@@ -1,9 +1,11 @@
+import { DisabledOptions } from "../../base/models/base-model";
 import { IconOptions } from "../../base/models/icon-model";
 
 /**
  * 可操作项组件 的配置选项
+ * - disabled 为true时，不响应操作项触发
  */
-export type ActionOptions = {
+export type ActionOptions = DisabledOptions & {
     /**
      * 触发方式
      *  - hover：鼠标移入显示

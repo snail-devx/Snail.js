@@ -13,7 +13,8 @@
             <slot />
         </div>
         <!-- 鼠标引入时显示时 -->
-        <Icon class="hover-tips" button custom v-if="trigger == 'hover'" :size="16" @click="onFollowShow(false)">
+        <Icon class="hover-tips" button custom v-if="trigger == 'hover' && disabled != true" :size="16"
+            @click="onFollowShow(false)">
             <path
                 d="M415.93 223.79c0-52.98 43.004-95.984 95.984-95.984s95.984 43.004 95.984 95.984-43.004 95.984-95.984 95.984-95.984-43.003-95.984-95.984zM415.93 511.742c0-52.98 43.004-95.984 95.984-95.984s95.984 43.004 95.984 95.984-43.004 95.984-95.984 95.984-95.984-43.004-95.984-95.984zM415.93 799.866c0-52.98 43.004-95.984 95.984-95.984s95.984 43.003 95.984 95.984-43.004 95.983-95.984 95.983-95.984-43.175-95.984-95.983z" />
         </Icon>
@@ -55,28 +56,30 @@ async function onFollowShow(longPress: boolean) {
         popupScope.destroy();
         return;
     }
+    //  非【禁用】时才生效
+    if (props.disabled != true) {
+        //  后期针对 longPress 时，计算出跟手的效果，避免割裂；现在followX 策略先： center > start > end
+        popupScope = follow<string, ActionItemsOptions>(rootDom.value, {
+            component: ActionItems,
+            closeOnEscape: true,
+            closeOnMask: true,
+            closeOnResize: true,
+            closeOnTarget: true,
+            followX: longPress
+                ? ["center", "start", "end"]
+                : ["after", "end", "start", "end", "center"],
+            followY: longPress
+                ? ["center", "after", "before"]
+                : ["after", "before", "center", "end", "after"],
 
-    //  后期针对 longPress 时，计算出跟手的效果，避免割裂；现在followX 策略先： center > start > end
-    popupScope = follow<string, ActionItemsOptions>(rootDom.value, {
-        component: ActionItems,
-        closeOnEscape: true,
-        closeOnMask: true,
-        closeOnResize: true,
-        closeOnTarget: true,
-        followX: longPress
-            ? ["center", "start", "end"]
-            : ["after", "end", "start", "end", "center"],
-        followY: longPress
-            ? ["center", "after", "before"]
-            : ["after", "before", "center", "end", "after"],
-
-        props: {
-            mode: "vertical",
-            actions: props.actions,
-        }
-    });
-    const code = await popupScope;
-    isStringNotEmpty(code) && emits("trigger", code);
+            props: {
+                mode: "vertical",
+                actions: props.actions,
+            }
+        });
+        const code = await popupScope;
+        isStringNotEmpty(code) && emits("trigger", code);
+    }
 }
 
 /**
