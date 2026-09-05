@@ -6,69 +6,84 @@
 <template>
     <div class="snail-fold" :class="statusModel">
         <!-- 折叠面板头部：支持插槽，并做默认实现 -->
-        <div class="fold-header">
-            <slot name="header">
+        <div class="fold-header" ref="foldHeader" :class="header ? header.class : []">
+            <slot name="header" :="slotHandle">
                 <div class="title ellipsis" v-text="title" />
                 <div class="subtitle ellipsis" v-if="!!subtitle" v-text="subtitle" />
                 <div class="status" v-if="disabled != true">
-                    <Icon :custom="false" type="arrow" button :title="statusModel == 'expand' ? '收起' : '展开'"
+                    <Icon type="arrow" button :title="statusModel == 'expand' ? '收起' : '展开'"
                         :rotate="statusModel == 'expand' ? -90 : 90" @click="onStatusClick" />
                 </div>
             </slot>
         </div>
         <!-- 折叠面板内容区域：后续支持最大高度，然后垂直滚动 -->
-        <div class="fold-body" ref="foldBody">
-            <slot />
+        <div class="fold-body" ref="foldBody" :class="body ? body.class : []">
+            <slot :="slotHandle" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { throwError } from "snail.core";
-import { useAnimation } from "snail.view";
-import { nextTick, useTemplateRef } from "vue";
+import { CSS, useAnimation } from "snail.view";
+import { nextTick, onMounted, useTemplateRef } from "vue";
 import Icon from "../base/icon.vue";
-import { FoldEvents, FoldOptions, FoldStatus } from "./models/fold-model";
+import { FoldEvents, FoldOptions, FoldSlotHandle, FoldStatus } from "./models/fold-model";
 import { useReactive } from "../base/reactive";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-defineProps<FoldOptions>();
+const props = defineProps<FoldOptions>();
 const emits = defineEmits<FoldEvents>();
 const { transition } = useAnimation();
 const { watcher } = useReactive();
 /**     折叠状态：默认展开 */
 const statusModel = defineModel<FoldStatus>("status", { default: "expand" });
-//      监听折叠状态，进行样式计算
-watcher(statusModel, updateFoldStyle);
-/**     折叠面板内容区域引用 */
+/**     折叠面板头部区域Dom */
+const foldHeaderDom = useTemplateRef("foldHeader");
+/**     折叠面板内容区域Dom */
 const foldBodyDom = useTemplateRef("foldBody");
+/**     折叠面板插槽句柄 */
+const slotHandle: FoldSlotHandle = {
+    getStatus: () => statusModel.value,
+    setStatus: value => statusModel.value = value,
+    toggle: () => (onStatusClick(), statusModel.value),
+}
 //  2、可选配置选项
 defineOptions({ name: "Fold", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
  * 更新面板展示样式
+ * @param disableAnimation 是否禁用过度动画
  */
-function updateFoldStyle() {
+function updateFoldStyle(disableAnimation?: boolean) {
     /** 是否是展开状态 */
     const isExpand = statusModel.value == "expand";
     //  折叠内容样式：折叠时，动画完成后保留target样式，且此时overflow:hidden，否则折叠将失效
     if (foldBodyDom.value) {
-        const minHeight = 32;
+        const minHeight = foldHeaderDom.value.getBoundingClientRect().height;
         const maxHeight = minHeight + foldBodyDom.value.getBoundingClientRect().height;
-        transition(foldBodyDom.value.parentElement, {
-            from: {
-                transition: "height 0.2s ease",
-                overflow: "hidden",
-                height: `${isExpand ? minHeight : maxHeight}px`
-            },
-            to: { height: `${isExpand ? maxHeight : minHeight}px` },
-            end: {
-                overflow: isExpand ? "" : "hidden",
-                height: isExpand ? "" : `${minHeight}px`,
-            }
-        });
+
+        const endStyle: CSS = {
+            overflow: isExpand ? "" : "hidden",
+            height: isExpand ? "" : `${minHeight}px`,
+        }
+
+        if (disableAnimation === true) {
+            Object.assign(foldBodyDom.value.parentElement.style, endStyle);
+        }
+        else {
+            transition(foldBodyDom.value.parentElement, {
+                from: {
+                    transition: "height 0.2s ease",
+                    overflow: "hidden",
+                    height: `${isExpand ? minHeight : maxHeight}px`
+                },
+                to: { height: `${isExpand ? maxHeight : minHeight}px` },
+                end: endStyle
+            });
+        }
     }
 }
 /** 状态图标点击事件：切换展开、收起状态 */
@@ -89,6 +104,17 @@ function onStatusClick() {
     //  延迟change事件；外部同时使用v-model和change事件时，valueModel.value修改不会立马生效
     nextTick(() => emits("change", statusModel.value));
 }
+
+// *****************************************   👉  组件渲染    *****************************************
+//  1、数据初始化、变化监听
+//  2、生命周期响应
+onMounted(() => {
+    //  初始状态处理，进行动画
+    statusModel.value != "expand" && updateFoldStyle(true);
+    //  监听折叠状态变化，进行样式计算 
+    watcher(statusModel, () => updateFoldStyle(false))
+});
+
 </script>
 
 <style lang="less">
