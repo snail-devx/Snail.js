@@ -62,7 +62,7 @@ export type CSSClassOptions = {
      * - string 时，多个类样式用 空格 分割
      * - string[] 时，每个类样式为一个数组元素
      */
-    class: string | string[];
+    class?: string | string[];
 }
 
 

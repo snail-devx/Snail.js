@@ -93,7 +93,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated, onMounted } from "vue";
-import { components } from "../../libraries/snail.vue"
+import { components } from "../../libraries/snail_vue"
 import { useTimer } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************

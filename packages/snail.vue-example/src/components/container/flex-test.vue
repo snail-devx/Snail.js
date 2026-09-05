@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { components } from "../../libraries/snail.vue";
+import { components } from "../../libraries/snail_vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

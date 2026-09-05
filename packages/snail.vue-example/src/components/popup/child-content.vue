@@ -10,9 +10,9 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { ref, shallowRef } from "vue";
 import { useTimer } from "snail.core";
-import { components, DialogHandle, FollowHandle, PopupHandle, usePopup } from "snail.vue";
+import { components, DialogHandle, FollowHandle, PopupHandle, usePopup } from "../../libraries/snail_vue";
 const { } = components;
 import DialogContentTest from "./child-content.vue";
 
@@ -23,7 +23,7 @@ const { onInterval } = useTimer();
 const {
     inPopup, closePopup,
     onBeforeClose,
-} = defineProps<DialogHandle<any> & PopupHandle<any> & FollowHandle<any>>()
+} = defineProps<DialogHandle<string> & PopupHandle<any> & FollowHandle<any>>()
 const emits = defineEmits<{
     (e: "customEvent", data: number)
 }>();

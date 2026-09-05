@@ -1,6 +1,6 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <Fold :title="'测试Fold'" style="margin:10px">
+    <Fold :title="'测试Fold'" style="margin:10px" :header="{ class: ['dddd'] }">
         <template #>
             <div style="height:200px;background: red;" />
         </template>
@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components } from "snail.vue"
+import { components } from "../../libraries/snail_vue"
 const { Fold } = components;
 
 // *****************************************   👉  组件定义    *****************************************

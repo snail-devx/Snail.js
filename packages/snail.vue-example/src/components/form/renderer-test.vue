@@ -20,7 +20,7 @@ import {
     NumberControlSettings,
     OptionControlSettings, TextControlSettings,
     TimeControlSettings
-} from "../../libraries/snail.vue-form";
+} from "../../libraries/snail_vue-form";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

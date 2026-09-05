@@ -76,7 +76,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, } from "vue";
-import { TimePickerOptions, usePicker, components } from "../../libraries/snail.vue";
+import { TimePickerOptions, usePicker, components } from "../../libraries/snail_vue";
 import { IAsyncScope } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************

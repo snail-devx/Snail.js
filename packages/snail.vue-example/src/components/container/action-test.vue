@@ -5,11 +5,15 @@
         <span class="ellipsis">测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试</span>
     </Action>
     <Action :mode="'popup'" :trigger="'long-press'" :actions="actions">长摁测试 dd d</Action>
+    <Action :mode="'popup'" :trigger="'hover'" :actions="actions" :disabled="true" @trigger="console.log">
+        鼠标移入-禁用效果
+    </Action>
+    <Action :mode="'popup'" :trigger="'long-press'" :actions="actions" disabled>长摁测试 禁用效果</Action>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, } from "vue";
-import { ActionOptions, components, useReactive } from "../../libraries/snail.vue";
+import { ActionOptions, components, useReactive } from "../../libraries/snail_vue";
 const { Action } = components;
 
 // *****************************************   👉  组件定义    *****************************************

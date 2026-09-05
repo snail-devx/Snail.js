@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, ShallowRef, shallowRef, } from "vue";
-import { components, useReactive } from "../../libraries/snail.vue";
+import { components, useReactive } from "../../libraries/snail_vue";
 import { useTimer } from "snail.core";
 import ElasticTestBody from "./elastic-test-body.vue";
 

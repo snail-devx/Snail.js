@@ -1,8 +1,8 @@
 //  -------------------------------------------------- 通用库处理，合并打包过来   ------------------------------------------------------------
 //  引入snail.view、snail.vue、snail.vue-form；通过源码方式引入，实现修改时这边能实时编译最新的
 import "./libraries/snail.view";
-import "./libraries/snail.vue";
-import "./libraries/snail.vue-form";
+import "./libraries/snail_vue";
+import "./libraries/snail_vue-form";
 //  注册为自身为通用库
 import { script } from "snail.core";
 script.register(

@@ -173,7 +173,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, } from "vue";
-import { usePicker, DatePickerOptions, components } from "../../libraries/snail.vue";
+import { usePicker, DatePickerOptions, components } from "../../libraries/snail_vue";
 import { IAsyncScope } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************

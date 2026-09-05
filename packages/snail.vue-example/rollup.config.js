@@ -78,9 +78,9 @@ const builder = Builder.getBuilder(options, (component, context, options) => {
                     case "snail.view":
                         return { id: resolve(options.srcRoot, "libraries/snail.view.ts") }
                     case "snail.vue":
-                        return { id: resolve(options.srcRoot, "libraries/snail.vue.ts") }
+                        return { id: resolve(options.srcRoot, "libraries/snail_vue.ts") }
                     case "snail.vue-form":
-                        return { id: resolve(options.srcRoot, "libraries/snail.vue-form.ts") }
+                        return { id: resolve(options.srcRoot, "libraries/snail_vue-form.ts") }
                 }
             }
         },

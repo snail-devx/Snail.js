@@ -8,7 +8,7 @@
 </template>
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { usePopup } from "snail.vue";
+import { usePopup } from "../../libraries/snail_vue";
 
 const { toast } = usePopup();
 const showTest = shallowRef(false);

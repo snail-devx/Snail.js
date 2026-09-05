@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import { ref, shallowRef, watch, onActivated, onDeactivated, useModel } from "vue";
 
-import { components } from "snail.vue"
+import { components } from "../../libraries/snail_vue"
 const { Search } = components;
 
 

@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, } from "vue";
-import { components, FieldOptions, IFormDesignerHandle, NumberControlSettings, OptionControlSettings, TextControlSettings } from "../../libraries/snail.vue-form";
+import { components, FieldOptions, IFormDesignerHandle, NumberControlSettings, OptionControlSettings, TextControlSettings } from "../../libraries/snail_vue-form";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
