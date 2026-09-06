@@ -7,7 +7,7 @@
     <div class="snail-wrapper" :class="inPopup ? 'in-popup' : 'in-normal'">
         <Header v-if="header && header.disabled != true" :="header || { useTo: 'dialog', title: '对话框' }"
             :use-to="(header ? header.useTo : undefined) || (inPopup ? 'dialog' : 'page')" @close="emits('cancel')" />
-        <Scroll class="wrapper-body" :="content || { scroll: 'none' }">
+        <Scroll class="wrapper-body flex-1" :="content || { scroll: 'none' }">
             <slot />
         </Scroll>
         <Footer v-if="footer && footer.disabled != true" :="footer || {}" @cancel="emits('cancel')"
@@ -46,10 +46,6 @@ const emits = defineEmits<WrapperEvents>();
     background-color: white;
     //  flex布局，列 为主轴：display: flex，flex-direction: column;
     .flex-column();
-
-    >.snail-scroll {
-        flex: 1;
-    }
 }
 
 // *****************************************   👉  特殊样式适配    *****************************************
@@ -62,9 +58,11 @@ const emits = defineEmits<WrapperEvents>();
 
 //  弹窗模式下下样式
 .snail-wrapper.in-popup {
-    width: 60%;
     min-width: 800px;
+    width: 60%;
+    max-width: 100%;
     height: 80%;
+    max-height: 100%;
     overflow: hidden;
 }
 </style>
