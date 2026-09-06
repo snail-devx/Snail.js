@@ -30,9 +30,9 @@ function onOpenClick(startWrapper) {
         closeOnEscape: true,
         closeOnMask: true,
         wrapper: startWrapper ? {
-            header: { title: "弹窗" },
-            content: { scroll: "none" },
-            footer: {}
+            header: { title: "弹窗", class: "fffffffffff-header" },
+            content: { scroll: "none", class: "ffffffffffff-content" },
+            footer: { class: "fffffffffffff-footer" }
         } : undefined,
         // transition: "scale",
         props: {
