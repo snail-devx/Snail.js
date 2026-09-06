@@ -2,33 +2,70 @@
 <template>
     <div :class="['snail-dialog', options.rootClass, popupStatus.value, popupTransition.value]"
         :style="{ 'z-index': zIndex }" @click.self="options.closeOnMask && closePopup();">
-        <Dynamic class="dialog-body" :name="options.name" :component="options.component" :url="options.url"
-            :props="props" :="dialogExtend" :popup-status="popupStatus.value" v-model="model" />
+        <template v-if="options.wrapper == undefined" :key="'no-wrapper'">
+            <Dynamic class="dialog-body" :name="options.name" :component="options.component" :url="options.url"
+                :props="props" :="dialogExtend" :popup-status="popupStatus.value" v-model="model" />
+        </template>
+        <!-- 启用Wrapper模式时，强制注入【onBuildData】 -->
+        <Wrapper v-else class="dialog-body" :in-popup="true" :="options.wrapper" @cancel="closePopup()"
+            @confirm="onWrapperConfirm">
+            <Dynamic :name="options.name" :component="options.component" :url="options.url" :props="props"
+                :="dialogExtend" :popup-status="popupStatus.value" v-model="model"
+                :on-build-data="registerBuildDataFunc" />
+        </Wrapper>
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, shallowRef } from "vue";
-import { DialogOptions, DialogHandle } from "../models/dialog-model";
+import { DialogOptions, DialogHandle, DialogWrapperHandle } from "../models/dialog-model";
 import { PopupDescriptor } from "../models/popup-model";
 import Dynamic from "../../container/dynamic.vue";
 import { useObserver } from "snail.view";
+import Wrapper from "../../container/wrapper.vue";
+import { correctFunction, mustFunction, RunResult, wait } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
+defineOptions({ name: "DialogContainer", inheritAttrs: true, });
 const { options, extOptions, popupStatus, zIndex, popupTransition } = defineProps<PopupDescriptor<DialogOptions, DialogHandle<any>>>();
 const { props, model = shallowRef(undefined) } = options;
 const { closePopup, onBeforeClose } = extOptions;
 /** 监听器 */
 const { onEvent } = useObserver();
+//  2、组件交互变量
 /** 对话框扩展配置，传递给【内容组件】使用 */
 const dialogExtend = Object.freeze<DialogHandle<any>>({
     inPopup: 'dialog',
     closePopup: closePopup,
     onBeforeClose: onBeforeClose
 });
-//  2、可选配置选项
-defineOptions({ name: "DialogContainer", inheritAttrs: true, });
+/** onBuildData 句柄方法 */
+let fn_onBuildData: () => any | Promise<any> = undefined;
+
+// *****************************************   👉  方法+事件    ****************************************
+/**
+ * 注册【构建数据】方法
+ * - 使用变量，方便复用类型
+ * @param fn 
+ */
+const registerBuildDataFunc: DialogWrapperHandle<any>["onBuildData"] = fn => {
+    mustFunction(fn, "fn");
+    fn_onBuildData = fn;
+};
+/**
+ * 包裹器【确认】按钮点击时
+ */
+async function onWrapperConfirm() {
+    if (fn_onBuildData != undefined) {
+        const rt = (await wait(fn_onBuildData())) || { success: true, data: undefined };
+        console.log("onBuildData result：", rt);
+        rt.success !== false && closePopup(rt.data);
+    }
+    else {
+        closePopup();
+    }
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 onMounted(() => {
@@ -70,6 +107,17 @@ onMounted(() => {
         border-radius: 4px;
         //  私有添加阴影，增强显示效果
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    }
+
+    // 启用包裹组件时，特殊样式：默认不制定高度和宽度，由内容组件自己决定
+    >.snail-wrapper {
+        width: fit-content;
+        min-width: auto;
+        height: fit-content;
+
+        >.wrapper-body {
+            padding: 0 40px;
+        }
     }
 }
 

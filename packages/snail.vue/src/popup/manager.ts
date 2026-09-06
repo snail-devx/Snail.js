@@ -73,10 +73,10 @@ export function usePopup(): IPopupManager & IScope {
                     if (hook.destroyed == true || isClosing == true) {
                         return;
                     }
-                    //  执行拦截器，返回false则取消关闭
+                    //  执行拦截器，返回false则取消关闭；执行时，将弹窗data数据同步传递下去
                     {
                         isClosing = true;
-                        const rt = await hook.runHookAsync("onBeforeClose", { mode: "one", order: "desc" });
+                        const rt = await hook.runHookAsync("onBeforeClose", { mode: "one", order: "desc" }, data);
                         isClosing = false;
                         if (rt.success != true) {
                             console.warn("run onBeforeClose failed", rt.reason, rt.ex);
