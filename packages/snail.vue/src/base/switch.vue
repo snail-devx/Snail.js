@@ -9,7 +9,7 @@
         v-bind:class="type || 'switch'" @click="onSwitchChange">
         <!-- 单选复选展示效果 -->
         <template v-if="type == 'checkbox' || type == 'radio'">
-            <Icon v-if="switchModel" :type="'success'" :color="'white'" :size="16" />
+            <Icon v-show="switchModel" :type="'success'" :color="'white'" :size="16" />
         </template>
         <!-- 默认渲染效果 -->
         <template v-else>
@@ -129,8 +129,8 @@ function onSwitchChange() {
 .snail-switch.radio,
 .snail-switch.checkbox {
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
