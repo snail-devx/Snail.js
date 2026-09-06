@@ -32,12 +32,9 @@ defineOptions({ name: "Footer", inheritAttrs: true, });
     background-color: white;
     height: 72px;
     padding: 0 40px;
+    gap: 20px;
     // flex 布局：display: flex，align-items 为center
     .flex-cross-center();
-
-    >.snail-button:nth-child(n + 2) {
-        margin-left: 20px;
-    }
 }
 
 // *****************************************   👉  特殊样式适配    *****************************************
