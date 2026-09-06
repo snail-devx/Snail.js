@@ -2,7 +2,7 @@
 <template>
     <div class="snail-layout-test">
         左中右布局：<br />
-        <Layout :mode="'horizontal'" style="width: 100%;height: 30%;" :top="{ height: '40px' }">
+        <Layout :direction="'horizontal'" style="width: 100%;height: 30%;" :top="{ height: '40px' }">
             <template #main>main</template>
             <template #top>top</template>
             <template #bottom>bottom</template>
@@ -10,7 +10,7 @@
             <template #right>right</template>
         </Layout>
         <br />上中下布局：<br />
-        <Layout :mode="'vertical'" style="width: 100%;height: 30%;"
+        <Layout :direction="'vertical'" style="width: 100%;height: 30%;"
             :top="{ height: '40px', scroll: { scroll: 'y', barSize: 'mini' } }">
             <template #main>main</template>
             <template #top>
@@ -21,10 +21,10 @@
             <template #right>right</template>
         </Layout>
         <br />上中下，再嵌套左中右布局：<br />
-        <Layout :mode="'vertical'" style="width: 100%;height: 30%;margin-top: 10px;"
+        <Layout :direction="'vertical'" style="width: 100%;height: 30%;margin-top: 10px;"
             :top="{ height: '40px', maxHeight: '200px', scroll: { scroll: 'y' } }">
             <template #main>
-                <Layout :mode="'horizontal'" style="height: 100%;"
+                <Layout :direction="'horizontal'" style="height: 100%;"
                     :top="{ height: '20px', maxHeight: '200px', scroll: { scroll: 'y' } }">
                     <template #main>main</template>
                     <template #top>top</template>
@@ -39,10 +39,10 @@
             <template #right>right</template>
         </Layout>
         <br />左中右，再嵌套上中下布局：<br />
-        <Layout :mode="'horizontal'" style="width: 100%;height: 30%;margin-top: 10px;"
+        <Layout :direction="'horizontal'" style="width: 100%;height: 30%;margin-top: 10px;"
             :top="{ height: '40px', maxHeight: '200px', scroll: { scroll: 'y' } }">
             <template #main>
-                <Layout :mode="'vertical'" style="height: 100%;"
+                <Layout :direction="'vertical'" style="height: 100%;"
                     :top="{ height: '40px', maxHeight: '200px', scroll: { scroll: 'y' } }">
                     <template #main>main</template>
                     <template #top>top</template>

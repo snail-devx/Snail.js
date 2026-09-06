@@ -11,12 +11,12 @@ import { EventsType } from "./component-model";
  */
 export type LayoutOptions = {
     /**
-     * 布局模式
+     * 布局方向
      * - horizontal 水平布局：左中右
      * - vertical 垂直布局：上中下
      * - 默认为 `horizontal`
      */
-    mode?: "horizontal" | "vertical";
+    direction?: "horizontal" | "vertical";
 
     /**
      * 主内容区域配置

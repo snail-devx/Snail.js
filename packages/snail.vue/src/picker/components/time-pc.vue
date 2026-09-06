@@ -2,7 +2,7 @@
     1、实现上，参照效果【zane-calendar】库效果
   -->
 <template>
-    <Layout class="time-picker pc" :class="{ 'second-disabled': format != 'HH:mm:ss' }" :mode="'vertical'">
+    <Layout class="time-picker pc" :class="{ 'second-disabled': format != 'HH:mm:ss' }" :direction="'vertical'">
         <!-- 时分秒选择区域-->
         <template #main>
             <Motion multiple :effect="MOTION.top">

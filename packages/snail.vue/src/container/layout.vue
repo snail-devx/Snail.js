@@ -4,7 +4,7 @@
     3、若对应区域未启用滚动配置，则是不使用Scroll组件，通过template做一下v-if；
 -->
 <template>
-    <div class="snail-layout" :class="mode">
+    <div class="snail-layout" :class="direction || 'horizontal'">
         <template v-for="item in ['top', 'left', 'main', 'right', 'bottom']" :key="item">
             <template v-if="areaMap[item] && $slots[item]">
                 <Scroll v-if="areaMap[item].scrollable" :class="areaMap[item].class" :style="areaMap[item].style"
@@ -42,7 +42,7 @@ const areaMap = computed(() => {
         style: undefined,
     };
     //  垂直布局时，顶部、底部区域
-    if (props.mode == "vertical") {
+    if (props.direction == "vertical") {
         map.top = {
             scrollable: props.top && props.top.scroll != undefined,
             class: buildAreaClass("top-area", props.top),

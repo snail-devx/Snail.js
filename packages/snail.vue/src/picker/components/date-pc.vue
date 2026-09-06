@@ -3,7 +3,7 @@
     2、内部集成 time-pc.vue时间选择，但时间的最大、最小值单独设置，不从日期的最大、最小值中提取
   -->
 <template>
-    <Layout class="date-picker pc" :class="{ 'time-now': pinned && pinned.value == true }" :mode="'vertical'"
+    <Layout class="date-picker pc" :class="{ 'time-now': pinned && pinned.value == true }" :direction="'vertical'"
         :top="{ height: '40px' }" :bottom="{ height: '30px' }">
         <!-- 顶部导航区域：展示左右切换等功能 -->
         <template #top>
