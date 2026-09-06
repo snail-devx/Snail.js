@@ -11,8 +11,8 @@
 </template>
 <script setup lang="ts">
 import { ref, shallowRef } from "vue";
-import { useTimer } from "snail.core";
-import { components, DialogHandle, FollowHandle, PopupHandle, usePopup } from "../../libraries/snail_vue";
+import { RunResult, useTimer } from "snail.core";
+import { components, DialogHandle, DialogWrapperHandle, FollowHandle, PopupHandle, usePopup } from "../../libraries/snail_vue";
 const { } = components;
 import DialogContentTest from "./child-content.vue";
 
@@ -23,7 +23,8 @@ const { onInterval } = useTimer();
 const {
     inPopup, closePopup,
     onBeforeClose,
-} = defineProps<DialogHandle<string> & PopupHandle<any> & FollowHandle<any>>()
+    onBuildData,
+} = defineProps<DialogHandle<string> & PopupHandle<any> & FollowHandle<any> & DialogWrapperHandle<any>>()
 const emits = defineEmits<{
     (e: "customEvent", data: number)
 }>();
@@ -60,6 +61,9 @@ function trigger() {
 onBeforeClose && onBeforeClose(() => {
     return new Date().getSeconds() % 2 == 0 ? false : undefined;
 })
+onBuildData && onBuildData(() => {
+    return Promise.resolve(new Date());
+});
 onInterval(() => bvModel.value = !bvModel.value, 1000);
 //  2、生命周期响应
 </script>
