@@ -6,11 +6,11 @@
 <template>
     <div class="snail-wrapper" :class="inPopup ? 'in-popup' : 'in-normal'">
         <Header v-if="header && header.disabled != true" :="header || { useTo: 'dialog', title: '对话框' }"
-            @close="emits('cancel')" />
+            :use-to="(header ? header.useTo : undefined) || (inPopup ? 'dialog' : 'page')" @close="emits('cancel')" />
         <Scroll class="wrapper-body" :="content || { scroll: 'none' }">
             <slot />
         </Scroll>
-        <Footer v-if="footer && readonly != true && footer.disabled != true" :="footer || {}" @cancel="emits('cancel')"
+        <Footer v-if="footer && footer.disabled != true" :="footer || {}" @cancel="emits('cancel')"
             @confirm="emits('confirm')" />
     </div>
 </template>

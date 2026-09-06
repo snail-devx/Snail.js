@@ -1,4 +1,4 @@
-import { DisabledOptions, ReadonlyOptions } from "../../base/models/base-model";
+import { DisabledOptions } from "../../base/models/base-model";
 import { HeaderOptions } from "../../base/models/header-model";
 import { FooterEvents, FooterOptions } from "../../base/models/footer-model";
 import { ScrollOptions } from "./scroll-model";
@@ -6,7 +6,7 @@ import { ScrollOptions } from "./scroll-model";
 /**
  * 包裹组件 相关实体
  */
-export type WrapperOptions = ReadonlyOptions & {
+export type WrapperOptions = {
     /**
      * 是否是弹窗模式
      */
@@ -16,7 +16,7 @@ export type WrapperOptions = ReadonlyOptions & {
      * Header组件配置
      * - 不传入，则不需要 Header组件
      */
-    header?: HeaderOptions & DisabledOptions;
+    header?: Partial<HeaderOptions> & DisabledOptions;
     /**
      * 内容组件配置
      * - 滚动相关配置
