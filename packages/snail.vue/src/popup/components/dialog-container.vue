@@ -111,8 +111,9 @@ onMounted(() => {
 
     // 启用包裹组件时，特殊样式：默认不制定高度和宽度，由内容组件自己决定
     >.snail-wrapper {
-        width: fit-content;
         min-width: auto;
+        width: fit-content;
+        min-height: auto;
         height: fit-content;
 
         >.wrapper-body {

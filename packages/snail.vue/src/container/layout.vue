@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, shallowRef, useSlots, } from "vue";
+import { computed } from "vue";
 import { LayoutAreaItem, LayoutOptions } from "./models/layout-model";
 import Scroll from "./scroll.vue";
 import { css, CSSClassOptions, HeightStyle, WidthStyle, } from "snail.view";
