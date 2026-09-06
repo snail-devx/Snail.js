@@ -1,6 +1,31 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <Switch />
+    <Flex :direction="'column'" :gap="'10px'">
+        <div class="flex-cross-center" style="gap: 10px;">
+            默认效果:
+            <Switch />
+            默认效果(只读):
+            <Switch readonly />
+        </div>
+        <div class="flex-cross-center" style="gap: 10px;">
+            switch模式:
+            <Switch :type="'switch'" />
+            switch模式(只读):
+            <Switch :type="'switch'" :readonly="true" />
+        </div>
+        <div class="flex-cross-center" style="gap: 10px;">
+            radio模式:
+            <Switch :type="'radio'" />
+            radio模式(只读):
+            <Switch :type="'radio'" :readonly="true" />
+        </div>
+        <div class="flex-cross-center" style="gap: 10px;">
+            checkbox模式:
+            <Switch :type="'checkbox'" />
+            checkbox模式(只读):
+            <Switch :type="'checkbox'" :readonly="true" />
+        </div>
+    </Flex>
 </template>
 
 <script setup lang="ts">
@@ -9,7 +34,7 @@ import { components } from "../../libraries/snail_vue"
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { Switch } = components;
+const { Switch, Flex } = components;
 //  2、可选配置选项
 defineOptions({ name: "SwitchTest", inheritAttrs: true, });
 
