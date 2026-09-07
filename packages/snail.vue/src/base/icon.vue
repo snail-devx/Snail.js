@@ -54,6 +54,9 @@ const styleRef = computed(() => {
     //  旋转样式
     const rotate = correctNumber(props.rotate, 0);
     rotate != 0 && (style.transform = `rotate(${rotate}deg)`);
+    //  透明度
+    const opacity = correctNumber(props.opacity, undefined);
+    opacity >= 0 && (style.opacity = opacity);
 
     return style;
 });

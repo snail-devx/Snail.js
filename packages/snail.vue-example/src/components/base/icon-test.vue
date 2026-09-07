@@ -40,6 +40,12 @@
         <section>
             <Icon :type="'warn'" />
         </section>
+
+        <section>
+            <Icon :type="'warn'" :opacity="0.3" />
+            <Icon :type="'warn'" :opacity="-1" />
+            <Icon :type="'warn'" :opacity="0.1" />
+        </section>
     </article>
 </template>
 

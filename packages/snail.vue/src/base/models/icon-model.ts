@@ -45,6 +45,11 @@ export type IconOptions = TitleOptions & {
      * - 通过：transform: rotate(1.06); 实现
      */
     rotate?: number;
+    /**
+     * 图标透明度
+     * - 不传入，默认1
+     */
+    opacity?: number;
 
     /**
      * 图形伸展
