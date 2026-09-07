@@ -40,6 +40,9 @@
         <section>
             <Icon :type="'warn'" />
         </section>
+        <section>
+            <Icon :type="'more'" />
+        </section>
 
         <section>
             <Icon :type="'warn'" :opacity="0.3" />
