@@ -10,22 +10,23 @@
 <template>
     <div class="snail-action flex-cross-center" ref="snail-action">
         <div class="action-slot flex-cross-center">
-            <slot />
+            <slot name="default" :="slotHandle" />
         </div>
         <!-- 鼠标引入时显示时 -->
-        <Icon class="hover-tips" button custom v-if="trigger == 'hover' && disabled != true" :size="16"
-            @click="onFollowShow(false)">
-            <path
-                d="M415.93 223.79c0-52.98 43.004-95.984 95.984-95.984s95.984 43.004 95.984 95.984-43.004 95.984-95.984 95.984-95.984-43.003-95.984-95.984zM415.93 511.742c0-52.98 43.004-95.984 95.984-95.984s95.984 43.004 95.984 95.984-43.004 95.984-95.984 95.984-95.984-43.004-95.984-95.984zM415.93 799.866c0-52.98 43.004-95.984 95.984-95.984s95.984 43.003 95.984 95.984-43.004 95.983-95.984 95.983-95.984-43.175-95.984-95.983z" />
-        </Icon>
+        <div class="trigger-area" :class="{ hidden: trigger == 'hover' }"
+            v-if="disabled != true && (trigger == 'hover' || trigger == 'always')">
+            <slot name="trigger" :="slotHandle">
+                <Icon button :type="'more'" :size="16" @click="onFollowShow(false)" />
+            </slot>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { IAsyncScope } from 'snail.core';
-import { onMounted, useTemplateRef } from 'vue';
+import { onMounted, shallowRef, ShallowRef, useTemplateRef } from 'vue';
 import { isStringNotEmpty } from 'snail.core';
-import { ActionEvents, ActionItemsOptions, ActionOptions } from './models/action-model';
+import { ActionEvents, ActionItemsOptions, ActionOptions, ActionSlotHandle } from './models/action-model';
 import Icon from '../base/icon.vue';
 import { usePopup } from '../popup/manager';
 import ActionItems from './components/action-items.vue';
@@ -40,10 +41,15 @@ const { onEvent } = useObserver();
 //  2、组件交互变量、常量
 /**     根节点 */
 const rootDom = useTemplateRef("snail-action");
-/**     弹窗组件 */
-let popupScope: IAsyncScope<string> = undefined;
+/**      弹窗组件*/
+const popupScopeRef: ShallowRef<IAsyncScope<string>> = shallowRef(undefined);
 /**     按压启动时间 */
 let pressStartDate: Date = undefined;
+/**     操作项句柄 */
+const slotHandle: ActionSlotHandle = Object.freeze<ActionSlotHandle>({
+    isActived: () => popupScopeRef.value != undefined,
+    trigger: () => onFollowShow(props.trigger == "long-press"),
+});
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -52,14 +58,13 @@ let pressStartDate: Date = undefined;
  */
 async function onFollowShow(longPress: boolean) {
     //  若已显示了，则直接销毁
-    if (popupScope && popupScope.destroyed != true) {
-        popupScope.destroy();
-        return;
+    if (popupScopeRef.value && popupScopeRef.value.destroyed != true) {
+        popupScopeRef.value.destroy();
     }
     //  非【禁用】时才生效
-    if (props.disabled != true) {
+    else if (props.disabled != true) {
         //  后期针对 longPress 时，计算出跟手的效果，避免割裂；现在followX 策略先： center > start > end
-        popupScope = follow<string, ActionItemsOptions>(rootDom.value, {
+        popupScopeRef.value = follow<string, ActionItemsOptions>(rootDom.value, {
             component: ActionItems,
             closeOnEscape: true,
             closeOnMask: true,
@@ -77,9 +82,12 @@ async function onFollowShow(longPress: boolean) {
                 actions: props.actions,
             }
         });
-        const code = await popupScope;
+        const code = await popupScopeRef.value;
         isStringNotEmpty(code) && emits("trigger", code);
     }
+
+    //  最终清空
+    popupScopeRef.value = undefined;
 }
 
 /**
@@ -154,16 +162,21 @@ onMounted(() => {
     }
 
     // 鼠标移入时，操作提示区域
-    >.hover-tips {
+    >.trigger-area {
         flex-shrink: 0;
-        display: none;
+        width: fit-content;
+        align-items: center;
+
+        &.hidden {
+            display: none;
+        }
     }
 }
 
 // 鼠标移入时的效果
 .snail-action:hover {
-    >.hover-tips {
-        display: block;
+    >.trigger-area {
+        display: flex;
     }
 }
 </style>

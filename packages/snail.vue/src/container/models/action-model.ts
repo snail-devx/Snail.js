@@ -8,10 +8,11 @@ import { IconOptions } from "../../base/models/icon-model";
 export type ActionOptions = DisabledOptions & {
     /**
      * 触发方式
-     *  - hover：鼠标移入显示
-     *  - long-press：长摁显示
+     *  - always ：始终显示一个触发图标，点击图标弹出操作项
+     *  - hover：鼠标移入显示一个触发图标，点击图标弹出操作项
+     *  - long-press：长摁直接弹出操作项
      */
-    trigger: "hover" | "long-press";
+    trigger: "always" | "hover" | "long-press";
     /**
      * 显示模式
      * - popup：弹出显示操作项
@@ -67,6 +68,22 @@ export type ActionItem = {
      */
     icon?: Pick<IconOptions, "type" | "size" | "title">
 }
+
+/**
+ * 可操作向组件 插槽句柄
+ */
+export type ActionSlotHandle = {
+    /**
+     * 操作项是否激活显示
+     */
+    isActived(): boolean;
+    /**
+     * 触发操作项显示
+     */
+    trigger(): void;
+}
+
+
 /**
  * 可操作项组件 的事件
  */
