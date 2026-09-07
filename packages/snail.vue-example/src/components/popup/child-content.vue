@@ -62,6 +62,7 @@ onBeforeClose && onBeforeClose(() => {
     return new Date().getSeconds() % 2 == 0 ? false : undefined;
 })
 onBuildData && onBuildData(() => {
+    // throw new Error("xxxxxxxxxxx");
     return Promise.resolve(new Date());
 });
 onInterval(() => bvModel.value = !bvModel.value, 1000);

@@ -23,7 +23,7 @@ import { PopupDescriptor } from "../models/popup-model";
 import Dynamic from "../../container/dynamic.vue";
 import { useObserver } from "snail.view";
 import Wrapper from "../../container/wrapper.vue";
-import { correctFunction, mustFunction, RunResult, wait } from "snail.core";
+import { mustFunction, runAsync, wait } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -58,7 +58,7 @@ const registerBuildDataFunc: DialogWrapperHandle<any>["onBuildData"] = fn => {
  */
 async function onWrapperConfirm() {
     if (fn_onBuildData != undefined) {
-        const rt = (await wait(fn_onBuildData())) || { success: true, data: undefined };
+        const rt = await runAsync(fn_onBuildData);
         console.log("onBuildData result：", rt);
         rt.success !== false && closePopup(rt.data);
     }
