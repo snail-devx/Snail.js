@@ -50,6 +50,18 @@ export type IconOptions = TitleOptions & {
      * - 不传入，默认1
      */
     opacity?: number;
+    /**
+     * 图标边样式
+     */
+    border?: string;
+    /**
+     * 图标圆角样式
+     */
+    radius?: string;
+    /**
+     * 图标背景样式
+     */
+    background?: string;
 
     /**
      * 图形伸展
@@ -71,6 +83,7 @@ export type IconOptions = TitleOptions & {
  * - - download     下载
  * - - print        打印
  * - - edit         编辑
+ * - - pause        暂停，两道竖线
  * - 指向类：
  * - - arrow        向右箭头
  * - - datepicker   日期选择器
@@ -82,6 +95,6 @@ export type IconOptions = TitleOptions & {
  * - - grip         紧握图标，垂直方向，一般用于拖动句柄
  */
 export type IconType = "success" | "error" | "warn"
-    | "close" | "trash" | "download" | "print" | "edit"
+    | "close" | "trash" | "download" | "print" | "edit" | "pause"
     | "arrow" | "datepicker" | "timepicker"
     | "plus" | "subtract" | "more" | "grip";

@@ -57,6 +57,10 @@ const styleRef = computed(() => {
     //  透明度
     const opacity = correctNumber(props.opacity, undefined);
     opacity >= 0 && (style.opacity = opacity);
+    //  边框、背景色
+    style.border = correctString(props.border, undefined, true);
+    style.borderRadius = correctString(props.radius, undefined, true);
+    style.background = correctString(props.background, undefined, true);
 
     return style;
 });
