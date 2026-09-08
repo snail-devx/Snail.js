@@ -1,0 +1,76 @@
+// 盒子模型 相关样式：尺寸大小、边框、圆角、滚动条
+
+//  -- 溢出滚动相关
+.snail-app {
+
+    //  滚动条样式
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+        border-radius: 12px;
+        background-color: transparent;
+    }
+
+    ::-webkit-scrollbar-button {
+        display: none !important;
+        height: 0;
+        width: 0;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background-color: rgba(180, 180, 180, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.85);
+    }
+
+    ::-webkit-scrollbar-track {
+        border-radius: 10px;
+        background-color: transparent;
+    }
+
+    //  溢出时，x轴出滚动条，y轴隐藏
+    .scroll-x {
+        overflow: auto hidden;
+    }
+
+    //  溢出时，y轴出滚动条，x轴隐藏
+    .scroll-y {
+        overflow: hidden auto;
+    }
+
+    //  溢出时，x、y轴都出滚动条
+    .scroll-xy {
+        overflow: auto;
+    }
+
+    //  溢出时，x、y轴都隐藏
+    .scroll-none {
+        overflow: hidden;
+    }
+
+    //  normal 滚动条   10px
+    .scrollbar-normal::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    //  small 滚动条   6px
+    .scrollbar-small::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    //  mini滚动条   4px
+    .scrollbar-mini::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    //  none滚动条   0px
+    .scrollbar-none::-webkit-scrollbar {
+        width: 0px;
+        height: 0px;
+    }
+
+
+}

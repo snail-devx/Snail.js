@@ -1,0 +1,91 @@
+/** 基础类样式
+ *  1、无需引入类样式名，直接针对 `snail-app`下的通用样式和元素默认样式
+ */
+.snail-app {
+    //  指定默认字体
+    font-family: "Microsoft YaHei", "微软雅黑", "Hiragino Sans GB", "tahoma", "arial", "simsun", "宋体", "sans-serif";
+
+    //  强制元素 box-sizing: border-box
+    &,
+    * {
+        box-sizing: border-box !important;
+    }
+
+    //  文本展示，默认14px
+    div,
+    span {
+        font-size: 14px;
+    }
+}
+
+//  输入框等，去掉默认的外边框；仅针对输入类型的，后续逐步扩充。checkbox、radio等先忽略
+.snail-app {
+
+    input[type="search"],
+    input[type="text"],
+    input[type="url"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    textarea {
+        outline: 0 !important;
+        appearance: none !important;
+        //  给个最小宽度，避免走默认导致部分宽度不够时撑开外部容器的情况
+        min-width: 10px;
+        margin: 0;
+        border: 1px solid #dddfed;
+        border-radius: 4px;
+        padding: 0 10px;
+        //  字体颜色渲染
+        font: inherit;
+        font-weight: 400;
+        font-size: 14px;
+        color: #2e3033;
+        text-overflow: ellipsis;
+
+        //  搜索模式时的【清除】按钮
+        &::-webkit-search-cancel-button {
+            display: none;
+        }
+
+        &:focus {
+            border: 1px solid #3292ea;
+        }
+
+        //  只读时的边框样式
+        &:read-only:focus {
+            border: 1px solid #dddfed;
+        }
+    }
+
+    textarea {
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    //  选项类：取消边距等
+    input[type="radio"],
+    input[type="checkbox"] {
+        margin: 0;
+        padding: 0;
+    }
+
+    //  数据类型输入框的上一个、下一个点击按钮
+    input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+        margin: 0;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    }
+
+    //  文本提示文字颜色
+    input::placeholder,
+    textarea::placeholder {
+        color: #8a9099;
+    }
+}
