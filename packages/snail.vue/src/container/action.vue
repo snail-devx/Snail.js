@@ -70,12 +70,10 @@ async function onFollowShow(longPress: boolean) {
             closeOnMask: true,
             closeOnResize: true,
             closeOnTarget: true,
-            followX: longPress
-                ? ["center", "start", "end"]
-                : ["after", "end", "start", "end", "center"],
-            followY: longPress
-                ? ["center", "after", "before"]
-                : ["after", "before", "center", "end", "after"],
+            followX: props.followX || ["center", "start", "end", "after", "before", "ratio"],
+            followY: props.followY || ["after", "before", "center", "end", "start", "ratio"],
+            spaceX: props.spaceX,
+            spaceY: props.spaceY,
 
             props: {
                 mode: "vertical",

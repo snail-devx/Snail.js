@@ -1,5 +1,6 @@
 import { DisabledOptions } from "../../base/models/base-model";
 import { IconOptions } from "../../base/models/icon-model";
+import { FollowPositionOptions, FollowStrategy } from "../../popup/models/follow-model";
 
 /**
  * 可操作项组件 的配置选项
@@ -24,7 +25,7 @@ export type ActionOptions = DisabledOptions & {
      * 可用操作项
      */
     actions: ActionItem[];
-}
+} & Pick<FollowPositionOptions, "followX" | "followY" | "spaceX" | "spaceY">;
 /**
  * 操作项集合 组件渲染配置选项
  */
