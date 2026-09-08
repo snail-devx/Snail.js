@@ -25,14 +25,14 @@
             <template v-if="stepRef == 'year'">
                 <div class="year-item" v-for="item in yearItems" :key="item.year"
                     :class="{ 'active': dateRef.year == item.year, 'disabled': item.disabled, }">
-                    <span v-text="item.year" @click="onYearItemClick(item)" />
+                    <span v-text="item.year" @click="onYearItemClick(item)" @dblclick="onYearItemClick(item, true)" />
                 </div>
             </template>
             <!-- 选择月份 -->
             <template v-else-if="stepRef == 'month'">
                 <div class="month-item" v-for="item in monthItems" :key="`${item.year}-${item.month}`"
                     :class="{ 'active': dateRef.month == item.month, 'disabled': item.disabled, }">
-                    <span v-text="item.text" @click="onMonthItemClick(item)" />
+                    <span v-text="item.text" @click="onMonthItemClick(item)" @dblclick="onMonthItemClick(item, true)" />
                 </div>
             </template>
             <!-- 选择天 -->
@@ -45,7 +45,7 @@
                         'now-month': dateRef.year == item.year && dateRef.month == item.month,
                         'disabled': item.disabled,
                     }">
-                    <span v-text="item.day" @click="onDayItemClick(item)" />
+                    <span v-text="item.day" @click="onDayItemClick(item)" @dblclick="onDayItemClick(item, true)" />
                 </div>
             </template>
         </template>
@@ -212,17 +212,18 @@ function onSwitchStepClick(newValue: typeof stepRef.value) {
  * 点击选择了 年 时
  * @param item 
  */
-function onYearItemClick(item: DatePickerYearItem) {
+function onYearItemClick(item: DatePickerYearItem, dbClick?: boolean) {
     /** 选项可用的情况下才处理
-     *  1、仅为【yyyy】则直接关闭弹窗
+     *  1、仅为【yyyy】时，双击则直接关闭弹窗
      *  2、其他情况，则切换到【月份选择】
      */
     if (item.disabled != true) {
         dateRef.value.year = item.year;
         if (format == "yyyy") {
-            const value = String(dateRef.value.year).padStart(4, "0");
-            emits("confirm", value);
-            props.inPopup && props.closePopup(value);
+            // const value = String(dateRef.value.year).padStart(4, "0");
+            // emits("confirm", value);
+            // props.inPopup && props.closePopup(value);
+            dbClick && onConfirm();
         }
         else {
             dateRef.value.month = 1;
@@ -235,18 +236,19 @@ function onYearItemClick(item: DatePickerYearItem) {
  * 点击选择了 月 时
  * @param month 
  */
-function onMonthItemClick(item: DatePickerMonthItem) {
+function onMonthItemClick(item: DatePickerMonthItem, dbClick?: boolean) {
     /** 选项可用的情况下才处理
-     *  1、仅为【yyyy-MM】则直接关闭弹窗
+     *  1、仅为【yyyy-MM】时，双击则直接关闭弹窗
      *  2、其他情况，则切换到【天选择】
      */
     if (item.disabled != true) {
         dateRef.value.year = item.year;
         dateRef.value.month = item.month;
         if (format == "yyyy-MM") {
-            const value = formatDateValue(dateRef.value, "yyyy-MM");
-            emits("confirm", value);
-            props.inPopup && props.closePopup(value);
+            // const value = formatDateValue(dateRef.value, "yyyy-MM");
+            // emits("confirm", value);
+            // props.inPopup && props.closePopup(value);
+            dbClick && onConfirm();
         }
         else {
             dateRef.value.day = 1;
@@ -259,20 +261,21 @@ function onMonthItemClick(item: DatePickerMonthItem) {
  * 点击选择了 日 时
  * @param item 
  */
-function onDayItemClick(item: DatePickerDayItem) {
+function onDayItemClick(item: DatePickerDayItem, dbClick?: boolean) {
     /** 选项可用的情况下才处理
-     *  1、仅为【yyyy-MM-dd】则直接关闭弹窗
+     *  1、仅为【yyyy-MM-dd】时，双击则直接关闭弹窗
      *  2、其他情况，则校验选择是否有效
      */
     if (item.disabled != true) {
-        const isNowMonth = item.year == dateRef.value.year && item.month == dateRef.value.month;
         Object.assign(dateRef.value, { year: item.year, month: item.month, day: item.day });
         if (format == "yyyy-MM-dd") {
-            const value = formatDateValue(dateRef.value, "yyyy-MM-dd");
-            emits("confirm", value);
-            props.inPopup && props.closePopup(value);
+            // const value = formatDateValue(dateRef.value, "yyyy-MM-dd");
+            // emits("confirm", value);
+            // props.inPopup && props.closePopup(value);
+            dbClick && onConfirm();
         }
         else {
+            const isNowMonth = item.year == dateRef.value.year && item.month == dateRef.value.month;
             isNowMonth || buildPickerItems("day", 0);
         }
     }

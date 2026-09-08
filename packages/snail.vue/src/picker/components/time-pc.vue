@@ -9,18 +9,21 @@
                 <div class="tz-item" ref="hour-items">
                     <div class="tzi-number" v-for="item in hourItems" :key="item.hour"
                         :class="{ active: item.hour == timeRef.hour, disabled: item.disabled }"
-                        v-text="padStart(item.hour, 2, '0')" @click="onHourClick(item)" />
+                        v-text="padStart(item.hour, 2, '0')" @click="onHourClick(item)"
+                        @dblclick="onHourClick(item, true)" />
                 </div>
                 <div class="tz-item" ref="minute-items">
                     <div class="tzi-number" v-for="item in minuteItems" :key="`${item.hour}:${item.minute}`"
                         :class="{ active: item.minute == timeRef.minute, disabled: item.disabled }"
-                        v-text="padStart(item.minute, 2, '0')" @click="onMinuteClick(item)" />
+                        v-text="padStart(item.minute, 2, '0')" @click="onMinuteClick(item)"
+                        @dblclick="onMinuteClick(item, true)" />
                 </div>
                 <div class="tz-item" ref="second-items" v-if="format == 'HH:mm:ss'">
                     <div class="tzi-number" v-for="item in secondItems"
                         :key="`${item.hour}:${item.minute}:${item.second}`"
                         :class="{ active: item.second == timeRef.second, disabled: item.disabled }"
-                        v-text="padStart(item.second, 2, '0')" @click="onSecondClick(item)" />
+                        v-text="padStart(item.second, 2, '0')" @click="onSecondClick(item)"
+                        @dblclick="onSecondClick(item, true)" />
                 </div>
             </Motion>
         </template>
@@ -120,7 +123,7 @@ function scrollIntoView(items: HTMLElement) {
  * 小时点击时
  * @param item 
  */
-function onHourClick(item: TimePickerHourItem) {
+function onHourClick(item: TimePickerHourItem, dbClick?: true) {
     /** 非禁用，且有改变时，基于小时构建分钟*/
     if (item.disabled != true && timeRef.value.hour != item.hour) {
         timeRef.value.hour = item.hour;
@@ -132,15 +135,20 @@ function onHourClick(item: TimePickerHourItem) {
  * 分钟点击时
  * @param item 
  */
-function onMinuteClick(item: TimePickerMinuteItem) {
+function onMinuteClick(item: TimePickerMinuteItem, dbClick?: true) {
+    /**
+     * 1、若为 HH:MM 格式，则双击时直接关闭
+     * 2、其他情况，构建 秒 选项
+     */
     if (item.disabled != true) {
+        timeRef.value.minute = item.minute;
         if (format == "HH:mm") {
-            const value = formatTimeValue(item, "HH:mm");
-            emits("confirm", value);
-            props.inPopup && props.closePopup(value);
+            // const value = formatTimeValue(item, "HH:mm");
+            // emits("confirm", value);
+            // props.inPopup && props.closePopup(value);
+            dbClick && onConfirm();
         }
         else if (timeRef.value.minute != item.minute) {
-            timeRef.value.minute = item.minute;
             secondItems.value = buildSecondItems(item, min, max);
         }
     }
@@ -149,10 +157,13 @@ function onMinuteClick(item: TimePickerMinuteItem) {
  * 秒钟点击时
  * @param item 
  */
-function onSecondClick(item: TimePickerSecondItem) {
+function onSecondClick(item: TimePickerSecondItem, dbClick?: true) {
+    /**
+     * 双击时，直接关闭
+     */
     if (item.disabled != true) {
         timeRef.value.second = item.second;
-        onConfirm();
+        dbClick && onConfirm();
     }
 }
 
