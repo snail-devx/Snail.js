@@ -168,9 +168,15 @@
             禁用操作按钮 :format="'yyyy-MM-dd HH:mm'"
             <DatePicker :format="'yyyy-MM-dd HH:mm'" :value="valueRef" @change="console.log" style="width: 100px;" />
         </section>
+    </article>
+    <article>
         <section class="">
             简化模式
             <DatePicker :mode="'simple'" :value="valueRef" @change="console.log" />
+        </section>
+        <section class="">
+            弹窗模式
+            <DatePicker :popup="{ mode: 'dialog' }" :mode="'simple'" :value="valueRef" @change="console.log" />
         </section>
     </article>
 </template>

@@ -5,7 +5,7 @@
 import { IAsyncScope } from "snail.core";
 import { DatePickerOptions, TimePickerOptions } from "./datetime-model";
 import { IPopupManager } from "../../popup/models/manager-model";
-import { FollowOptions, FollowPositionOptions } from "../../popup/models/follow-model";
+import { FollowOptions, FollowPositionOptions, DialogOptions } from "../../popup/manager";
 
 /**
  * 接口：选择器管理器
@@ -32,7 +32,26 @@ export interface IPickerManager {
  * 选择器弹窗配置选项
  * - 放开一些属性，方便用户做一些自定义
  */
-export type PickerPopupOptions = FollowPositionOptions;
+export type PickerPopupOptions = {
+    /**
+     * 弹窗模式
+     * - follow     【默认值】跟随弹窗，跟随制定的target
+     * - dialog     模态弹窗
+     */
+    mode?: "dialog" | "follow";
+
+    /**
+     * 跟随效果
+     * - mode 为 `follow` 生效
+     */
+    follow?: FollowPositionOptions;
+    /**
+     * 弹窗配置
+     * - mode 为 `dialog` 生效
+     */
+    dialog?: Pick<DialogOptions, "closeOnEscape" | "closeOnMask" | "rootClass">;
+
+} /** & FollowPositionOptions */;
 
 /**
  * 选择器扩展

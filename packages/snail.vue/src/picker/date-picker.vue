@@ -19,10 +19,11 @@ import { ChangeEvents } from "../base/models/base-event";
 import { usePicker } from "./manager";
 import { formatDateValue, IAsyncScope, isStringNotEmpty, parseDateValue } from "snail.core";
 import { useReactive } from "../base/reactive";
+import { PickerPopupOptions } from "./models/picker-model.js";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<ReadonlyOptions & DatePickerOptions>();
+const props = defineProps<ReadonlyOptions & DatePickerOptions & { popup?: PickerPopupOptions }>();
 const emits = defineEmits<ChangeEvents<string>>();
 const pickerDom = useTemplateRef("datepicker");
 const { showDate } = usePicker();
@@ -50,13 +51,7 @@ async function showPicker(evt: MouseEvent) {
                 ...props,
                 value: valueRef.value,
             },
-            {
-                followX: props.followX || ((evt.target as HTMLElement).tagName == "svg" ? ["end"] : undefined),
-                followY: props.followY,
-                spaceX: props.spaceX,
-                spaceY: props.spaceY,
-                closeOnTarget: true
-            }
+            props.popup,
         );
         const dateText = await pickerScope;
         pickerScope = undefined;

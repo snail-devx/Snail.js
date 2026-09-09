@@ -77,7 +77,7 @@ import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initSte
 import Layout from "../../container/layout.vue";
 import Icon from "../../base/icon.vue";
 import Button from "../../base/button.vue";
-import { PickerExtend } from "../models/picker-model";
+import { PickerExtend, PickerPopupOptions } from "../models/picker-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -303,10 +303,13 @@ async function onSelectTime() {
                 toolbarDisabled: props.toolbarDisabled,
             },
             {
-                followX: "start",
-                followY: "before",
-                spaceX: -2,
-                spaceY: 4,
+                mode: "follow",
+                follow: {
+                    followX: "start",
+                    followY: "before",
+                    spaceX: -2,
+                    spaceY: 4,
+                }
             }
         );
         task.finally(() => setTimeout(() => props.pinned.value = false))

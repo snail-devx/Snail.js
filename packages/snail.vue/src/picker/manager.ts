@@ -2,7 +2,7 @@ import { correctNumber, defer, IAsyncScope, IScope, isStringNotEmpty, mountScope
 import { IPickerManager, PickerExtend, PickerPopupOptions } from "./models/picker-model";
 import { TimePickerOptions, DatePickerOptions } from "./models/datetime-model";
 import { PropsType } from "../container/models/component-model";
-import { FollowOptions, usePopup } from "../popup/manager";
+import { FollowOptions, FollowPositionOptions, usePopup } from "../popup/manager";
 import TimePc from "./components/time-pc.vue";
 import DatePc from "./components/date-pc.vue";
 import { Component } from "vue";
@@ -50,21 +50,47 @@ export function usePicker(): IPickerManager & IScope {
      * @returns 异步任务，可销毁选择器；可接收选择器的选择值
      */
     function showPicker<Value, Props extends Record<string, any>>(target: HTMLElement, component: Component, options: Props, popupOptions?: PickerPopupOptions): IAsyncScope<Value> {
-        //  判断弹出PC还是移动端选择；后期判断target是否存在，不存在则使用模态弹窗
-        {
-            popupOptions = { ...popupOptions, }
-            popupOptions.followX = popupOptions.followX || ["start", "end", "center", "before", "after"];
-            popupOptions.spaceX = correctNumber(popupOptions.spaceX, 2);
-            popupOptions.spaceY = correctNumber(popupOptions.spaceY, 2);
-            popupOptions.spaceClient = correctNumber(popupOptions.spaceClient, 10);
-            popupOptions.closeOnMask = popupOptions.closeOnMask == undefined ? true : popupOptions.closeOnMask;
+        /**
+         * 判断弹出PC还是移动端选择；后期判断target是否存在，不存在则使用模态弹窗
+         */
+
+        //  模态弹窗
+        if (popupOptions && popupOptions.mode == "dialog") {
+            return popup.dialog<Value, Props & PickerExtend>({
+                component: component,
+                ...(popupOptions.dialog || {
+                    closeOnEscape: false,
+                    closeOnMask: true,
+                }),
+                //  时间选择器属性
+                props: {
+                    ...options,
+                    picker: manager,
+                    popup: popup
+                } as any,
+            });
         }
-        return popup.follow<Value, Props & PickerExtend>(target, {
-            ...popupOptions,
-            component: component,
-            //  时间选择器属性
-            props: { ...options, picker: manager, popup: popup } as any,
-        });
+        //  跟随弹窗：跟随效果给一些默认值
+        else {
+            const follow: FollowPositionOptions = (popupOptions ? popupOptions.follow : undefined) || Object.create(null);
+            {
+                follow.followX = follow.followX || ["center", "start", "end", "before", "after"];
+                follow.spaceX = correctNumber(follow.spaceX, 2);
+                follow.spaceY = correctNumber(follow.spaceY, 2);
+                follow.spaceClient = correctNumber(follow.spaceClient, 10);
+                follow.closeOnMask = follow.closeOnMask == undefined ? true : follow.closeOnMask;
+            }
+            return popup.follow<Value, Props & PickerExtend>(target, {
+                ...follow,
+                component: component,
+                //  时间选择器属性
+                props: {
+                    ...options,
+                    picker: manager,
+                    popup: popup
+                } as any,
+            });
+        }
     }
     //#endregion
 

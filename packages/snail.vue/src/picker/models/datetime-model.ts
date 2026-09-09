@@ -1,6 +1,7 @@
 import { DateFormat, DateValue, IAsyncScope, TimeValue } from "snail.core";
 import { DisabledOptions, ValueOptions } from "../../base/models/base-model";
 import { FollowOptions } from "../../popup/models/follow-model";
+import { PickerPopupOptions } from "./picker-model";
 
 /**
  * 日期时间的功能禁用配置选项
@@ -68,7 +69,8 @@ export type DatePickerOptions = {
      * - 不参与日期最大值验证，仅在选择时间时框定结束时间
      */
     maxPickTime?: string;
-} & DatetimeDisabledOptions & Pick<FollowOptions, "followX" | "followY" | "spaceX" | "spaceY">;
+} & DatetimeDisabledOptions;
+
 /**
  * 时间选择控件配置项
  */
@@ -103,7 +105,7 @@ export type TimePickerOptions = {
      * - 如 "08" ，则 08:00:00为最大时间，之后时间不可选择
      */
     max?: string;
-} & DatetimeDisabledOptions & Pick<FollowOptions, "followX" | "followY" | "spaceX" | "spaceY">;
+} & DatetimeDisabledOptions;
 
 /**
  * 日期时间选择 事件

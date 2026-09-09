@@ -19,10 +19,11 @@ import { ChangeEvents } from "../base/models/base-event";
 import { usePicker } from "./manager";
 import Icon from "../base/icon.vue";
 import { useReactive } from "../base/reactive";
+import { PickerPopupOptions } from "./models/picker-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<ReadonlyOptions & TimePickerOptions>();
+const props = defineProps<ReadonlyOptions & TimePickerOptions & { /**弹窗配置选项*/popup?: PickerPopupOptions }>();
 const emits = defineEmits<ChangeEvents<string>>();
 const pickerDom = useTemplateRef("timepicker");
 const { showTime } = usePicker();
@@ -50,13 +51,7 @@ async function showPicker(evt: MouseEvent) {
                 ...props,
                 value: valueRef.value,
             },
-            {
-                followX: props.followX || ((evt.target as HTMLElement).tagName == "svg" ? ["end"] : undefined),
-                followY: props.followY,
-                spaceX: props.spaceX,
-                spaceY: props.spaceY,
-                closeOnTarget: true,
-            }
+            props.popup,
         );
         const timeText = await pickerScope;
         pickerScope = undefined;
