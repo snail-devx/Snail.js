@@ -2,8 +2,10 @@
     1、文本输入框，集成日期选择功能
  -->
 <template>
-    <div class="snail-timepicker" ref="timepicker" :class="{ readonly }" :title="valueRef" @click="showPicker">
-        <input class="wh-fill" type="text" readonly v-model="valueRef" />
+    <div class="snail-timepicker" ref="timepicker" :class="{ readonly, 'simple': mode == 'simple' }" :title="valueRef"
+        @click="showPicker">
+        <span v-if="mode != 'simple' || isStringNotEmpty(valueRef)" class="ellipsis"
+            :class="{ 'flex-1': mode != 'simple' }" v-text="valueRef" />
         <Icon v-if="readonly != true" type="timepicker" button :size="20" :color="'#aeb6c2'" :hover-color="'#279bf1'" />
     </div>
 </template>
@@ -49,7 +51,10 @@ async function showPicker(evt: MouseEvent) {
                 value: valueRef.value,
             },
             {
-                followX: (evt.target as HTMLElement).tagName == "svg" ? ["end"] : undefined,
+                followX: props.followX || ((evt.target as HTMLElement).tagName == "svg" ? ["end"] : undefined),
+                followY: props.followY,
+                spaceX: props.spaceX,
+                spaceY: props.spaceY,
                 closeOnTarget: true,
             }
         );
@@ -79,17 +84,39 @@ watcher(() => props.value, newValue => newValue !== valueRef.value && resetTimeV
 .snail-timepicker {
     height: 32px;
     position: relative;
-
-    >input:not(.readonly) {
-        cursor: pointer;
-        padding-right: 34px !important;
-    }
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #2E3033;
 
     >svg {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        right: 8px;
+        flex-shrink: 0;
+        margin-right: 8px;
+    }
+
+    //  非只读时，鼠标手型
+    &:not(.readonly) {
+        cursor: pointer;
+
+        >span {
+            padding-left: 10px;
+        }
+    }
+
+    //  非简单模式下时：填充满
+    &:not(.simple) {
+        width: 100%;
+        border: 1px solid #dddfed;
+    }
+
+    //  简单模式下时
+    &.simple {
+        width: fit-content;
+
+        >span {
+            padding-left: 0;
+        }
     }
 }
 </style>

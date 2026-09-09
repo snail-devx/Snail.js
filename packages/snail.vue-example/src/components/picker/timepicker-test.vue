@@ -71,6 +71,11 @@
             时分秒，禁用工具条
             <TimePicker @change="console.log" :="{ format: 'HH:mm:ss', toolbarDisabled: true }" />
         </section>
+
+        <section class="">
+            简单模式：
+            <TimePicker :mode="'simple'" @change="console.log" />
+        </section>
     </article>
 </template>
 

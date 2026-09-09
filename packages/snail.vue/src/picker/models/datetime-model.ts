@@ -1,5 +1,6 @@
 import { DateFormat, DateValue, IAsyncScope, TimeValue } from "snail.core";
 import { DisabledOptions, ValueOptions } from "../../base/models/base-model";
+import { FollowOptions } from "../../popup/models/follow-model";
 
 /**
  * 日期时间的功能禁用配置选项
@@ -36,6 +37,12 @@ export type DatePickerOptions = {
      * - 默认 “yyyy-MM-dd"
      */
     format?: DateFormat;
+    /**
+     * 渲染模式
+     * - default    默认模式，文本框+图标，文本框填充满+边框
+     * - simple     简单模式，有值时才显示文本框，且无边框+不填充满
+     */
+    mode?: "default" | "simple";
 
     /**
      * 日期最小值
@@ -61,7 +68,7 @@ export type DatePickerOptions = {
      * - 不参与日期最大值验证，仅在选择时间时框定结束时间
      */
     maxPickTime?: string;
-} & DatetimeDisabledOptions;
+} & DatetimeDisabledOptions & Pick<FollowOptions, "followX" | "followY" | "spaceX" | "spaceY">;
 /**
  * 时间选择控件配置项
  */
@@ -76,6 +83,13 @@ export type TimePickerOptions = {
      */
     format?: "HH:mm:ss" | "HH:mm";
     /**
+     * 渲染模式
+     * - default    默认模式，文本框+图标，文本框填充满+边框
+     * - simple     简单模式，有值时才显示文本框，且无边框+不填充满
+     */
+    mode?: "default" | "simple";
+
+    /**
      * 最小时间
      * - 传入值格式为 "时:分:秒" 
      * - 如 "08:30:00"，则08:30:00为最小时间，之前的时间不可选择
@@ -89,7 +103,7 @@ export type TimePickerOptions = {
      * - 如 "08" ，则 08:00:00为最大时间，之后时间不可选择
      */
     max?: string;
-} & DatetimeDisabledOptions;
+} & DatetimeDisabledOptions & Pick<FollowOptions, "followX" | "followY" | "spaceX" | "spaceY">;
 
 /**
  * 日期时间选择 事件
