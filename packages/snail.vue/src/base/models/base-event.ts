@@ -10,8 +10,9 @@
 export type ClickEvents = {
     /**
      * 单击事件
+     * @param evt 事件对象
      */
-    click: [];
+    click: [evt?: MouseEvent | TouchEvent | PointerEvent];
 }
 
 /**

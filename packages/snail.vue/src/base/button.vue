@@ -1,18 +1,19 @@
 <!-- 按钮组件：做一些常见按钮样式的封装 -->
 <template>
-    <div class="snail-button" :class="[size, type]" :title="title">
+    <div class="snail-button" :class="[size, type]" :title="title" @click="evt => emits('click', evt)">
         <slot>按钮</slot>
     </div>
 </template>
 
 <script setup lang="ts">
+import { ClickEvents } from "./models/base-event";
 import { ButtonOptions } from "./models/button-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-defineProps<ButtonOptions>();
-//  2、可选配置选项
 defineOptions({ name: "Button", inheritAttrs: true, });
+defineProps<ButtonOptions>();
+const emits = defineEmits<ClickEvents>();
 </script>
 
 <style lang="less">

@@ -53,7 +53,7 @@
             <Icon :type="'warn'" :opacity="0.1" />
         </section>
         <section>
-            <Icon :type="'warn'" :border="'1px solid red'" :background="'blue'" :radius="'50%'" />
+            <Icon :type="'warn'" :border="'1px solid red'" :background="'blue'" :radius="'50%'" @click="console.log" />
         </section>
     </article>
 </template>

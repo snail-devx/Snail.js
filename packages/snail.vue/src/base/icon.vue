@@ -5,7 +5,7 @@
 <template>
     <svg class="snail-icon" :class="type" v-bind:class="{ button: button }"
         :viewBox="correctString(viewBox, '0 0 1024 1024', false)" :="sizeRef" :style="styleRef"
-        @mouseenter="isMouseEnterRef = true" @mouseleave="isMouseEnterRef = false">
+        @click="evt => emits('click', evt)">
         <title v-text="title || ''" />
         <!-- 定义图标绘制时 -->
         <template v-if="custom == true">
@@ -21,13 +21,13 @@ import { computed, ref, ShallowRef, shallowRef } from "vue";
 import { IconOptions } from "./models/icon-model";
 import { getBuiltinIcon } from "./utils/icon-util";
 import { correctNumber, correctString, isObject } from "snail.core";
+import { ClickEvents } from "./models/base-event";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<IconOptions>();
+const emits = defineEmits<ClickEvents>();
 //  2、组件交互变量、常量
-/**     是否是鼠标进入了 */
-const isMouseEnterRef: ShallowRef<boolean> = shallowRef(false);
 /**     图标尺寸，包含高度、宽度值 */
 const sizeRef = computed(() => {
     if (isObject(props.size) == true) {
@@ -48,9 +48,13 @@ const sizeRef = computed(() => {
 const styleRef = computed(() => {
     const style = Object.create(null);
     //  fill样式
-    let fill = isMouseEnterRef.value ? correctString(props.hoverColor, props.color, true) : undefined;
-    fill == undefined && (fill = correctString(props.color, undefined, true));
-    fill && (style.fill = fill);
+    let fill = correctString(props.color, undefined, true);
+    fill && (style["--fill"] = fill);
+    fill = correctString(props.hoverColor, fill, true);
+    fill && (style["--hover"] = fill);
+    // let fill = isMouseEnterRef.value ? correctString(props.hoverColor, props.color, true) : undefined;
+    // fill == undefined && (fill = correctString(props.color, undefined, true));
+    // fill && (style.fill = fill);
     //  旋转样式
     const rotate = correctNumber(props.rotate, 0);
     rotate != 0 && (style.transform = `rotate(${rotate}deg)`);
@@ -70,12 +74,23 @@ const styleRef = computed(() => {
 </script>
 <style lang="less">
 .snail-icon {
+    --fill: #8a8099;
+    --hover: #8a8099;
     transition: all 0.2s linear;
-    fill: #8a8099;
     opacity: 1;
 
     &.button {
         cursor: pointer;
     }
+
+    &:not(:hover) {
+        fill: var(--fill)
+    }
+
+    //  鼠标移入颜色
+    &:hover {
+        fill: var(--hover);
+    }
+
 }
 </style>
