@@ -7,7 +7,8 @@
         :top="{ height: '40px' }" :bottom="{ height: '30px' }">
         <!-- 顶部导航区域：展示左右切换等功能 -->
         <template #top>
-            <Icon type="arrow" button :rotate="180" :size="26" @click="buildPickerItems(stepRef, -1)" />
+            <Icon type="arrow" button :rotate="180" :size="26" :color="'#8a9099'" :hover-color="'#58a4fd'"
+                @click="buildPickerItems(stepRef, -1)" />
             <div class="header-content" :class="stepRef">
                 <template v-if="stepRef == 'year'">
                     <div v-text="`${yearItems[0].year}年 - ${getFromArray(yearItems, -1).year}年`" />
@@ -17,7 +18,8 @@
                     <div v-text="`${dateRef.month}月`" v-if="stepRef == 'day'" @click="onSwitchStepClick('month')" />
                 </template>
             </div>
-            <Icon type="arrow" button :size="26" @click="buildPickerItems(stepRef, 1)" />
+            <Icon class="flex-0" type="arrow" button :size="26" :color="'#8a9099'" :hover-color="'#58a4fd'"
+                @click="buildPickerItems(stepRef, 1)" />
         </template>
         <!-- 年月日选择-->
         <template #main>
@@ -382,15 +384,6 @@ buildPickerItems(stepRef.value, 0);
         align-items: center;
         border-bottom: solid 1px #eee;
         padding: 0 4px;
-
-        >svg {
-            flex-shrink: 0;
-            fill: #8a9099;
-
-            &:hover {
-                fill: #58a4fd;
-            }
-        }
 
         >div.header-content {
             flex: 1;

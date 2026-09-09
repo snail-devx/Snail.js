@@ -78,19 +78,24 @@ const styleRef = computed(() => {
     --hover: #8a8099;
     transition: all 0.2s linear;
     opacity: 1;
+    fill: var(--fill);
 
     &.button {
         cursor: pointer;
     }
 
-    &:not(:hover) {
-        fill: var(--fill)
-    }
+
 
     //  鼠标移入颜色
-    &:hover {
+    // &:hover {
+    //     fill: var(--hover);
+    // }
+}
+
+//  仅在拥有精确指针设备（如鼠标）时应用 hover 效果；避免 移动端 点击后，也会保留 :hover 效果
+@media (hover: hover) and (pointer: fine) {
+    .snail-icon:hover {
         fill: var(--hover);
     }
-
 }
 </style>
