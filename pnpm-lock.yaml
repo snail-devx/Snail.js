@@ -88,8 +88,8 @@ importers:
   packages/snail.vue:
     dependencies:
       snail.core:
-        specifier: '>=2.0.30'
-        version: 2.0.30(typescript@5.9.3)
+        specifier: '>=2.0.31'
+        version: 2.0.31(typescript@5.9.3)
       snail.view:
         specifier: '>=2.0.11'
         version: 2.0.11(typescript@5.9.3)
@@ -131,14 +131,14 @@ importers:
   packages/snail.vue-example:
     dependencies:
       snail.core:
-        specifier: '>=2.0.30'
-        version: 2.0.30(typescript@5.9.3)
+        specifier: '>=2.0.31'
+        version: 2.0.31(typescript@5.9.3)
       snail.view:
         specifier: '>=2.0.11'
         version: 2.0.11(typescript@5.9.3)
       snail.vue:
-        specifier: '>=2.0.29'
-        version: 2.0.29(typescript@5.9.3)
+        specifier: '>=2.0.30'
+        version: 2.0.30(typescript@5.9.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -216,14 +216,14 @@ importers:
   packages/snail.vue-form:
     dependencies:
       snail.core:
-        specifier: '>=2.0.30'
-        version: 2.0.30(typescript@5.9.3)
+        specifier: '>=2.0.31'
+        version: 2.0.31(typescript@5.9.3)
       snail.view:
         specifier: '>=2.0.11'
         version: 2.0.11(typescript@5.9.3)
       snail.vue:
-        specifier: '>=2.0.29'
-        version: 2.0.29(typescript@5.9.3)
+        specifier: '>=2.0.30'
+        version: 2.0.30(typescript@5.9.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -272,8 +272,8 @@ importers:
   rollups/snail.rollup-asset:
     dependencies:
       snail.core:
-        specifier: '>=2.0.30'
-        version: 2.0.30(typescript@5.9.3)
+        specifier: '>=2.0.31'
+        version: 2.0.31(typescript@5.9.3)
       snail.rollup:
         specifier: '>=2.0.0'
         version: 2.0.0(typescript@5.9.3)
@@ -284,8 +284,8 @@ importers:
   rollups/snail.rollup-html:
     dependencies:
       snail.core:
-        specifier: '>=2.0.30'
-        version: 2.0.30(typescript@5.9.3)
+        specifier: '>=2.0.31'
+        version: 2.0.31(typescript@5.9.3)
       snail.rollup:
         specifier: '>=2.0.0'
         version: 2.0.0(typescript@5.9.3)
@@ -293,8 +293,8 @@ importers:
   rollups/snail.rollup-inject:
     dependencies:
       snail.core:
-        specifier: '>=2.0.30'
-        version: 2.0.30(typescript@5.9.3)
+        specifier: '>=2.0.31'
+        version: 2.0.31(typescript@5.9.3)
       snail.rollup:
         specifier: '>=2.0.0'
         version: 2.0.0(typescript@5.9.3)
@@ -302,8 +302,8 @@ importers:
   rollups/snail.rollup-script:
     dependencies:
       snail.core:
-        specifier: '>=2.0.30'
-        version: 2.0.30(typescript@5.9.3)
+        specifier: '>=2.0.31'
+        version: 2.0.31(typescript@5.9.3)
       snail.rollup:
         specifier: '>=2.0.0'
         version: 2.0.0(typescript@5.9.3)
@@ -342,8 +342,8 @@ importers:
         specifier: ^10.1.3
         version: 10.1.3(postcss@8.5.6)
       snail.core:
-        specifier: '>=2.0.30'
-        version: 2.0.30(typescript@5.9.3)
+        specifier: '>=2.0.31'
+        version: 2.0.31(typescript@5.9.3)
       snail.rollup:
         specifier: '>=2.0.0'
         version: 2.0.0(typescript@5.9.3)
@@ -367,8 +367,8 @@ importers:
   rollups/snail.rollup-url:
     dependencies:
       snail.core:
-        specifier: '>=2.0.30'
-        version: 2.0.30(typescript@5.9.3)
+        specifier: '>=2.0.31'
+        version: 2.0.31(typescript@5.9.3)
       snail.rollup:
         specifier: '>=2.0.0'
         version: 2.0.0(typescript@5.9.3)
@@ -382,8 +382,8 @@ importers:
         specifier: ^3.5.13
         version: 3.5.24
       snail.core:
-        specifier: '>=2.0.30'
-        version: 2.0.30(typescript@5.9.3)
+        specifier: '>=2.0.31'
+        version: 2.0.31(typescript@5.9.3)
       snail.rollup:
         specifier: '>=2.0.0'
         version: 2.0.0(typescript@5.9.3)
@@ -2354,6 +2354,11 @@ packages:
     peerDependencies:
       typescript: '>=5.8.2'
 
+  snail.core@2.0.31:
+    resolution: {integrity: sha512-gieSwVd6586luXnudTZu56WzJ2ydsPJ38Ux6C5IHrQiJceiXIQyJNuBZGblNJ9CqlRKNBgYdiuCkxkjw5C0ibQ==}
+    peerDependencies:
+      typescript: '>=5.8.2'
+
   snail.rollup-asset@2.0.0:
     resolution: {integrity: sha512-GyyROIkKYxv+JfYbIwboZuhWAztYwVjomW+wkcAkNSFwh3AYagMJVUemUxQ6mwAYXp5De/Hb+ZIia1ZwHOU1gQ==}
 
@@ -2381,8 +2386,8 @@ packages:
   snail.view@2.0.11:
     resolution: {integrity: sha512-UhUQU6Guj0qESORYWpCePmrgAViNUhN2/D6T31SHDG7BkF6hgglPPflTIw+6fiBheVrqL1SQLnFT1njbfIhtXQ==}
 
-  snail.vue@2.0.29:
-    resolution: {integrity: sha512-SG9IJBs0vVRKJ6h6HfO03y7aPIJxF2qN2n9n+bd4V4DUY/ajodxGLc19JcfkkhOd0uin2Eti+i9khTaQgtuJvg==}
+  snail.vue@2.0.30:
+    resolution: {integrity: sha512-YRiJ6aIMYOeCaOquStAxKknZM1icL9rzvjlJlXw+WQZwbGLoAqoWr12L7znaBGW7Fqc0lF2Ps0iMLkHUyShWjw==}
 
   sortablejs@1.15.6:
     resolution: {integrity: sha512-aNfiuwMEpfBM/CN6LY0ibyhxPfPbyFeBTYJKCvzkJ2GkUpazIt3H+QIPAMHwqQ7tMKaHz1Qj+rJJCqljnf4p3A==}
@@ -4771,6 +4776,10 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
+  snail.core@2.0.31(typescript@5.9.3):
+    dependencies:
+      typescript: 5.9.3
+
   snail.rollup-asset@2.0.0(typescript@5.9.3):
     dependencies:
       snail.core: 2.0.30(typescript@5.9.3)
@@ -4781,14 +4790,14 @@ snapshots:
 
   snail.rollup-html@2.0.0(typescript@5.9.3):
     dependencies:
-      snail.core: 2.0.30(typescript@5.9.3)
+      snail.core: 2.0.31(typescript@5.9.3)
       snail.rollup: 2.0.0(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
   snail.rollup-inject@2.0.0(typescript@5.9.3):
     dependencies:
-      snail.core: 2.0.30(typescript@5.9.3)
+      snail.core: 2.0.31(typescript@5.9.3)
       snail.rollup: 2.0.0(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
@@ -4822,7 +4831,7 @@ snapshots:
       postcss: 8.5.6
       postcss-nested: 7.0.2(postcss@8.5.6)
       postcss-url: 10.1.3(postcss@8.5.6)
-      snail.core: 2.0.30(typescript@5.9.3)
+      snail.core: 2.0.31(typescript@5.9.3)
       snail.rollup: 2.0.0(typescript@5.9.3)
       snail.rollup-asset: 2.0.0(typescript@5.9.3)
       snail.rollup-inject: 2.0.0(typescript@5.9.3)
@@ -4833,7 +4842,7 @@ snapshots:
 
   snail.rollup-url@2.0.0(typescript@5.9.3):
     dependencies:
-      snail.core: 2.0.30(typescript@5.9.3)
+      snail.core: 2.0.31(typescript@5.9.3)
       snail.rollup: 2.0.0(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
@@ -4842,7 +4851,7 @@ snapshots:
     dependencies:
       '@vitejs/plugin-vue': 5.2.4(vite@6.4.1(@types/node@22.19.0)(less@4.4.2)(terser@5.44.1))(vue@3.5.24(typescript@5.9.3))
       '@vue/compiler-sfc': 3.5.24
-      snail.core: 2.0.30(typescript@5.9.3)
+      snail.core: 2.0.31(typescript@5.9.3)
       snail.rollup: 2.0.0(typescript@5.9.3)
       snail.rollup-script: 2.0.0(@types/node@22.19.0)(less@4.4.2)(terser@5.44.1)(typescript@5.9.3)
       snail.rollup-style: 2.0.0(typescript@5.9.3)
@@ -4870,13 +4879,13 @@ snapshots:
 
   snail.view@2.0.11(typescript@5.9.3):
     dependencies:
-      snail.core: 2.0.30(typescript@5.9.3)
+      snail.core: 2.0.31(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
-  snail.vue@2.0.29(typescript@5.9.3):
+  snail.vue@2.0.30(typescript@5.9.3):
     dependencies:
-      snail.core: 2.0.30(typescript@5.9.3)
+      snail.core: 2.0.31(typescript@5.9.3)
       snail.view: 2.0.11(typescript@5.9.3)
       sortablejs: 1.15.6
       vue: 3.5.24(typescript@5.9.3)
