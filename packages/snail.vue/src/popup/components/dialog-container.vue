@@ -7,7 +7,7 @@
                 :props="props" :="dialogExtend" :popup-status="popupStatus.value" v-model="model" />
         </template>
         <!-- 启用Wrapper模式时，强制注入【onBuildData】 -->
-        <Wrapper v-else class="dialog-body" :in-popup="true" :="options.wrapper" @cancel="closePopup()"
+        <Wrapper v-else class="dialog-body dialog-builtin" :in-popup="true" :="options.wrapper" @cancel="closePopup()"
             @confirm="onWrapperConfirm">
             <Dynamic :name="options.name" :component="options.component" :url="options.url" :props="props"
                 :="dialogExtend" :popup-status="popupStatus.value" v-model="model"
@@ -107,20 +107,21 @@ onMounted(() => {
         border-radius: 4px;
         //  私有添加阴影，增强显示效果
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-    }
 
-    // 启用包裹组件时，特殊样式：默认不制定高度和宽度，由内容组件自己决定
-    >.snail-wrapper {
-        min-width: auto;
-        width: fit-content;
-        min-height: auto;
-        height: fit-content;
+        // Dialog 内置的Wrapper组件：默认不指定高度和宽度，由内容组件自己决定
+        &.snail-wrapper.dialog-builtin {
+            min-width: auto;
+            width: fit-content;
+            min-height: auto;
+            height: fit-content;
 
-        >.wrapper-body {
-            padding: 0 40px;
+            >.wrapper-body {
+                padding: 0 40px;
+            }
         }
     }
 }
+
 
 // *****************************************   👉  特殊状态    *****************************************
 //  非激活状态时
