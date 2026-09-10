@@ -139,15 +139,34 @@ export function correctTimeFormat(format: TimeFormat, newValue: TimeFormat): Tim
 
 //#region *************************************        格式美化        *************************************
 /**
+ * 格式化UTC日期时间字符串
+ * @param utcStr  世界协调时间字符串，带有时区信息，如 T+08
+ * @param format 格式，默认为 "yyyy-MM-dd"
+ * @returns 格式化后的日期字符串；`utcStr`无效返回undefined
+ */
+export function formatUtcStr(utcStr: string, format?: DateFormat): string | undefined {
+    try {
+        const date = new Date(utcStr);
+        return isDate(date) == true
+            ? formatDate(date, format)
+            : undefined;
+    }
+    catch (ex) {
+        console.error("format utc str failed. utcStr:", utcStr, ex)
+        return undefined;
+    }
+}
+/**
  * 格式化日期为字符串
  * @param date 
  * @param format 格式，默认为 "yyyy-MM-dd"
- * @returns 格式化后的日期字符串；date无效返回undefined
+ * @returns 格式化后的日期字符串；`date`无效返回undefined
  */
-export function formatDate(date: Date, format: DateFormat): string | undefined {
+export function formatDate(date: Date, format?: DateFormat): string | undefined {
     //  后续再考虑优化一下，有不少重复性的代码项
     const dateValue = getDateValue(date);
-    if (dateValue) {
+    if (dateValue != undefined) {
+        format = correctDateFormat(format, "yyyy-MM-dd")
         switch (format) {
             case "yyyy": {
                 return padStart(dateValue.year, 4, "0");
@@ -201,9 +220,9 @@ export function formatDate(date: Date, format: DateFormat): string | undefined {
  * 格式化日期值为字符串
  * @param value 
  * @param format 格式，默认为 "yyyy-MM-dd"
- * @returns 格式化后的日期字符串；dValue无效返回undefined
+ * @returns 格式化后的日期字符串；`value`无效返回undefined
  */
-export function formatDateValue(value: Partial<DateValue>, format: DateFormat): string | undefined {
+export function formatDateValue(value: Partial<DateValue>, format?: DateFormat): string | undefined {
     const date = getDateByValue(value);
     return formatDate(date, format);
 }
@@ -216,7 +235,7 @@ export function formatDateValue(value: Partial<DateValue>, format: DateFormat): 
 export function formatTimeValue(time: Partial<TimeValue>, format?: TimeFormat): string | undefined {
     //  后续再考虑优化一下，有不少重复性的代码项
     time = correctTimeValue({ ...time });
-    if (time) {
+    if (time != undefined) {
         switch (format) {
             case "HH": return padStart(time.hour || 0, 2, "0");
             case "HH:mm": return [
