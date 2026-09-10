@@ -1,4 +1,52 @@
 // 文本渲染相关样式，如文本养色、字体大小、斜体、下划线等
+
+
+//  字体样式
+.snail-app {
+
+    //  加粗
+    .font-bold {
+        font-weight: bold;
+    }
+
+    //  斜体
+    .italic {
+        font-style: italic;
+    }
+}
+
+// 文本渲染
+.snail-app {
+
+    //  文本不换行
+    .text-nowrap {
+        text-wrap: nowrap;
+        white-space: nowrap;
+    }
+
+    //  居中对齐
+    .text-center {
+        text-align: center;
+    }
+
+    // 右对齐
+    .text-right {
+        text-align: right;
+    }
+
+    //  下划线
+    .underline {
+        text-decoration: underline;
+    }
+
+    //  上划线
+    .overline {
+        text-decoration: overline;
+    }
+
+}
+
+//  特定效果
 .snail-app {
 
     //  占位提示文本
@@ -8,6 +56,7 @@
 
     //  文本省略号
     .ellipsis {
+        text-wrap: nowrap;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

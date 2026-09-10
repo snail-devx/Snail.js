@@ -1,32 +1,50 @@
 // 盒子模型 相关样式：尺寸大小、边框、圆角、滚动条
 
+//  -- 高度、宽度相关
+.snail-app {
+    .wh-full {
+        width: 100%;
+        height: 100%;
+    }
+
+    .w-full {
+        width: 100%;
+    }
+
+    .h-full {
+        height: 100%;
+    }
+
+    .wh-fit {
+        width: fit-content;
+        height: fit-content;
+    }
+
+    .w-fit {
+        width: fit-content;
+    }
+
+    .h-fit {
+        height: fit-content;
+    }
+
+    //------------下面是一些常用的高度、宽度尺寸
+
+    .h-32px {
+        height: 32px;
+    }
+
+    .h-40px {
+        height: 40px;
+    }
+
+    .h-100px {
+        height: 100%;
+    }
+}
+
 //  -- 溢出滚动相关
 .snail-app {
-
-    //  滚动条样式
-    ::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
-        border-radius: 12px;
-        background-color: transparent;
-    }
-
-    ::-webkit-scrollbar-button {
-        display: none !important;
-        height: 0;
-        width: 0;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        border-radius: 10px;
-        background-color: rgba(180, 180, 180, 0.9);
-        border: 1px solid rgba(255, 255, 255, 0.85);
-    }
-
-    ::-webkit-scrollbar-track {
-        border-radius: 10px;
-        background-color: transparent;
-    }
 
     //  溢出时，x轴出滚动条，y轴隐藏
     .scroll-x {
@@ -71,6 +89,108 @@
         width: 0px;
         height: 0px;
     }
+}
 
+//  -- 溢出隐藏相关：和 scroll-x、scroll-y、scroll-xy 重合，但在溢出语义环境下更清晰
+.snail-app {
 
+    //  水平垂直方向溢出隐藏：overflow: hidden
+    .hidden-xy {
+        overflow: hidden;
+    }
+
+    //  水平方向溢出隐藏：overflow-x: hidden;
+    .hidden-x {
+        overflow-x: hidden;
+    }
+
+    //  垂直方向溢出隐藏：overflow-x: hidden;
+    .hidden-y {
+        overflow-y: hidden;
+    }
+}
+
+//  -- 定位位置相关
+.snail-app {
+
+    //  position 定位
+    & {
+
+        //  绝对定位
+        .absolute {
+            position: absolute;
+        }
+
+        // 相对定位
+        .relative {
+            position: relative;
+        }
+
+        // 固定位置
+        .fixed {
+            position: fixed;
+        }
+
+        // 黏性定位
+        .sticky {
+            position: sticky;
+        }
+    }
+
+    //  起始位置
+    & {
+        .lt-start {
+            left: 0;
+            top: 0;
+        }
+
+        .lb-start {
+            left: 0;
+            top: 100%;
+        }
+
+        .rt-start {
+            left: 100%;
+            top: 0%;
+        }
+
+        .rb-start {
+            left: 100%;
+            top: 100%;
+        }
+    }
+
+    //  结束位置
+    & {
+        .lt-end {
+            right: 100%;
+            bottom: 100%;
+        }
+
+        .lb-end {
+            right: 100%;
+            bottom: 0;
+        }
+
+        .rt-end {
+            right: 0;
+            bottom: 100%;
+        }
+
+        .rb-end {
+            right: 0;
+            bottom: 0;
+        }
+    }
+
+    //  中心点
+    & {
+
+        //  中心点居中；水平垂直居中：和父保持一个中心点
+        .cp-center {
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
 }

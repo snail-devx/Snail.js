@@ -89,3 +89,31 @@
         color: #8a9099;
     }
 }
+
+//  滚动条默认样式
+.snail-app {
+
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+        border-radius: 12px;
+        background-color: transparent;
+    }
+
+    ::-webkit-scrollbar-button {
+        display: none !important;
+        height: 0;
+        width: 0;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background-color: rgba(180, 180, 180, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.85);
+    }
+
+    ::-webkit-scrollbar-track {
+        border-radius: 10px;
+        background-color: transparent;
+    }
+}
