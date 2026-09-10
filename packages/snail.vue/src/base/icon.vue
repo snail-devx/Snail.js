@@ -74,22 +74,18 @@ const styleRef = computed(() => {
 </script>
 <style lang="less">
 .snail-icon {
-    --fill: #8a8099;
-    --hover: #8a8099;
     transition: all 0.2s linear;
     opacity: 1;
+    flex-shrink: 0;
+
+    //  颜色控制
+    --fill: #8a8099;
+    --hover: #8a8099;
     fill: var(--fill);
 
     &.button {
         cursor: pointer;
     }
-
-
-
-    //  鼠标移入颜色
-    // &:hover {
-    //     fill: var(--hover);
-    // }
 }
 
 //  仅在拥有精确指针设备（如鼠标）时应用 hover 效果；避免 移动端 点击后，也会保留 :hover 效果
