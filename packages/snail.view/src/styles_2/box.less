@@ -2,111 +2,148 @@
 
 //  -- 高度、宽度相关
 .snail-app {
+
+    //------------高度、宽度相关
+
+    //  高宽充满父容器
     .wh-full {
         width: 100%;
         height: 100%;
     }
 
-    .w-full {
-        width: 100%;
-    }
-
-    .h-full {
-        height: 100%;
-    }
-
+    // 高宽按内容适应
     .wh-fit {
         width: fit-content;
         height: fit-content;
     }
 
+    //------------宽度相关
+
+    // 宽度充满父容器
+    .w-full {
+        width: 100%;
+    }
+
+    // 宽度按内容适应
     .w-fit {
         width: fit-content;
     }
 
+    //------------高度相关
+
+    // 高度充满父容器
+    .h-full {
+        height: 100%;
+    }
+
+    // 高度按内容适应
     .h-fit {
         height: fit-content;
     }
 
-    //------------下面是一些常用的高度、宽度尺寸
-
+    // 高度 32px
     .h-32px {
         height: 32px;
     }
 
+    // 高度 40px
     .h-40px {
         height: 40px;
     }
 
+    // 高度 100px
     .h-100px {
         height: 100%;
     }
 }
 
-//  -- 溢出滚动相关
+//  -- 溢出相关：溢出隐藏和溢出滚动重合，但在隐藏语义下更贴合，先保留
 .snail-app {
 
-    //  溢出时，x轴出滚动条，y轴隐藏
-    .scroll-x {
-        overflow: auto hidden;
+    // 溢出隐藏
+    & {
+
+        //  X轴溢出隐藏：overflow-x: hidden;
+        .x-hidden {
+            overflow-x: hidden;
+        }
+
+        //  Y轴溢出隐藏：overflow-y: hidden;
+        .y-hidden {
+            overflow-y: hidden;
+        }
+
+        //  XY轴溢出隐藏：overflow: hidden
+        .xy-hidden {
+            overflow: hidden;
+        }
     }
 
-    //  溢出时，y轴出滚动条，x轴隐藏
-    .scroll-y {
-        overflow: hidden auto;
+    // 溢出自动滚动
+    & {
+
+        //  x轴出自动滚动条，y轴隐藏
+        .x-auto {
+            overflow: auto hidden;
+        }
+
+        //  y轴自动出滚动条，x轴隐藏
+        .y-auto {
+            overflow: hidden auto;
+        }
+
+        //  x、y轴都自动出滚动条
+        .xy-auto {
+            overflow: auto;
+        }
+
     }
 
-    //  溢出时，x、y轴都出滚动条
-    .scroll-xy {
-        overflow: auto;
+    //  始终出滚动条
+    & {
+
+        //  x轴始终出滚动条，y轴隐藏
+        .x-scroll {
+            overflow: scroll hidden;
+        }
+
+        //  y轴始终出滚动条，x轴隐藏
+        .y-scroll {
+            overflow: hidden scroll;
+        }
+
+        //  x、y轴都始终出滚动条
+        .xy-scroll {
+            overflow: scroll;
+        }
     }
 
-    //  溢出时，x、y轴都隐藏
-    .scroll-none {
-        overflow: hidden;
-    }
+    // 滚动条大小
+    & {
 
-    //  normal 滚动条   10px
-    .scrollbar-normal::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
-    }
+        //  normal 滚动条   10px
+        .bar-normal::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
 
-    //  small 滚动条   6px
-    .scrollbar-small::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-    }
+        //  small 滚动条   6px
+        .bar-small::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
 
-    //  mini滚动条   4px
-    .scrollbar-mini::-webkit-scrollbar {
-        width: 4px;
-        height: 4px;
-    }
+        //  mini 滚动条   4px
+        .bar-mini::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
 
-    //  none滚动条   0px
-    .scrollbar-none::-webkit-scrollbar {
-        width: 0px;
-        height: 0px;
-    }
-}
-
-//  -- 溢出隐藏相关：和 scroll-x、scroll-y、scroll-xy 重合，但在溢出语义环境下更清晰
-.snail-app {
-
-    //  水平垂直方向溢出隐藏：overflow: hidden
-    .hidden-xy {
-        overflow: hidden;
-    }
-
-    //  水平方向溢出隐藏：overflow-x: hidden;
-    .hidden-x {
-        overflow-x: hidden;
-    }
-
-    //  垂直方向溢出隐藏：overflow-x: hidden;
-    .hidden-y {
-        overflow-y: hidden;
+        //  none 滚动条   0px
+        .bar-none::-webkit-scrollbar {
+            width: 0px;
+            height: 0px;
+        }
     }
 }
 
@@ -137,60 +174,233 @@
         }
     }
 
-    //  起始位置
+    //  位置信息 - 开始位置
     & {
+
+        //---------- 基础样式 ----------
+
+        // 左侧为开始位置
+        .left-start {
+            left: 0;
+        }
+
+        //  右侧为开始位置
+        .right-start {
+            left: 100%;
+        }
+
+        // 顶部为开始位置
+        .top-start {
+            top: 0;
+        }
+
+        //  底部为开始位置
+        .bottom-start {
+            top: 100%;
+        }
+
+        //---------- 组合样式 ----------
+
+        // 左上角为开始位置
         .lt-start {
             left: 0;
             top: 0;
         }
 
+        // 左下角为开始位置
         .lb-start {
             left: 0;
             top: 100%;
         }
 
+        // 右上角为开始位置
         .rt-start {
             left: 100%;
             top: 0%;
         }
 
+        // 右下角为开始位置
         .rb-start {
             left: 100%;
             top: 100%;
         }
     }
 
-    //  结束位置
+    //  位置信息 - 结束位置
     & {
+
+        //---------- 基础样式 ----------
+
+        // 左侧为结束位置
+        .left-end {
+            right: 100%;
+        }
+
+        //  右侧为结束位置
+        .right-end {
+            right: 0;
+        }
+
+        // 顶部为结束位置
+        .top-end {
+            bottom: 100%;
+        }
+
+        //  底部为结束位置
+        .bottom-end {
+            bottom: 0;
+        }
+
+        //---------- 复合样式 ----------
+
+        // 左上角为结束位置
         .lt-end {
             right: 100%;
             bottom: 100%;
         }
 
+        // 左下角为结束位置
         .lb-end {
             right: 100%;
             bottom: 0;
         }
 
+        // 右上角为结束位置
         .rt-end {
             right: 0;
             bottom: 100%;
         }
 
+        // 右下角为结束位置
         .rb-end {
             right: 0;
             bottom: 0;
         }
     }
 
-    //  中心点
+    //  居中位置
     & {
 
-        //  中心点居中；水平垂直居中：和父保持一个中心点
-        .cp-center {
+        // X轴居中；水平居中
+        .x-center {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        // Y轴居中；垂直居中
+        .y-center {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        // XY轴居中；水平垂直居中；和父保持一个中心点
+        .xy-center {
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
         }
     }
+
+    //  固定钉住位置，内容能显示出来：固定左上角，右上角、左下角、右下角
+    & {
+
+        //  左上角 为钉住位置
+        .lt-pin {
+            left: 0;
+            top: 0;
+        }
+
+        // 左下角 为钉住位置
+        .lb-pin {
+            left: 0;
+            bottom: 0;
+        }
+
+        // 右上角 为钉住位置
+        .rt-pin {
+            right: 0;
+            top: 0;
+        }
+
+        // 右下角 为钉住位置
+        .rb-pin {
+            right: 0;
+            bottom: 0;
+        }
+    }
+
+    // 复合样式 - 绝对定位
+    & {
+
+        //  绝对定位：left、top起始位置：left: 0; top: 0;
+        .absolute-start {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        //  绝对定位，水平垂直居中显示：left:50% top:50%; transform: translate(-50%, -50%)
+        .absolute-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        //  绝对定位，右下角为结束位置
+        .absolute-end {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+        }
+
+        // 绝对定位，充满容器，左上角为开始位置，右下角为结束位置
+        .absolute-full {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    // 复合样式 - 固定定位
+    & {
+
+        //  固定定位：left、top起始位置：left: 0; top: 0;
+        .fixed-start {
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        //  固定定位，水平垂直居中显示：left:50% top:50%; transform: translate(-50%, -50%)
+        .fixed-center {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        //  固定定位，右下角为结束位置
+        .fixed-end {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+        }
+
+        // 固定定位，充满容器，左上角为开始位置，右下角为结束位置
+        .fixed-full {
+            position: fixed;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
 }

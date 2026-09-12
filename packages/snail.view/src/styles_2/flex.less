@@ -1,46 +1,241 @@
 //  display：flex 时，弹性布局关布局样式
-.snail-app {
 
-    //  flex 布局，主轴和交叉轴居中
-    .flex-center {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+//  Flex 布局： 容器属性 - 主轴方向+换行
+.snail-app .flex {
+    display: flex;
+
+    //---------- 下面是 主轴方向 ----------
+
+    //  主轴为水平方向，起点在左端
+    &.row {
+        flex-direction: row;
     }
 
-    //  flex 布局，主轴居中
-    .flex-main-center {
-        display: flex;
-        justify-content: center;
+    // 主轴为水平方向，起点在右端。
+    &.row-reverse {
+        flex-direction: row-reverse;
     }
 
-    //  flex 布局，交叉轴居中
-    .flex-cross-center {
-        display: flex;
-        align-items: center;
-    }
-
-    //  flex 布局，主轴和交叉轴end对齐
-    .flex-end {
-        display: flex;
-        align-items: flex-end;
-        justify-content: flex-end;
-    }
-
-    //  flex布局，列 为主轴
-    .flex-column {
-        display: flex;
+    // 主轴为垂直方向，起点在上沿。
+    &.column {
         flex-direction: column;
     }
 
-    //  flex:0 不自动撑开
-    .flex-0 {
-        flex: none;
+    // 主轴为垂直方向，起点在下沿
+    &.column-reverse {
+        flex-direction: column-reverse;
     }
 
-    //  flex:1 自动撑开
-    .flex-1 {
+    //---------- 下面是 项目换行方式 ----------
+
+    // 换行，第一行在上方
+    &.wrap {
+        flex-wrap: wrap;
+    }
+
+    // 换行，第一行在下方
+    &.wrap-reverse {
+        flex-wrap: wrap-reverse;
+    }
+
+    // 不换行，所有 flex 项都排在一行
+    &.nowrap {
+        flex-wrap: nowrap;
+    }
+}
+
+// Flex 布局： 容器属性 - 项目对齐方式
+.snail-app .flex {
+
+    //---------- 下面是 项目主轴上对齐方式 ----------
+
+    //  主轴 起始位置对齐
+    &.main-start {
+        justify-content: flex-start;
+    }
+
+    //  主轴 居中对齐
+    &.main-center {
+        justify-content: center;
+    }
+
+    //  主轴 结束位置对齐
+    &.main-end {
+        justify-content: flex-end;
+    }
+
+    //  主轴两端对齐，项目之间间隔平均分布。首尾元素位于start和end
+    &.main-between {
+        justify-content: space-between;
+    }
+
+    //  主轴项目两侧间隔平均分布；【项目之间的间隔】是【项目与边框的间隔】的2倍
+    &.main-around {
+        justify-content: space-around;
+    }
+
+    //  主轴 主轴每个项目之间间隔平均分布；【项目之间的间隔】和【项目与边框的间隔】一致
+    &.main-evenly {
+        justify-content: space-evenly;
+    }
+
+    //---------- 下面是 项目交叉轴上对齐方式 ----------
+
+    //  交叉轴 起始位置对齐
+    &.cross-start {
+        align-items: flex-start;
+    }
+
+    //  交叉轴 居中对齐
+    &.cross-center {
+        align-items: center;
+    }
+
+    //  交叉轴 结束位置对齐
+    &.cross-end {
+        align-items: flex-end;
+    }
+
+    //  交叉轴 拉伸填充满
+    &.cross-stretch {
+        align-items: stretch;
+    }
+
+    //  交叉轴 第一行文字基线对齐
+    &.cross-baseline {
+        align-items: baseline;
+    }
+
+    //---------- 下面是 项目换行时多根轴线上对齐方式 ----------
+
+    //  多行时 交叉轴起点对齐
+    &.content-start {
+        align-content: flex-start;
+    }
+
+    //  多行时 交叉轴居中对齐
+    &.content-center {
+        align-content: center;
+    }
+
+    //  多行时 交叉轴终点对齐
+    &.content-end {
+        align-content: flex-end;
+    }
+
+    //  多行时 交叉轴两端对齐，行之间间隔平均分布
+    &.content-between {
+        align-content: space-between;
+    }
+
+    //  多行时 交叉轴每行两侧间隔平均分布
+    &.content-around {
+        align-content: space-around;
+    }
+
+    //  多行时 交叉轴每行之间间隔平均分布
+    &.content-evenly {
+        align-content: space-evenly;
+    }
+
+    //  多行时 交叉轴拉伸对齐
+    &.content-stretch {
+        align-content: flex-stretch;
+    }
+}
+
+//  Flex 布局：项目属性 - 复合样式
+.snail-app {
+    .flex-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+    }
+}
+
+
+//  Flex 布局：项目属性 - 自定义对齐
+.snail-app .flex {
+
+    //---------- 下面是 覆盖容器指定的 align-items 对齐方式 ----------
+
+    // 交叉轴 起始位置对齐
+    >.self-start {
+        align-self: flex-start;
+    }
+
+    // 交叉轴 居中对齐
+    >.self-center {
+        align-self: center;
+    }
+
+    // 交叉轴 结束位置对齐
+    >.self-end {
+        align-self: flex-end;
+    }
+
+    // 交叉轴 拉伸填充满
+    >.self-stretch {
+        align-self: stretch;
+    }
+
+    // 交叉轴 第一行文字基线对齐
+    >.self-baseline {
+        align-self: baseline;
+    }
+}
+
+//  Flex 布局：项目属性 - 缩放
+.snail-app .flex {
+
+    //---------- 缩放控制 ----------
+
+    //  初始值 仅放大（0 1 auto）
+    >.flex-initial {
+        // flex: 0 1 auto;
+        flex: initial;
+    }
+
+    //  自动缩放 （1 1 auto）
+    >.flex-auto {
+        // flex: 1 1 auto;
+        flex: auto;
+    }
+
+    //  自动缩放 （	flex: 1 1 0%）
+    >.flex-1 {
+        // flex: 1 1 0%;
         flex: 1;
     }
 
+    //  不缩放，固定尺寸 （0 0 auto)
+    >.flex-none {
+        // flex: 0 0 auto;
+        flex: none;
+    }
+
+    //---------- 缩小控制 ----------
+
+    //  自动缩小
+    >.shrink-1 {
+        flex-shrink: 1;
+    }
+
+    // 不缩小
+    >.shrink-0 {
+        flex-shrink: 0;
+    }
+
+    //---------- 放大控制 ----------
+
+    // 自动放大
+    >.grow-1 {
+        flex-grow: 1;
+    }
+
+    // 不放大
+    >.grow-0 {
+        flex-grow: 0;
+    }
 }
