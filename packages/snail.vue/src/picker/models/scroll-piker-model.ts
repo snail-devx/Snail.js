@@ -34,7 +34,7 @@ export type ScrollPickItem = {
      * 是否禁用
      * - 为true,表示禁用此选项，不能被选中
      */
-    disabled?: string;
+    disabled?: boolean;
 }
 /**
  * 滚动选择器 组件事件
