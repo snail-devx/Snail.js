@@ -60,61 +60,46 @@
 //  -- 溢出相关：溢出隐藏和溢出滚动重合，但在隐藏语义下更贴合，先保留
 .snail-app {
 
-    // 溢出隐藏
+    // 溢出时，隐藏溢出内容
     & {
 
         //  X轴溢出隐藏：overflow-x: hidden;
-        .x-hidden {
+        .hidden-x {
             overflow-x: hidden;
         }
 
         //  Y轴溢出隐藏：overflow-y: hidden;
-        .y-hidden {
+        .hidden-y {
             overflow-y: hidden;
         }
 
         //  XY轴溢出隐藏：overflow: hidden
-        .xy-hidden {
+        .hidden-xy {
             overflow: hidden;
         }
     }
 
-    // 溢出自动滚动
+    // 溢出时，自动出滚动条
     & {
 
-        //  x轴出自动滚动条，y轴隐藏
-        .x-auto {
+        //  自动滚动X轴溢出，隐藏Y轴溢出
+        .scroll-x {
             overflow: auto hidden;
         }
 
-        //  y轴自动出滚动条，x轴隐藏
-        .y-auto {
+        //  自动滚动Y轴溢出，隐藏X轴溢出
+        .scroll-y {
             overflow: hidden auto;
         }
 
-        //  x、y轴都自动出滚动条
-        .xy-auto {
+        //  自动滚动XY轴溢出
+        .scroll-xy {
             overflow: auto;
         }
 
-    }
-
-    //  始终出滚动条
-    & {
-
-        //  x轴始终出滚动条，y轴隐藏
-        .x-scroll {
-            overflow: scroll hidden;
-        }
-
-        //  y轴始终出滚动条，x轴隐藏
-        .y-scroll {
-            overflow: hidden scroll;
-        }
-
-        //  x、y轴都始终出滚动条
-        .xy-scroll {
-            overflow: scroll;
+        //  隐藏XY轴溢出，和`hidden-xy`一致
+        .scroll-none {
+            overflow: hidden;
         }
     }
 
@@ -176,50 +161,49 @@
 
     //  位置信息 - 开始位置
     & {
-
         //---------- 基础样式 ----------
 
-        // 左侧为开始位置
+        // 左侧开始
         .left-start {
             left: 0;
         }
 
-        //  右侧为开始位置
+        //  右侧开始
         .right-start {
             left: 100%;
         }
 
-        // 顶部为开始位置
+        // 顶部开始
         .top-start {
             top: 0;
         }
 
-        //  底部为开始位置
+        //  底部开始
         .bottom-start {
             top: 100%;
         }
 
         //---------- 组合样式 ----------
 
-        // 左上角为开始位置
+        // 左上角开始
         .lt-start {
             left: 0;
             top: 0;
         }
 
-        // 左下角为开始位置
+        // 左下角开始
         .lb-start {
             left: 0;
             top: 100%;
         }
 
-        // 右上角为开始位置
+        // 右上角开始
         .rt-start {
             left: 100%;
             top: 0%;
         }
 
-        // 右下角为开始位置
+        // 右下角开始
         .rb-start {
             left: 100%;
             top: 100%;
@@ -231,101 +215,73 @@
 
         //---------- 基础样式 ----------
 
-        // 左侧为结束位置
+        // 左侧结束
         .left-end {
             right: 100%;
         }
 
-        //  右侧为结束位置
+        //  右侧结束
         .right-end {
             right: 0;
         }
 
-        // 顶部为结束位置
+        // 顶部结束
         .top-end {
             bottom: 100%;
         }
 
-        //  底部为结束位置
+        //  底部结束
         .bottom-end {
             bottom: 0;
         }
 
         //---------- 复合样式 ----------
 
-        // 左上角为结束位置
+        // 左上角结束
         .lt-end {
             right: 100%;
             bottom: 100%;
         }
 
-        // 左下角为结束位置
+        // 左下角结束
         .lb-end {
             right: 100%;
             bottom: 0;
         }
 
-        // 右上角为结束位置
+        // 右上角结束
         .rt-end {
             right: 0;
             bottom: 100%;
         }
 
-        // 右下角为结束位置
+        // 右下角结束
         .rb-end {
             right: 0;
             bottom: 0;
         }
     }
 
-    //  居中位置
+    //  中心点位置：center-point
     & {
 
-        // X轴居中；水平居中
-        .x-center {
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        // Y轴居中；垂直居中
-        .y-center {
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        // XY轴居中；水平垂直居中；和父保持一个中心点
-        .xy-center {
+        //  中心点居中：水平垂直居中
+        .cp-center {
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
         }
-    }
 
-    //  固定钉住位置，内容能显示出来：固定左上角，右上角、左下角、右下角
-    & {
-
-        //  左上角 为钉住位置
-        .lt-pin {
-            left: 0;
-            top: 0;
+        //  中心点x轴居中：水平居中
+        .cpx-center {
+            left: 50%;
+            transform: translateX(-50%);
         }
 
-        // 左下角 为钉住位置
-        .lb-pin {
-            left: 0;
-            bottom: 0;
-        }
-
-        // 右上角 为钉住位置
-        .rt-pin {
-            right: 0;
-            top: 0;
-        }
-
-        // 右下角 为钉住位置
-        .rb-pin {
-            right: 0;
-            bottom: 0;
+        //  中心点y轴居中：垂直居中
+        .cpy-center {
+            top: 50%;
+            transform: translateY(-50%);
         }
     }
 
@@ -347,14 +303,14 @@
             transform: translate(-50%, -50%);
         }
 
-        //  绝对定位，右下角为结束位置
+        //  绝对定位，右下角结束
         .absolute-end {
             position: absolute;
             right: 0;
             bottom: 0;
         }
 
-        // 绝对定位，充满容器，左上角为开始位置，右下角为结束位置
+        // 绝对定位，充满容器，左上角开始，右下角结束
         .absolute-full {
             position: absolute;
             left: 0;
@@ -384,14 +340,14 @@
             transform: translate(-50%, -50%);
         }
 
-        //  固定定位，右下角为结束位置
+        //  固定定位，右下角结束
         .fixed-end {
             position: fixed;
             right: 0;
             bottom: 0;
         }
 
-        // 固定定位，充满容器，左上角为开始位置，右下角为结束位置
+        // 固定定位，充满容器，左上角开始，右下角结束
         .fixed-full {
             position: fixed;
             left: 0;
@@ -404,3 +360,11 @@
     }
 
 }
+
+//  -- 背景 background
+
+//  -- 外边距 margin
+
+//  -- 外边框 border bt(border-top) bw(border-width) bc(border-color)  radius（边框）
+
+//  -- 内边距 padding
