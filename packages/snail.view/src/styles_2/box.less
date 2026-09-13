@@ -41,12 +41,12 @@
         height: fit-content;
     }
 
-    // 高度 32px
+    // 高度 32px,一般为一行高度
     .h-32px {
         height: 32px;
     }
 
-    // 高度 40px
+    // 高度 40px，标题行，导航头部高度
     .h-40px {
         height: 40px;
     }
@@ -82,22 +82,22 @@
     // 溢出时，自动出滚动条
     & {
 
-        //  自动滚动X轴溢出，隐藏Y轴溢出
+        //  X轴溢出滚动条，Y轴溢出隐藏
         .scroll-x {
             overflow: auto hidden;
         }
 
-        //  自动滚动Y轴溢出，隐藏X轴溢出
+        //  Y轴溢出滚动条，X轴溢出隐藏
         .scroll-y {
             overflow: hidden auto;
         }
 
-        //  自动滚动XY轴溢出
+        //  XY轴溢出滚动条
         .scroll-xy {
             overflow: auto;
         }
 
-        //  隐藏XY轴溢出，和`hidden-xy`一致
+        //  XY轴溢出无滚动条，溢出隐藏，和`hidden-xy`一致
         .scroll-none {
             overflow: hidden;
         }

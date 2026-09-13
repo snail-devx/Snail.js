@@ -154,38 +154,6 @@
     }
 }
 
-
-//  Flex 布局：项目属性 - 自定义对齐
-.snail-app .flex {
-
-    //---------- 下面是 覆盖容器指定的 align-items 对齐方式 ----------
-
-    // 交叉轴 起始位置对齐
-    >.self-start {
-        align-self: flex-start;
-    }
-
-    // 交叉轴 居中对齐
-    >.self-center {
-        align-self: center;
-    }
-
-    // 交叉轴 结束位置对齐
-    >.self-end {
-        align-self: flex-end;
-    }
-
-    // 交叉轴 拉伸填充满
-    >.self-stretch {
-        align-self: stretch;
-    }
-
-    // 交叉轴 第一行文字基线对齐
-    >.self-baseline {
-        align-self: baseline;
-    }
-}
-
 //  Flex 布局：项目属性 - 缩放
 .snail-app .flex {
 
@@ -237,5 +205,37 @@
     // 不放大
     >.grow-0 {
         flex-grow: 0;
+    }
+}
+
+
+//  Flex 布局：项目属性 - 自定义对齐
+.snail-app .flex {
+
+    //---------- 下面是 覆盖容器指定的 align-items 对齐方式 ----------
+
+    // 交叉轴 起始位置对齐
+    >.self-start {
+        align-self: flex-start;
+    }
+
+    // 交叉轴 居中对齐
+    >.self-center {
+        align-self: center;
+    }
+
+    // 交叉轴 结束位置对齐
+    >.self-end {
+        align-self: flex-end;
+    }
+
+    // 交叉轴 拉伸填充满
+    >.self-stretch {
+        align-self: stretch;
+    }
+
+    // 交叉轴 第一行文字基线对齐
+    >.self-baseline {
+        align-self: baseline;
     }
 }
