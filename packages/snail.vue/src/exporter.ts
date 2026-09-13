@@ -81,8 +81,10 @@ import FlashNumber from "./other/flash-number.vue";
 //  类型导出
 export * from "./picker/models/datetime-model"
 export * from "./picker/models/picker-model"
+export * from "./picker/models/scroll-piker-model"
 //  组件导出
 import DatePicker from "./picker/date-picker.vue";
+import ScrollPicker from "./picker/scroll-picker.vue";
 import TimePicker from "./picker/time-picker.vue";
 
 //  方法导出
@@ -113,7 +115,7 @@ export const components = {
     Dynamic, Elastic, Flex, Fold, Motion, Layout, Scroll, Sort, Table, TableRow, TableCol, Tree, Wrapper,
     FlashNumber,
     //  picker    下的组件
-    DatePicker, TimePicker,
+    DatePicker, ScrollPicker, TimePicker,
     //  prompt 下的组件
     DragVerify, Empty, Loading
 };
