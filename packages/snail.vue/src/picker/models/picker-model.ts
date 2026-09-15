@@ -6,6 +6,7 @@ import { IAsyncScope } from "snail.core";
 import { DatePickerOptions, TimePickerOptions } from "./datetime-model";
 import { IPopupManager } from "../../popup/models/manager-model";
 import { FollowOptions, FollowPositionOptions, DialogOptions } from "../../popup/manager";
+import { ScrollPickerOptions, ScrollPickItem } from "./scroll-piker-model";
 
 /**
  * 接口：选择器管理器
@@ -27,6 +28,14 @@ export interface IPickerManager {
      * @returns 异步任务，可销毁时间选择控件；可接收时间选择控件的选择值
      */
     showTime(target: HTMLElement, options?: TimePickerOptions, popupOptions?: PickerPopupOptions): IAsyncScope<string>;
+
+    /**
+     * 显示【滚动】选择器
+     * - 通过滚动选择数据项；默认强制在底部弹出
+     * @param options 
+     * @returns 异步任务，可销毁选择组件；可接受组件选择值
+     */
+    showScroll(options: ScrollPickerOptions): IAsyncScope<string>;
 }
 /**
  * 选择器弹窗配置选项

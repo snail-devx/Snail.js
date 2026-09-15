@@ -6,6 +6,8 @@ import { FollowOptions, FollowPositionOptions, usePopup } from "../popup/manager
 import TimePc from "./components/time-pc.vue";
 import DatePc from "./components/date-pc.vue";
 import { Component } from "vue";
+import { ScrollPickerOptions } from "./models/scroll-piker-model";
+import ScrollPicker from "./scroll-picker.vue";
 
 /**
  * 使用选择器
@@ -37,6 +39,24 @@ export function usePicker(): IPickerManager & IScope {
     function showTime(target: HTMLElement, options?: TimePickerOptions, popupOptions?: PickerPopupOptions): IAsyncScope<string> {
         options = { ...options };
         return showPicker<string, TimePickerOptions>(target, TimePc, options, popupOptions)
+    }
+
+
+    /**
+     * 显示【滚动】选择器
+     * - 通过滚动选择数据项；默认强制在底部弹出
+     * @param options 
+     * @returns 异步任务，可销毁选择组件；可接受组件选择值
+     */
+    function showScroll(options: ScrollPickerOptions): IAsyncScope<string> {
+        const popupOptions: PickerPopupOptions = {
+            mode: "dialog",
+            dialog: {
+                closeOnEscape: true,
+                closeOnMask: true
+            }
+        }
+        return showPicker<string, ScrollPickerOptions>(undefined, ScrollPicker, options, popupOptions);
     }
     //#endregion
 
@@ -97,6 +117,7 @@ export function usePicker(): IPickerManager & IScope {
     //  初始化管理器并返回
     const manager = Object.freeze(mountScope<IPickerManager>({
         showDate, showTime,
+        showScroll,
     }, "IPickerManager"));
     manager.onDestroy(popup.destroy);
     return manager;
