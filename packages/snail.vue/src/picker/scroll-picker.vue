@@ -4,15 +4,20 @@
     3、可作为弹窗使用，此时固定到底部使用；也可直接嵌入组件中使用
  -->
 <template>
-    <div class="snail-scroll-picker wh-fill" :class="{ 'in-pupup': inPopup }">
+    <div class="snail-scroll-picker">
         <!-- dialog模式下时，需要支持标题栏 -->
-        <div class="pick-header" v-if="inPopup">ddd</div>
+        <div class="pick-header" v-if="inPopup">
+            <span class="pick-button" v-text="'取消'" @click="closePopup(undefined)" />
+            <span class="pick-button" v-text="'清空'" v-if="clearDisabled != true" @click="closePopup('')" />
+            <span class="pick-title ellipsis" v-text="title" />
+            <span class="pick-button" v-text="'确定'" @click="closePopup(valueRef)" />
+        </div>
         <!-- 实际的选择内容区域 -->
         <div class="pick-body">
             <!-- 选择项目 -->
             <div class="pick-items" ref="pick-items">
                 <span class="pick-item" v-for="item in items" :key="item.code"
-                    :class="{ selected: item.code === valueRef, disabled: item.disabled }" v-text="item.text" />
+                    :class="{ selected: item.code === valueRef, disabled: item.disabled }" v-text="item.name" />
             </div>
             <!-- 选择区域：上面留白、中间选中结果、下面留白 -->
             <div class="pick-layer">
@@ -21,23 +26,21 @@
                 <span class="layer-bottom"></span>
             </div>
         </div>
-
     </div>
 </template>
 
 <script setup lang="ts">
 import { useTimer } from "snail.core";
 import { ref, onMounted, useTemplateRef, shallowRef, ShallowRef } from "vue";
-import { ScrollPickerEvents, ScrollPickerOptions } from "./models/scroll-piker-model";
+import { ScrollPickerEvents, ScrollPickerOptions, ScrollPickerPopupOptions } from "./models/scroll-piker-model";
 import { ElasticDetail, IElasticManager, useElastic, useObserver } from "snail.view";
 import { DialogHandle } from "../popup/models/dialog-model";
 import { PopupStatusOptions } from "../popup/models/popup-model";
 import { PickerExtend } from "./models/picker-model";
-import { TitleOptions } from "../base/models/base-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<ScrollPickerOptions & TitleOptions & Partial<DialogHandle<string> & PopupStatusOptions & PickerExtend>>();
+const props = defineProps<ScrollPickerOptions & ScrollPickerPopupOptions & Partial<DialogHandle<string> & PopupStatusOptions & PickerExtend>>();
 const emits = defineEmits<ScrollPickerEvents>();
 const { onSize } = useObserver();
 const { onTimeout } = useTimer();
@@ -114,26 +117,60 @@ onMounted(async () => {
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-scroll-picker {
+    user-select: none;
     position: relative;
     width: 100%;
-    height: 100%;
     overflow: hidden;
-    user-select: none;
-
     display: flex;
     flex-direction: column;
 
+    //  非弹窗使用时，不要头部工具条区域
+    &:not(.dialog-body) {
+        height: 100%;
+
+        >.pick-header {
+            display: none !important;
+        }
+    }
+
+    //  弹窗使用时，底部对齐，固定高度
+    &.dialog-body {
+        align-self: flex-end;
+        height: 230px;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
     // 标题头部
     >.pick-header {
-        height: 40px;
-        background-color: gray;
+        height: 36px;
+        background: #f2f1f6;
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        gap: 20px;
+
+        >.pick-button {
+            flex-shrink: 0;
+            cursor: pointer;
+            color: #0188FD;
+            //  取消移动端点击高亮色
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        >.pick-title {
+            flex: 1;
+            color: #2e3033;
+            font-size: 16px;
+            text-align: center;
+        }
     }
 
     // 选择器内容区域
     >.pick-body {
         flex: 1;
-        overflow: hidden;
         position: relative;
+        overflow: hidden;
 
         //  绝对定位，后面的覆盖前面；内部flex布局，水平垂直居中
         >div {
@@ -181,7 +218,7 @@ onMounted(async () => {
             >.layer-top {
                 flex: 1;
                 background: linear-gradient(180deg, #fff 10%, rgba(255, 255, 255, .6));
-                border-bottom: 1px solid #c8c7cc;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             }
 
             >.layer-selection {
@@ -191,16 +228,9 @@ onMounted(async () => {
             >.layer-bottom {
                 flex: 1;
                 background: linear-gradient(0deg, #fff 10%, rgba(255, 255, 255, .6));
-                border-top: 1px solid #c8c7cc;
+                border-top: 1px solid rgba(0, 0, 0, 0.1);
             }
         }
     }
-
-
-}
-
-.snail-scroll-picker.dialog-body {
-    align-self: flex-end;
-    height: 200px;
 }
 </style>

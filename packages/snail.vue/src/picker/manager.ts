@@ -6,7 +6,7 @@ import { FollowOptions, FollowPositionOptions, usePopup } from "../popup/manager
 import TimePc from "./components/time-pc.vue";
 import DatePc from "./components/date-pc.vue";
 import { Component } from "vue";
-import { ScrollPickerOptions } from "./models/scroll-piker-model";
+import { ScrollPickerOptions, ScrollPickerPopupOptions } from "./models/scroll-piker-model";
 import ScrollPicker from "./scroll-picker.vue";
 
 /**
@@ -46,9 +46,9 @@ export function usePicker(): IPickerManager & IScope {
      * 显示【滚动】选择器
      * - 通过滚动选择数据项；默认强制在底部弹出
      * @param options 
-     * @returns 异步任务，可销毁选择组件；可接受组件选择值
+     * @returns 异步任务，可销毁选择组件；可接受组件选择值（清空时返回空字符串）
      */
-    function showScroll(options: ScrollPickerOptions): IAsyncScope<string> {
+    function showScroll(options: ScrollPickerOptions & ScrollPickerPopupOptions): IAsyncScope<string> {
         const popupOptions: PickerPopupOptions = {
             mode: "dialog",
             dialog: {

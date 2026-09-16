@@ -2,6 +2,11 @@
  * 滚动选择器 相关实体
  */
 
+import { TitleOptions } from "../../base/models/base-model";
+import { DialogHandle } from "../../popup/models/dialog-model";
+import { PopupStatusOptions } from "../../popup/models/popup-model";
+import { PickerExtend } from "./picker-model";
+
 /**
  * 滚动选择器 组件配置选项
  */
@@ -17,6 +22,16 @@ export type ScrollPickerOptions = {
     value?: string;
 }
 /**
+ * 滚动选择器 组件弹窗时配置选项
+ */
+export type ScrollPickerPopupOptions = TitleOptions & {
+    /**
+     * 禁用【清空】按钮
+     */
+    clearDisabled?: boolean;
+};
+
+/**
  * 滚动选择器的一个滚动选项
  */
 export type ScrollPickItem = {
@@ -26,9 +41,9 @@ export type ScrollPickItem = {
      */
     code: string;
     /**
-     * 选项文本
+     * 选项名称
      */
-    text: string;
+    name: string;
 
     /**
      * 是否禁用
