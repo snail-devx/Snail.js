@@ -43,7 +43,6 @@ export * from "./base/utils/icon-util";
 
 // *****************************************   👉  container 相关导出    ****************************************
 //  类型导出
-export * from "./container/models/action-model";
 export * from "./container/models/component-model";
 export * from "./container/models/elastic-model";
 export * from "./container/models/flex-model";
@@ -56,7 +55,6 @@ export * from "./container/models/table-model";
 export * from "./container/models/tree-model";
 export * from "./container/models/wrapper-model";
 //  组件导出：赋值给 components
-import Action from "./container/action.vue";
 import Dynamic from "./container/dynamic.vue";
 import Elastic from "./container/elastic.vue";
 import Flex from "./container/flex.vue";
@@ -75,6 +73,10 @@ export * from "./container/utils/component-util";
 export * from "./container/utils/motion-util";
 
 // *****************************************   👉  other 相关导出    ****************************************
+//  类型导出
+export * from "./other/models/action-model";
+//  组件导出：赋值给 components
+import Action from "./other/action.vue";
 import FlashNumber from "./other/flash-number.vue";
 
 // *****************************************   👉  picker 相关导出    ****************************************
@@ -110,10 +112,11 @@ import Loading from "./prompt/loading.vue";
 // *****************************************   👉  组件合并导出    ****************************************
 export const components = {
     //  base下的组件
-    Action, Button, Choose, Footer, Header, Icon, Input, Number, Search, Select, Switch, Textarea,
+    Button, Choose, Footer, Header, Icon, Input, Number, Search, Select, Switch, Textarea,
     //  container 下的组件
     Dynamic, Elastic, Flex, Fold, Motion, Layout, Scroll, Sort, Table, TableRow, TableCol, Tree, Wrapper,
-    FlashNumber,
+    //  other   下的组件
+    Action, FlashNumber,
     //  picker    下的组件
     DatePicker, ScrollPicker, TimePicker,
     //  prompt 下的组件

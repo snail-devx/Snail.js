@@ -23,7 +23,6 @@ import SelectTest from "./base/select-test.vue";
 import SwitchTest from "./base/switch-test.vue";
 import TextareaTest from "./base/textarea-test.vue";
 //  👉 容器组件
-import ActionTest from "./container/action-test.vue";
 import DynamicTest from "./container/dynamic-test.vue";
 import ElasticTest from "./container/elastic-test.vue";
 import FlexTest from "./container/flex-test.vue";
@@ -51,6 +50,7 @@ import LoadingTest from "./prompt/loading-test.vue";
 import DragVerifyTest from "./prompt/drag-verify-test.vue";
 import EmptyTest from "./prompt/empty-test.vue";
 //  👉 其他组件
+import ActionTest from "./other/action-test.vue";
 import FlashNumberTest from "./other/flash-number-test.vue";
 
 
@@ -95,7 +95,6 @@ const treeOptions: TreeOptions<Component> = {
         {
             text: "容器组件",
             children: [
-                { text: "Action 操作项", data: ActionTest, clickable: true, searchable: true },
                 { text: "Dynamic 动态组件", data: DynamicTest, clickable: true, searchable: true, },
                 { text: "Elastic 弹性组件", data: ElasticTest, clickable: true, searchable: true, },
                 { text: "Flex 弹性布局", data: FlexTest, clickable: true, searchable: true, },
@@ -141,6 +140,7 @@ const treeOptions: TreeOptions<Component> = {
         {
             text: "其他组件",
             children: [
+                { text: "Action 操作项", data: ActionTest, clickable: true, searchable: true },
                 { text: "FlashNumber", data: FlashNumberTest, clickable: true, searchable: true }
             ],
         }

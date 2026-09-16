@@ -13,8 +13,7 @@
 
 <script setup lang="ts">
 import { correctString, isStringNotEmpty } from "snail.core";
-import { ref, shallowRef, } from "vue";
-import { ActionEvents, ActionItem, ActionItemsOptions } from "../models/action-model";
+import { ActionEvents, ActionItemsOptions } from "../models/action-model";
 import Icon from "../../base/icon.vue";
 import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
 
