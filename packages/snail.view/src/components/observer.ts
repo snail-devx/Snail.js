@@ -4,8 +4,8 @@
  * 注意事项：
  *  1、不提供全局【观察者】对象；这个涉到不少子scope的销毁，在全局挂着始终不好
  */
-import { checkScope, IScope, IScopes, mountScope, mustFunction, mustString, run, throwIfFalse, useScopes } from "snail.core";
-import { ElementSize, IObserver, TouchDetail, TouchDistance, TouchOptions, ElementPosition, TouchStatus } from "../models/observer-model";
+import { checkScope, correctNumber, IScope, IScopes, mountScope, mustFunction, mustString, run, throwIfFalse, useScopes } from "snail.core";
+import { ElementSize, IObserver, TouchDetail, TouchDistance, TouchOptions, ElementPosition, TouchStatus, TouchTarget } from "../models/observer-model";
 
 // 把自己的类型共享出去
 export * from "../models/observer-model";
@@ -54,51 +54,44 @@ export function useObserver(): IObserver & IScope {
         throwIfFalse(el instanceof Element, "onEvent: target must be a Element");
         mustFunction(fn, "onTouch: fn");
         //  1、进行触摸事件处理的相关方法，变量
-        /**     触摸开始时间，用于计算耗时和速度 */
-        let startDate: number = undefined;
-        /**     触摸启动位置，用于计算距离和速度 */
-        let startPosition: ElementPosition = undefined;
-        /**     上一次时间：执行fn时的时间 */
-        let preDate: number = undefined;
-        /**     上一次位置：执行fn时的位置 */
-        let prePosition: ElementPosition = undefined;
+        /**     触摸启动目标，用于计算距离和速度 */
+        let startTarget: TouchTarget = undefined;
+        /**     上一次触摸目标 */
+        let preTarget: TouchTarget = undefined;
         /**     执行fn回调
          *      @param status 当前状态
-         *      @param position 当前位置，若为空，表示娶不到位置，复用上一个位置 */
-        function runFn(status: TouchStatus, position?: ElementPosition) {
-            const nowDate: number = Date.now();
-            position && Object.freeze(position);
-            if (status == "start") {
-                startDate = nowDate;
-                startPosition = position;
-            }
-            //  默认值处理，方便后续计算值
-            preDate == undefined && (preDate = startDate);
-            prePosition == undefined && (prePosition = startPosition);
-            position == undefined && (position = prePosition);
+         *      @param target 触发事件的事件对象*/
+        function runFn(status: TouchStatus, target: TouchTarget) {
+            status == "start" && (startTarget = target);
+            preTarget == undefined && (preTarget = startTarget);
             //  计算触摸详情
             const detail: TouchDetail = {
-                status,
-                start: startPosition,
-                now: position,
-                //  move状态，计算移动间距
-                move: status == "move"
-                    ? buildMoveDistance(nowDate, nowDate - preDate, position, prePosition)
-                    : undefined,
-                //  非 status 状态时计算整体位移
-                total: status != "start"
-                    ? buildMoveDistance(nowDate, nowDate - startDate, position, startPosition)
-                    : undefined,
+                status: status,
+                start: startTarget,
+                pre: preTarget,
+                now: target,
+                move: undefined,
+                total: undefined,
             };
-            //  当前信息，保留为上次状态
-            preDate = nowDate;
-            prePosition = position;
-            //  触摸结束后，重置变量
-            if (status == "cancel" || status == "end") {
-                startDate = undefined;
-                startPosition = undefined;
-                preDate = undefined;
-                prePosition = undefined;
+            //  计算move、total位置；进行变量重置：注意不同状态的计算方式
+            switch (status) {
+                //  开始状态，无移动位置，计算无意义
+                case "start":
+                    preTarget = target;
+                    break;
+                //  移动状态：计算所有位置
+                case "move":
+                    detail.move = buildMoveDistance(target, preTarget);
+                    detail.total = buildMoveDistance(target, startTarget);
+                    preTarget = target;
+                    break;
+                //  结束、取消 状态：但此时无position位置，使用`preTarget`作为结束位置
+                case "end":
+                case "cancel":
+                    detail.total = buildMoveDistance(preTarget, startTarget);
+                    preTarget = undefined;
+                    startTarget = undefined;
+                    break;
             }
             //  执行回调
             try { fn(Object.freeze<TouchDetail>(detail)); }
@@ -115,42 +108,38 @@ export function useObserver(): IObserver & IScope {
             ("ontouchstart" in window) && scope.add(onEvent(el, "touchstart", (evt: TouchEvent) => {
                 if (startType == undefined) {
                     startType = "touch";
-                    runFn("start", { x: evt.touches[0].clientX, y: evt.touches[0].clientY });
+                    runFn("start", buildTargetByTouch(evt));
                 }
             }));
             ("ontouchmove" in window) && scope.add(onEvent(window, "touchmove", (evt: TouchEvent) => {
-                if (startType == "touch") {
-                    runFn("move", { x: evt.touches[0].clientX, y: evt.touches[0].clientY });
-                }
+                startType == "touch" && runFn("move", buildTargetByTouch(evt));
             }));
-            ("ontouchend" in window) && scope.add(onEvent(window, "touchend", (evt) => {
+            ("ontouchend" in window) && scope.add(onEvent(window, "touchend", (evt: TouchEvent) => {
                 if (startType == "touch") {
                     startType = undefined;
-                    runFn("end", undefined);
+                    runFn("end", buildTargetByTouch(evt));
                 }
             }));
-            ("ontouchcancel" in window) && scope.add(onEvent(window, "touchcancel", () => {
+            ("ontouchcancel" in window) && scope.add(onEvent(window, "touchcancel", (evt: TouchEvent) => {
                 if (startType == "touch") {
                     startType = undefined;
-                    runFn("cancel", undefined);
+                    runFn("cancel", buildTargetByTouch(evt));
                 }
             }));
             // 鼠标相关事件监听
             ("onmousedown" in window) && scope.add(onEvent(el, "mousedown", (evt: MouseEvent) => {
                 if (startType == undefined) {
                     startType = "mouse";
-                    runFn("start", { x: evt.clientX, y: evt.clientY });
+                    runFn("start", buildTargetByMouse(evt));
                 }
             }));
             ("onmousemove" in window) && scope.add(onEvent(window, "mousemove", (evt: MouseEvent) => {
-                if (startType == "mouse") {
-                    runFn("move", { x: evt.clientX, y: evt.clientY });
-                }
+                startType == "mouse" && runFn("move", buildTargetByMouse(evt));
             }));
-            ("onmouseup" in window) && scope.add(onEvent(window, "mouseup", () => {
+            ("onmouseup" in window) && scope.add(onEvent(window, "mouseup", (evt: MouseEvent) => {
                 if (startType == "mouse") {
                     startType = undefined;
-                    runFn("end", undefined);
+                    runFn("end", buildTargetByMouse(evt));
                 }
             }));
         }
@@ -247,23 +236,51 @@ export function useObserver(): IObserver & IScope {
 
     //#region ************************************* 内部方法：辅助结构实现的方法 *************************************
     /**
+     * 构建触摸目标
+     * @param evt 
+     * @returns
+     */
+    function buildTargetByTouch(evt: TouchEvent): TouchTarget {
+        const target: TouchTarget = {
+            timestamp: Date.now(),
+            target: evt.target,
+            x: evt.touches.length ? evt.touches[0].clientX : undefined,
+            y: evt.touches.length ? evt.touches[0].clientY : undefined,
+        }
+        return Object.freeze(target);
+    }
+    /**
+     * 构建触摸目标
+     * @param evt 
+     */
+    function buildTargetByMouse(evt: MouseEvent): TouchTarget {
+        const target: TouchTarget = {
+            timestamp: Date.now(),
+            target: evt.target,
+            x: evt.clientX,
+            y: evt.clientY
+        }
+        return Object.freeze(target);
+    }
+
+    /**
      * 构建移动距离信息
-     * @param timestamp 当前时间戳
-     * @param time 时长
-     * @param end 结束位置
-     * @param start 开始位置
+     * @param end 结束目标
+     * @param start 开始目标
      * @returns 
      */
-    function buildMoveDistance(timestamp: number, time: number, end: ElementPosition, start: ElementPosition): TouchDistance {
-        const x: number = end.x - start.x;
-        const y: number = end.y - start.y;
+    function buildMoveDistance(end: TouchTarget, start: TouchTarget): TouchDistance {
+        const x: number = correctNumber(end.x - start.x, undefined);
+        const y: number = correctNumber(end.y - start.y, undefined);
+        const time: number = end.timestamp - start.timestamp;
+
         return Object.freeze<TouchDistance>({
-            timestamp,
+            timestamp: end.timestamp,
             time,
             x,
-            vx: x / time,
+            vx: x != undefined && time != 0 ? (x / time) : 0,
             y,
-            vy: y / time
+            vy: y != undefined && time != 0 ? (y / time) : 0
         });
     }
     //#endregion

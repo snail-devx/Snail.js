@@ -111,13 +111,20 @@ export type TouchDetail = {
     status: TouchStatus;
 
     /**
-     * 启动时的位置
+     * 触摸启动时的对象信息
+     * - 包含位置、时间戳、事件目标对象等
      */
-    start: ElementPosition;
+    start: TouchTarget;
     /**
-     * 当前位置
+     * 上一次触摸事件对象信息
+     * - 包含位置、时间戳、事件目标对象等
      */
-    now: ElementPosition;
+    pre: TouchTarget;
+    /**
+     * 当前触摸事件对象信息
+     * - 包含位置、时间戳、事件目标对象等
+     */
+    now: TouchTarget;
 
     /**
      * 移动距离信息
@@ -131,8 +138,36 @@ export type TouchDetail = {
      * - status 为 start 时无值
      */
     total?: TouchDistance;
-
 }
+/**
+ * 触摸的目标对象信息
+ */
+export type TouchTarget = {
+    /**
+     * 时间戳
+     * - 单位毫秒
+     */
+    timestamp: number;
+
+    /**
+     * 触发触摸事件的事件对象
+     */
+    target: EventTarget;
+
+    /**
+     * 触摸点x轴位置
+     * - 触摸结束、取消时，可能无值
+     * - 触摸开始、移动时，有值
+     */
+    x: number;
+    /**
+     * 触摸点y轴位置
+     * - 触摸结束、取消时，可能无值
+     * - 触摸开始、移动时，有值
+     */
+    y: number;
+
+};
 /**
  * 触摸状态
  * - start      启动
