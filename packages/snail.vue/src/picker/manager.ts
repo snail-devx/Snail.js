@@ -3,8 +3,8 @@ import { IPickerManager, PickerExtend, PickerPopupOptions } from "./models/picke
 import { TimePickerOptions, DatePickerOptions } from "./models/datetime-model";
 import { PropsType } from "../container/models/component-model";
 import { FollowOptions, FollowPositionOptions, usePopup } from "../popup/manager";
-import TimePc from "./components/time-pc.vue";
-import DatePc from "./components/date-pc.vue";
+import DatePopup from "./components/date-popup.vue";
+import TimePopup from "./components/time-popup.vue";
 import { Component } from "vue";
 import { ScrollPickerOptions, ScrollPickerPopupOptions } from "./models/scroll-piker-model";
 import ScrollPicker from "./scroll-picker.vue";
@@ -27,7 +27,7 @@ export function usePicker(): IPickerManager & IScope {
      */
     function showDate(target: HTMLElement, options?: DatePickerOptions, popupOptions?: PickerPopupOptions): IAsyncScope<string> {
         options = { ...options };
-        return showPicker<string, DatePickerOptions>(target, DatePc, options, popupOptions);
+        return showPicker<string, DatePickerOptions>(target, DatePopup, options, popupOptions);
     }
     /**
      * 显示【时间】选择器
@@ -38,9 +38,8 @@ export function usePicker(): IPickerManager & IScope {
      */
     function showTime(target: HTMLElement, options?: TimePickerOptions, popupOptions?: PickerPopupOptions): IAsyncScope<string> {
         options = { ...options };
-        return showPicker<string, TimePickerOptions>(target, TimePc, options, popupOptions)
+        return showPicker<string, TimePickerOptions>(target, TimePopup, options, popupOptions);
     }
-
 
     /**
      * 显示【滚动】选择器

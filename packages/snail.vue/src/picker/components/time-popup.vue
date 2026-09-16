@@ -1,8 +1,9 @@
-<!-- 时间选择器 PC端组件
+<!-- 时间选择器  弹窗组件
     1、实现上，参照效果【zane-calendar】库效果
   -->
 <template>
-    <Layout class="time-picker pc" :class="{ 'second-disabled': format != 'HH:mm:ss' }" :direction="'vertical'">
+    <Layout class="snail-time-picker-popup" :class="{ 'second-disabled': format != 'HH:mm:ss' }"
+        :direction="'vertical'">
         <!-- 时分秒选择区域-->
         <template #main>
             <Motion multiple :effect="MOTION.top">
@@ -188,7 +189,7 @@ onMounted(rebuildItems);
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
 
-.snail-layout.time-picker.pc {
+.snail-time-picker-popup {
     width: 210px !important;
     height: 240px !important;
     background-color: #fff;
@@ -288,7 +289,7 @@ onMounted(rebuildItems);
 
 // *****************************************   👉  特定样式适配    *****************************************
 //  禁用秒选择
-.snail-layout.time-picker.pc.second-disabled {
+.snail-time-picker-popup.second-disabled {
     width: 180px;
 
     >.main-area {

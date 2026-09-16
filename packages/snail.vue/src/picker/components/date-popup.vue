@@ -1,10 +1,10 @@
-<!-- 日期选择器 PC端组件
+<!-- 日期选择器 弹窗组件
     1、外部使用 follow弹窗打开
-    2、内部集成 time-pc.vue时间选择，但时间的最大、最小值单独设置，不从日期的最大、最小值中提取
+    2、内部集成 time-popup.vue时间选择，但时间的最大、最小值单独设置，不从日期的最大、最小值中提取
   -->
 <template>
-    <Layout class="date-picker pc" :class="{ 'time-now': pinned && pinned.value == true }" :direction="'vertical'"
-        :top="{ height: '40px' }" :bottom="{ height: '30px' }">
+    <Layout class="snail-date-picker-popup" :class="{ 'time-now': pinned && pinned.value == true }"
+        :direction="'vertical'" :top="{ height: '40px' }" :bottom="{ height: '30px' }">
         <!-- 顶部导航区域：展示左右切换等功能 -->
         <template #top>
             <Icon type="arrow" button :rotate="180" :size="26" :color="'#8a9099'" :hover-color="'#58a4fd'"
@@ -359,7 +359,7 @@ buildPickerItems(stepRef.value, 0);
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
 
-.snail-layout.date-picker.pc {
+.snail-date-picker-popup {
     width: 280px !important;
     height: 300px !important;
     background-color: #fff;
