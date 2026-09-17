@@ -111,12 +111,15 @@ export function useScroll(): IScrollManager & IScope {
     //#endregion
 
     //  构建管理器
-    return Object.freeze(mountScope<IScrollManager>({
-        isLeft, isRight,
-        isTop, isBottom,
-        getStatus,
-        buildClassStyle,
-    }, "IScrollManager"));
+    return Object.freeze(mountScope<IScrollManager>(
+        {
+            isLeft, isRight,
+            isTop, isBottom,
+            getStatus,
+            buildClassStyle,
+        },
+        { type: "IScrollManager" }
+    ));
 }
 
 /**
@@ -361,11 +364,14 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
     }
     //  初始化，构建管理器，并触摸事件监听
     {
-        const manager = Object.freeze(mountScope<IElasticManager>({
-            // disable, 后期提供
-            scrollTo,
-            refresh,
-        }, "IElasticManager"));
+        const manager = Object.freeze(mountScope<IElasticManager>(
+            {
+                // disable, 后期提供
+                scrollTo,
+                refresh,
+            },
+            { type: "IElasticManager" }
+        ));
         //  监听触摸事件，并自动销毁
         const observer = useObserver();
         observer.onTouch(target.parentElement, {}, onTouching);

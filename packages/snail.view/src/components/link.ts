@@ -2,7 +2,7 @@
  * link 标签管理
  *  1、csslink标签管理，自动追加版本号，维护生命周期
  */
-import { IScope, mountScope, useScope } from "snail.core"
+import { IScope, mountScope, ScopeOptions, useScope } from "snail.core"
 import { event, mustString, isArrayNotEmpty, isStringNotEmpty, version } from "snail.core";
 import { ILinkManager, LinkElement, LinkFile, LinkOptions } from "../models/link-model";
 import { checkLinkOptions, destroylink, EVENT_ChangeTheme, getLinkDefaultContainer, LINK_CONFIG, LINK_CONTAINER_ID, setlinkByTheme } from "../utils/link-util";
@@ -16,7 +16,8 @@ export * from "../models/link-model";
  * @param options 
  * @returns 新的管理器+作用域 
  */
-export function useLink(options?: Partial<LinkOptions>): ILinkManager & IScope {
+export function useLink(options?: Partial<LinkOptions> & Pick<ScopeOptions, "global">): ILinkManager & IScope {
+    const global = options ? options.global : false;
     /** 脚本配置选项 */
     options = Object.freeze(checkLinkOptions(options));
     /** 当前link主题 */
@@ -76,7 +77,7 @@ export function useLink(options?: Partial<LinkOptions>): ILinkManager & IScope {
         //  基于主题设置sytle；并构建link句柄返回
         funclinks.length > 0 && setlinkByTheme(funclinks, scopeTheme, options);
         //  构建作用域返回：销毁时移除link
-        return useScope().onDestroy(() => destroylink(funclinks, false));
+        return useScope({ global }).onDestroy(() => destroylink(funclinks, false));
     }
     /**
      * 改变主题；自动将非当前主题的link禁用掉(公共link除外)
@@ -95,7 +96,10 @@ export function useLink(options?: Partial<LinkOptions>): ILinkManager & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<ILinkManager>({ register, theme }, "ILinkManager");
+    const manager = mountScope<ILinkManager>(
+        { register, theme },
+        { global, type: "ILinkManager" }
+    );
     manager.onDestroy(() => {
         event.off(EVENT_ChangeTheme, theme);
         destroylink(scopeLinks, true)
@@ -112,7 +116,7 @@ export const linkMap: Map<string, string> = new Map();
 /** 
  * 全局【link管理器】
  */
-export const link: ILinkManager = useLink();
+export const link: ILinkManager = useLink({ global: true });
 //  全局link管理器监听【改变主题】事件，则会进入死循环(自己触发、自己监听）；全局切换主题采用:Link.theme(code)
 event.off(EVENT_ChangeTheme, link.theme);
 

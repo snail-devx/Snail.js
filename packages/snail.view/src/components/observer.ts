@@ -4,7 +4,7 @@
  * 注意事项：
  *  1、不提供全局【观察者】对象；这个涉到不少子scope的销毁，在全局挂着始终不好
  */
-import { checkScope, correctNumber, IScope, IScopes, mountScope, mustFunction, mustString, run, throwIfFalse, useScopes } from "snail.core";
+import { checkScope, correctNumber, IScope, IScopes, mountScope, mustFunction, mustString, run, ScopeOptions, throwIfFalse, useScopes } from "snail.core";
 import { ElementSize, IObserver, TouchDetail, TouchDistance, TouchOptions, ElementPosition, TouchStatus, TouchTarget } from "../models/observer-model";
 
 // 把自己的类型共享出去
@@ -14,11 +14,13 @@ export * from "../models/observer-model";
  * 使用【观察者】
  * - 观察元素尺寸、位置变化
  * - 观察事件，scope销毁时自动清理事件监听
+ * @param options 配置选项
  * @returns 全新的【观察者】+作用域
  */
-export function useObserver(): IObserver & IScope {
+export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver & IScope {
+    const global = options ? options.global : false;
     /** 作用域组：管理【观察者】子作用域 */
-    const scopes: IScopes = useScopes();
+    const scopes: IScopes = useScopes({ global });
 
     //#region ************************************* 接口方法：IObserver具体实现 *************************************
     /**
@@ -286,10 +288,13 @@ export function useObserver(): IObserver & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IObserver>({
-        onEvent, onTouch, onSize,
-        onClient, onMutation
-    }, "IObserver");
+    const manager = mountScope<IObserver>(
+        {
+            onEvent, onTouch, onSize,
+            onClient, onMutation
+        },
+        { global, type: "IObserver" }
+    );
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
 }

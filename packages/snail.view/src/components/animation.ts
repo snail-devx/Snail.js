@@ -6,7 +6,7 @@
  * 注意事项：
  *  1、不提供全局【观察者】对象；这个涉到不少子scope的销毁，在全局挂着始终不好
  */
-import { IScope, IScopes, isObject, ITimer, mountScope, throwIfFalse, useScopes, useTimer } from "snail.core";
+import { IScope, IScopes, isObject, ITimer, mountScope, ScopeOptions, throwIfFalse, useScopes, useTimer } from "snail.core";
 import { TransitionEffect, IAnimationManager } from "../models/animation-model";
 import { getAnimationScope } from "../utils/animation-util";
 import { CSS, css } from "./css";
@@ -16,11 +16,13 @@ export * from "../models/animation-model";
 
 /**
  * 使用【动画管理器】
+ * @param options 配置选项
  * @returns 全新的【动画管理器】+作用域
  */
-export function useAnimation(): IAnimationManager & IScope {
+export function useAnimation(options?: Pick<ScopeOptions, "global">): IAnimationManager & IScope {
+    const global = options ? options.global : false;
     /** 作用域组：管理动画效果子作用域 */
-    const scopes: IScopes = useScopes();
+    const scopes: IScopes = useScopes({ global });
 
     //#region *************************************实现接口：IAnimationManager接口方法*************************************
     /**
@@ -63,7 +65,10 @@ export function useAnimation(): IAnimationManager & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IAnimationManager>({ transition }, "IAnimationManager");
+    const manager = mountScope<IAnimationManager>(
+        { transition },
+        { global, type: "IAnimationManager" }
+    );
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
 }
