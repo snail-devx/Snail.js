@@ -102,4 +102,4 @@ export function configVersion(options: Partial<VersionOptions>): IVersionManager
 /** 
  * 全局【版本管理】
  */
-export const version: IVersionManager = useVersion();
+export const version: IVersionManager = useVersion({ global: true });

@@ -61,8 +61,8 @@ export function useScript(options?: Partial<ScriptOptions> & Pick<ScopeOptions, 
             SCRIPTS[sf.id] = sf;
             sfs[sf.id] = sf;
         });
-        //  构建作用域返回：销毁时移除脚本
-        return useScope().onDestroy(() => destroyScript(sfs));
+        //  构建作用域返回：销毁时移除脚本，构建作用域时，继承 manager 的全局属性
+        return useScope({ global }).onDestroy(() => destroyScript(sfs));
     }
     /**
      * 指定脚本是否已注册

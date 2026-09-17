@@ -5,10 +5,9 @@ import { checkScope, mountScope, useScope } from "./scope";
 
 /**
  * 使用【钩子函数】
- * @param options 配置选项
  * @returns 全新的【钩子函数管理器】实例
  */
-export function useHook<HookCodes>(options?: Pick<ScopeOptions, "global">): IHookManager<HookCodes> & IScope {
+export function useHook<HookCodes>(): IHookManager<HookCodes> & IScope {
     /** 注册的钩子函数信息：key为钩子编码，value为钩子处理函数集合 */
     const hookMap: Map<HookCodes, HookFunction[]> = new Map();
 
@@ -140,7 +139,7 @@ export function useHook<HookCodes>(options?: Pick<ScopeOptions, "global">): IHoo
             register, remove,
             runHook, runHookAsync
         },
-        { global: options ? options.global : false, type: "IHookManager" }
+        { type: "IHookManager" }
     );
     manager.onDestroy(() => hookMap.clear());
     return Object.freeze(manager);

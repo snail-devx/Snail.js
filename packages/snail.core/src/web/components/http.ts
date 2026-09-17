@@ -134,5 +134,5 @@ export function configHttp(options: Partial<HttpOptions>): void {
 export function configHttpIntercept(interceptor: HttpInterceptor): IScope {
     interceptor = checkInterceptor(interceptor);
     HTTP_INTERCEPTORS.push(interceptor);
-    return useScope().onDestroy(() => removeFromArray(HTTP_INTERCEPTORS, interceptor));
+    return useScope({ global: true }).onDestroy(() => removeFromArray(HTTP_INTERCEPTORS, interceptor));
 }

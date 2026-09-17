@@ -19,7 +19,8 @@ export * from "../models/timer-model"
  * @returns 全新的【定时器】实例
  */
 export function useTimer(options?: Pick<ScopeOptions, "global">): ITimer & IScope {
-
+    const global = options ? options.global : false;
+    const scopes: IScopes = useScopes({ global });
     //#region *************************************实现接口：ITimer接口方法*************************************
     /**
     * 执行timeout操作
@@ -63,9 +64,8 @@ export function useTimer(options?: Pick<ScopeOptions, "global">): ITimer & IScop
         {
             onTimeout, onInterval
         },
-        { global: options ? options.global : false, type: "ITimer" }
+        { global, type: "ITimer" }
     );
-    const scopes: IScopes = useScopes();
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
 }

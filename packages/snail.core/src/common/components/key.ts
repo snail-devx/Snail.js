@@ -26,7 +26,7 @@ export function newId(): string {
  * @returns Key管理器+作用域对象
  */
 export function useKey<T>(options?: KeyOptions<T> & Pick<ScopeOptions, "global">): IKeyManager<T> & IScope {
-    const { idFunc, global } = options;
+    const { global, idFunc } = { ...options };
     /** 
      * Key的缓存字典
      * - key为数据对象，value为数据对象的唯一key值

@@ -2,7 +2,7 @@
  * 导航相关扩展：如设备类型判断、、、
  */
 
-import { IScope, IScopes, mountScope, ScopeOptions, useScopes } from "../../common";
+import { IScope, IScopes, mountScope, ScopeOptions } from "../../common";
 import { INavigator } from "../models/navigator-model";
 
 /**
@@ -12,8 +12,6 @@ import { INavigator } from "../models/navigator-model";
  * @returns 导航器+作用域实例
  */
 export function useNavigator(options?: Pick<ScopeOptions, "global">): INavigator & IScope {
-    /** 作用域组 */
-    const scopes: IScopes = useScopes();
 
     //#region ************************************* 接口方法：INavigator具体实现 *************************************
     /**
@@ -80,7 +78,6 @@ export function useNavigator(options?: Pick<ScopeOptions, "global">): INavigator
             },
             { global: options ? options.global : false, type: "INavigator" }
         );
-        navigator.onDestroy(scopes.destroy);
         return navigator;
     }
 }

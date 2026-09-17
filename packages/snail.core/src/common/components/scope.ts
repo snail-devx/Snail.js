@@ -81,7 +81,7 @@ export function onMountScope(fn: (scope: IScope) => void): void {
  * @returns 全新的IScope实例
  */
 export function useScope(options?: ScopeOptions): IScope {
-    return mountScope<IScope>(Object.create(null), Object.assign({ type: "IScope" }, options));
+    return mountScope<IScope>(Object.create(null), { type: "IScope", ...options },);
 }
 /**
  * 使用【作用域组】
@@ -131,7 +131,7 @@ export function useScopes(options?: ScopeOptions): IScopes {
         }
     });
     //  监听【作用域】销毁事件，执行子作用域的销毁逻辑
-    mountScope(scopes, Object.assign({ type: "IScopes" }, options)).onDestroy(function () {
+    mountScope(scopes, { type: "IScopes", ...options }).onDestroy(function () {
         /*  先备份子作用域，清理后再执行destroy方法；避免remove过程中影响map的keys索引 */
         const tmpScopes = [...children.keys()];
         children.clear();
