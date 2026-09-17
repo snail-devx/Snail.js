@@ -292,14 +292,17 @@ export function useGroup(global: IFieldGlobalContext, props: FieldRenderOptions<
         }
     }
     //  构建管理器对象，并管理内部子作用域
-    const manager = Object.freeze(mountScope<IGroupControl>({
-        fields: fieldsRef.value,
-        children: childrenRef.value,
-        fieldManager: fieldManager,
-        getItemKey: keyed.getKey,
-        buildItemMonitor,
-        addNewItem, moveItem, deleteItem
-    }, "IGroupControlManager"));
+    const manager = Object.freeze(mountScope<IGroupControl>(
+        {
+            fields: fieldsRef.value,
+            children: childrenRef.value,
+            fieldManager: fieldManager,
+            getItemKey: keyed.getKey,
+            buildItemMonitor,
+            addNewItem, moveItem, deleteItem
+        },
+        { type: "IGroupControlManager" }
+    ));
     manager.onDestroy(function () {
         fieldManager.destroy();
         keyed.destroy();

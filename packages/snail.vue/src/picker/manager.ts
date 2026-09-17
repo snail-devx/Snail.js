@@ -1,4 +1,4 @@
-import { correctNumber, defer, IAsyncScope, IScope, isStringNotEmpty, mountScope, newId, useAsyncScope, useScopes } from "snail.core";
+import { correctNumber, IAsyncScope, IScope, mountScope, ScopeOptions } from "snail.core";
 import { IPickerManager, PickerExtend, PickerPopupOptions } from "./models/picker-model";
 import { TimePickerOptions, DatePickerOptions } from "./models/datetime-model";
 import { PropsType } from "../container/models/component-model";
@@ -11,11 +11,13 @@ import ScrollPicker from "./scroll-picker.vue";
 
 /**
  * 使用选择器
+ * @param options 配置选项
  * @returns 选择器实例+作用域对象
  */
-export function usePicker(): IPickerManager & IScope {
+export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManager & IScope {
+    const global = options ? options.global : false;
     /** 弹窗管理器 */
-    const popup = usePopup();
+    const popup = usePopup({ global });
 
     //#region *************************************实现接口：IPickerManager接口方法*************************************
     /**
@@ -114,10 +116,13 @@ export function usePicker(): IPickerManager & IScope {
     //#endregion
 
     //  初始化管理器并返回
-    const manager = Object.freeze(mountScope<IPickerManager>({
-        showDate, showTime,
-        showScroll,
-    }, "IPickerManager"));
+    const manager = Object.freeze(mountScope<IPickerManager>(
+        {
+            showDate, showTime,
+            showScroll,
+        },
+        { global, type: "IPickerManager" }
+    ));
     manager.onDestroy(popup.destroy);
     return manager;
 }

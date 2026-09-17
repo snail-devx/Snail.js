@@ -6,7 +6,7 @@
     <div class="snail-form-fields" :class="[`tc-${global.columns}`, global.mode]" :title="buildGlobalTitle()">
         <!-- 设计时：增加排序组件：这个key使用字段id可能有问题，后续再考虑优化，特别是运行时的时候；设计时构建 复制、删除 按钮 -->
         <Sort v-if="global.mode == 'design'" draggable=".field-item" handle=".field-toolbar" :changer="fields.length"
-            :group="{ name: global.global, put: onPutItem, pull: onPullItem }" :disabled="global.readonly"
+            :group="{ name: global.key, put: onPutItem, pull: onPullItem }" :disabled="global.readonly"
             @start="onDragStart" @add="onDragAddField" @update="moveField" @end="onDragEnd">
             <template v-for="(field, index) in fields" :key="getFieldKey(field.id)">
                 <div class="field-item" :class="buildFieldClass(field)" :data-type="'field'" :data-index="index">

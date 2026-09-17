@@ -56,7 +56,7 @@ export function useSelectContext<T>(items: SelectItem<T>[], selectsRef: ShallowR
             treeContxt,
             { selected, selectedText }
         );
-        mountScope(context, "ISelectContext");
+        mountScope(context, { type: "ISelectContext" });
         //  相互监听销毁，实现自动销毁
         treeContxt.onDestroy(() => context.destroyed || context.destroy());
         context.onDestroy(() => treeContxt.destroyed || treeContxt.destroy());

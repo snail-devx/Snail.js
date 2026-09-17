@@ -89,29 +89,30 @@ export function useGlobalContext(options: FieldContainerOptions & Pick<IFieldGlo
     //  构建上下文，并冻结
     {
         const fieldSetting = useFieldSetting({ getContainer });
-        const context = Object.freeze(mountScope<IFieldGlobalContext>({
-            global: newId(),
-            readonly: options.readonly == true,
-            mode: options.mode || "runtime",
+        const context = mountScope<IFieldGlobalContext>(
+            {
+                key: newId(),
+                readonly: options.readonly == true,
+                mode: options.mode || "runtime",
 
-            layout: options.layout || "form",
-            columns: columns as any,
-            defaultSpan: Math.max(1, Math.min(columns, parseInt(String(options.defaultSpan || columns / 2)))),
-            initialDisabled: options.initialDisabled == true,
+                layout: options.layout || "form",
+                columns: columns as any,
+                defaultSpan: Math.max(1, Math.min(columns, parseInt(String(options.defaultSpan || columns / 2)))),
+                initialDisabled: options.initialDisabled == true,
 
-            hook: options.hook || Object.create({}),
-            controls: controls,
-            getControl: type => controlMap[type],
+                hook: options.hook || Object.create({}),
+                controls: controls,
+                getControl: type => controlMap[type],
 
-            registerContainer,
-            getContainer,
+                registerContainer,
+                getContainer,
 
-            fieldSetting: fieldSetting,
-        }, "useFieldContainerContext"));
-
+                fieldSetting: fieldSetting,
+            },
+            { type: "IFieldGlobalContext" }
+        );
         context.onDestroy(fieldSetting.destroy);
-
-        return context;
+        return Object.freeze(context);
     }
 }
 //#endregion
@@ -177,13 +178,16 @@ function useFieldSetting(gloabl: Pick<IFieldGlobalContext, "getContainer">): IFi
     }
     //#endregion
 
-    return Object.freeze(mountScope<IFieldSettingHandle>({
-        getActiveKey,
-        getactiveField,
-        isActiveField,
-        activateField,
-        deactivateField,
-    }, "IFieldSettingHandle"));
+    return Object.freeze(mountScope<IFieldSettingHandle>(
+        {
+            getActiveKey,
+            getactiveField,
+            isActiveField,
+            activateField,
+            deactivateField,
+        },
+        { type: "IFieldSettingHandle" }
+    ));
 }
 //#endregion
 
@@ -287,16 +291,19 @@ export function useField(global: IFieldGlobalContext, props: FieldRenderOptions<
     //#region *************************************内部辅助方法，配合进行字段管理使用 *****************************************
     //#endregion
 
-    const manager = Object.freeze(mountScope<IFieldManager>({
-        emitter, handle,
-        //  字段错误信息管理
-        getError: () => errorRef.value,
-        updateError: error => errorRef.value = error,
-        //  状态管理实现
-        isReqired: () => statusRef.value.required == true,
-        isReadonly: () => global.readonly == true || props.readonly == true || statusRef.value.readonly == true,
-        isHidden: () => global.mode == "runtime" && statusRef.value.hidden == true,
-    }, "IFieldManager"));
+    const manager = Object.freeze(mountScope<IFieldManager>(
+        {
+            emitter, handle,
+            //  字段错误信息管理
+            getError: () => errorRef.value,
+            updateError: error => errorRef.value = error,
+            //  状态管理实现
+            isReqired: () => statusRef.value.required == true,
+            isReadonly: () => global.readonly == true || props.readonly == true || statusRef.value.readonly == true,
+            isHidden: () => global.mode == "runtime" && statusRef.value.hidden == true,
+        },
+        { type: "IFieldManager" }
+    ));
     return manager;
 }
 //#endregion

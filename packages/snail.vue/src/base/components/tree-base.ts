@@ -110,11 +110,14 @@ export function useTreeContext<T>(nodes: TreeNode<T, TreeNodeExtend>[], activeNo
     //#endregion
 
     //  构建context上下文
-    const context = mountScope<ITreeBaseContext<T>>({
-        doSearch,
-        isActived, isPatched, isShow, isShowChildren,
-        getPath, getKey
-    }, "ITreeBaseContext");
+    const context = mountScope<ITreeBaseContext<T>>(
+        {
+            doSearch,
+            isActived, isPatched, isShow, isShowChildren,
+            getPath, getKey
+        },
+        { type: "ITreeBaseContext" }
+    );
     context.onDestroy(() => {
         failed.value = undefined;
         patched.value = undefined;

@@ -7,7 +7,7 @@
  * 5、【后续支持】全局配置z-index起始值，容器组件、、、
  */
 import { Component } from "vue";
-import { defer, IAsyncScope, IScope, IScopes, isStringNotEmpty, mountScope, useAsyncScope, useHook, useScopes } from "snail.core";
+import { defer, IAsyncScope, IScope, IScopes, isStringNotEmpty, mountScope, ScopeOptions, useAsyncScope, useHook, useScopes } from "snail.core";
 import { checkDialog, monitorDialog } from "./utils/dialog-util";
 import { checkFollow } from "./utils/follow-util";
 import { checkPopup, destroyPopup, openPopup } from "./utils/popup-util";
@@ -36,9 +36,14 @@ export * from "./models/toast-model"
 
 /**
  * 使用【弹窗管理器】
+ * @param options 配置选项
  * @returns 全新的【弹窗管理器】实例+作用域对象
  */
-export function usePopup(): IPopupManager & IScope {
+export function usePopup(options?: Pick<ScopeOptions, "global">): IPopupManager & IScope {
+    const global = options ? options.global : false;
+    /** 作用域组：管理动画效果子作用域 */
+    const scopes: IScopes = useScopes({ global });
+
     //#region *************************************实现接口：IPopupManager接口方法*************************************
     /**
      * 弹出
@@ -217,12 +222,13 @@ export function usePopup(): IPopupManager & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IPopupManager>({
-        popup, dialog, follow,
-        confirm, toast
-    }, "IPopupManager");
-    /** 作用域组：管理动画效果子作用域 */
-    const scopes: IScopes = useScopes();
+    const manager = mountScope<IPopupManager>(
+        {
+            popup, dialog, follow,
+            confirm, toast
+        },
+        { global: options ? options.global : false, type: "IPopupManager" }
+    );
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
 }

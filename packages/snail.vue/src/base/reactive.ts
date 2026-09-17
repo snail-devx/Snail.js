@@ -13,6 +13,7 @@ import { IScope, IScopes, isObject, isPromise, mountScope, RunResult, throwIfFal
  * @returns 全新的【响应式管理器】+作用域
  */
 export function useReactive(): IReactiveManager & IScope {
+    const scopes: IScopes = useScopes();
     //#region *************************************实现接口：IReactiveManager接口方法*************************************
     /**
      * 【过渡】变量值
@@ -65,7 +66,6 @@ export function useReactive(): IReactiveManager & IScope {
         // )
     }
 
-
     /**
      * 监听器：监听单个值变化
      * - 内部利用vue的watch逻辑实现
@@ -83,8 +83,14 @@ export function useReactive(): IReactiveManager & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IReactiveManager>({ transition, load, watcher }, "IReactiveManager");
-    const scopes: IScopes = useScopes();
-    manager.onDestroy(scopes.destroy);
-    return Object.freeze(manager);
+    {
+        const manager = mountScope<IReactiveManager>(
+            {
+                transition, load, watcher
+            },
+            { type: "IReactiveManager" }
+        );
+        manager.onDestroy(scopes.destroy);
+        return Object.freeze(manager);
+    }
 }

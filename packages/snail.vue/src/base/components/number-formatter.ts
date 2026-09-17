@@ -235,18 +235,21 @@ export function useFormatter(options: NumberBaseOptions): INumberFormatter & ISc
     //#endregion
 
     //  构建格式化器，并返回
-    const formatter = Object.freeze(mountScope<INumberFormatter>({
-        minValue: isNumberNotNaN(options.minValue) ? options.minValue : undefined,
-        maxValue: isNumberNotNaN(options.maxValue) ? options.maxValue : undefined,
-        precision: options.precision >= 0
-            ? parseInt(String(options.precision))
-            : undefined,
-        thousands: options.thousands || "disabled",
-        upper: options.upper === true,
+    const formatter = Object.freeze(mountScope<INumberFormatter>(
+        {
+            minValue: isNumberNotNaN(options.minValue) ? options.minValue : undefined,
+            maxValue: isNumberNotNaN(options.maxValue) ? options.maxValue : undefined,
+            precision: options.precision >= 0
+                ? parseInt(String(options.precision))
+                : undefined,
+            thousands: options.thousands || "disabled",
+            upper: options.upper === true,
 
-        format, checkThreshold,
-        buildUpper, buildThousands,
-        calcByStep,
-    }, "INumberFormatter"));
+            format, checkThreshold,
+            buildUpper, buildThousands,
+            calcByStep,
+        },
+        { type: "INumberFormatter" }
+    ));
     return formatter;
 }

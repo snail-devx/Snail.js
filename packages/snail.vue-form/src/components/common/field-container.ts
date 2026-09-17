@@ -35,11 +35,14 @@ export function useContainer(global: IFieldGlobalContext, options: FieldContaine
     /** 字段容器句柄对象*/
     const handle = useContainerHandle(global, { fields: fieldsRef.value, canAddField, addField, refresh, getFieldHandle });
     /** 字段容器对象 */
-    const container: IFieldContainer & IScope = Object.freeze(mountScope<IFieldContainer>({
-        fields: fieldsRef.value, handle,
-        getFieldKey, getFieldWidth, buildFieldMonitor, getFieldHandle, isVisible, calcFormLayout,
-        canAddField, addField, refresh, moveField, canCopyField, copyField, canDeleteField, deleteField
-    }, "useFieldContainer"));
+    const container: IFieldContainer & IScope = Object.freeze(mountScope<IFieldContainer>(
+        {
+            fields: fieldsRef.value, handle,
+            getFieldKey, getFieldWidth, buildFieldMonitor, getFieldHandle, isVisible, calcFormLayout,
+            canAddField, addField, refresh, moveField, canCopyField, copyField, canDeleteField, deleteField
+        },
+        { type: "IFieldContainer" }
+    ));
     /** 弹窗管理器；用于进行消息提醒处理 */
     const popup = usePopup();
 
@@ -645,10 +648,13 @@ export function useContainerHandle(global: IFieldGlobalContext,
     //#endregion
 
     //  构建容器句柄，挂载作用域
-    return Object.freeze(mountScope<IFieldContainerHandle>({
-        addField, refresh, getFields, getField, isDuplicateTitle,
-        getValues, getValue, setValue,
-        getStatus, setStatus,
-    }, "IFieldContainerHandle"));
+    return Object.freeze(mountScope<IFieldContainerHandle>(
+        {
+            addField, refresh, getFields, getField, isDuplicateTitle,
+            getValues, getValue, setValue,
+            getStatus, setStatus,
+        },
+        { type: "IFieldContainerHandle" }
+    ));
 }
 //#endregion

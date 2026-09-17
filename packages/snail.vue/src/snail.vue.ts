@@ -6,9 +6,9 @@ import { getType, onMountScope } from "snail.core";
 //  导出组件、方法、类型
 export * from "./exporter";
 
-//  挂载Scope时，若在Vue的setup中，则自动销毁
+//  挂载Scope时，若在Vue的setup中，则自动销毁（全局作用域，不进行自动销毁）
 onMountScope(scope => {
-    getCurrentScope() && onScopeDispose(scope.destroy);
+    scope.global != true && getCurrentScope() && onScopeDispose(scope.destroy);
 
     // const type = getType(scope);
     // console.log(`%c${type}:`, "color:green", "scope mounted");

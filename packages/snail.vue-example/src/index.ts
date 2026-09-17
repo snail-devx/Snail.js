@@ -24,7 +24,7 @@ import { getType, onMountScope } from "snail.core";
 onMountScope(scope => {
     const type = getType(scope);
     console.log(`%c${type}:`, "color:green", "scope mounted");
-    getCurrentScope() && onScopeDispose(() => {
+    scope.global != true && getCurrentScope() && onScopeDispose(() => {
         console.log(`%c${type}:`, "color:blue", "scope auto destroyed");
         scope.destroy();
     });

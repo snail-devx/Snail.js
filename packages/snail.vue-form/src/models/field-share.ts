@@ -21,7 +21,7 @@ export interface IFieldGlobalContext {
      * 全局标记值
      * - 如一个表单下，可能存在多个字段容器，此时所有字段容器共享一个全局标记值，用于实现字段在容器间拖拽
      */
-    readonly global: string;
+    readonly key: string;
     /**
      * 是否处于只读状态
      */
