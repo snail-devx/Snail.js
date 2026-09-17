@@ -1,6 +1,6 @@
 
 import { removeFromArray, tidyString } from "../../base";
-import { checkScope, IScope, mountScope, useScope } from "../../common";
+import { checkScope, IScope, mountScope, ScopeOptions, useScope } from "../../common";
 import { HttpOptions, HttpInterceptor, IHttpClient, HttpRequest, HttpResponse } from "../models/http-model";
 import { ServerOptions } from "../models/server-model";
 import { server } from "./server";
@@ -12,7 +12,8 @@ import { HTTP_CONFIG, HTTP_INTERCEPTORS, } from "../utils/http-util";
  * @param options HTTP配置选项
  * @returns 全新的【HTTP客户端】+作用域
  */
-export function useHttp(options?: Partial<HttpOptions>): IHttpClient & IScope {
+export function useHttp(options?: Partial<HttpOptions> & Pick<ScopeOptions, "global">): IHttpClient & IScope {
+    const global = options ? options.global : false;
     options = Object.freeze(checkHttpOptions(options));
     /** HTTP客户端实例拦截器 */
     const scopeInterceptors: HttpInterceptor[] = [];
@@ -95,7 +96,12 @@ export function useHttp(options?: Partial<HttpOptions>): IHttpClient & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const hc = mountScope<IHttpClient>({ intercept, send, get, post }, "IHttpClient");
+    const hc = mountScope<IHttpClient>(
+        {
+            intercept, send, get, post
+        },
+        { global, type: "IHttpClient" }
+    );
     hc.onDestroy(() => scopeInterceptors.splice(0));
     return Object.freeze(hc);
 }

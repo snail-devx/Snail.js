@@ -19,3 +19,15 @@ export interface IKeyManager<T> {
      */
     clear(): void;
 }
+
+/**
+ * 唯一标记配置选项
+ */
+export type KeyOptions<T> = {
+    /**
+     * idFunc 唯一id生成器，若无需自定义则忽略
+     * @param data 外部获取key、删除key时传入的数据
+     * @returns 基于`data`生成的唯一Id之
+     */
+    idFunc?: (data: T) => string
+}

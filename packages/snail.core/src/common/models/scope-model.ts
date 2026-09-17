@@ -4,6 +4,12 @@
  */
 export interface IScope {
     /**
+     * 是否是全局作用域
+     * - 为true时：标记为全局作用域，不要随意销毁，应该在程序全生命周期中存在
+     * - 为false时：表示临时作用域，调用结束后，即时销毁
+     */
+    global: Readonly<boolean>;
+    /**
      * 【作用域】是否已经销毁了
      * - 外部只读，不可修改
      */
@@ -21,6 +27,24 @@ export interface IScope {
      * 销毁【作用域】
      */
     destroy(): void;
+}
+/**
+ * 作用域配置选项
+ * - 在useXXX、mountScope构建作用域时传入
+ */
+export type ScopeOptions = {
+    /**
+     * 是否是全局作用域
+     * - 为true时：标记为全局作用域，不要随意销毁，应该在程序全生命周期中存在
+     * - 为false时：表示临时作用域，调用结束后，即时销毁
+     */
+    global?: IScope["global"];
+    /**
+     * 作用域的类型
+     * - 自定义作用域类型，作为Object.prototype.toString.call(target) 的返回值
+     * - 不传入则忽略
+     */
+    type?: string;
 }
 
 /**

@@ -1,14 +1,15 @@
 import { mustFunction, mustString, hasAny, hasOwnProperty, isFunction, isObject, tidyString, run } from "../../base";
 import { EventHandle, EventSender, IEventManager } from "../models/event-model";
 import { newId } from "./key";
-import { checkScope, IScope, mountScope } from "./scope";
+import { checkScope, IScope, mountScope, ScopeOptions } from "./scope";
 
 /**
  * 使用【事件管理器】
  * - 全新作用域，和其他【事件管理器】实例隔离
+ * @param options 配置选项
  * @returns 全新的管理器+作用域 
  */
-export function useEvent(): IEventManager & IScope {
+export function useEvent(options?: Pick<ScopeOptions, "global">): IEventManager & IScope {
     /** 为什么不采用class：
      *      采用class类，即使属性约束为private的属性，编译为js后，也会挂载到this上，不安全（外部可直接操作定义的事件数组）
      *      采用这种方式；确保定义的事件监听100%不会对外暴露，确保安全性
@@ -121,11 +122,17 @@ export function useEvent(): IEventManager & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IEventManager>({ on, once, off, trigger }, "IEventManager");
+    const manager = mountScope<IEventManager>(
+        {
+            on, once, off,
+            trigger
+        },
+        { global: options ? options.global : false, type: "IEventManager" }
+    );
     manager.onDestroy(() => Object.keys(events).forEach(key => delete events[key]));
     return Object.freeze(manager);
 }
 /**
  * 全局【事件管理器】
  */
-export const event: IEventManager = useEvent();
+export const event: IEventManager = useEvent({ global: true });

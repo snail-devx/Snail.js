@@ -6,7 +6,7 @@
 
 import { isArray, isArrayNotEmpty, isObject, isStringNotEmpty, isFunction } from "../../base";
 import { mustString, tidyString, hasOwnProperty, extract, getMessage, throwIfNullish, throwIfTrue } from "../../base";
-import { checkScope, IScope, mountScope, useScope } from "../../common";
+import { checkScope, IScope, mountScope, ScopeOptions, useScope } from "../../common";
 import { IScriptManager, ScriptFile, ScriptLoadOptions, ScriptOptions } from "../models/script-model";
 import { SCRIPT_CONFIG, checkScriptOptions, formScriptUrl, buildScriptByUrl, drillScriptByHash } from "../utils/script-util";
 import { version } from "./version";
@@ -15,9 +15,11 @@ import { version } from "./version";
  * 使用【脚本管理】
  * - 全新作用域，和其他【脚本管理】实例隔离
  * @param  options 配置选项
+ * @param options 配置选项
  * @returns 全新的【脚本管理器】+作用域 
  */
-export function useScript(options?: Partial<ScriptOptions>): IScriptManager & IScope {
+export function useScript(options?: Partial<ScriptOptions> & Pick<ScopeOptions, "global">): IScriptManager & IScope {
+    const global = options ? options.global : false;
     /** 脚本配置选项 */
     options = Object.freeze(checkScriptOptions(options));
     /** 注册的脚本信息：key为脚本id,value为脚本信息 */
@@ -199,14 +201,17 @@ export function useScript(options?: Partial<ScriptOptions>): IScriptManager & IS
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IScriptManager>({ register, has, load, loads }, "IScriptManager");
+    const manager = mountScope<IScriptManager>(
+        { register, has, load, loads },
+        { global, type: "IScriptManager" }
+    );
     manager.onDestroy(() => destroyScript(SCRIPTS));
     return Object.freeze(manager);
 }
 /**
  * 全局的【脚本管理器】
  */
-export const script: IScriptManager = useScript();
+export const script: IScriptManager = useScript({ global: true });
 /**
  * 脚本管理 全局配置
  * @param options 

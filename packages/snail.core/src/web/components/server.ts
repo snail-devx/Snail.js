@@ -5,16 +5,17 @@
  */
 
 import { mustString, hasOwnProperty, isObject, isStringNotEmpty, throwError, throwIfNullish } from "../../base";
-import { checkScope, IScope, mountScope } from "../../common"
+import { checkScope, IScope, mountScope, ScopeOptions } from "../../common"
 import { IServerManager, ServerOptions } from "../models/server-model";
 
 /** 默认的服务器类型；后续支持configServer方法中做配置*/
 const DEFAULT_ServerType: keyof (ServerOptions) = "api";
 /**
  * 使用【服务器管理器】
+ * @param options 配置选项
  * @returns 全新的【服务器管理器】+作用域 
  */
-export function useServer(): IServerManager & IScope {
+export function useServer(options?: Pick<ScopeOptions, "global">): IServerManager & IScope {
     /** 注册的服务器：key为服务器编码code；value为对应的服务器配置选项 */
     const servers: { [key in string]: ServerOptions } = Object.create(null);
 
@@ -32,6 +33,18 @@ export function useServer(): IServerManager & IScope {
         servers[code] = Object.freeze({ ...server });
         return manager;
     }
+    /**
+     * 移除指定服务器
+     * @param code 服务器编码
+     * @returns 管理器自身，方便链式调用
+     */
+    function remove(code: string): IServerManager {
+        //  不检测管理器是否销毁，对服务器管理没有影响
+        // checkScope(manager, "remove: server manager destroyed.");
+        delete servers[code];
+        return manager;
+    }
+
     /**
      * 是否存在指定服务器
      * @param code 服务器编码
@@ -65,25 +78,20 @@ export function useServer(): IServerManager & IScope {
         isStringNotEmpty(url) || throwError(`the server[${code}] has not this type[${type}] server address`);
         return url;
     }
-    /**
-     * 移除指定服务器
-     * @param code 服务器编码
-     * @returns 管理器自身，方便链式调用
-     */
-    function remove(code: string): IServerManager {
-        //  不检测管理器是否销毁，对服务器管理没有影响
-        // checkScope(manager, "remove: server manager destroyed.");
-        delete servers[code];
-        return manager;
-    }
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IServerManager>({ register, has, get, getUrl, remove }, "IServerManager");
+    const manager = mountScope<IServerManager>(
+        {
+            register, remove,
+            has, get, getUrl,
+        },
+        { global: options ? options.global : false, type: "IServerManager" }
+    );
     manager.onDestroy(() => Object.keys(servers).forEach(remove));
     return Object.freeze(manager);
 }
 /**
  * 全局【服务器管理器】
  */
-export const server: IServerManager = useServer();
+export const server: IServerManager = useServer({ global: true });

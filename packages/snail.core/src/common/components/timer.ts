@@ -7,7 +7,7 @@
 
 import { mustFunction, run } from "../../base";
 import { ITimer } from "../models/timer-model";
-import { IScope, IScopes, mountScope, useScopes } from "./scope";
+import { IScope, IScopes, mountScope, ScopeOptions, useScopes } from "./scope";
 
 /** 把自己的类型共享出去 */
 export * from "../models/timer-model"
@@ -15,10 +15,10 @@ export * from "../models/timer-model"
 /**
  * 使用【定时器】
  * - 定时器销毁时，自动销毁内部清理setTimeou、setInterval
- * 
+ * @param options 配置选项
  * @returns 全新的【定时器】实例
  */
-export function useTimer(): ITimer & IScope {
+export function useTimer(options?: Pick<ScopeOptions, "global">): ITimer & IScope {
 
     //#region *************************************实现接口：ITimer接口方法*************************************
     /**
@@ -59,7 +59,12 @@ export function useTimer(): ITimer & IScope {
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<ITimer>({ onTimeout, onInterval }, "ITimer");
+    const manager = mountScope<ITimer>(
+        {
+            onTimeout, onInterval
+        },
+        { global: options ? options.global : false, type: "ITimer" }
+    );
     const scopes: IScopes = useScopes();
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);

@@ -2,15 +2,16 @@
  * 导航相关扩展：如设备类型判断、、、
  */
 
-import { IScope, IScopes, mountScope, useScopes } from "../../common";
+import { IScope, IScopes, mountScope, ScopeOptions, useScopes } from "../../common";
 import { INavigator } from "../models/navigator-model";
 
 /**
  * 使用【导航器】
  * - 提供设配类型判断，设备获取（如录音、蓝牙等）
+ * @param options 配置选项
  * @returns 导航器+作用域实例
  */
-export function useNavigator(): INavigator & IScope {
+export function useNavigator(options?: Pick<ScopeOptions, "global">): INavigator & IScope {
     /** 作用域组 */
     const scopes: IScopes = useScopes();
 
@@ -72,10 +73,13 @@ export function useNavigator(): INavigator & IScope {
 
     //  构建实例：并实时销毁scopes作用域组
     {
-        const navigator: INavigator & IScope = mountScope<INavigator>({
-            getDevice: getDeviceType,
-            getOS
-        }, "INavigator");
+        const navigator: INavigator & IScope = mountScope<INavigator>(
+            {
+                getDevice: getDeviceType,
+                getOS
+            },
+            { global: options ? options.global : false, type: "INavigator" }
+        );
         navigator.onDestroy(scopes.destroy);
         return navigator;
     }

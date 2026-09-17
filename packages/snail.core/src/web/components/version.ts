@@ -1,5 +1,5 @@
 import { mustString, throwIfUndefined } from "../../base";
-import { checkScope, IScope, mountScope } from "../../common";
+import { checkScope, IScope, mountScope, ScopeOptions } from "../../common";
 import { IVersionManager, VersionOptions } from "../models/version-model";
 import { UrlParseResult } from "../models/url-model";
 import { checkVersionOptions, DEFAULT_VERSION, VERSION_CONFIG } from "../utils/version-util";
@@ -10,7 +10,8 @@ import { url } from "./url";
  * @param options 配置选项
  * @returns 全新的【版本管理器】+作用域 
  */
-export function useVersion(options?: Partial<VersionOptions>): IVersionManager & IScope {
+export function useVersion(options?: Partial<VersionOptions> & Pick<ScopeOptions, "global">): IVersionManager & IScope {
+    const global = options ? options.global : false;
     options = Object.freeze(checkVersionOptions(options));
     /** 版本文件：用于指定特定文件的版本信息；key为文件路径（不带查询参数和锚点），value为带有版本的url地址 */
     const versionFiles: Record<string, string> = Object.create(null);
@@ -81,7 +82,10 @@ export function useVersion(options?: Partial<VersionOptions>): IVersionManager &
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IVersionManager>({ getVersion, addFile, formart }, "IVersionManager");
+    const manager = mountScope<IVersionManager>(
+        { getVersion, addFile, formart },
+        { global, type: "IVersionManager" }
+    );
     manager.onDestroy(() => Object.keys(versionFiles).forEach(key => delete versionFiles[key]));
     return Object.freeze(manager);
 }

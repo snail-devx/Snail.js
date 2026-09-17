@@ -2,8 +2,8 @@
  * 键值管理，确保唯一性
  */
 
-import { IKeyManager } from "../models/key-model";
-import { checkScope, IScope, mountScope } from "./scope";
+import { IKeyManager, KeyOptions } from "../models/key-model";
+import { checkScope, IScope, mountScope, ScopeOptions } from "./scope";
 
 //  导出数据结构
 export * from "../models/key-model";
@@ -25,7 +25,8 @@ export function newId(): string {
  * @param idFunc 唯一id生成器，若无需自定义则忽略
  * @returns Key管理器+作用域对象
  */
-export function useKey<T>(idFunc?: (data: T) => string): IKeyManager<T> & IScope {
+export function useKey<T>(options?: KeyOptions<T> & Pick<ScopeOptions, "global">): IKeyManager<T> & IScope {
+    const { idFunc, global } = options;
     /** 
      * Key的缓存字典
      * - key为数据对象，value为数据对象的唯一key值
@@ -65,7 +66,10 @@ export function useKey<T>(idFunc?: (data: T) => string): IKeyManager<T> & IScope
     //#endregion
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IKeyManager<T>>({ getKey, deleteKey, clear }, "IKeyManager");
+    const manager = mountScope<IKeyManager<T>>(
+        { getKey, deleteKey, clear },
+        { global, type: "IKeyManager" }
+    );
     manager.onDestroy(() => keyCache.clear());
     return Object.freeze(manager);
 }

@@ -1,13 +1,14 @@
 import { mustFunction, run, runAsync, RunResult } from "../../base";
 import { HookFunction, HookRunOptions, IHookManager } from "../models/hook-model";
-import { IScope } from "../models/scope-model";
+import { IScope, ScopeOptions } from "../models/scope-model";
 import { checkScope, mountScope, useScope } from "./scope";
 
 /**
  * 使用【钩子函数】
+ * @param options 配置选项
  * @returns 全新的【钩子函数管理器】实例
  */
-export function useHook<HookCodes>(): IHookManager<HookCodes> & IScope {
+export function useHook<HookCodes>(options?: Pick<ScopeOptions, "global">): IHookManager<HookCodes> & IScope {
     /** 注册的钩子函数信息：key为钩子编码，value为钩子处理函数集合 */
     const hookMap: Map<HookCodes, HookFunction[]> = new Map();
 
@@ -28,6 +29,15 @@ export function useHook<HookCodes>(): IHookManager<HookCodes> & IScope {
         //  构建作用域返回：销毁时移除hook
         return useScope().onDestroy(() => hooks[index] = undefined);
     }
+    /**
+     * 销毁指定的钩子
+     * @param code 钩子编码
+     */
+    function remove(code: HookCodes) {
+        checkScope(manager, "remove: hook manager destroyed.");
+        hookMap.delete(code);
+    }
+
     /**
      * 执行已注册的钩子
      * - 钩子处理函数无异步逻辑时，使用此方法
@@ -80,15 +90,6 @@ export function useHook<HookCodes>(): IHookManager<HookCodes> & IScope {
         }
         return { success: true };
     }
-
-    /**
-     * 销毁指定的钩子
-     * @param code 钩子编码
-     */
-    function remove(code: HookCodes) {
-        checkScope(manager, "remove: hook manager destroyed.");
-        hookMap.delete(code);
-    }
     //#endregion
 
     //#region *************************************私有方法*************************************
@@ -134,7 +135,13 @@ export function useHook<HookCodes>(): IHookManager<HookCodes> & IScope {
     //#region 
 
     //  构建管理器实例，挂载scope作用域
-    const manager = mountScope<IHookManager<HookCodes>>({ register, runHook, runHookAsync, remove }, "IHookManager");
+    const manager = mountScope<IHookManager<HookCodes>>(
+        {
+            register, remove,
+            runHook, runHookAsync
+        },
+        { global: options ? options.global : false, type: "IHookManager" }
+    );
     manager.onDestroy(() => hookMap.clear());
     return Object.freeze(manager);
 }

@@ -1,5 +1,5 @@
-import { isPromise, isStringNotEmpty, mustFunction, run, throwIfFalse, throwIfTrue } from "../../base";
-import { IScope, IAsyncScope, IScopes, KeyScopeUseResult } from "../models/scope-model";
+import { isObject, isPromise, isStringNotEmpty, mustFunction, run, throwIfFalse, throwIfTrue } from "../../base";
+import { IScope, IAsyncScope, IScopes, KeyScopeUseResult, ScopeOptions } from "../models/scope-model";
 
 // 把自己的类型共享出去
 export * from "../models/scope-model";
@@ -12,15 +12,21 @@ const mountHandles: Array<(scope: IScope) => void> = [];
  * - 挂载时配置为 只读、不可枚举
  * - 让target拥有自己的专有【作用域】，如给IHttpClient、IScriptManager等接口实例提供【作用域】功能
  * @param target 要挂载【作用域】的实例
- * @param type target的类型，用于 Object.prototype.toString.call(target) 的返回值；不传入则忽略
+ * @param options 作用域挂载配置选项
  * @returns 挂载了IScope的target实例
  */
-export function mountScope<T>(target: T, type?: string): T & IScope {
+export function mountScope<T>(target: T, options?: ScopeOptions): T & IScope {
+    const { global, type } = { ...options };
     throwIfFalse(typeof (target) === "object", "mountScope: target must be an Object.");
     var destroyed: boolean = false;
     const handles: Array<() => void> = [];
     /** 使用  defineProperties 进行只读赋值，避免外部改变，且destroyed为属性，通过 defineProperties get 方法实现 */
     const scope = Object.defineProperties(target, {
+        //  【作用域】是否为全局作用域
+        global: {
+            enumerable: false,
+            get: () => global === true,
+        },
         //  【作用域】是否销毁了：通过get属性实现外部只读，内部修改可直接反应出来
         destroyed: {
             enumerable: false,
@@ -71,18 +77,20 @@ export function onMountScope(fn: (scope: IScope) => void): void {
 /**
  * 使用【作用域】
  * - 内部逻辑：Object.create(null)创建对象，然后执行 mountScope 挂载作用域
+ * @param options 作用域挂载配置选项
  * @returns 全新的IScope实例
  */
-export function useScope(): IScope {
-    return mountScope<IScope>(Object.create(null), "IScope");
+export function useScope(options?: ScopeOptions): IScope {
+    return mountScope<IScope>(Object.create(null), Object.assign({ type: "IScope" }, options));
 }
 /**
  * 使用【作用域组】
  * - 通过 Object.defineProperties 将IScopes相关属性、方法挂载
  * - 挂载时配置为 只读、不可枚举
+ * @param options 作用域挂载配置选项
  * @returns 全新的IScopes实例
  */
-export function useScopes(): IScopes {
+export function useScopes(options?: ScopeOptions): IScopes {
     //  管理子作用域、挂载scope属性；使用map管理，方便remove时操作
     const children: Map<IScope, boolean> = new Map();
     const scopes: IScopes = Object.defineProperties(Object.create(null), {
@@ -123,7 +131,7 @@ export function useScopes(): IScopes {
         }
     });
     //  监听【作用域】销毁事件，执行子作用域的销毁逻辑
-    mountScope(scopes, "IScopes").onDestroy(function () {
+    mountScope(scopes, Object.assign({ type: "IScopes" }, options)).onDestroy(function () {
         /*  先备份子作用域，清理后再执行destroy方法；避免remove过程中影响map的keys索引 */
         const tmpScopes = [...children.keys()];
         children.clear();
@@ -141,7 +149,7 @@ export function useScopes(): IScopes {
  */
 export function useAsyncScope<T>(task: Promise<T>): IAsyncScope<T> {
     throwIfFalse(isPromise(task), "useAsyncScope: task must be a Promise.");
-    const scope = mountScope<Promise<T>>(task, "IAsyncScope") as IAsyncScope<T>
+    const scope = mountScope<Promise<T>>(task, { type: "IAsyncScope" }) as IAsyncScope<T>
     task.finally(scope.destroy);
     return scope;
 }

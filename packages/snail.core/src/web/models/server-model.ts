@@ -10,6 +10,13 @@ export interface IServerManager {
      */
     register(code: string, server: ServerOptions): IServerManager,
     /**
+     * 移除全局服务器配置
+     * @param code 服务器编码
+     * @returns 管理器自身，方便链式调用
+     */
+    remove(code: string): IServerManager;
+
+    /**
      * 判断全局服务器配置是否存在
      * @param code 服务器编码
      * @returns 存在返回true，否则false
@@ -28,12 +35,6 @@ export interface IServerManager {
      * @returns 注册的服务器地址
      */
     getUrl(code: string, type?: keyof (ServerOptions)): string;
-    /**
-     * 移除全局服务器配置
-     * @param code 服务器编码
-     * @returns 管理器自身，方便链式调用
-     */
-    remove(code: string): IServerManager;
 }
 /**
  * 服务器配置选项；先固化几个，后面再加

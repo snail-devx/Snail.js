@@ -12,6 +12,11 @@ export interface IHookManager<HookCodes> {
      * @returns 返回scope作用域，支持销毁处理函数
      */
     register(code: HookCodes, fn: HookFunction): IScope;
+    /**
+     * 移除指定的钩子；销毁此钩子的所有处理函数
+     * @param code 钩子编码
+     */
+    remove(code: HookCodes);
 
     /**
      * 执行已注册的钩子
@@ -38,12 +43,6 @@ export interface IHookManager<HookCodes> {
      * - 其他情况正常执行：  { success: true };
      */
     runHookAsync(code: HookCodes, options?: HookRunOptions, ...args: any[]): Promise<RunResult<false | undefined>>;
-
-    /**
-     * 移除指定的钩子；销毁此钩子的所有处理函数
-     * @param code 钩子编码
-     */
-    remove(code: HookCodes);
 }
 
 /**
