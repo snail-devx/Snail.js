@@ -1,5 +1,5 @@
-import { isObject, isPromise, isStringNotEmpty, mustFunction, run, throwIfFalse, throwIfTrue } from "../../base";
-import { IScope, IAsyncScope, IScopes, KeyScopeUseResult, ScopeOptions } from "../models/scope-model";
+import { isObject, isPromise, isStringNotEmpty, mustFunction, run, RunResult, throwIfFalse, throwIfTrue, wait } from "../../base";
+import { IScope, IAsyncScope, IScopes, KeyScopeUseResult, ScopeOptions, IScopeController } from "../models/scope-model";
 
 // 把自己的类型共享出去
 export * from "../models/scope-model";
@@ -162,6 +162,7 @@ const KEY_SCOPE_MAP: Map<any, IScope> = new Map();
  * @param key 作用域Key，此key下至多存在一个作用域
  * @param reuse 【作用域】复用：true 则复用已存在的scope；否则 先销毁存在的scope
  * @returns use结果，作用域对象+是否为新建作用域
+ * @deprecated 推荐使用 {@link useScopeCtrl} ；
  */
 export function useKeyScope<T>(key: T, reuse: boolean): KeyScopeUseResult {
     var scope = KEY_SCOPE_MAP.get(key);
@@ -191,4 +192,49 @@ export function useKeyScope<T>(key: T, reuse: boolean): KeyScopeUseResult {
 export function checkScope(scope: IScope, message: string): true {
     throwIfTrue(scope.destroyed, message);
     return true;
+}
+
+/**
+ * 使用作用域控制器
+ * - 详细说明参照 {@link IScopeController}
+ * @returns 作用域控制器
+ */
+export function useScopeCtrl(): IScopeController & IScope {
+    /** 当前任务作用域 */
+    let curScope: IAsyncScope<any> = undefined;
+    /** 当前任务作用域Key */
+    let curScopeKey: string = undefined;
+
+    /**
+     * 运行任务
+     * @param key 作用域Key：相同key的作用域对象复用直到销毁；不同key的作用域，先销毁之前运行的，再执行当前运行
+     * @param fn 异步任务，返回异步任务作用域
+     * @returns 运行情况，`success`为`true`时表示本次执行了，此时可从`data`取本次运行结果数据
+     */
+    function run<T>(key: string, fn: () => IAsyncScope<T>): Promise<RunResult<T>> {
+        //  当前作用域为销毁时，判断key，若key相同则直接返回，否则先销毁再执行
+        if (curScope != undefined && curScope.destroyed != true) {
+            if (curScopeKey == key) {
+                const rt: RunResult<T> = { success: false, data: undefined, reason: "same key scope is running" }
+                return Promise.resolve(rt);
+            }
+            curScope.destroy();
+        }
+        //  运行新的任务，存储当前作用域
+        curScope = fn();
+        curScopeKey = key;
+        curScope && curScope.onDestroy(function () {
+            curScope = undefined;
+            curScopeKey = undefined;
+        });
+        //  等待任务执行完成
+        return wait(curScope);
+    }
+
+    //  构建控制器对象
+    {
+        const controller = mountScope<IScopeController>({ run }, { type: "IScopeController" });
+        controller.onDestroy(() => curScope && curScope.destroyed != true && curScope.destroy());
+        return Object.freeze(controller);
+    }
 }

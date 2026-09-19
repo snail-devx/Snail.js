@@ -1,3 +1,5 @@
+import { RunResult } from "../../base";
+
 /**
  * 接口：作用域
  * - 约束资源销毁方法
@@ -96,4 +98,22 @@ export type KeyScopeUseResult = {
      * - false 新创建的
      */
     reuse: boolean;
+}
+
+
+/**
+ * 作用域控制器
+ * - 进行作用域控制，实现同一时间，只有一个作用域对象在运行，后期支持配置并发数量等
+ * - 适用于一些做并发/节流控制场景
+ * - - 组件有多个弹窗业务时，不用每个弹窗业务拿一个临时变量管理scope状态和并发控制
+ * - - 事件重复点击节流场景，避免重复点击导致的一些作用域滥用问题
+ */
+export interface IScopeController {
+    /**
+     * 运行任务
+     * @param key 作用域Key：相同key的作用域对象复用直到销毁；不同key的作用域，先销毁之前运行的，再执行当前运行
+     * @param fn 异步任务，返回异步任务作用域
+     * @returns 运行情况，`success`为`true`时表示本次成功运行了，此时可从`data`取本次运行结果数据
+     */
+    run<T>(key: string, fn: () => IAsyncScope<T>): Promise<RunResult<T>>;
 }
