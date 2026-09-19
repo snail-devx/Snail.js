@@ -15,8 +15,8 @@ export * from "./base/models/choose-model";
 export * from "./base/models/footer-model";
 export * from "./base/models/header-model";
 export * from "./base/models/icon-model";
-export * from "./base/models/input-model"
-export * from "./base/models/number-model"
+export * from "./base/models/input-model";
+export * from "./base/models/number-model";
 export * from "./base/models/reactive-model";
 export * from "./base/models/search-model";
 export * from "./base/models/select-model";
@@ -36,8 +36,8 @@ import Select from "./base/select.vue";
 import Switch from "./base/switch.vue";
 import Textarea from "./base/textarea.vue";
 //  方法导出
-export * from "./base/reactive";
 export * from "./base/components/tree-base";
+export * from "./base/reactive";
 export * from "./base/utils/app-util";
 export * from "./base/utils/icon-util";
 
@@ -55,6 +55,8 @@ export * from "./container/models/table-model";
 export * from "./container/models/tree-model";
 export * from "./container/models/wrapper-model";
 //  组件导出：赋值给 components
+import TableCol from "./container/components/table-col.vue";
+import TableRow from "./container/components/table-row.vue";
 import Dynamic from "./container/dynamic.vue";
 import Elastic from "./container/elastic.vue";
 import Flex from "./container/flex.vue";
@@ -64,8 +66,6 @@ import Motion from "./container/motion.vue";
 import Scroll from "./container/scroll.vue";
 import Sort from "./container/sort.vue";
 import Table from "./container/table.vue";
-import TableRow from "./container/components/table-row.vue";
-import TableCol from "./container/components/table-col.vue";
 import Tree from "./container/tree.vue";
 import Wrapper from "./container/wrapper.vue";
 //  方法导出
@@ -75,15 +75,17 @@ export * from "./container/utils/motion-util";
 // *****************************************   👉  other 相关导出    ****************************************
 //  类型导出
 export * from "./other/models/action-model";
+export * from "./other/models/field-panel-model";
 //  组件导出：赋值给 components
 import Action from "./other/action.vue";
+import FieldPanel from "./other/field-panel.vue";
 import FlashNumber from "./other/flash-number.vue";
 
 // *****************************************   👉  picker 相关导出    ****************************************
 //  类型导出
-export * from "./picker/models/datetime-model"
-export * from "./picker/models/picker-model"
-export * from "./picker/models/scroll-piker-model"
+export * from "./picker/models/datetime-model";
+export * from "./picker/models/picker-model";
+export * from "./picker/models/scroll-piker-model";
 //  组件导出
 import DatePicker from "./picker/date-picker.vue";
 import ScrollPicker from "./picker/scroll-picker.vue";
@@ -116,7 +118,7 @@ export const components = {
     //  container 下的组件
     Dynamic, Elastic, Flex, Fold, Motion, Layout, Scroll, Sort, Table, TableRow, TableCol, Tree, Wrapper,
     //  other   下的组件
-    Action, FlashNumber,
+    Action, FieldPanel, FlashNumber,
     //  picker    下的组件
     DatePicker, ScrollPicker, TimePicker,
     //  prompt 下的组件

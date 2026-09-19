@@ -8,7 +8,7 @@
 </template>
 <script setup lang="ts">
 import { Component, onMounted, shallowRef } from "vue";
-import { useReactive, components, TreeOptions, TreeNodeModel, TreeNodeSlotOptions } from "../libraries/snail_vue";
+import { components, TreeNodeModel, TreeOptions, useReactive } from "../libraries/snail_vue";
 
 //#region *******************************   👉  组件定义    *****************************************
 //  👉 基础组件：
@@ -37,20 +37,19 @@ import DesignerTest from "./form/designer-test.vue";
 import RendererTest from "./form/renderer-test.vue";
 //  👉 选择器组件
 import DatepickerTest from "./picker/datepicker-test.vue";
-import TimepickerTest from "./picker/timepicker-test.vue";
 import ScrollpikcerTest from "./picker/scrollpikcer-test.vue";
-
-
+import TimepickerTest from "./picker/timepicker-test.vue";
 //  👉 弹窗组件
 import DialogTest from "./popup/dialog-test.vue";
 import FollowTest from "./popup/follow-test.vue";
 import PopupTest from "./popup/popup-test.vue";
 //  👉 提示组件
-import LoadingTest from "./prompt/loading-test.vue";
 import DragVerifyTest from "./prompt/drag-verify-test.vue";
 import EmptyTest from "./prompt/empty-test.vue";
+import LoadingTest from "./prompt/loading-test.vue";
 //  👉 其他组件
 import ActionTest from "./other/action-test.vue";
+import FieldPanelTest from "./other/field-panel-test.vue";
 import FlashNumberTest from "./other/flash-number-test.vue";
 
 
@@ -141,6 +140,7 @@ const treeOptions: TreeOptions<Component> = {
             text: "其他组件",
             children: [
                 { text: "Action 操作项", data: ActionTest, clickable: true, searchable: true },
+                { text: "FieldPanel 字段区域", data: FieldPanelTest, clickable: true, searchable: true },
                 { text: "FlashNumber", data: FlashNumberTest, clickable: true, searchable: true }
             ],
         }
@@ -161,6 +161,7 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 
 onMounted(() => {
     onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
+    // onTreeNodeClick(treeOptions.nodes[treeOptions.nodes.length - 1].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[2].children[1], undefined);
