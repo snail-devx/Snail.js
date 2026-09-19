@@ -64,6 +64,8 @@
     textarea {
         padding-top: 4px;
         padding-bottom: 4px;
+        //  避免默认 inline-block 布局时，让外层div多了2-4px的高度，影响布局
+        display: block;
     }
 
     //  选项类：取消边距等
