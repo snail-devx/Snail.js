@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "vue": "^3.5.14",
-    "snail.core": ">=2.0.33",
-    "snail.view": ">=2.0.14",
-    "snail.vue": ">=2.0.33",
+    "snail.core": ">=2.0.34",
+    "snail.view": ">=2.0.15",
+    "snail.vue": ">=2.0.34",
     "sortablejs": ">=1.15.6"
   },
   "devDependencies": {
