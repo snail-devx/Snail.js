@@ -269,7 +269,7 @@ onMounted(() => {
 
     //  列布局时的空间修补子项特例样式：不显示，无宽度
     &.column>.repair-item,
-    &.column-reverse {
+    &.column-reverse>.repair-item {
         width: 0 !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
