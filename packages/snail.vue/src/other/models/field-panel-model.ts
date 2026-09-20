@@ -2,12 +2,12 @@
  * 字段区域相关数据实体
  */
 
-import { TitleOptions } from "../../base/models/base-model";
+import { PageModeOptions, TitleOptions } from "../../base/models/base-model";
 
 /**
  * 字段区域组件配置选项
  */
-export type FieldPanelOptions = Required<TitleOptions> & {
+export type FieldPanelOptions = Required<TitleOptions> & PageModeOptions & {
     /**
      * 是否是必填字段
      */

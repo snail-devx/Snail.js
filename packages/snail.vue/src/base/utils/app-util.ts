@@ -53,12 +53,23 @@ export function setPageMode(pageMode: PageModeOptions["mode"]): PageModeOptions[
     return pageMode;
 }
 /**
- * 获取页面模式
- * -  inject 从上级组件获取
- * @param defaultValue 默认值，inject 取不到是使用。默认为 `desktop`
- * @returns 
+ * 使用页面模式
+ * - 取值逻辑：
+ * - - mode 不存在，则 `inject` 取上级组件注入的值
+ * - - inject 不存在，则 `defaultValue` 取默认值
+ * - - `defaultValue`值无效，则强制返回 `desktop`
+ * - 注意事项：
+ * - - 上级组件需要先 {@link setPageMode} 设置页面模式了；子组件才能够 {@link inejct} 获取到
+ * @param mode 当前传入的页面样式值，无值时，
+ * @param defaultValue 默认值，
+ * @returns 页面模式 配置选项
  */
-export function getPageMode(defaultValue?: PageModeOptions["mode"]): PageModeOptions["mode"] {
-    defaultValue = defaultValue == "mobile" ? "mobile" : "desktop";
-    return inject(INJECTKEY_PageMode, defaultValue);
+export function usePageMode(mode?: PageModeOptions["mode"], defaultValue?: PageModeOptions["mode"]): Required<PageModeOptions> {
+    mode != "desktop" && mode != "mobile" && (mode = undefined);
+    mode == undefined && (mode = inject(INJECTKEY_PageMode));
+    mode != "desktop" && mode != "mobile" && (mode = defaultValue);
+    mode != "desktop" && mode != "mobile" && (mode = "desktop");
+
+    const options: Required<PageModeOptions> = { mode };
+    return Object.freeze(options);
 }

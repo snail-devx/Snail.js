@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { components } from '../../libraries/snail_vue';
 
 
@@ -34,7 +35,11 @@ const { FieldPanel } = components;
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
+// setPageMode("mobile");
 //  2、生命周期响应
+onMounted(() => {
+
+});
 
 </script>
 

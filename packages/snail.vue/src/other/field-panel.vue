@@ -5,7 +5,7 @@
     4、后期支持制定尺寸模式，实现不同尺寸下的字段区域布局
   -->
 <template>
-    <div class="snail-field-panel">
+    <div class="snail-field-panel" :class="mode">
         <!-- 字段头部区域：标题+必填标记：在外层包裹一下，实现多标题换行和*号跟随效果-->
         <div class="field-header">
             <div class="wrapper">
@@ -28,12 +28,13 @@
 
 <script setup lang="ts">
 import { isStringNotEmpty } from 'snail.core';
+import { usePageMode } from '../base/utils/app-util';
 import { FieldPanelOptions } from './models/field-panel-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-defineProps<FieldPanelOptions>();
-
+const props = defineProps<FieldPanelOptions>();
+const { mode } = usePageMode(props.mode);
 //  2、组件交互变量、常量
 
 
@@ -51,6 +52,7 @@ defineProps<FieldPanelOptions>();
 
 .snail-field-panel {
     min-height: 48px;
+    position: relative;
     display: flex;
     padding: 0 14px;
     display: flex;
@@ -59,7 +61,6 @@ defineProps<FieldPanelOptions>();
 
     // 字段头部区域：14px的上下内边距，留20px的标题区域，实现48px高度下垂直居中，多行是则不垂直居中，14px的上边距为起点
     >.field-header {
-        width: 135px;
         flex: none;
         padding: 14px 0;
 
@@ -67,7 +68,8 @@ defineProps<FieldPanelOptions>();
             line-height: 20px;
 
             >span.title {
-                color: #63688E;
+                // color: #63688E;
+                color: #8A9099;
             }
 
             >span.required {
@@ -122,6 +124,44 @@ defineProps<FieldPanelOptions>();
 
             &.error {
                 color: #E64545;
+            }
+        }
+    }
+}
+
+//  pc、移动端特定样式
+.snail-field-panel {
+
+    // 桌面端 特定样式
+    &.desktop {
+        >.field-header {
+            width: 135px;
+        }
+
+        // >.field-body {
+        //     >.control {
+
+        //     }
+        // }
+    }
+
+    // 移动端 特定样式，标题区域小一些，输入框取消边框和左内边距
+    &.mobile {
+        background: white;
+
+        >.field-header {
+            width: 100px;
+        }
+
+        >.field-body {
+            >.control {
+
+                >input,
+                >textarea {
+                    padding-left: 0;
+                    border: none !important;
+                    background: transparent !important;
+                }
             }
         }
     }

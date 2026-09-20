@@ -90,7 +90,7 @@ export type PageModeOptions = {
      * - desktop 桌面端页面，适合pc、笔记本等大屏幕渲染
      * - mobile 移动端页面，适合小屏幕，如h5页面，嵌入app中的页面
      */
-    mode: "desktop" | "mobile"
+    mode?: "desktop" | "mobile"
 };
 
 
