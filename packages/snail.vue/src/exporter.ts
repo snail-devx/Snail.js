@@ -49,6 +49,7 @@ export * from "./container/models/flex-model";
 export * from "./container/models/fold-model";
 export * from "./container/models/layout-model";
 export * from "./container/models/motion-model";
+export * from "./container/models/page-model";
 export * from "./container/models/scroll-model";
 export * from "./container/models/sort-model";
 export * from "./container/models/table-model";
@@ -63,6 +64,7 @@ import Flex from "./container/flex.vue";
 import Fold from "./container/fold.vue";
 import Layout from "./container/layout.vue";
 import Motion from "./container/motion.vue";
+import Page from "./container/page.vue";
 import Scroll from "./container/scroll.vue";
 import Sort from "./container/sort.vue";
 import Table from "./container/table.vue";
@@ -116,7 +118,7 @@ export const components = {
     //  base下的组件
     Button, Choose, Footer, Header, Icon, Input, Number, Search, Select, Switch, Textarea,
     //  container 下的组件
-    Dynamic, Elastic, Flex, Fold, Motion, Layout, Scroll, Sort, Table, TableRow, TableCol, Tree, Wrapper,
+    Dynamic, Elastic, Flex, Fold, Motion, Layout, Page, Scroll, Sort, Table, TableRow, TableCol, Tree, Wrapper,
     //  other   下的组件
     Action, FieldPanel, FlashNumber,
     //  picker    下的组件

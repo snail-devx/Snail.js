@@ -44,19 +44,21 @@ const INJECTKEY_PageMode = Symbol() as InjectionKey<PageModeOptions["mode"]>;
 /**
  * 设置页面模式
  * - provide 给下级组件使用
- * @param pageMode 
+ * @param pageMode 页面模式
  * @returns 页面模式
  */
 export function setPageMode(pageMode: PageModeOptions["mode"]): PageModeOptions["mode"] {
+    pageMode = pageMode == "mobile" ? "mobile" : "desktop";
     provide(INJECTKEY_PageMode, pageMode);
     return pageMode;
 }
 /**
  * 获取页面模式
  * -  inject 从上级组件获取
- * @param defaultValue 默认值，inject 取不到是使用
+ * @param defaultValue 默认值，inject 取不到是使用。默认为 `desktop`
  * @returns 
  */
-export function getPageMode(defaultValue: PageModeOptions["mode"]): PageModeOptions["mode"] {
+export function getPageMode(defaultValue?: PageModeOptions["mode"]): PageModeOptions["mode"] {
+    defaultValue = defaultValue == "mobile" ? "mobile" : "desktop";
     return inject(INJECTKEY_PageMode, defaultValue);
 }

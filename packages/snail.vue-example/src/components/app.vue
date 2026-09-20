@@ -29,6 +29,7 @@ import FlexTest from "./container/flex-test.vue";
 import FoldTest from "./container/fold-test.vue";
 import LayoutTest from "./container/layout-test.vue";
 import MotionTest from "./container/motion-test.vue";
+import PageTest from "./container/page-test.vue";
 import ScrollTest from "./container/scroll-test.vue";
 import TableTest from "./container/table-test.vue";
 import TreeTest from "./container/tree-test.vue";
@@ -100,6 +101,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Fold 折叠组件", data: FoldTest, clickable: true, searchable: true, },
                 { text: "Layout 布局测试", data: LayoutTest, clickable: true, searchable: true, },
                 { text: "Motion 动画组件", data: MotionTest, clickable: true, searchable: true, },
+                { text: "Page 页面组件", data: PageTest, clickable: true, searchable: true, },
                 { text: "Scroll 滚动组件", data: ScrollTest, clickable: true, searchable: true, },
                 { text: "Table 表格组件", data: TableTest, clickable: true, searchable: true, },
                 { text: "Tree 树组件", data: TreeTest, clickable: true, searchable: true, },
