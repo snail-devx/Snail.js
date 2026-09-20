@@ -2,8 +2,9 @@
  * Vue App助手类，做一些app实例的辅助性工作
  */
 
-import { App } from "vue";
-import { mustFunction, IScope, useScope, removeFromArray } from "snail.core";
+import { IScope, mustFunction, removeFromArray, useScope } from "snail.core";
+import { App, inject, InjectionKey, provide } from "vue";
+import { PageModeOptions } from "../models/base-model";
 
 /** 私有类型：App类型 
  * - normal 普通app实例
@@ -32,4 +33,30 @@ export function onAppCreated(fn: (app: App, type?: AppType) => void): IScope {
 export function triggerAppCreated(app: App, type?: AppType): App {
     appCreatedFns.forEach(fn => fn(app, type));
     return app;
+}
+
+
+/**
+ * 注入Key：页面模式
+ * - 上级组件通过provide注入后，后续组件直接使用inejct获取使用，避免逐级逐级往下传递
+ */
+const INJECTKEY_PageMode = Symbol() as InjectionKey<PageModeOptions["mode"]>;
+/**
+ * 设置页面模式
+ * - provide 给下级组件使用
+ * @param pageMode 
+ * @returns 页面模式
+ */
+export function setPageMode(pageMode: PageModeOptions["mode"]): PageModeOptions["mode"] {
+    provide(INJECTKEY_PageMode, pageMode);
+    return pageMode;
+}
+/**
+ * 获取页面模式
+ * -  inject 从上级组件获取
+ * @param defaultValue 默认值，inject 取不到是使用
+ * @returns 
+ */
+export function getPageMode(defaultValue: PageModeOptions["mode"]): PageModeOptions["mode"] {
+    return inject(INJECTKEY_PageMode, defaultValue);
 }
