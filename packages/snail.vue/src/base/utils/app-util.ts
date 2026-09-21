@@ -3,16 +3,60 @@
  */
 
 import { IScope, mustFunction, removeFromArray, useScope } from "snail.core";
-import { App, inject, InjectionKey, provide } from "vue";
-import { PageModeOptions } from "../models/base-model";
+import { App, Component, createApp, inject, InjectionKey, provide } from "vue";
+import { AppOptions, AppType } from "../models/app-model";
 
-/** 私有类型：App类型 
- * - normal 普通app实例
- * - popup  弹窗app实例；包括 Dialog、Follow等所有弹窗
-*/
-type AppType = "normal" | "popup";
+
 /** 应用创建后的通知方法集合 */
 const appCreatedFns: Array<(app: App, type?: AppType) => void> = [];
+
+
+/**
+ * 注入Key：APP配置选项
+ * - 上级组件通过provide注入后，后续组件直接使用inejct获取使用，避免逐级逐级往下传递
+ */
+export const INJECTKEY_AppOptions = Symbol() as InjectionKey<Readonly<Required<AppOptions>>>;
+/**
+ * 校正应用配置选项
+ * @param options app配置选项
+ * @returns 校正后的配置选项；传入无效则构建默认值
+ */
+function correctAppOptions(options?: AppOptions): Readonly<Required<AppOptions>> {
+    const page: Required<AppOptions> = Object.create(null);
+    if (options != undefined) {
+        page.mode = options.mode == "mobile" ? "mobile" : "desktop";
+    }
+    return Object.freeze(page);
+}
+/**
+ * 新创建一个app实例
+ * - 使用 {@link createApp} 创建app实例
+ * - 将页面参数通过{@link provide}注入给app实例，方便后代组件使用{@link usePageMode}获取到
+ * - 执行 {@link triggerAppCreated} 方法，触发app创建的监听回调 {@link onAppCreated}
+ * @param type                  应用类型
+ * @param options               app配置选项
+ * @param component             app挂载的根组件
+ * @param props                 根组件的属性参数
+ * @returns 新的app实例对象
+ */
+export function newApp<T extends Record<string, any>>(type: AppType, options: AppOptions, component: Component, props: T) {
+    const app = createApp(component, props);
+    app.provide(INJECTKEY_AppOptions, correctAppOptions(options));
+    triggerAppCreated(app, type);
+    return app;
+}
+/**
+ * 使用app应用程序
+ * - 使用 {@link inject} 取上级提供的应用程序配置
+ * - 若上级未注入，则强制初始化默认值，确保返回值有效
+ * @param defaultValue 默认值，上级未提供应用程序配置时生效
+ * @returns vue应用配置选项
+ */
+export function useApp(): Required<AppOptions> {
+    //  后期考虑返回app实例，在newApp的时候，构建一个唯一Key传递下去，在后代组件中直接取到
+    const options = inject(INJECTKEY_AppOptions);
+    return correctAppOptions(options);
+}
 
 /**
  * app实例创建完之后的回调通知
@@ -33,43 +77,4 @@ export function onAppCreated(fn: (app: App, type?: AppType) => void): IScope {
 export function triggerAppCreated(app: App, type?: AppType): App {
     appCreatedFns.forEach(fn => fn(app, type));
     return app;
-}
-
-
-/**
- * 注入Key：页面模式
- * - 上级组件通过provide注入后，后续组件直接使用inejct获取使用，避免逐级逐级往下传递
- */
-const INJECTKEY_PageMode = Symbol() as InjectionKey<PageModeOptions["mode"]>;
-/**
- * 设置页面模式
- * - provide 给下级组件使用
- * @param pageMode 页面模式
- * @returns 页面模式
- */
-export function setPageMode(pageMode: PageModeOptions["mode"]): PageModeOptions["mode"] {
-    pageMode = pageMode == "mobile" ? "mobile" : "desktop";
-    provide(INJECTKEY_PageMode, pageMode);
-    return pageMode;
-}
-/**
- * 使用页面模式
- * - 取值逻辑：
- * - - mode 不存在，则 `inject` 取上级组件注入的值
- * - - inject 不存在，则 `defaultValue` 取默认值
- * - - `defaultValue`值无效，则强制返回 `desktop`
- * - 注意事项：
- * - - 上级组件需要先 {@link setPageMode} 设置页面模式了；子组件才能够 {@link inejct} 获取到
- * @param mode 当前传入的页面样式值，无值时，
- * @param defaultValue 默认值，
- * @returns 页面模式 配置选项
- */
-export function usePageMode(mode?: PageModeOptions["mode"], defaultValue?: PageModeOptions["mode"]): Required<PageModeOptions> {
-    mode != "desktop" && mode != "mobile" && (mode = undefined);
-    mode == undefined && (mode = inject(INJECTKEY_PageMode));
-    mode != "desktop" && mode != "mobile" && (mode = defaultValue);
-    mode != "desktop" && mode != "mobile" && (mode = "desktop");
-
-    const options: Required<PageModeOptions> = { mode };
-    return Object.freeze(options);
 }

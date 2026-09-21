@@ -3,10 +3,11 @@
  * - 为了简化Manager中代码，不对外独立使用
  */
 
-import { PopupDescriptor, PopupOptions } from "../models/popup-model";
-import { triggerAppCreated } from "../../base/utils/app-util"
-import { createApp, App, Component, shallowRef } from "vue";
 import { FlatPromise, isObject, isStringNotEmpty, mustObject, throwIfFalse } from "snail.core";
+import { App, Component, shallowRef } from "vue";
+import { AppOptions } from "../../base/models/app-model";
+import { newApp } from "../../base/utils/app-util";
+import { PopupDescriptor, PopupOptions } from "../models/popup-model";
 
 /** 默认的Z-index值 */
 const DEFAULT_ZINDEX: number = 2000;
@@ -34,12 +35,15 @@ export function checkPopup(options: PopupOptions): string | undefined {
 
 /**
  * 打开弹窗
+ * - 弹窗页面将作为独立app存在
+ * @param page  弹窗页面配置选项
  * @param container 弹窗容器组件；作为createApp的根组件；如DialogContainer、PopupContainer、、、
  * @param options 弹窗配置选项
  * @param extOptions 弹窗扩展配置选项
+ * @param page 页面配置参数，注入到新的app实例中，后台组件可{@link usePageMode}取到
  * @returns 弹窗描述器对象
  */
-export function openPopup<Options extends PopupOptions, ExtOptions extends Record<string, any>>(container: Component, options: Options, extOptions: ExtOptions)
+export function openPopup<Options extends PopupOptions, ExtOptions extends Record<string, any>>(page: AppOptions, container: Component, options: Options, extOptions: ExtOptions)
     : Readonly<PopupDescriptor<Options, ExtOptions>> {
     const descriptor = Object.freeze<PopupDescriptor<Options, ExtOptions>>({
         popupId: `popup-${getPopupId()}`,
@@ -50,10 +54,10 @@ export function openPopup<Options extends PopupOptions, ExtOptions extends Recor
         popupTransition: shallowRef<string>(`${options.transition || "fade"}-in`),
     });
     {
-        const app = createApp(container, descriptor);
-        triggerAppCreated(app, "popup");
-        const appEl = getPopupAppElement(descriptor.popupId);
-        app.mount(appEl);
+        // const app = createApp(container, descriptor);
+        // triggerAppCreated(app, "popup");
+        const app = newApp("popup", page, container, descriptor);
+        app.mount(getPopupAppElement(descriptor.popupId));
         POPUPMAPS.set(descriptor.popupId, app);
     }
     return descriptor;

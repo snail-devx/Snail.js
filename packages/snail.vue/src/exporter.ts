@@ -8,6 +8,7 @@
 
 // *****************************************   👉  base 相关导出    ****************************************
 //  类型导出
+export * from "./base/models/app-model";
 export * from "./base/models/base-event";
 export * from "./base/models/base-model";
 export * from "./base/models/button-model";

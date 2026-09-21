@@ -78,22 +78,6 @@ export type ValueOptions<T> = {
     value?: T;
 }
 
-/** 
- * 页面模式 配置选项
- * - 用于一些组件需要同时兼容桌面、移动端两种渲染和交互时，使用此配置选项做区分
- * - - 如日期选择控件，桌面端follow弹窗，移动端 scroll-picker 模式
- * - 组件使用方，根据自身业务场景，决定具体使用哪种页面模式
- */
-export type PageModeOptions = {
-    /**
-     * 页面模式
-     * - desktop 桌面端页面，适合pc、笔记本等大屏幕渲染
-     * - mobile 移动端页面，适合小屏幕，如h5页面，嵌入app中的页面
-     */
-    mode?: "desktop" | "mobile"
-};
-
-
 /**
  * 确认区域 配置选项
  * - 约束 确认区域 的 确定、取消 按钮

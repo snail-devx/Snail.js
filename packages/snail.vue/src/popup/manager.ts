@@ -6,20 +6,21 @@
  * 4、统一管理 弹出层z-index值等
  * 5、【后续支持】全局配置z-index起始值，容器组件、、、
  */
-import { Component } from "vue";
 import { defer, IAsyncScope, IScope, IScopes, isStringNotEmpty, mountScope, ScopeOptions, useAsyncScope, useHook, useScopes } from "snail.core";
+import { Component } from "vue";
 import { checkDialog, monitorDialog } from "./utils/dialog-util";
 import { checkFollow } from "./utils/follow-util";
 import { checkPopup, destroyPopup, openPopup } from "./utils/popup-util";
 //  弹窗相关数据结构
-import { ToastOptions } from "./models/toast-model";
 import { IconType } from "../base/models/icon-model";
+import { ConfirmOptions } from "./models/confirm-model";
 import { DialogHandle, DialogOptions } from "./models/dialog-model";
 import { FollowExtend, FollowHandle, FollowOptions } from "./models/follow-model";
 import { IPopupManager } from "./models/manager-model";
-import { ConfirmOptions } from "./models/confirm-model";
 import { PopupHandle, PopupOptions } from "./models/popup-model";
+import { ToastOptions } from "./models/toast-model";
 //  用到的弹窗容器组件
+import { useApp } from "../base/utils/app-util";
 import ConfirmContainer from "./components/confirm-container.vue";
 import DialogContainer from "./components/dialog-container.vue";
 import FollowContainer from "./components/follow-container.vue";
@@ -27,20 +28,23 @@ import PopupContainer from "./components/popup-container.vue";
 import ToastContainer from "./components/toast-container.vue";
 
 /** 把自己的类型共享出去 */
-export * from "./models/confirm-model"
-export * from "./models/dialog-model"
-export * from "./models/follow-model"
-export * from "./models/manager-model"
-export * from "./models/popup-model"
-export * from "./models/toast-model"
+export * from "./models/confirm-model";
+export * from "./models/dialog-model";
+export * from "./models/follow-model";
+export * from "./models/manager-model";
+export * from "./models/popup-model";
+export * from "./models/toast-model";
 
 /**
  * 使用【弹窗管理器】
- * @param options 配置选项
+ * - 内部会调用 {@link useApp} 方法构建应用程序配置，并在打开弹窗时自动继承下去
+ * @param options 配置选项；可配置应用程序配置
  * @returns 全新的【弹窗管理器】实例+作用域对象
  */
 export function usePopup(options?: Pick<ScopeOptions, "global">): IPopupManager & IScope {
     const global = options ? options.global : false;
+    /** 弹窗页面配置选项 */
+    const page = useApp();
     /** 作用域组：管理动画效果子作用域 */
     const scopes: IScopes = useScopes({ global });
 
@@ -94,7 +98,7 @@ export function usePopup(options?: Pick<ScopeOptions, "global">): IPopupManager 
                 },
                 onBeforeClose: fn => hook.register("onBeforeClose", fn),
             });
-            const descriptor = openPopup<any, DialogHandle<T>>(DialogContainer, options, extOptions);
+            const descriptor = openPopup<any, DialogHandle<T>>(page, DialogContainer, options, extOptions);
             scope = useAsyncScope<T>(deferred.promise);
             monitorDialog(descriptor, scope, deferred);
         }
@@ -214,7 +218,7 @@ export function usePopup(options?: Pick<ScopeOptions, "global">): IPopupManager 
             },
             ...extOptions
         });
-        const descriptor = openPopup(container || PopupContainer, options, extOptions);
+        const descriptor = openPopup(page, container || PopupContainer, options, extOptions);
         const scope = useAsyncScope<T>(deferred.promise);
         scope.onDestroy(() => destroyPopup(descriptor, deferred));
         return scope;
