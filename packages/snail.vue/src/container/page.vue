@@ -6,53 +6,65 @@
     3、mobile 移动端模式下
         1、支持Footer配置，指定操作按钮，先默认确定和取消，后期看情况在增加
         2、支持内容区域配置滚动模式等
+    4、支持 default 插槽，实现各端共享主内容区域渲染，如表单
 -->
 <template>
-    <div class="snail-page" :class="pageMode">
-        <!-- 桌面客户端模式 -->
-        <template v-if="pageMode != 'mobile'">
-            <Header class="header-area" v-if="desktop && desktop.header && desktop.header.disabled != true"
-                :="desktop.header" @close="emits('cancel')" />
-            <Scroll class="main-area flex-1" :="desktop ? desktop.main : Object.create(null)">
-                <slot name="desktop">
-                    <Empty :message="'未实现桌面端渲染'" />
-                </slot>
-            </Scroll>
-            <Footer class="footer-area" v-if="desktop && desktop.footer && desktop.footer.disabled != true"
-                :="desktop.footer" @confirm="emits('confirm')" @cancel="emits('cancel')" />
+    <div class="snail-page" :class="mode">
+        <template v-if="pageArea != undefined" :key="mode">
+            <!-- 头部渲染：配置了，且没禁用时显示 -->
+            <Header class="header-area" v-if="header && header.disabled != true" :="header" @close="emits('close')" />
+            <!-- 主内容区域渲染。渲染顺序：端自有插槽 > 默认插槽 > 不支持提示 -->
+            <Flex class="main-area" :="main">
+                <slot v-if="$slots[mode]" :name="mode" :="slotHandle" />
+                <slot v-else-if="$slots.default" :="slotHandle" />
+                <Empty v-else :message="`未实现[${mode}]端渲染`" />
+            </Flex>
+            <!-- 底部区域：配置了，且没禁用时显示-->
+            <Flex class="footer-area" :class="{ divider: footer && footer.divider == true }"
+                v-if="footer && footer.disabled != true" :cross="'center'"
+                :main="footer && footer.align ? footer.align : 'end'" :gap="'20px'">
+                <template v-for="item in footer.buttons" :key="item.code">
+                    <Button v-if="item.disabled != true" :type="item.type || 'primary'" :size="item.size || 'max'"
+                        :title="item.title" v-text="item.title" @click="emits('button', item.code)" />
+                </template>
+            </Flex>
         </template>
-        <!-- 移动端模式 -->
-        <template v-else>
-            <Scroll class="main-area flex-1" :="mobile ? mobile.main : Object.create(null)">
-                <slot name="mobile">
-                    <Empty :message="'未实现移动端渲染'" />
-                </slot>
-            </Scroll>
-            <Footer class="footer-area" v-if="mobile && mobile.footer && mobile.footer.disabled != true"
-                :="mobile.footer" @confirm="emits('confirm')" @cancel="emits('cancel')" />
-        </template>
+        <Empty v-else :message="`不支持[${mode}]端渲染`" />
     </div>
 </template>
 <script setup lang="ts">
-import Footer from '../base/footer.vue';
+import { isStringNotEmpty } from 'snail.core';
+import Button from '../base/button.vue';
 import Header from '../base/header.vue';
-import { setPageMode } from '../base/utils/app-util';
+import { useApp } from '../base/utils/app-util';
 import Empty from '../prompt/empty.vue';
-import { PageEvents, PageOptions } from './models/page-model';
-import Scroll from './scroll.vue';
+import Flex from './flex.vue';
+import { PageEvents, PageOptions, PageSlotHandle } from './models/page-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<PageOptions>();
 const emits = defineEmits<PageEvents>();
+const { mode } = useApp();
 //  2、组件交互变量、常量
-/** 页面模式 */
-const pageMode: PageOptions["mode"] = setPageMode(props.mode);
+/**     插槽句柄 */
+const slotHandle: PageSlotHandle = Object.freeze<PageSlotHandle>({ mode });
+/**     要渲染的页面区域：根据mode动态计算出来，mobile模式下，强制header失效 */
+const pageArea = [
+    { code: "desktop", ...props.desktop },
+    { code: "mobile", ...props.mobile, header: undefined }
+].find(item => item.code == mode);
+const { header, main = {}, footer } = pageArea || {};
 
 // *****************************************   👉  方法+事件    ****************************************
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
+//      对main区域的配置做默认值处理
+{
+    isStringNotEmpty(main.direction) || (main.direction = "column");
+    main.class || (main.class = "scroll-y small-scrollbar");
+}
 //  2、生命周期响应
 </script>
 
@@ -68,6 +80,18 @@ const pageMode: PageOptions["mode"] = setPageMode(props.mode);
 
     >div.main-area {
         position: relative;
+        flex: 1;
+    }
+
+    >div.footer-area {
+        position: relative;
+        flex-shrink: 0;
+        width: 100%;
+        background-color: white;
+
+        &.divider {
+            border-top: 1px solid #dddfed;
+        }
     }
 
     // 桌面端
@@ -77,11 +101,20 @@ const pageMode: PageOptions["mode"] = setPageMode(props.mode);
         &.dialog-body {
             width: 80%;
             max-width: 1000px;
-            height: 70%;
+            height: fit-content;
+            min-height: 50%;
+            max-height: 70%;
 
+            // 弹窗打开时，左右外边距，实现和Header、Footer对齐
             >div.main-area {
                 margin: 0 40px;
             }
+        }
+
+        //  桌面端 底部区域特定样式
+        >.footer-area {
+            height: 72px;
+            padding: 0 40px;
         }
     }
 
@@ -91,14 +124,15 @@ const pageMode: PageOptions["mode"] = setPageMode(props.mode);
         height: 100%;
         background: #F7F8F9;
 
+        //  移动端 底部区域特定样式
         >.footer-area {
             margin-top: 8px;
             height: 55px;
             padding: 0 12px;
             box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-            background: white;
 
-            >div {
+            // 按钮 均分宽度
+            >div.snail-button {
                 flex: 1;
                 font-size: 16px;
             }

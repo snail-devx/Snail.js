@@ -28,13 +28,13 @@
 
 <script setup lang="ts">
 import { isStringNotEmpty } from 'snail.core';
-import { usePageMode } from '../base/utils/app-util';
+import { useApp } from '../base/utils/app-util';
 import { FieldPanelOptions } from './models/field-panel-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<FieldPanelOptions>();
-const { mode } = usePageMode(props.mode);
+const { mode } = useApp();
 //  2、组件交互变量、常量
 
 

@@ -1,13 +1,15 @@
-import { DisabledOptions, PageModeOptions } from "../../base/models/base-model";
-import { FooterEvents, FooterOptions } from "../../base/models/footer-model";
+import { CSSClassOptions } from "snail.view";
+import { AppOptions } from "../../base/models/app-model";
+import { CloseEvents } from "../../base/models/base-event";
+import { DisabledOptions, TitleOptions } from "../../base/models/base-model";
+import { ButtonOptions } from "../../base/models/button-model";
 import { HeaderOptions } from "../../base/models/header-model";
-import { ScrollOptions } from "./scroll-model";
-
+import { FlexOptions } from "./flex-model";
 
 /**
  * 页面组件配置选项
  */
-export type PageOptions = PageModeOptions & {
+export type PageOptions = {
     /**
      * desktop 桌面客户端模式下的页面配置
      * - header 头部区域，有配置不禁用才显示
@@ -17,7 +19,6 @@ export type PageOptions = PageModeOptions & {
     desktop?: PageAreaOptions;
     /**
      * mobile 移动端模式下的页面配置
-     * - header 头部区域，暂时不支持
      * - main   内容区域，无配置则不滚动，自动撑开内容页面
      * - footer 底部区域，有配置不禁用才显示
      */
@@ -33,16 +34,55 @@ export type PageAreaOptions = {
     header?: HeaderOptions & DisabledOptions;
     /**
      * 内容区域，无配置则不滚动，自动撑开内容页面
+     * - 使用`Flex`组件渲染
      */
-    main?: ScrollOptions;
+    main?: FlexOptions & CSSClassOptions;
     /**
      * 底部区域，有配置不禁用才显示
      */
-    footer?: FooterOptions & DisabledOptions;
+    footer?: PageFooterOptions
 }
+/**
+ * 页面底部配置选项
+ */
+export type PageFooterOptions = {
+    /**
+    * 内部的按钮水平方向对齐方式：
+    * - 默认 end
+    */
+    align?: "start" | "center" | "end";
+    /**
+     * 是否启用分割线
+     * - 启用后，则组件顶部设置边框
+     */
+    divider?: boolean;
+    /**
+     * 底部操作按钮
+     */
+    buttons?: PageFooterButton[];
+} & DisabledOptions;
+/**
+ * 页面组件底部按钮配置信息
+ * - title 作为按钮名称渲染
+ */
+export type PageFooterButton = Required<TitleOptions> & {
+    /**
+     * 按钮编码
+     * - 点击时事件触发使用
+     */
+    code: string;
+} & Pick<ButtonOptions, "type" | "size"> & DisabledOptions;
+/**
+ * 页面组件 插槽句柄
+ */
+export type PageSlotHandle = Required<Pick<AppOptions, "mode">>;
 
 /**
  * 页面组件事件
- * - 集成header和footer组件时，提供cancel和confirm事件
  */
-export type PageEvents = FooterEvents;
+export type PageEvents = CloseEvents & {
+    /**
+     * 按钮点击事件
+     */
+    button: [code: string];
+};

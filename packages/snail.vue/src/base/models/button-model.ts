@@ -6,17 +6,18 @@ import { TitleOptions } from "./base-model";
 export type ButtonOptions = TitleOptions & {
     /**
      * 按钮尺寸
+     * - 默认值：normal
      * - max    ： 120 X 40
      * - middle ： 90 X 32
      * - normal ： 54 X 28
      * - small  ： 30 X 20
      */
-    size: "max" | "middle" | "normal" | "small";
+    size?: "max" | "middle" | "normal" | "small";
     /**
      * 按钮类型
+     *  - default: 【默认值】默认按钮：白色背景
      *  - primary: 主按钮：蓝色背景
-     *  - default: 默认按钮：白色背景
      *  - link   ：链接式按钮：蓝色字体颜色，无边框
      */
-    type: "primary" | "default" | "link";
+    type?: "primary" | "default" | "link";
 }
