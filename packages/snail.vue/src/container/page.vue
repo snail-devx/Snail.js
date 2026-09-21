@@ -25,7 +25,7 @@
                 :main="footer && footer.align ? footer.align : 'end'" :gap="'20px'">
                 <template v-for="item in footer.buttons" :key="item.code">
                     <Button v-if="item.disabled != true" :type="item.type || 'primary'" :size="item.size || 'max'"
-                        :title="item.title" v-text="item.title" @click="emits('button', item.code)" />
+                        :title="item.name" v-text="item.name" @click="emits('button', item.code)" />
                 </template>
             </Flex>
         </template>

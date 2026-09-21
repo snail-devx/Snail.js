@@ -1,7 +1,7 @@
 import { CSSClassOptions } from "snail.view";
 import { AppOptions } from "../../base/models/app-model";
 import { CloseEvents } from "../../base/models/base-event";
-import { DisabledOptions, TitleOptions } from "../../base/models/base-model";
+import { DisabledOptions } from "../../base/models/base-model";
 import { ButtonOptions } from "../../base/models/button-model";
 import { HeaderOptions } from "../../base/models/header-model";
 import { FlexOptions } from "./flex-model";
@@ -65,12 +65,16 @@ export type PageFooterOptions = {
  * 页面组件底部按钮配置信息
  * - title 作为按钮名称渲染
  */
-export type PageFooterButton = Required<TitleOptions> & {
+export type PageFooterButton = {
     /**
      * 按钮编码
-     * - 点击时事件触发使用
+     * - 确保唯一；点击时事件触发使用
      */
     code: string;
+    /**
+     * 按钮名称
+     */
+    name: string;
 } & Pick<ButtonOptions, "type" | "size"> & DisabledOptions;
 /**
  * 页面组件 插槽句柄

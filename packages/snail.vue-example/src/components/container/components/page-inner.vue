@@ -14,8 +14,8 @@
             align: 'center',
             divider: true,
             buttons: [
-                { code: 'xx', title: '测试', size: 'max' },
-                { code: 'xx1', title: '测试2', type: 'primary', size: 'max' }
+                { code: 'xx', name: '测试', size: 'max' },
+                { code: 'xx1', name: '测试2', type: 'primary', size: 'max' }
             ]
         }
     }">
@@ -40,8 +40,8 @@
         footer: {
             disabled: false,
             buttons: [
-                { code: 'xx', title: '测试', size: 'max' },
-                { code: 'xx1', title: '测试2', type: 'primary', size: 'max' }
+                { code: 'xx', name: '测试', size: 'max' },
+                { code: 'xx1', name: '测试2', type: 'primary', size: 'max' }
             ]
         }
     }">
