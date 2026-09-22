@@ -368,3 +368,62 @@
 //  -- 外边框 border bt(border-top) bw(border-width) bc(border-color)  radius（边框）
 
 //  -- 内边距 padding
+
+//  -- 其他样式
+.snail-app {
+
+    // absolute 定位的水平方向上下边框线；不占元素自身空间，利用 ::before ::after 伪元素实现
+    & {
+
+        .before-line,
+        .after-line {
+            position: relative;
+        }
+
+        .before-line::before,
+        .after-line::after {
+            position: absolute;
+            background-color: #e5e5e5;
+            content: " ";
+            width: 100%;
+            height: 1px;
+            left: 0;
+        }
+
+        .before-line::before {
+            top: 0;
+        }
+
+        .after-line::after {
+            bottom: 0;
+        }
+    }
+
+    // absolute 定位的垂直方向左右边框线；不占元素自身空间，利用 ::before ::after 伪元素实现
+    & {
+
+        .before-vline,
+        .after-vline {
+            position: relative;
+        }
+
+        .before-vline::before,
+        .after-vline::after {
+            position: absolute;
+            background-color: #e5e5e5;
+            content: " ";
+            width: 1px;
+            height: 100%;
+            top: 0;
+        }
+
+        .before-vline::before {
+            left: 0;
+        }
+
+        .after-vline::after {
+            right: 0;
+        }
+    }
+
+}
