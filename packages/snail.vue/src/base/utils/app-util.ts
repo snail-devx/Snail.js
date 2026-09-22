@@ -6,10 +6,8 @@ import { IScope, mustFunction, removeFromArray, useScope } from "snail.core";
 import { App, Component, createApp, inject, InjectionKey, provide } from "vue";
 import { AppOptions, AppType } from "../models/app-model";
 
-
 /** 应用创建后的通知方法集合 */
 const appCreatedFns: Array<(app: App, type?: AppType) => void> = [];
-
 
 /**
  * 注入Key：APP配置选项
@@ -21,7 +19,7 @@ export const INJECTKEY_AppOptions = Symbol() as InjectionKey<Readonly<Required<A
  * @param options app配置选项
  * @returns 校正后的配置选项；传入无效则构建默认值
  */
-function correctAppOptions(options?: AppOptions): Readonly<Required<AppOptions>> {
+export function correctAppOptions(options?: AppOptions): Readonly<Required<AppOptions>> {
     const page: Required<AppOptions> = Object.create(null);
     if (options != undefined) {
         page.mode = options.mode == "mobile" ? "mobile" : "desktop";

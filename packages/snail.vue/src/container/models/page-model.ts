@@ -48,7 +48,7 @@ export type PageAreaOptions = {
 export type PageFooterOptions = {
     /**
     * 内部的按钮水平方向对齐方式：
-    * - 默认 end
+    * - 默认 center
     */
     align?: "start" | "center" | "end";
     /**
@@ -75,6 +75,10 @@ export type PageFooterButton = {
      * 按钮名称
      */
     name: string;
+    /**
+     * 按钮点击时的处理方法
+     */
+    click?: () => any;
 } & Pick<ButtonOptions, "type" | "size"> & DisabledOptions;
 /**
  * 页面组件 插槽句柄

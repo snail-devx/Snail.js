@@ -22,10 +22,10 @@
             <!-- 底部区域：配置了，且没禁用时显示-->
             <Flex class="footer-area" :class="{ divider: footer && footer.divider == true }"
                 v-if="footer && footer.disabled != true" :cross="'center'"
-                :main="footer && footer.align ? footer.align : 'end'" :gap="'20px'">
+                :main="footer && footer.align ? footer.align : 'center'" :gap="'20px'">
                 <template v-for="item in footer.buttons" :key="item.code">
                     <Button v-if="item.disabled != true" :type="item.type || 'primary'" :size="item.size || 'max'"
-                        :title="item.name" v-text="item.name" @click="emits('button', item.code)" />
+                        :title="item.name" v-text="item.name" @click="onFooterButtonClick(item)" />
                 </template>
             </Flex>
         </template>
@@ -33,13 +33,13 @@
     </div>
 </template>
 <script setup lang="ts">
-import { isStringNotEmpty } from 'snail.core';
+import { isFunction, isStringNotEmpty } from 'snail.core';
 import Button from '../base/button.vue';
 import Header from '../base/header.vue';
 import { useApp } from '../base/utils/app-util';
 import Empty from '../prompt/empty.vue';
 import Flex from './flex.vue';
-import { PageEvents, PageOptions, PageSlotHandle } from './models/page-model';
+import { PageEvents, PageFooterButton, PageOptions, PageSlotHandle } from './models/page-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -57,13 +57,21 @@ const pageArea = [
 const { header, main = {}, footer } = pageArea || {};
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 底部的按钮点击时
+ * @param button 
+ */
+function onFooterButtonClick(button: PageFooterButton) {
+    emits("button", button.code);
+    isFunction(button.click) && button.click();
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //      对main区域的配置做默认值处理
 {
     isStringNotEmpty(main.direction) || (main.direction = "column");
-    main.class || (main.class = "scroll-y small-scrollbar");
+    main.class || (main.class = ["scroll-y", `${mode == "mobile" ? "mini" : "small"}-scrollbar`]);
 }
 //  2、生命周期响应
 </script>
@@ -102,8 +110,8 @@ const { header, main = {}, footer } = pageArea || {};
             width: 80%;
             max-width: 1000px;
             height: fit-content;
-            min-height: 50%;
-            max-height: 70%;
+            min-height: 60%;
+            max-height: 90%;
 
             // 弹窗打开时，左右外边距，实现和Header、Footer对齐
             >div.main-area {
