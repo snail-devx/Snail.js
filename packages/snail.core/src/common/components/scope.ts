@@ -1,5 +1,5 @@
-import { isObject, isPromise, isStringNotEmpty, mustFunction, run, RunResult, throwIfFalse, throwIfTrue, wait } from "../../base";
-import { IScope, IAsyncScope, IScopes, KeyScopeUseResult, ScopeOptions, IScopeController } from "../models/scope-model";
+import { isFunction, isPromise, isStringNotEmpty, mustFunction, run, RunResult, throwIfFalse, throwIfTrue, wait } from "../../base";
+import { IAsyncScope, IScope, IScopeController, IScopes, KeyScopeUseResult, ScopeOptions } from "../models/scope-model";
 
 // 把自己的类型共享出去
 export * from "../models/scope-model";
@@ -192,6 +192,17 @@ export function useKeyScope<T>(key: T, reuse: boolean): KeyScopeUseResult {
 export function checkScope(scope: IScope, message: string): true {
     throwIfTrue(scope.destroyed, message);
     return true;
+}
+/**
+ * 是否是{@link IScope}对象
+ * - 判断对象是否有 `onDestroy`、`destroy`方法
+ * @param scope 
+ * @returns 是返回true,否则返回false
+ */
+export function isScope(scope: any): boolean {
+    return scope
+        ? isFunction(scope.onDestroy) && isFunction(scope.destroy)
+        : false;
 }
 
 /**
