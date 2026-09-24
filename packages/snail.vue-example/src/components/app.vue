@@ -50,6 +50,7 @@ import EmptyTest from "./prompt/empty-test.vue";
 import LoadingTest from "./prompt/loading-test.vue";
 //  👉 其他组件
 import ActionTest from "./other/action-test.vue";
+import CardTest from "./other/card-test.vue";
 import FieldPanelTest from "./other/field-panel-test.vue";
 import FlashNumberTest from "./other/flash-number-test.vue";
 //  👉 其他组件
@@ -143,6 +144,7 @@ const treeOptions: TreeOptions<Component> = {
             text: "其他组件",
             children: [
                 { text: "Action 操作项", data: ActionTest, clickable: true, searchable: true },
+                { text: "Card 卡片", data: CardTest, clickable: true, searchable: true },
                 { text: "FieldPanel 字段区域", data: FieldPanelTest, clickable: true, searchable: true },
                 { text: "FlashNumber", data: FlashNumberTest, clickable: true, searchable: true }
             ],
@@ -168,14 +170,14 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 }
 
 onMounted(() => {
-    onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
+    // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[treeOptions.nodes.length - 1].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[2].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
-    // onTreeNodeClick(treeOptions.nodes[6].children[0], undefined);
+    onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
 
 });
 </script>
