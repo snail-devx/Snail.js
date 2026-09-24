@@ -2,12 +2,28 @@
  * 滚动相关组件
  */
 
-import { correctFunction, correctNumber, correctString, IScope, isNumberInRange, isObject, mountScope, run, throwIfFalse, throwIfNullish, useScope } from "snail.core";
-import { ElasticDetail, ElasticBaseOptions, IElasticManager, IScrollManager, ScrollbarOptions, ScrollStatus, ElasticStatus } from "../models/scroll-model";
-import { ElementPosition, ElementSize, TouchDetail, TouchDistance, useObserver } from "./observer";
+import { correctFunction, correctNumber, correctString, IScope, isNumberInRange, isObject, isStringNotEmpty, mountScope, throwIfFalse } from "snail.core";
+import { ElasticBaseOptions, ElasticDetail, ElasticStatus, IElasticManager, IScrollManager, ScrollbarOptions, ScrollStatus } from "../models/scroll-model";
+import { ElementPosition, TouchDetail, TouchDistance, useObserver } from "./observer";
 
 // 把自己的类型共享出去
 export * from "../models/scroll-model";
+
+/**
+ * 将目标元素滚动到视图中
+ * @param target 目标元素，支持dom元素或者dom元素Id
+ * @param options 滚动配置效果
+ * @param delay 延迟时间，若>0，则延迟执行，适用于需要等vue等组件渲染完成后再滚动的情况
+ */
+export function scrollIntoView(target: HTMLElement | string, options?: ScrollIntoViewOptions, delay?: number): void {
+    function run() {
+        isStringNotEmpty(target) == true && (target = document.getElementById(target as string));
+        target instanceof HTMLElement
+            ? target.scrollIntoView(options)
+            : console.error("scrollIntoView: target must be a HTMLElement or a id of HTMLElement");
+    }
+    delay > 0 ? run() : setTimeout(run, delay);
+}
 
 /**
  * 使用滚动视图
