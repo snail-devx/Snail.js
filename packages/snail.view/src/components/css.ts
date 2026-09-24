@@ -4,8 +4,8 @@
  *  2、style 内联样式管理
  *  3、【后续支持】直接构建style标签
  */
-import { extract, isArrayNotEmpty, isObject, isStringNotEmpty } from "snail.core";
-import { AllStyle, CSS, CSSDescriptor, ICSSManager } from "../models/css-model";
+import { hasOwnProperty, isArrayNotEmpty, IScope, isObject, isStringNotEmpty, mountScope, mustString } from "snail.core";
+import { AllStyle, CSS, CSSDescriptor, ICSSManager, IStyleManager, StyleClassItem } from "../models/css-model";
 
 // 把自己的类型共享出去
 export * from "../models/css-model";
@@ -62,7 +62,6 @@ function useCSS(): ICSSManager {
     /**
      * 构建样式
      * @param options 样式配置
-     * @param isFlex 是否是flex布局
      * @returns 计算出来的组件样式信息
      */
     function buildStyle(options: AllStyle): Record<string, string> {
@@ -95,7 +94,63 @@ function useCSS(): ICSSManager {
     //  构建管理器实例，挂载scope作用域
     return Object.freeze({ parse, operate, buildStyle });
 }
+
 /**
  * 全局的【CSS管理器】
  */
 export const css: ICSSManager = useCSS();
+
+
+
+/**
+ * 使用style标签管理器
+ * - 实现临时style样式管理：基于传入的类样式，自动构建，并加上特定的class前缀，实现作用域隔离
+ * - 如一些组件需要创建临时样式，组件销毁时自动销毁
+ */
+export function useStyle(): IStyleManager & IScope {
+    /** style标签元素 */
+    const style: HTMLStyleElement = document.createElement("style");
+    /** 分配的根类样式 */
+    const namespace: string = `namespace_${++styleTagIndex}`
+
+    //#region ************************************* 接口方法：IStyleManager具体实现 *************************************
+    /**
+     * 构建style标签的类样式
+     * - 每次构建时，会删除之前的类样式，添加新的类样式
+     * @param classes 类样式数组，name为类样式名称，options为样式配置（key为css样式，value为样式值；如width
+     */
+    function build(classes: StyleClassItem[]) {
+        style.parentElement || document.head.appendChild(style);
+        if (isArrayNotEmpty(classes) == true) {
+            style.innerText = classes.map((item, index) => {
+                //  构建当前class的类样式，注意key的大写问题
+                const styles: string[] = [];
+                {
+                    const style = css.buildStyle(item.styles);
+                    for (const key in style) {
+                        hasOwnProperty(style, key) && styles.push(`\t${key.replace(/([A-Z])/g, "-$1").toLowerCase()}:${style[key]};`);
+                    }
+                }
+                //  生成类样式
+                mustString(item.rule, `classes[${index}].rule`);
+                return `.${namespace} ${item.rule} { ${styles.join("\t")} }`;
+            }).join("\n");
+        }
+        else {
+            style.innerText = "";
+        }
+    }
+    //#endregion
+
+    //  初始化
+    {
+        const manager = mountScope<IStyleManager>({
+            namespace,
+            build
+        }, { type: "IStyleManager" })
+        manager.onDestroy(() => style.parentElement && style.parentElement.removeChild(style));
+        return Object.freeze(manager);
+    }
+}
+/** style标签的索引 */
+let styleTagIndex: number = 0;

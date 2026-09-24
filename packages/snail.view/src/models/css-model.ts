@@ -30,6 +30,41 @@ export interface ICSSManager {
      */
     buildStyle(options: AllStyle): Record<string, string>;
 }
+/**
+ * 接口：style标签管理器
+ * - 实现临时style样式管理：基于传入的类样式，自动构建，并加上特定的class前缀，实现作用域隔离
+ * - 如一些组件需要创建临时样式，组件销毁时自动销毁
+ */
+export interface IStyleManager {
+    /**
+     * 当前style标签的命名空间值
+     * - 作为标签中类样式的根前缀
+     * - 将此名称样式约束元素的上层dom的class中，否则{@link reset}设置的样式不会生效
+     */
+    readonly namespace: string;
+
+    /**
+     * 构建style标签的类样式
+     * - 每次构建时，会删除之前的类样式，添加新的类样式
+     * @param classes 类样式数组，name为类样式名称，options为样式配置（key为css样式，value为样式值；如width
+     */
+    build(classes: StyleClassItem[])
+}
+/**
+ * style标签的类样式项
+ */
+export type StyleClassItem = {
+    /**
+     * 样式规则
+     * - 作为样式选择器，支持 .类样式、#id选择、:伪类选择等等
+     * - 都会挂载到{@link IStyleManager.namespace}下
+     */
+    rule: string;
+    /**
+     * 样式配置（key为css样式，value为样式值；如width
+     */
+    styles: AllStyle;
+}
 
 /**
  * css 样式

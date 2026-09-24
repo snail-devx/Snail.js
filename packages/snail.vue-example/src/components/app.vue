@@ -52,7 +52,8 @@ import LoadingTest from "./prompt/loading-test.vue";
 import ActionTest from "./other/action-test.vue";
 import FieldPanelTest from "./other/field-panel-test.vue";
 import FlashNumberTest from "./other/flash-number-test.vue";
-
+//  👉 其他组件
+import UseStyleTest from "./view/use-style.vue";
 
 //#endregion
 
@@ -145,6 +146,11 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "FieldPanel 字段区域", data: FieldPanelTest, clickable: true, searchable: true },
                 { text: "FlashNumber", data: FlashNumberTest, clickable: true, searchable: true }
             ],
+        }, {
+            text: "Snail.View",
+            children: [
+                { text: "useStyle 测试", data: UseStyleTest, clickable: true, searchable: true }
+            ]
         }
     ],
 }
