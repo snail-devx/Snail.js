@@ -7,17 +7,16 @@ import { DynamicOptions } from "../models/dynamic-model";
 /**
  * 挂载指定的Vue组件
  * - 全新构建的vue app实例，挂载传入的组件
- * @param root app配置选项；注入到新的app实例中，后台组件可{@link useApp}取到
- * @param target 挂载的目标元素
- * @param root   挂载的根组件配置选项，约束挂载的根组件和组件属性配置                 
+ * @param options app配置选项；注入到新的app实例中，后台组件可{@link useApp}取到
+ * @param target    挂载的目标元素
+ * @param props   挂载的根组件配置选项，约束挂载的根组件和组件属性配置                 
  * @returns 作用域对象，销毁挂载实例
  */
-export function mount<Props>(options: AppOptions, target: HTMLElement, root: DynamicOptions<Props>): IScope {
+export function mount<Props>(options: AppOptions, target: HTMLElement, props: DynamicOptions<Props>): IScope {
     (target instanceof HTMLElement) || throwError("target must be a HTMLElement");
-    mustObject(root, "root");
+    mustObject(props, "props");
+    const app = newApp("normal", options, Dynamic, props);
     target.classList.add("snail-app");
-
-    const app = newApp("normal", options, Dynamic, root);
     app.mount(target);
     return useScope().onDestroy(() => app.unmount());
 
