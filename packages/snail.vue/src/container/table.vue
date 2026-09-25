@@ -1,95 +1,43 @@
-<!-- 表格组件
-    1、配合TableRow、TableCol使用 
-    2、支持hearder插槽、默认为内容插槽
+<!--表格组件：
+    1、使用原生 table 标签进行绘制，实现数据表能力
+    2、支持拖拽调整顺序能力：支持列的触发handle，不指定则整行、、
+    3、支持固定头部，固定列等操作，支持 支持列插槽，绘制时区分header和body模式
+    4、实现数据加载能力，主动去取数据，集成滚动加载能力，实现动态交互 
+    5、实现选择能力，支持单选、多选、全选和取消能力
+        1、外部通知进入选择模式（单选/多选，多选时是否支持全选）
+        2、外部通知退出选择模式（确定/取消，确定时返回选中的数据（全选时，标记全选，选择了哪些，没选哪些）
+    6、实现数据管理能力：
+        1、数据完全由Table组件管理，初始化加载数据、滚动分页加载下一页数据
+    7给外部暴露的接口：
+            load（init/more/search）
+            forc（id） 将那条数据显示到可视化区域，并支持高亮效果（如加个边框，过一会儿自动取消）
+            add（data，index） 添加数据，支持指定位置
+            update(index,data) 支持传入多个索引，或者数据Id值；然后传入更新的数据字典（key、value）
+            delete(index) 支持传入多个索引，或者数据Id值
+
+
 -->
 <template>
-    <Scroll class="snail-table" :scroll="scroll" :bar-size="barSize" :class="{ 'start-border': border == true }">
-        <!-- 头部区域 -->
-        <div class="table-header" :style="hStyleRef">
-            <slot name="header" />
-        </div>
-        <!-- 内容区域：滚动 -->
-        <div class="table-body">
-            <slot />
-        </div>
-        <!-- 尾部区域 -->
-        <div class="table-footer" :style="fStyleRef">
-            <slot name="footer" />
-        </div>
-    </Scroll>
+
 </template>
 
 <script setup lang="ts">
-import Scroll from "./scroll.vue"
-import { TableOptions } from "./models/table-model";
-import { computed } from "vue";
-import { css } from "snail.view";
 
 // *****************************************   👉  组件定义    *****************************************
-//  1、props、data
-const props = defineProps<TableOptions>();
-/** 表头样式 */
-const hStyleRef = computed(() => css.buildStyle(props.headerStyle));
-/** 表尾样式 */
-const fStyleRef = computed(() => css.buildStyle(props.footerStyle));
-//  2、可选配置选项
-defineOptions({ name: "Table", inheritAttrs: true, });
+//  1、props、event、model、components
+
+//  2、组件交互变量、常量
+
 
 // *****************************************   👉  方法+事件    ****************************************
+
+// *****************************************   👉  组件渲染    *****************************************
+//  1、数据初始化、变化监听
+//  2、生命周期响应
 
 </script>
 
 <style lang="less">
-// 引入Mixins样式
+// 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
-
-.snail-table {
-    display: flex;
-    flex-direction: column;
-
-    //  表头区域、底部区域：不缩放；内部居中对齐，
-    >div.table-header,
-    >div.table-footer {
-        width: 100%;
-        flex-shrink: 0;
-        // flex 布局：display: flex，align-items 为center
-        .flex-cross-center();
-    }
-
-    //  表头钉住位置；给个默认背景色，避免滑动时盖不住数据行
-    >div.table-header {
-        position: sticky !important;
-        top: 0;
-        z-index: 1;
-        background-color: white;
-    }
-
-    // 实际内容区域
-    >div.table-body {
-        width: 100%;
-        flex: 1;
-    }
-}
-
-// *****************************************   👉  特殊样式适配    *****************************************
-//  启用边框时，进行修饰，避免边框线重叠（核心规则：body中尽可能全）
-.snail-table.start-border {
-
-    //  所有区域的列：从第二列开始取消左边框
-    >div.table-header,
-    >div.table-body>.table-row,
-    >div.table-footer {
-        >.table-col:nth-child(n + 2) {
-            border-left: none !important;
-        }
-    }
-
-    //  内容区域和尾部区域：取消列的顶部边框
-    >div.table-body>.table-row,
-    >div.table-footer {
-        >.table-col {
-            border-top: none !important;
-        }
-    }
-}
 </style>
