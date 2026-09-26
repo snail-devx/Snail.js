@@ -73,7 +73,7 @@ export type StyleClassItem = {
     /**
      * 样式配置（key为css样式，value为样式值；如width
      */
-    styles: AllStyle;
+    style: AllStyle;
 }
 
 /**
