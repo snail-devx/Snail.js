@@ -131,9 +131,16 @@ export function useStyle(): IStyleManager & IScope {
                         hasOwnProperty(style, key) && styles.push(`\t${key.replace(/([A-Z])/g, "-$1").toLowerCase()}:${style[key]};`);
                     }
                 }
-                //  生成类样式
+                //  生成类样式；基于 mode 生成连接符，拼接 namespace 和 rule
                 mustString(item.rule, `classes[${index}].rule`);
-                return `.${namespace} ${item.rule} { ${styles.join("\t")} }`;
+                let linker: string = undefined;
+                switch (item.mode) {
+                    case "child": linker = ">"; break;
+                    case "nesting": linker = ""; break;
+                    default: linker = " "; break;
+                }
+
+                return `.${namespace}${linker}${item.rule} { ${styles.join("\t")} }`;
             }).join("\n");
         }
         else {

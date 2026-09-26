@@ -61,6 +61,14 @@ export type StyleClassItem = {
      */
     rule: string;
     /**
+     * 模式
+     * 决定{@link StyleClassItem.rule}和{@link IStyleManager.namespace}拼接方式
+     * - descendant:【默认值】后代模式，使用 “ ”
+     * - child: 直属子元素模式，使用 “>”
+     * - nesting: 嵌套模式，使用 “”，类似less中的 &
+     */
+    mode?: "descendant" | "child" | "nesting";
+    /**
      * 样式配置（key为css样式，value为样式值；如width
      */
     styles: AllStyle;
