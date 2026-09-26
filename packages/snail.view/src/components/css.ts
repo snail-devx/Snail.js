@@ -123,6 +123,7 @@ export function useStyle(): IStyleManager & IScope {
         style.parentElement || document.head.appendChild(style);
         if (isArrayNotEmpty(classes) == true) {
             style.innerText = classes.map((item, index) => {
+                mustString(item.rule, `classes[${index}].rule`);
                 //  构建当前class的类样式，注意key的大写问题
                 const styles: string[] = [];
                 {
@@ -131,16 +132,23 @@ export function useStyle(): IStyleManager & IScope {
                         hasOwnProperty(style, key) && styles.push(`\t${key.replace(/([A-Z])/g, "-$1").toLowerCase()}:${style[key]};`);
                     }
                 }
-                //  生成类样式；基于 mode 生成连接符，拼接 namespace 和 rule
-                mustString(item.rule, `classes[${index}].rule`);
+                //  生成类样式
+                //      基于 mode 生成连接符，拼接 namespace 和 rule
                 let linker: string = undefined;
                 switch (item.mode) {
                     case "child": linker = ">"; break;
                     case "nesting": linker = ""; break;
                     default: linker = " "; break;
                 }
+                //      嵌套模式时，如果为元素tag选择器，需要调整连接顺序。如 span.namespace
+                if (item.mode == "nesting" && /^[#a-zA-Z]+/.test(item.rule) == true) {
+                    //      后续验证不能有子、后代选择器，否则可能样式错误
+                    return `${item.rule}.${namespace} { ${styles.join("\t")} }`;
+                }
+                else {
+                    return `.${namespace}${linker}${item.rule}  { ${styles.join("\t")} }`;
+                }
 
-                return `.${namespace}${linker}${item.rule} { ${styles.join("\t")} }`;
             }).join("\n");
         }
         else {

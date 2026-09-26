@@ -55,19 +55,21 @@ export interface IStyleManager {
  */
 export type StyleClassItem = {
     /**
-     * 样式规则
-     * - 作为样式选择器，支持 .类样式、#id选择、:伪类选择等等
-     * - 都会挂载到{@link IStyleManager.namespace}下
-     */
-    rule: string;
-    /**
-     * 模式
+     * 类样式模式
      * 决定{@link StyleClassItem.rule}和{@link IStyleManager.namespace}拼接方式
      * - descendant:【默认值】后代模式，使用 “ ”
      * - child: 直属子元素模式，使用 “>”
      * - nesting: 嵌套模式，使用 “”，类似less中的 &
      */
     mode?: "descendant" | "child" | "nesting";
+
+    /**
+     * 样式规则
+     * - 作为样式选择器，支持 .类样式、#id选择、:伪类选择等等
+     * - 支持多级选择器，如 .a .b 、span>svg 等
+     * - - 在 {@link StyleClassItem.mode}为 “nesting” 禁止多级，否则可能出现样式错乱
+     */
+    rule: string;
     /**
      * 样式配置（key为css样式，value为样式值；如width
      */
