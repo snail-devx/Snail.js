@@ -92,9 +92,10 @@ export type IconOptions = TitleOptions & {
  * - - plus         加号
  * - - subtract     减号
  * - - more         更多，默认垂直三个点
+ * - - stats        统计图标
  * - - grip         紧握图标，垂直方向，一般用于拖动句柄
  */
 export type IconType = "success" | "error" | "warn"
     | "close" | "trash" | "download" | "print" | "edit" | "pause"
     | "arrow" | "datepicker" | "timepicker"
-    | "plus" | "subtract" | "more" | "grip";
+    | "plus" | "subtract" | "more" | "stats" | "grip";
