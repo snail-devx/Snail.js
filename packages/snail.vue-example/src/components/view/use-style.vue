@@ -27,7 +27,7 @@ function onChangeStyle() {
     const rt = build([
         {
             rule: ".text",
-            styles: {
+            style: {
                 height: "200px",
                 color: "red",
                 overflowX: "hidden"
@@ -35,13 +35,13 @@ function onChangeStyle() {
         },
         {
             rule: ".padding",
-            styles: {
+            style: {
                 paddingLeft: "20px",
                 backgroundColor: "gray"
             }
         }, {
             rule: "span",
-            styles: {
+            style: {
                 border: "1px solid red"
             }
         }

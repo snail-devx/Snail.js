@@ -4,7 +4,7 @@
  *  2、style 内联样式管理
  *  3、【后续支持】直接构建style标签
  */
-import { hasOwnProperty, isArrayNotEmpty, IScope, isObject, isStringNotEmpty, mountScope, mustString } from "snail.core";
+import { hasOwnProperty, isArray, isArrayNotEmpty, IScope, isObject, isStringNotEmpty, mountScope, mustArray, mustString } from "snail.core";
 import { AllStyle, CSS, CSSDescriptor, ICSSManager, IStyleManager, StyleClassItem } from "../models/css-model";
 
 // 把自己的类型共享出去
@@ -123,7 +123,6 @@ export function useStyle(): IStyleManager & IScope {
         style.parentElement || document.head.appendChild(style);
         if (isArrayNotEmpty(classes) == true) {
             style.innerText = classes.map((item, index) => {
-                mustString(item.rule, `classes[${index}].rule`);
                 //  构建当前class的类样式，注意key的大写问题
                 const styles: string[] = [];
                 {
@@ -140,15 +139,17 @@ export function useStyle(): IStyleManager & IScope {
                     case "nesting": linker = ""; break;
                     default: linker = " "; break;
                 }
-                //      嵌套模式时，如果为元素tag选择器，需要调整连接顺序。如 span.namespace
-                if (item.mode == "nesting" && /^[#a-zA-Z]+/.test(item.rule) == true) {
-                    //      后续验证不能有子、后代选择器，否则可能样式错误
-                    return `${item.rule}.${namespace} { ${styles.join("\t")} }`;
-                }
-                else {
-                    return `.${namespace}${linker}${item.rule}  { ${styles.join("\t")} }`;
-                }
-
+                //      拼接规则：嵌套模式时，如果为元素tag选择器，需要调整连接顺序。如 span.namespace
+                const rules: string[] = (isArray(item.rule) ? item.rule as string[] : [item.rule as string])
+                    .map((rule, ruleIndex) => {
+                        mustString(rule, `classes[${index}].rule[${ruleIndex}]`);
+                        return item.mode == "nesting" && /^[#a-zA-Z]+/.test(rule) == true
+                            ? `${rule}.${namespace}`
+                            : `.${namespace}${linker}${rule}`;
+                    });
+                mustArray(rules, `classes[${index}].rule`);
+                //      组装规则样式
+                return `${rules.join(', ')} { ${styles.join("\t")} }`;
             }).join("\n");
         }
         else {

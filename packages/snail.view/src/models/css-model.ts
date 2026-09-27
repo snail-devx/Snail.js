@@ -66,10 +66,11 @@ export type StyleClassItem = {
     /**
      * 样式规则
      * - 作为样式选择器，支持 .类样式、#id选择、:伪类选择等等
+     * - 为数组时，多个样式规则公用一套 {@link StyleClassItem.style} 样式 
      * - 支持多级选择器，如 .a .b 、span>svg 等
      * - - 在 {@link StyleClassItem.mode}为 “nesting” 禁止多级，否则可能出现样式错乱
      */
-    rule: string;
+    rule: string | string[];
     /**
      * 样式配置（key为css样式，value为样式值；如width
      */
