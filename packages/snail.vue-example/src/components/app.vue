@@ -31,6 +31,7 @@ import LayoutTest from "./container/layout-test.vue";
 import MotionTest from "./container/motion-test.vue";
 import PageTest from "./container/page-test.vue";
 import ScrollTest from "./container/scroll-test.vue";
+import TableTest from "./container/table-test.vue";
 import TreeTest from "./container/tree-test.vue";
 //  👉 表单组件
 import DesignerTest from "./form/designer-test.vue";
@@ -104,6 +105,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Motion 动画组件", data: MotionTest, clickable: true, searchable: true, },
                 { text: "Page 页面组件", data: PageTest, clickable: true, searchable: true, },
                 { text: "Scroll 滚动组件", data: ScrollTest, clickable: true, searchable: true, },
+                { text: "TableTest 表格组件", data: TableTest, clickable: true, searchable: true, },
                 { text: "Tree 树组件", data: TreeTest, clickable: true, searchable: true, },
             ]
         },
@@ -175,7 +177,8 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[2].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
-    onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
+    // onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
+    onTreeNodeClick(treeOptions.nodes[1].children[8], undefined);
 
 });
 </script>

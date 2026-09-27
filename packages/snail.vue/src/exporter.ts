@@ -53,6 +53,7 @@ export * from "./container/models/motion-model";
 export * from "./container/models/page-model";
 export * from "./container/models/scroll-model";
 export * from "./container/models/sort-model";
+export * from "./container/models/table-model";
 export * from "./container/models/tree-model";
 export * from "./container/models/wrapper-model";
 //  组件导出：赋值给 components
@@ -65,6 +66,7 @@ import Motion from "./container/motion.vue";
 import Page from "./container/page.vue";
 import Scroll from "./container/scroll.vue";
 import Sort from "./container/sort.vue";
+import Table from "./container/table.vue";
 import Tree from "./container/tree.vue";
 import Wrapper from "./container/wrapper.vue";
 //  方法导出
@@ -117,7 +119,7 @@ export const components = {
     //  base下的组件
     Button, Choose, Footer, Header, Icon, Input, Number, Search, Select, Switch, Textarea,
     //  container 下的组件
-    Dynamic, Elastic, Flex, Fold, Motion, Layout, Page, Scroll, Sort, Tree, Wrapper,
+    Dynamic, Elastic, Flex, Fold, Motion, Layout, Page, Scroll, Sort, Table, Tree, Wrapper,
     //  other   下的组件
     Action, Card, FieldPanel, FlashNumber,
     //  picker    下的组件
