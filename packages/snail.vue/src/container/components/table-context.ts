@@ -3,7 +3,7 @@
  * - 将一些公共属性和方法抽取出来，减少 Table 组件中的代码
  */
 
-import { correctNumber, isArray, isArrayNotEmpty, IScope, isFunction, isNumberNotNaN, isString, mountScope, mustFunction, mustString, newId, throwError, throwIfTrue, throwIfUndefined, useScope } from "snail.core";
+import { correctNumber, isArray, isArrayNotEmpty, IScope, isFunction, isNumberNotNaN, isString, mountScope, moveFromArray, mustFunction, mustString, newId, throwError, throwIfTrue, throwIfUndefined, useScope } from "snail.core";
 import { scrollIntoView } from "snail.view";
 import { Ref, ref, ShallowRef, shallowRef } from "vue";
 import { EmitterType } from "../models/component-model";
@@ -151,7 +151,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * @param index 索引位置，为undefined时，添加到最后一行
          * @param id 行数据主键Id之
          * @param data 行附带数据
-         * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
+         * @returns 数据行详情; 不存在则返回undefined
          */
         addRow(index: number | undefined, id: string, data?: any): TableDataRowDetail<any> {
             selectModeRef.value == "none" || throwError("cannot add row when select mode.");
@@ -171,7 +171,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * - 将行显示到可视区域
          * - 高亮效果（如加个边框，过一会儿自动取消）
          * @param position 数据行位置
-         * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
+         * @returns 数据行详情; 不存在则返回undefined
          */
         forceRow(position: TableDataRowPosition<any>): TableDataRowDetail<any> | undefined {
             const row = handle.getRow(position);
@@ -189,10 +189,26 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
             return row;
         },
         /**
+         * 移动行到指定位置
+         * @param oldPosition 旧位置
+         * @param newPosition 新位置
+         * @returns 数据行移动后的详情；否则返回undefined
+         */
+        moveRow(oldPosition: TableDataRowPosition<any>, newPosition: TableDataRowPosition<any>): TableDataRowDetail<any> | undefined {
+            const oldRow = handle.getRow(oldPosition);
+            let newRow = oldRow ? handle.getRow(newPosition) : undefined;
+            if (newRow != undefined) {
+                moveFromArray(rowsRef.value, oldRow.index, newRow.index);
+                newRow = handle.getRow(oldRow.id);
+                newRow && emits("move", newRow, oldRow.index, newRow.index)
+            }
+            return newRow;
+        },
+        /**
          * 刷新数据行：重新渲染对应数据行
          * @param position 数据行位置
          * @param data 行附带的数据
-         * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
+         * @returns 数据行详情; 不存在则返回undefined
          */
         refreshRow(position: TableDataRowPosition<any>, data?: any): TableDataRowDetail<any> | undefined {
             /** 先删除后插入 */
@@ -203,7 +219,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
         /**
          * 删除数据行
          * @param position 数据行位置
-         * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
+         * @returns 数据行详情; 不存在则返回undefined
          */
         deleteRow(position: TableDataRowPosition<any>): TableDataRowDetail<any> | undefined {
             selectModeRef.value == "none" || throwError("cannot delete row when select mode.");
@@ -235,7 +251,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * 切换行的选择
          * - 处于【选择模式】时才生效
          * - 【多选模式】下，可传undefined表示切换【全选】按钮
-         * @param position 数据行位置，传undefined表示切换全选
+         * @param position 数据行详情，传undefined表示切换全选
          */
         toggleRowSelect(position?: TableDataRowPosition<any>): void {
             selectModeRef.value == "none" && throwError("table is not in select mode.");

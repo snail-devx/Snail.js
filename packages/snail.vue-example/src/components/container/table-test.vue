@@ -33,7 +33,8 @@
         </div>
     </div>
 
-    <Table :columns="columns" :load="loadData" :footer="{}" @ready="h => handle = h" @select="console.log">
+    <Table :columns="columns" :load="loadData" :main="{ draggable: true }" :footer="{}" @ready="h => handle = h"
+        @move="console.log" @select="console.log">
         <template #="{ rowIndex, columnIndex, row }: TableSlotHandle<any, any>">
             {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
         </template>

@@ -101,6 +101,16 @@ export type TableEvents = {
      * @param column 列配置
      */
     click: [row: TableDataRow<any>, column: TableColumnOptions<any>];
+
+    /**
+     * 数据行移动了
+     * - 拖拽调整行位置时触发
+     * @param row 行数据
+     * @param oldIndex 原始索引
+     * @param newIndex 新索引
+     */
+    move: [row: TableDataRow<any>, oldIndex: number, newIndex: number];
+
     /**
      * 选择模式下选择数据时
      * @param result 选择结果
@@ -247,7 +257,7 @@ export type TableHandle<T> = {
      * @param index 索引位置，为undefined时，添加到最后一行
      * @param id 行数据主键Id之
      * @param data 行附带数据
-     * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
+     * @returns 数据行详情; 不存在则返回undefined
      */
     addRow(index: number | undefined, id: string, data?: T): TableDataRowDetail<T>;
     /**
@@ -255,20 +265,27 @@ export type TableHandle<T> = {
      * - 将行显示到可视区域
      * - 高亮效果（如加个边框，过一会儿自动取消）
      * @param position 数据行位置
-     * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
+     * @returns 数据行详情; 不存在则返回undefined
      */
     forceRow(position: TableDataRowPosition<T>): TableDataRowDetail<T> | undefined;
+    /**
+     * 移动行到指定位置
+     * @param oldPosition 旧位置
+     * @param newPosition 新位置
+     * @returns 数据行移动后的详情；否则返回undefined
+     */
+    moveRow(oldPosition: TableDataRowPosition<T>, newPosition: TableDataRowPosition<T>): TableDataRowDetail<T> | undefined;
     /**
      * 刷新数据行：重新渲染对应数据行
      * @param position 数据行位置
      * @param data 行附带的数据
-     * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
+     * @returns 数据行详情; 不存在则返回undefined
      */
     refreshRow(position: TableDataRowPosition<T>, data?: T): TableDataRowDetail<T> | undefined;
     /**
      * 删除数据行
      * @param position 数据行位置
-     * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
+     * @returns 数据行详情; 不存在则返回undefined
      */
     deleteRow(position: TableDataRowPosition<T>): TableDataRowDetail<T> | undefined;
 
@@ -283,7 +300,7 @@ export type TableHandle<T> = {
      * 切换行的选择
      * - 处于【选择模式】时才生效
      * - 【多选模式】下，可传undefined表示切换【全选】按钮
-     * @param position 数据行位置，传undefined表示切换全选
+     * @param position 数据行详情，传undefined表示切换全选
      */
     toggleRowSelect(position?: TableDataRowPosition<T>): void;
     /**

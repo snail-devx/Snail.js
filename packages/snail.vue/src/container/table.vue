@@ -21,27 +21,30 @@
             </tbody>
             <!-- 真实数据行:main或者default插槽-->
             <tbody v-else>
-                <tr v-for="(row, rowIndex) in rowsRef" :key="row.id" :class="{ 'force-row': forceRowIdRef == row.id }"
-                    :id="buildRowDomId(row.id)">
-                    <td class="index">
-                        <template v-if="selectModeRef == 'single' || selectModeRef == 'multiple'">
-                            <div class="select"
-                                :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
-                                @click="toggleSelect(row)">
-                                <Icon :type="'success'" :color="'white'" :size="12" />
-                            </div>
-                        </template>
-                        <template v-else>
-                            {{ rowIndex + 1 }}
-                        </template>
-                    </td>
-                    <td v-for="(column, columnIndex) in columns" :key="getKey(column)"
-                        :class="{ link: column.type == 'link' }"
-                        @click="column.type == 'link' && emits('click', row, column)">
-                        <slot v-if="$slots.main" :="{ column, columnIndex, row, rowIndex }" />
-                        <slot v-else :="{ column, columnIndex, row, rowIndex }" />
-                    </td>
-                </tr>
+                <Sort :disabled="main ? main.draggable != true : true" :changer="rowsRef.length"
+                    :draggable="'.tbody-row'" :handle="main.dragHandle" @update="handle.moveRow">
+                    <tr v-for="(row, rowIndex) in rowsRef" :key="row.id" class="tbody-row"
+                        :class="{ 'force-row': forceRowIdRef == row.id }" :id="buildRowDomId(row.id)">
+                        <td class="index">
+                            <template v-if="selectModeRef == 'single' || selectModeRef == 'multiple'">
+                                <div class="select"
+                                    :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
+                                    @click="toggleSelect(row)">
+                                    <Icon :type="'success'" :color="'white'" :size="12" />
+                                </div>
+                            </template>
+                            <template v-else>
+                                {{ rowIndex + 1 }}
+                            </template>
+                        </td>
+                        <td v-for="(column, columnIndex) in columns" :key="getKey(column)"
+                            :class="{ link: column.type == 'link' }"
+                            @click="column.type == 'link' && emits('click', row, column)">
+                            <slot v-if="$slots.main" :="{ column, columnIndex, row, rowIndex }" />
+                            <slot v-else :="{ column, columnIndex, row, rowIndex }" />
+                        </td>
+                    </tr>
+                </Sort>
             </tbody>
             <!-- 表头 -->
             <thead>
@@ -86,7 +89,9 @@ import Empty from '../prompt/empty.vue';
 import Loading from '../prompt/loading.vue';
 import { useTable } from './components/table-context.js';
 import { TableColumnOptions, TableEvents, TableOptions } from './models/table-model';
+import Sort from './sort.vue';
 import { buildRowDomId, buildStyle, correctOptions } from './utils/table-util';
+
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
