@@ -101,6 +101,11 @@ export type TableEvents = {
      * @param column 列配置
      */
     click: [row: TableDataRow<any>, column: TableColumnOptions<any>];
+    /**
+     * 选择模式下选择数据时
+     * @param result 选择结果
+     */
+    select: [result: Readonly<TableSelectResult>];
 }
 
 /**
@@ -218,56 +223,69 @@ export type TableHandle<T> = {
      * @returns 异步任务，外部可感知加载进度
      */
     loadData(type: TableLoadType): Promise<void>;
+    /**
+     * 显示 加载中 提示
+     * @returns 作用域,作用域销毁时,取消 加载中 提示
+     */
+    showLoading(): IScope;
+
+    /**
+     * 获取行
+     * @param position 数据行位置
+     * @returns 数据行详情,包含行索引位置和行对象；不存在则返回undefined
+     */
+    getRow(position: TableDataRowPosition<T>): TableDataRowDetail<T> | undefined;
+    /**
+     * 获取符合条件的所有数据行索引
+     * @param predicate 断言函数，返回true时，表示符合条件
+     * @returns 符合条件的数据行详情数组；不存在则返回undefined
+     */
+    getRows(predicate: (row: TableDataRow<T>) => boolean): TableDataRowDetail<T>[];
 
     /**
      * 添加数据行
      * @param index 索引位置，为undefined时，添加到最后一行
      * @param id 行数据主键Id之
      * @param data 行附带数据
+     * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
      */
-    addRow(index: number | undefined, id: string, data?: T): void;
-    /**
-     * 刷新数据行：重新渲染对应数据行
-     * @param position 位置，支持索引位置，或者数据行Id
-     * @param data 行附带的数据
-     */
-    refreshRow(position: number | string, data?: T): void;
-    /**
-     * 删除数据行
-     * @param position 位置，支持索引位置，或者数据行Id
-     */
-    deleteRow(position: number | string): void;
+    addRow(index: number | undefined, id: string, data?: T): TableDataRowDetail<T>;
     /**
      * 聚焦数据行
      * - 将行显示到可视区域
      * - 高亮效果（如加个边框，过一会儿自动取消）
-     * @param position 位置，支持索引位置，或者数据行Id
+     * @param position 数据行位置
+     * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
      */
-    forceRow(position: number | string): void;
+    forceRow(position: TableDataRowPosition<T>): TableDataRowDetail<T> | undefined;
     /**
-     * 获取行数据
-     * @param position 位置，支持索引位置，或者数据行Id
+     * 刷新数据行：重新渲染对应数据行
+     * @param position 数据行位置
+     * @param data 行附带的数据
+     * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
      */
-    getRowData(position: number | string): T | undefined;
+    refreshRow(position: TableDataRowPosition<T>, data?: T): TableDataRowDetail<T> | undefined;
     /**
-     * 获取符合条件的第一个数据行索引
-     * @param predicate 断言函数，返回true时，表示符合条件
-     * @returns 符合条件的数据行索引；断言不通过时，返回undefined
+     * 删除数据行
+     * @param position 数据行位置
+     * @returns 行所在的索引位置和数据行对象; 不存在则返回undefined
      */
-    getRowIndex(predicate: (row: TableDataRow<T>) => boolean): number | undefined;
-    /**
-     * 获取符合条件的所有数据行索引
-     * @param predicate 断言函数，返回true时，表示符合条件
-     * @returns 符合条件的数据行索引数组；断言不通过时，返回undefined
-     */
-    getRowIndexes(predicate: (row: TableDataRow<T>) => boolean): number[] | undefined;
+    deleteRow(position: TableDataRowPosition<T>): TableDataRowDetail<T> | undefined;
 
     /**
-     * 开始选择模式
+     * 开启选择模式
+     * - 可通过 {@link TableEvents.select} 事件监听选择变化
      * @param mode 选择模式，单选还是多选
      * @param action 是什么动作进入的选择模式，用于判断此行是否支持选择时区分使用
      */
     startSelectMode(mode: "single" | "multiple", action: string): void;
+    /**
+     * 切换行的选择
+     * - 处于【选择模式】时才生效
+     * - 【多选模式】下，可传undefined表示切换【全选】按钮
+     * @param position 数据行位置，传undefined表示切换全选
+     */
+    toggleRowSelect(position?: TableDataRowPosition<T>): void;
     /**
      * 获取选择结果
      * - 启用选择模式时生效
@@ -275,9 +293,10 @@ export type TableHandle<T> = {
      */
     getSelectResult(): TableSelectResult;
     /**
-     * 退出选择模式
+     * 停止选择模式
+     * - 退出前，可使用 {@link TableHandle.getSelectResult}获取选择结果
      */
-    endSelectMode(): void;
+    stopSelectMode(): void;
 
     /**
      * 获取排序信息
@@ -285,15 +304,25 @@ export type TableHandle<T> = {
      * @returns 排序状态数组
      */
     getSortStatus<T>(): TableSortStatus<T>[];
-
-    /**
-     * 显示 加载中 提示
-     * @returns 作用域,作用域销毁时,取消 加载中 提示
-     */
-    showLoading(): IScope;
 }
 /**
- * 表格组件的选择结果
+ * 表格数据行详情
+ */
+export type TableDataRowDetail<T> = {
+    /**
+     * 所在索引位置
+     */
+    readonly index: number;
+} & TableDataRow<T>;
+/**
+ * 表格数据行位置
+ * - number：索引位置
+ * - string：数据行Id
+ * - function：断言函数，返回true时，表示符合条件
+ */
+export type TableDataRowPosition<T> = number | string | ((row: TableDataRow<T>) => boolean);
+/**
+ * 表格组件选择模式下的选择结果信息
  */
 export type TableSelectResult = {
     /**
@@ -306,13 +335,13 @@ export type TableSelectResult = {
      * 已选中的数据Id
      * - 【全选】未选中时有效，表示选中了那些数据
      */
-    readonly selectedIds: string[];
+    readonly selectedIds: string[] | undefined;
     /**
      * 取消选中的数据行Id
      * - 多选模式启用【全选】时有效
      * - 表示：全选后，有哪些数据行取消选中了
      */
-    readonly unSelectedIds: string[];
+    readonly unSelectedIds: string[] | undefined;
 }
 /**
  * 排序状态信息

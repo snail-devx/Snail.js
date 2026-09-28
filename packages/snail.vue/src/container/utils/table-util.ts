@@ -9,7 +9,7 @@ import { TableColumnOptions, TableMainAreaOptions, TableOptions, TableRowOptions
 
 /**
  * 校验表格组件配置参数
- * @param options \
+ * @param options 
  * @returns 
  */
 export function correctOptions(options: TableOptions<any>): Readonly<TableOptions<any>> {
@@ -120,4 +120,14 @@ function correctRowStyle(row: TableRowOptions): AllStyle {
     style.borderBottom = correctString(row.borderBottom, undefined, true);
 
     return style;
+}
+
+/**
+ * 构建数据行的dom元素id值
+ * @param rowId 
+ * @returns
+ */
+export function buildRowDomId(rowId: string): string {
+    mustString(rowId, "rowId");
+    return `tr_${rowId}`;
 }

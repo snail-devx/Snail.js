@@ -21,13 +21,14 @@
             </tbody>
             <!-- 真实数据行:main或者default插槽-->
             <tbody v-else>
-                <tr v-for="(row, rowIndex) in rowsRef" :key="row.id" :class="{ 'force-row': forceRowIdRef == row.id }">
+                <tr v-for="(row, rowIndex) in rowsRef" :key="row.id" :class="{ 'force-row': forceRowIdRef == row.id }"
+                    :id="buildRowDomId(row.id)">
                     <td class="index">
                         <template v-if="selectModeRef == 'single' || selectModeRef == 'multiple'">
                             <div class="select"
                                 :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
                                 @click="toggleSelect(row)">
-                                <Icon :type="'success'" :color="'white'" :size="14" />
+                                <Icon :type="'success'" :color="'white'" :size="12" />
                             </div>
                         </template>
                         <template v-else>
@@ -50,7 +51,7 @@
                         <template v-else-if="selectModeRef == 'multiple'">
                             <div class="select" :class="[isSelected(undefined) == true ? 'on' : 'off']"
                                 @click="toggleSelect(undefined)">
-                                <Icon :type="'success'" :color="'white'" :size="14" />
+                                <Icon :type="'success'" :color="'white'" :size="12" />
                             </div>
                         </template>
                     </td>
@@ -62,7 +63,7 @@
                 </tr>
             </thead>
             <!-- 底部数据行:用于统计合计,序号列,给各图标 -->
-            <tfoot v-if="!!footer" v-show="selectModeRef == 'none'">
+            <tfoot v-if="!!footer && rowsRef.length > 0" v-show="selectModeRef == 'none'">
                 <tr>
                     <td>
                         <Icon :type="'stats'" :title="'合计'" :size="20" :color="'#4c94ff'" />
@@ -85,14 +86,14 @@ import Empty from '../prompt/empty.vue';
 import Loading from '../prompt/loading.vue';
 import { useTable } from './components/table-context.js';
 import { TableColumnOptions, TableEvents, TableOptions } from './models/table-model';
-import { buildStyle, correctOptions } from './utils/table-util';
+import { buildRowDomId, buildStyle, correctOptions } from './utils/table-util';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<TableOptions<any>>();
 const emits = defineEmits<TableEvents>();
 const options = correctOptions(props);
-const manager = useTable(options);
+const manager = useTable(options, emits);
 const { getKey } = useKey<TableColumnOptions<any>>();
 const { namespace, build } = useStyle();
 //  2、做一下参数解构，如覆盖props中属性
@@ -147,8 +148,8 @@ onMounted(() => {
         //  头部和内容区域的【序号列】中的选择按钮
         >thead>tr>td.index>div.select,
         >tbody>tr>td.index>div.select {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -206,20 +207,31 @@ onMounted(() => {
                     }
                 }
 
-                //  特定样式    聚焦行动画改编透明度
+                //  ------------- 特定样式   -------------
+
+                //      无数据提醒的样式
+                &.empty-message {
+                    >td {
+                        border-bottom: none !important;
+                    }
+                }
+
+                //      聚焦行动画改编透明度
                 &.force-row {
-                    animation: snail-table-force-row 1s ease-in-out;
+                    animation: snail-table-force-row 0.6s linear;
 
                     @keyframes snail-table-force-row {
 
                         0%,
                         50% {
                             opacity: 1;
+                            transform: translateX(-10px);
                         }
 
                         25%,
-                        100% {
+                        75% {
                             opacity: 0;
+                            transform: translateX(0);
 
                         }
                     }

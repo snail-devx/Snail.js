@@ -1,30 +1,39 @@
 <!-- Table 组件测试 -->
 <template>
-    <div style="display: flex;flex-direction: column; gap:10px;margin-bottom: 20px;">
+    <div class="snail-table-test">
         <div style="display: flex;gap: 10px;align-items: center; flex-wrap: wrap;">
             <button @click="handle && handle.addRow(0, String(Date.now()), Date.now())">添加行：首行</button>
             <button @click="handle && handle.addRow(3, String(Date.now()), Date.now())">添加行：索引3</button>
             <button @click="handle && handle.addRow(undefined, String(Date.now()), Date.now())">添加行：末尾</button>
+        </div>
+        <div style="display: flex;gap: 10px;align-items: center; flex-wrap: wrap;">
+            <button @click="handle && handle.refreshRow(0, String(Date.now()))">刷新行：首行</button>
+            <button @click="handle && handle.refreshRow(3, String(Date.now()))">刷新行：索引3</button>
+        </div>
+        <div style=" display: flex;gap: 10px;align-items: center; flex-wrap: wrap;">
             <button @click="handle && handle.forceRow(0)">聚焦行：首行</button>
             <button @click="handle && handle.forceRow(3)">聚焦行：索引3</button>
             <button @click="handle && handle.forceRow('14')">聚焦行：主键14</button>
+        </div>
+        <div style="display: flex;gap: 10px;align-items: center; flex-wrap: wrap;">
             <button @click="handle && handle.deleteRow(0)">删除行：首行</button>
             <button @click="handle && handle.deleteRow(3)">删除行：索引3</button>
             <button @click="handle && handle.deleteRow('14')">删除行：主键14</button>
         </div>
         <div style="display: flex;gap: 10px;align-items: center; flex-wrap: wrap;">
-            <button @click="handle && handle.startSelectMode('single', 'delete')">进入选择模式：单选</button>
-            <button @click="handle && handle.startSelectMode('multiple', 'delete')">进入选择模式：多选</button>
-            <button @click="handle && handle.getSelectResult()">获取选择结果</button>
-            <button @click="handle && handle.endSelectMode()">退出选择模式</button>
+            <button @click="handle && handle.startSelectMode('single', 'delete')">开启选择模式：单选</button>
+            <button @click="handle && handle.startSelectMode('multiple', 'delete')">开启选择模式：多选</button>
+            <button @click="handle && console.log(handle.getSelectResult())">获取选择结果</button>
+            <button @click="handle && handle.toggleRowSelect()">切换全选</button>
+            <button @click="handle && handle.toggleRowSelect(1)">切换选中：索引1</button>
+            <button @click="handle && handle.stopSelectMode()">停止选择模式</button>
         </div>
         <div style="display: flex;gap: 10px;align-items: center; flex-wrap: wrap;">
-            <button
-                @click="handle && onTimeout(scope => scope.destroy(), 1000, handle.showLoading())">显示loading</button>
+            <button @click="handle && onTimeout(scope => scope.destroy(), 1000, handle.showLoading())">loading</button>
         </div>
     </div>
 
-    <Table :columns="columns" :load="loadData" :footer="{}" @ready="h => handle = h">
+    <Table :columns="columns" :load="loadData" :footer="{}" @ready="h => handle = h" @select="console.log">
         <template #="{ rowIndex, columnIndex, row }: TableSlotHandle<any, any>">
             {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
         </template>
@@ -79,4 +88,17 @@ function loadData(type: TableLoadType): TableDataRow<any>[] {
 <style lang="less">
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
+
+.snail-table-test {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+
+    >div {
+        flex-shrink: 0;
+        border: 0.5px solid rgba(243, 7, 30, 0.5);
+        padding: 5px;
+    }
+}
 </style>
