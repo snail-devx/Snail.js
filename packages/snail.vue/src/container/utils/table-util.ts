@@ -116,8 +116,7 @@ function correctRowStyle(row: TableRowOptions): AllStyle {
     style.minHeight = correctString(row.minHeight, undefined, true);
     style.height = correctString(row.height, undefined, true);
     style.maxHeight = correctString(row.maxHeight, undefined, true);
-    style.backgroundColor = correctString(row.background, undefined, true);
-    style.borderBottom = correctString(row.borderBottom, undefined, true);
+    style.background = correctString(row.background, undefined, true);
 
     return style;
 }

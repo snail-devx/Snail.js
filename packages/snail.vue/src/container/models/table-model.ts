@@ -165,10 +165,6 @@ export type TableRowOptions = HeightStyle & {
      * - 默认白色
      */
     background?: string;
-    /**
-     * 下边框样式
-     */
-    borderBottom?: string;
 }
 /**
  * 表格组件的主内容区域配置选项
