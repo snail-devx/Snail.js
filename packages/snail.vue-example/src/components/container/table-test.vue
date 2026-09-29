@@ -56,9 +56,10 @@ const columns: TableColumnOptions<any>[] = [
     { name: "标题", type: "link" },
     { name: "创建时间1", width: "400px" },
     // { name: "创建时间2", width: "400px" },
-    // { name: "创建时间3", width: "400px" },
-    // { name: "创建时间4", width: "400px" },
-    // { name: "创建时间5", width: "400px" },
+    { name: "创建时间3", width: "20rem" },
+    // { name: "创建时间4", width: "54%" },
+    // { name: "创建时间4", width: "24%" },
+    { name: "创建时间4" },
 ];
 
 

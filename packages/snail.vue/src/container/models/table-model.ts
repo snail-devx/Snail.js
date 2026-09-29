@@ -129,6 +129,8 @@ export type TableColumnOptions<T> = {
     name: string;
     /**
      * 列宽度
+     * - 有效值格式`数值`+`单位`；如：`100px`、`10em`、`10%`
+     * - 其余格式值（如calc 计算类)会强制为无效，默认为自适应
      * - 不指定则自适应
      */
     width?: string;

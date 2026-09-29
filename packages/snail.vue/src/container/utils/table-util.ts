@@ -4,8 +4,8 @@
  */
 
 import { correctFunction, correctString, mustArray, mustFunction, mustString } from "snail.core";
-import { AllStyle, StyleClassItem, WidthStyle } from "snail.view";
-import { TableColumnOptions, TableMainAreaOptions, TableOptions, TableRowOptions } from "../models/table-model";
+import { AllStyle, StyleClassItem } from "snail.view";
+import { TableMainAreaOptions, TableOptions, TableRowOptions } from "../models/table-model";
 
 /**
  * 校验表格组件配置参数
@@ -29,7 +29,13 @@ export function correctOptions(options: TableOptions<any>): Readonly<TableOption
         mustString(col.name, `correctOptions:options.columns[${index}].name`);
         col.type = correctString(col.type, "normal", true) as any;
         col.sortable = col.sortable === true;
+        //  对宽度进行强制检验，有效值格式`数值`+`单位`；如：`100px`、`10em`、`10%`
         col.width = correctString(col.width, undefined, true);
+        if (col.width != undefined && isNaN(parseFloat(col.width)) == true) {
+            //  如果宽度不是数值，则直接忽略
+            console.warn(`invalid column width, it will be ignored. column name: ${col.name}`);
+            col.width = undefined;
+        }
 
         return Object.freeze(col);
     });
@@ -56,20 +62,17 @@ export function correctOptions(options: TableOptions<any>): Readonly<TableOption
 }
 /**
  * 构建表格的相关样式
- * @param width 表格宽度配置
- * @param columns 列配置
- * @param header 表头配置
- * @param main  表主内容区域配置
- * @param footer 表尾配置
+ * @param root 根元素
+ * @param options 表格配置
  * @returns 样式配置选项
  */
-export function buildStyle(width: WidthStyle, columns: TableColumnOptions<any>[], header: TableRowOptions, main: TableMainAreaOptions, footer?: TableRowOptions): StyleClassItem[] {
+export function buildStyle(root: HTMLDivElement, options: TableOptions<any>): StyleClassItem[] {
     const classes: StyleClassItem[] = [];
     //  table 高度配置
     classes.push({
         mode: "child",
         rule: "table",
-        style: width
+        style: options.width
     });
     //      组装列的宽度配置：第一列为【序号列】默认高度和宽度
     classes.push({
@@ -80,7 +83,7 @@ export function buildStyle(width: WidthStyle, columns: TableColumnOptions<any>[]
             textAlign: "center",
         }
     });
-    columns.forEach((col, index) => {
+    options.columns.forEach((col, index) => {
         classes.push({
             mode: "child",
             rule: `table>*>tr>td:nth-child(${index + 2})`,
@@ -91,17 +94,17 @@ export function buildStyle(width: WidthStyle, columns: TableColumnOptions<any>[]
     classes.push({
         mode: "child",
         rule: "table>thead>tr",
-        style: correctRowStyle(header),
+        style: correctRowStyle(options.header),
     });
     classes.push({
         mode: "child",
         rule: "table>tbody>tr",
-        style: correctRowStyle(main),
+        style: correctRowStyle(options.main),
     });
     classes.push({
         mode: "child",
         rule: "table>tfoot>tr",
-        style: correctRowStyle(header),
+        style: correctRowStyle(options.header),
     });
 
     return classes;

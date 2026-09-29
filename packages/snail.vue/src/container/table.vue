@@ -8,8 +8,16 @@
     7、支持事件能力，让外部能感知到表格组件状态，如渲染完成时将handle句柄暴露出去
 -->
 <template>
-    <div class="snail-table small-scrollbar" :class="namespace">
+    <div class="snail-table small-scrollbar" :class="namespace" ref="table-root">
+        <!-- loading提示 -->
         <Loading :show="loadingRef" />
+        <!-- 做一个宽度辅助元素：将列表中配置的固定值放到这里看看具体有宽：百分比和自适应不在这里计算 
+                按照索引顺序索引出每列的渲染宽度，宽度为0的列作为自适应列做处理,若没出横向滚动条则平分，出了横向滚动条则最小宽度150px
+         -->
+        <div class="width-assist">
+            <span v-for="col in columns" :style="{ width: col.width }" />
+        </div>
+        <!-- 实际内容表格渲染 -->
         <table cellpadding="0" cellspacing="0">
             <!-- 无数据提醒 -->
             <tbody v-if="rowsRef.length == 0">
@@ -21,8 +29,9 @@
             </tbody>
             <!-- 真实数据行:main或者default插槽-->
             <tbody v-else>
-                <Sort :disabled="main ? main.draggable != true : true" :changer="rowsRef.length"
-                    :draggable="'.tbody-row'" :handle="main.dragHandle" @update="handle.moveRow">
+                <Sort :disabled="main ? (selectModeRef != 'none' || main.draggable != true) : true"
+                    :changer="rowsRef.length" :draggable="'.tbody-row'" :handle="main.dragHandle"
+                    @update="handle.moveRow">
                     <tr v-for="(row, rowIndex) in rowsRef" :key="row.id" class="tbody-row"
                         :class="{ 'force-row': forceRowIdRef == row.id }" :id="buildRowDomId(row.id)">
                         <td class="index">
@@ -82,8 +91,8 @@
 
 <script setup lang="ts">
 import { correctString, useKey } from 'snail.core';
-import { useStyle } from 'snail.view';
-import { computed, onMounted } from 'vue';
+import { useObserver, useStyle } from 'snail.view';
+import { computed, onMounted, useTemplateRef } from 'vue';
 import Icon from '../base/icon.vue';
 import Empty from '../prompt/empty.vue';
 import Loading from '../prompt/loading.vue';
@@ -92,30 +101,41 @@ import { TableColumnOptions, TableEvents, TableOptions } from './models/table-mo
 import Sort from './sort.vue';
 import { buildRowDomId, buildStyle, correctOptions } from './utils/table-util';
 
-
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<TableOptions<any>>();
 const emits = defineEmits<TableEvents>();
+const rootDom = useTemplateRef("table-root");
 const options = correctOptions(props);
 const manager = useTable(options, emits);
+const { onSize } = useObserver();
 const { getKey } = useKey<TableColumnOptions<any>>();
 const { namespace, build } = useStyle();
-//  2、做一下参数解构，如覆盖props中属性
-const { width, columns, header, main, footer } = options;
+//  2、参数解构，如覆盖props中属性
+const { columns, main, footer } = options;
 const emptyMessage = computed(() => correctString(props.emptyMessage, '暂无数据', true));
 const { rowsRef, loadingRef, noMoreDataRef, forceRowIdRef, handle } = manager;
 const { selectModeRef, isSelectable, isSelected, toggleSelect } = manager;
+//  3、界面交互属性变量
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 构建表格自定义样式
+ * - 主要限定表格宽度
+ */
+function buildTableStyle() {
+    build(buildStyle(rootDom.value, options));
+    console.log(arguments);
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
 onMounted(() => {
-    //  样式构建样式
-    build(buildStyle(width, columns, header, main, footer));
     emits("ready", handle);
+    // buildTableStyle();
+    onSize(rootDom.value, buildTableStyle);
+
     handle.loadData("init")
 });
 
@@ -257,6 +277,21 @@ onMounted(() => {
                     border-bottom: 0.5px solid rgba(220, 223, 230, 0.8);
                 }
             }
+        }
+    }
+
+    //  宽度辅助元素：不显示出来，给高度0
+    >div.width-assist {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow: hidden;
+        height: 1px;
+        gap: 1px;
+
+        >span {
+            flex: none;
+            background-color: red;
         }
     }
 }
