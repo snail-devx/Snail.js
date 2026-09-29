@@ -132,6 +132,10 @@ export type BaseStyle = {
      */
     color?: string;
     /**
+     * 背景
+     */
+    background?: string;
+    /**
      * 背景颜色
      */
     backgroundColor?: string;
