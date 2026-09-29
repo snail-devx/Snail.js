@@ -11,15 +11,20 @@ import { FlexOptions } from "./flex-model";
  */
 export type PageOptions = {
     /**
+     * 显示loading效果
+     * - 用于做一些耗时、异步操作时，显示loading提示
+     */
+    loading?: boolean;
+    /**
      * desktop 桌面客户端模式下的页面配置
      * - header 头部区域，有配置不禁用才显示
-     * - main   内容区域，无配置则不滚动，自动撑开内容页面
+     * - main   内容区域，flex布局，无配置则不滚动，自动撑开内容页面
      * - footer 底部区域，有配置不禁用才显示
      */
     desktop?: PageAreaOptions;
     /**
      * mobile 移动端模式下的页面配置
-     * - main   内容区域，无配置则不滚动，自动撑开内容页面
+     * - main   内容区域，flex布局，无配置则不滚动，自动撑开内容页面
      * - footer 底部区域，有配置不禁用才显示
      */
     mobile?: Omit<PageAreaOptions, "header">;

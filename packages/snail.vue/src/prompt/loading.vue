@@ -31,10 +31,11 @@ defineOptions({ name: "Loading", inheritAttrs: true });
 .snail-loading {
     position: absolute;
     z-index: 10000;
-    // x、y起始位置：left:0,top:0
-    .left-top-start();
-    // width:100%；height:100%
-    .wh-fill();
+    //  使用坐标点撑开高度和宽度，避免wh的100%修饰
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
 
     &.show-mask {
         background-color: rgba(0, 0, 0, 0.15);

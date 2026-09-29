@@ -1,15 +1,16 @@
 <!-- 组件介绍写到这里 -->
 <template>
     桌面模式，默认：
-    <Page style="width: 100%;height: 200px;border: 1px solid gray;">
+    <button @click="loadingRef = !loadingRef">切换loading</button><br />
+    <Page style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef">
         <template #desktop>
             destktop区域
         </template>
     </Page>
     <br />
     桌面模式，配置头部和底部：
-    <Page class="no-xxx" style="width: 100%;height: 200px;border: 1px solid gray;" :desktop="{
-        header: { useTo: 'dialog' },
+    <Page class="no-xxx" style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef" :desktop="{
+        header: { useTo: 'dialog', title: '测试', divider: true },
         footer: {
             align: 'center',
             divider: true,
@@ -58,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { provide } from "vue";
+import { provide, shallowRef, ShallowRef } from "vue";
 import { AppOptions, components, INJECTKEY_AppOptions } from "../../../libraries/snail_vue";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -66,9 +67,8 @@ import { AppOptions, components, INJECTKEY_AppOptions } from "../../../libraries
 const { mode } = defineProps<AppOptions>();
 provide(INJECTKEY_AppOptions, Object.freeze({ mode }));
 const { Page } = components;
-
-
 //  2、组件交互变量、常量
+const loadingRef: ShallowRef<boolean> = shallowRef(true);
 
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -76,7 +76,7 @@ const { Page } = components;
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
-
+setTimeout(() => loadingRef.value = false, 1000);
 </script>
 
 <style lang="less">

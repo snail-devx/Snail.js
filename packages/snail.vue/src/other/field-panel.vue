@@ -37,7 +37,6 @@ const props = defineProps<FieldPanelOptions>();
 const { mode } = useApp();
 //  2、组件交互变量、常量
 
-
 // *****************************************   👉  方法+事件    ****************************************
 
 // *****************************************   👉  组件渲染    *****************************************
@@ -51,13 +50,15 @@ const { mode } = useApp();
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-field-panel {
-    min-height: 48px;
     position: relative;
+    min-height: 48px;
     display: flex;
     padding: 0 14px;
     display: flex;
     align-items: stretch;
     gap: 10px;
+    //  防御性，防止处于flex容器中时被压缩
+    flex: none;
 
     // 字段头部区域：14px的上下内边距，留20px的标题区域，实现48px高度下垂直居中，多行是则不垂直居中，14px的上边距为起点
     >.field-header {
@@ -81,9 +82,10 @@ const { mode } = useApp();
 
     // 字段内容区域：上下间距8，采用flex布局实现垂直居中效果
     >.field-body {
-        flex: 1;
         position: relative;
+        flex: 1;
         padding: 8px 0;
+        overflow-x: hidden;
 
         // 字段值渲染区域，给一些默认控件样式，确保和标题能够在同一水平线上
         >.control {
