@@ -5,10 +5,7 @@
  *  1、不提供全局【观察者】对象；这个涉到不少子scope的销毁，在全局挂着始终不好
  */
 import { checkScope, correctNumber, IScope, IScopes, mountScope, mustFunction, mustString, run, ScopeOptions, throwIfFalse, useScopes } from "snail.core";
-import { ElementSize, IObserver, TouchDetail, TouchDistance, TouchOptions, ElementPosition, TouchStatus, TouchTarget } from "../models/observer-model";
-
-// 把自己的类型共享出去
-export * from "../models/observer-model";
+import { ElementSize, IObserver, TouchDetail, TouchDistance, TouchOptions, TouchStatus, TouchTarget } from "../models/observer-model";
 
 /**
  * 使用【观察者】

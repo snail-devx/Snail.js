@@ -2,13 +2,9 @@
  * link 标签管理
  *  1、csslink标签管理，自动追加版本号，维护生命周期
  */
-import { IScope, mountScope, ScopeOptions, useScope } from "snail.core"
-import { event, mustString, isArrayNotEmpty, isStringNotEmpty, version } from "snail.core";
+import { event, isArrayNotEmpty, IScope, isStringNotEmpty, mountScope, mustString, ScopeOptions, useScope, version } from "snail.core";
 import { ILinkManager, LinkElement, LinkFile, LinkOptions } from "../models/link-model";
-import { checkLinkOptions, destroylink, EVENT_ChangeTheme, getLinkDefaultContainer, LINK_CONFIG, LINK_CONTAINER_ID, setlinkByTheme } from "../utils/link-util";
-
-// 把自己的类型共享出去
-export * from "../models/link-model";
+import { checkLinkOptions, destroylink, EVENT_ChangeTheme, getLinkDefaultContainer, LINK_CONFIG, setlinkByTheme } from "../utils/link-util";
 
 /**
  * 使用【link标签管理器】

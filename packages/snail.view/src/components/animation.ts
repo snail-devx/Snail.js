@@ -6,13 +6,11 @@
  * 注意事项：
  *  1、不提供全局【观察者】对象；这个涉到不少子scope的销毁，在全局挂着始终不好
  */
-import { IScope, IScopes, isObject, ITimer, mountScope, ScopeOptions, throwIfFalse, useScopes, useTimer } from "snail.core";
-import { TransitionEffect, IAnimationManager } from "../models/animation-model";
+import { IScope, IScopes, isObject, mountScope, ScopeOptions, throwIfFalse, useScopes } from "snail.core";
+import { IAnimationManager, TransitionEffect } from "../models/animation-model";
+import { CSS } from "../models/css-model";
 import { getAnimationScope } from "../utils/animation-util";
-import { CSS, css } from "./css";
-
-// 把自己的类型共享出去
-export * from "../models/animation-model";
+import { css } from "./css";
 
 /**
  * 使用【动画管理器】

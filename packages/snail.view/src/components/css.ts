@@ -7,9 +7,6 @@
 import { hasOwnProperty, isArray, isArrayNotEmpty, IScope, isObject, isStringNotEmpty, mountScope, mustArray, mustString } from "snail.core";
 import { AllStyle, CSS, CSSDescriptor, ICSSManager, IStyleManager, StyleClassItem } from "../models/css-model";
 
-// 把自己的类型共享出去
-export * from "../models/css-model";
-
 /**
  * 使用【CSS管理器】
  * @returns 全新【CSS管理器】
