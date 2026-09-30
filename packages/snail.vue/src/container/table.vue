@@ -8,15 +8,7 @@
     7、支持事件能力，让外部能感知到表格组件状态，如渲染完成时将handle句柄暴露出去
 -->
 <template>
-    <div class="snail-table small-scrollbar" :class="namespace" ref="table-root">
-        <!-- loading提示 -->
-        <Loading :show="loadingRef" />
-        <!-- 做一个宽度辅助元素：将列表中配置的固定值放到这里看看具体有宽：百分比和自适应不在这里计算 
-                按照索引顺序索引出每列的渲染宽度，宽度为0的列作为自适应列做处理,若没出横向滚动条则平分，出了横向滚动条则最小宽度150px
-         -->
-        <div class="width-assist">
-            <span v-for="col in columns" :style="{ width: col.width }" />
-        </div>
+    <div class="snail-table small-scrollbar" :class="namespace, border ? 'start-border' : ''" ref="table-root">
         <!-- 实际内容表格渲染 -->
         <table cellpadding="0" cellspacing="0">
             <!-- 无数据提醒 -->
@@ -27,16 +19,19 @@
                     </td>
                 </tr>
             </tbody>
-            <!-- 真实数据行:main或者default插槽-->
+            <!-- 真实数据行:main或者default插槽；启用拖拽调整行顺序时，不允许和其他容器拖出、拖出-->
             <tbody v-else>
-                <Sort :disabled="main ? (selectModeRef != 'none' || main.draggable != true) : true"
-                    :changer="rowsRef.length" :draggable="'.tbody-row'" :handle="main.dragHandle"
+                <Sort :group="{ name: dragId, pull: false, put: false }" :changer="rowsRef.length"
+                    :draggable="'.tbody-row'" :ghost-class="'drag-ghost'" :drag-class="'dragging'"
+                    :handle="main.dragHandle"
+                    :disabled="main ? (selectModeRef != 'none' || main.draggable != true) : true"
                     @update="handle.moveRow">
                     <tr v-for="(row, rowIndex) in rowsRef" :key="row.id" class="tbody-row"
                         :class="{ 'force-row': forceRowIdRef == row.id }" :id="buildRowDomId(row.id)">
+                        <!-- 序号列 -->
                         <td class="index">
                             <template v-if="selectModeRef == 'single' || selectModeRef == 'multiple'">
-                                <div class="select"
+                                <div class="row-select"
                                     :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
                                     @click="toggleSelect(row)">
                                     <Icon :type="'success'" :color="'white'" :size="12" />
@@ -46,6 +41,7 @@
                                 {{ rowIndex + 1 }}
                             </template>
                         </td>
+                        <!-- 真实数据列 -->
                         <td v-for="(column, columnIndex) in columns" :key="getKey(column)"
                             :class="{ link: column.type == 'link' }"
                             @click="column.type == 'link' && emits('click', row, column)">
@@ -55,13 +51,13 @@
                     </tr>
                 </Sort>
             </tbody>
-            <!-- 表头 -->
+            <!-- 表头：放到 tbody 的后面，这样固定列头就不用 index 值了 -->
             <thead>
                 <tr>
                     <td class="index">
                         <template v-if="selectModeRef == 'none'">序号</template>
                         <template v-else-if="selectModeRef == 'multiple'">
-                            <div class="select" :class="[isSelected(undefined) == true ? 'on' : 'off']"
+                            <div class="row-select" :class="[isSelected(undefined) == true ? 'on' : 'off']"
                                 @click="toggleSelect(undefined)">
                                 <Icon :type="'success'" :color="'white'" :size="12" />
                             </div>
@@ -86,11 +82,17 @@
                 </tr>
             </tfoot>
         </table>
+        <!-- loading提示 -->
+        <Loading :show="loadingRef" />
+        <!-- 做一个列宽度辅助元素：将列表中配置的固定值放到这里自动计算出来实际宽度，用于辅助【buildTableColStyle】方法计算列宽度样式-->
+        <div class="column-assist" ref="column-assist">
+            <span v-for="col in columns" :style="{ width: col.width }" />
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { correctString, useKey } from 'snail.core';
+import { correctString, newId, useKey } from 'snail.core';
 import { useObserver, useStyle } from 'snail.view';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import Icon from '../base/icon.vue';
@@ -99,24 +101,27 @@ import Loading from '../prompt/loading.vue';
 import { useTable } from './components/table-context.js';
 import { TableColumnOptions, TableEvents, TableOptions } from './models/table-model';
 import Sort from './sort.vue';
-import { buildRowDomId, buildStyle, correctOptions } from './utils/table-util';
+import { buildRowDomId, buildTableBaseStyle, buildTableColStyle, correctOptions } from './utils/table-util';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<TableOptions<any>>();
 const emits = defineEmits<TableEvents>();
 const rootDom = useTemplateRef("table-root");
+const colAssistDom = useTemplateRef("column-assist");
 const options = correctOptions(props);
 const manager = useTable(options, emits);
 const { onSize } = useObserver();
 const { getKey } = useKey<TableColumnOptions<any>>();
 const { namespace, build } = useStyle();
 //  2、参数解构，如覆盖props中属性
-const { columns, main, footer } = options;
+const { border, columns, main, footer } = options;
 const emptyMessage = computed(() => correctString(props.emptyMessage, '暂无数据', true));
 const { rowsRef, loadingRef, noMoreDataRef, forceRowIdRef, handle } = manager;
 const { selectModeRef, isSelectable, isSelected, toggleSelect } = manager;
 //  3、界面交互属性变量
+/**     拖拽组件分类的Id值，避免界面有多个Table组件时，相互拖入 */
+const dragId: string = newId();
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -124,8 +129,10 @@ const { selectModeRef, isSelectable, isSelected, toggleSelect } = manager;
  * - 主要限定表格宽度
  */
 function buildTableStyle() {
-    build(buildStyle(rootDom.value, options));
-    console.log(arguments);
+    const style = buildTableBaseStyle(options);
+    const colStyle = buildTableColStyle(colAssistDom.value);
+    style.push(...colStyle);
+    build(style);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
@@ -135,7 +142,7 @@ onMounted(() => {
     emits("ready", handle);
     // buildTableStyle();
     onSize(rootDom.value, buildTableStyle);
-
+    //  开始加载数据
     handle.loadData("init")
 });
 
@@ -150,61 +157,135 @@ onMounted(() => {
     overflow: auto;
     box-shadow: 0px 0px 6px 0px rgba(46, 48, 51, 0.14);
 
-    //  给默认值
+    // 表格内容渲染
     >table {
-        table-layout: fixed;
-        width: fit-content;
+        position: relative;
         min-width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
 
-        >*>tr {
+        //  行通用样式
+        tr {
+            position: relative;
             background: white;
-        }
 
-        >*>tr>td {
-            white-space: nowrap;
-            color: #2e3033;
-            overflow-x: hidden;
+            //  所有列的通用样式
+            >td {
+                position: relative;
+                white-space: nowrap;
+                color: #2e3033;
+                overflow-x: hidden;
+                text-overflow: ellipsis;
 
-            &:nth-child(n+2) {
-                padding: 0 10px;
-            }
-        }
+                &:nth-child(1) {
+                    text-align: center;
+                }
 
-        //  头部和内容区域的【序号列】中的选择按钮
-        >thead>tr>td.index>div.select,
-        >tbody>tr>td.index>div.select {
-            width: 14px;
-            height: 14px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+                &:nth-child(n+2) {
+                    padding: 0 10px;
+                }
 
-            &.off {
-                border: solid 1px #dcdfe6;
-
-                >svg {
-                    display: none;
+                // 使用伪类构建一个下边框线，不占用实际高度
+                &::after {
+                    content: "";
+                    position: absolute;
+                    width: 100%;
+                    border-bottom: 1px solid #e0e0e0;
+                    bottom: 0;
+                    left: 0;
                 }
             }
 
-            &.on {
-                border: solid 1px #4c9aff;
-                background-color: #4c9aff;
-            }
+            //  序号列的特定处理
+            >td.index {
+                >div.row-select {
+                    width: 14px;
+                    height: 14px;
+                    margin: 0 auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
 
-            &.disabled {
-                cursor: not-allowed;
-            }
+                    &.off {
+                        border: solid 1px #dcdfe6;
 
-            &:not(.disabled) {
-                cursor: pointer;
+                        >svg {
+                            display: none;
+                        }
+                    }
+
+                    &.on {
+                        border: solid 1px #4c9aff;
+                        background-color: #4c9aff;
+                    }
+
+                    &.disabled {
+                        cursor: not-allowed;
+                    }
+
+                    &:not(.disabled) {
+                        cursor: pointer;
+                    }
+                }
             }
         }
-    }
 
-    //  各个区域的特定样式
-    >table {
+        >tbody {
+
+            //  行通用样式
+            >tr {
+                height: 40px;
+                overflow-y: visible;
+                // box-shadow: rgba(66, 185, 131, 0.1) 0px 0px 2px 0px;
+
+                //  拖拽的时候 取消边框，避免因此出现滚动条
+                &.drag-ghost {
+                    border: none !important;
+                }
+
+                &.dragging {
+                    line-height: 40px;
+                }
+
+                >td {
+                    // border-bottom: 0.5px solid rgba(220, 223, 230, 0.8);
+
+                    &.link:hover {
+                        cursor: pointer;
+                        color: #58a4fd;
+                        text-decoration: underline;
+                    }
+                }
+            }
+
+            // 无数据提醒行样式
+            >tr.empty-message {
+                >td {
+                    border-bottom: none !important;
+                }
+            }
+
+            //  聚焦行样式，进行动画提醒
+            >tr.force-row {
+                animation: snail-table-force-row 0.6s linear;
+
+                @keyframes snail-table-force-row {
+
+                    0%,
+                    50% {
+                        opacity: 1;
+                        transform: translateX(-10px);
+                    }
+
+                    25%,
+                    75% {
+                        opacity: 0;
+                        transform: translateX(0);
+                    }
+                }
+            }
+        }
+
         >thead {
             box-shadow: rgba(46, 48, 51, 0.1) 0px 0px 12px 0px;
             position: sticky;
@@ -216,54 +297,6 @@ onMounted(() => {
             }
         }
 
-        >tbody {
-            >tr {
-                height: 40px;
-                overflow-y: visible;
-                // box-shadow: rgba(66, 185, 131, 0.1) 0px 0px 2px 0px;
-
-                >td {
-                    border-bottom: 0.5px solid rgba(220, 223, 230, 0.8);
-
-                    &.link:hover {
-                        cursor: pointer;
-                        color: #58a4fd;
-                        text-decoration: underline;
-                    }
-                }
-
-                //  ------------- 特定样式   -------------
-
-                //      无数据提醒的样式
-                &.empty-message {
-                    >td {
-                        border-bottom: none !important;
-                    }
-                }
-
-                //      聚焦行动画改编透明度
-                &.force-row {
-                    animation: snail-table-force-row 0.6s linear;
-
-                    @keyframes snail-table-force-row {
-
-                        0%,
-                        50% {
-                            opacity: 1;
-                            transform: translateX(-10px);
-                        }
-
-                        25%,
-                        75% {
-                            opacity: 0;
-                            transform: translateX(0);
-
-                        }
-                    }
-                }
-            }
-        }
-
         >tfoot {
             box-shadow: 0px -4px 8px 0px rgba(0, 0, 0, 0.08);
             position: sticky;
@@ -272,26 +305,71 @@ onMounted(() => {
             >tr {
                 height: 50px;
                 overflow-y: visible;
-
-                >td {
-                    border-bottom: 0.5px solid rgba(220, 223, 230, 0.8);
-                }
             }
         }
     }
 
-    //  宽度辅助元素：不显示出来，给高度0
-    >div.width-assist {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        overflow: hidden;
-        height: 1px;
-        gap: 1px;
+    //  宽度辅助元素：不显示出来，给高度0。加绝对优先级处理，防止外部做通用化标签处理影响
+    >div.column-assist {
+        width: 100% !important;
+        height: 0px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
 
+        // 子元素禁止缩放，列配置的宽度是多少就是多少，自适应列在flex布局下不指定宽度则为0
         >span {
-            flex: none;
-            background-color: red;
+            flex: none !important;
+        }
+    }
+}
+
+//  启用边框线时：使用after和before绘制边框线，避免其占用实际空间；且取消阴影效果，避免干扰
+.snail-table.start-border {
+    // 取消自身的阴影效果
+    box-shadow: none;
+
+    //  td 补充左侧边框线，分别每个td，tr构建最右边的边框线做收尾
+    >table {
+
+        td::before,
+        tr::after {
+            content: "";
+            position: absolute;
+            height: 100%;
+            border-right: 1px solid #e0e0e0;
+            top: 0;
+        }
+
+        td::before {
+            left: 0;
+        }
+
+        tr::after {
+            right: 0;
+        }
+    }
+
+    //  thead、foot补充顶部边框线
+    >table {
+        //  ⚠️ 使用伪类构建边框线的时候，thead和tfoot禁止使用 before 构建，避免影响宽度显示效果，具体原因没找出来
+
+        thead::after,
+        tfoot::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            border-top: 1px solid #e0e0e0;
+            top: 0;
+        }
+
+        //  tfooter需要错位一下，否则和tbody的最后一行重叠出现重影
+        tfoot::after {
+            top: -1px;
         }
     }
 }

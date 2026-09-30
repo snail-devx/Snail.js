@@ -16,6 +16,11 @@ export type TableOptions<T> = {
      * - 不配置则默认 width:100%
      */
     readonly width?: WidthStyle;
+    /**
+     * 是否启用边框
+     * - 为true时，每列都显示边框，
+     */
+    readonly border?: boolean;
 
     /**
      * 列配置选项

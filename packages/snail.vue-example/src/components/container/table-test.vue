@@ -33,9 +33,15 @@
         </div>
     </div>
 
-    <Table :columns="columns" :load="loadData" :main="{ draggable: true }" :footer="{}" @ready="h => handle = h"
-        @move="console.log" @select="console.log">
-        <template #="{ rowIndex, columnIndex, row }: TableSlotHandle<any, any>">
+    <Table style="height: 200px;" :columns="columns" :load="loadData" :main="{ draggable: true }" :footer="{}"
+        @ready="h => handle = h" @move="console.log" @select="console.log">
+        <template #="{ rowIndex, columnIndex, row }: TableSlotHandle<any, any>" :key="String(columnIndex)">
+            {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
+        </template>
+    </Table>
+    <Table style="height: 200px;margin-top: 10px;" :border="true" :columns="columns" :load="loadData"
+        :main="{ draggable: true }" :footer="{}" @ready="h => handle = h" @move="console.log" @select="console.log">
+        <template #="{ rowIndex, columnIndex, row }: TableSlotHandle<any, any>" :key="String(columnIndex)">
             {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
         </template>
     </Table>
@@ -54,6 +60,7 @@ let handle: TableHandle<any> = undefined;
 //  2、组件交互变量、常量
 const columns: TableColumnOptions<any>[] = [
     { name: "标题", type: "link" },
+    { name: "创建时间1", width: "400px" },
     { name: "创建时间1", width: "400px" },
     // { name: "创建时间2", width: "400px" },
     { name: "创建时间3", width: "20rem" },
