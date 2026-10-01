@@ -106,7 +106,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Motion 动画组件", data: MotionTest, clickable: true, searchable: true, },
                 { text: "Page 页面组件", data: PageTest, clickable: true, searchable: true, },
                 { text: "Scroll 滚动组件", data: ScrollTest, clickable: true, searchable: true, },
-                { text: "TableTest 表格组件", data: TableTest, clickable: true, searchable: true, },
+                { text: "Table 表格组件", data: TableTest, clickable: true, searchable: true, },
                 { text: "Tree 树组件", data: TreeTest, clickable: true, searchable: true, },
             ]
         },
