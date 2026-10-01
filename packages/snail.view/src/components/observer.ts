@@ -6,6 +6,7 @@
  */
 import { checkScope, correctNumber, IScope, IScopes, mountScope, mustFunction, mustString, run, ScopeOptions, throwIfFalse, useScopes } from "snail.core";
 import { ElementSize, IObserver, TouchDetail, TouchDistance, TouchOptions, TouchStatus, TouchTarget } from "../models/observer-model";
+import { useAnimationFrame } from "./animation";
 
 /**
  * 使用【观察者】
@@ -52,6 +53,7 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
         checkScope(manager, "onEvent: observer destroyed.");
         throwIfFalse(el instanceof Element, "onEvent: target must be a Element");
         mustFunction(fn, "onTouch: fn");
+        const animationFrame = useAnimationFrame<TouchDetail>("queue", fn);
         //  1、进行触摸事件处理的相关方法，变量
         /**     触摸启动目标，用于计算距离和速度 */
         let startTarget: TouchTarget = undefined;
@@ -92,11 +94,13 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
                     startTarget = undefined;
                     break;
             }
-            //  执行回调
-            try { fn(Object.freeze<TouchDetail>(detail)); }
-            catch (ex: any) {
-                console.error("onTouch: run fn error. message:", ex.message, ex);
-            }
+            //  执行回调：采用动画帧方式执行，避免频繁触发和卡顿
+
+            animationFrame.add(Object.freeze<TouchDetail>(detail));
+            // try { fn(Object.freeze<TouchDetail>(detail)); }
+            // catch (ex: any) {
+            //     console.error("onTouch: run fn error. message:", ex.message, ex);
+            // }
         }
         //  2、初始化作用域，开始监听触摸事件，需要是 touch 启动时，才做后续触摸事件处理
         const scope = useScopes();
@@ -144,6 +148,7 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
         }
         //  3、返回作用域；父级作用域销毁时，自动销毁自身作用域
         scopes.onDestroy(() => scope.destroy());
+        scope.onDestroy(() => animationFrame.destroy());
         return scope;
     }
 
