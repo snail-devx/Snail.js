@@ -212,8 +212,8 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
             //  结束时，进行惯性补偿
             default: {
                 let needInertia: boolean = false;
-                //  计算惯性滚动位置：看结束时间和上次move的时间戳，避免上时间停留时计算
-                if (Date.now() - preTouch.timestamp < 10) {
+                //  计算惯性滚动位置：看结束时间和上次move的时间戳，避免上时间停留时计算。鼠标快速点击时，不会进入move,preTouch为undefined,此时不用计算惯性
+                if (preTouch != undefined && Date.now() - preTouch.timestamp < 10) {
                     needInertia = true;
                     const inertia = calScrollPosition(curPosition, { x: preTouch.vx * 100, y: preTouch.vy * 100 });
                     updateTranslate(true, inertia.x, inertia.y);

@@ -93,7 +93,7 @@ onUnmounted(() => {
         background-color: #c3c7cb;
         z-index: 2;
         border-radius: 2px;
-        transition: all 0.2s linear;
+        transition: opacity 0.2s linear;
         opacity: 1;
     }
 
