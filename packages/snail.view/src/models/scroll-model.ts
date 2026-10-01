@@ -1,51 +1,39 @@
-import { ElementPosition, ElementSize, TouchDetail } from "./observer-model";
 
 /**
  * 接口：滚动视图管理器
- * - 先支持滚动条和滚动位置判断
- * - 后续支持滚动到指定位置，判断是否在可见视图、、、
  */
 export interface IScrollManager {
     /**
-     * 是否到最左了
-     * @param root 视图根节点
-     * @returns 
+     * 滚动条滚动
+     * @param x x轴方向滚动距离，单位px；不传则不滚动
+     * @param y y轴方向滚动距离，单位px；不传则不滚动
      */
-    isLeft(root: HTMLElement): boolean;
+    scroll(x: number | undefined, y: number | undefined): void;
     /**
-     * 是否到最右了
-     * @param root 视图根节点
-     * @returns 
+     * 滚动到制定位置
+     * @param x x轴位置，单位px；不传则不滚动
+     * @param y y轴位置，单位px；不传则不滚动
      */
-    isRight(root: HTMLElement): boolean;
+    scrollTo(x: number | undefined, y: number | undefined): void;
+
     /**
-     * 是否到最顶了
-     * @param root 视图根节点
-     * @returns 
+     * 刷新滚动视图
+     * - 重新映射滚动容器上的class信息
      */
-    isTop(root: HTMLElement): boolean;
-    /**
-     * 是否到最底了
-     * @param root 视图根节点
-     * @returns 
-     */
-    isBottom(root: HTMLElement): boolean;
+    refresh(): void;
 
     /**
      * 获取滚动状态
-     * @param root 视图根节点
      * @returns 
      */
-    getStatus(root: HTMLElement): ScrollStatus;
-
-    /**
-     * 构建滚动视图的自定义样式
-     * @param options 滚动视图配置选项
-     * @returns 类样式数组 
-     */
-    buildClassStyle(options: ScrollbarOptions): string[];
+    getStatus(): Readonly<ScrollStatus>;
 }
+/**
+ * 滚动视图基础配置选项
+ */
+export type ScrollBaseOptions = ScrollbarOptions & {
 
+}
 /**
  * 滚动条配置选项
  */
@@ -72,45 +60,50 @@ export type ScrollbarOptions = {
 }
 
 /**
+ * 滚动视图详情
+ * - 用于 触发滚动视图毁掉时，传递的回调参数
+ */
+export type ScrollDetail = {
+    /**
+     * 当前动作，什么原因触发的回调
+     * - initial ：初始化视图
+     * - size ：滚动视图大小变化
+     * - scroll ：滚动条滚动时
+     * - other ：其他情况触发；如视图内部内容变化导致的滚动条变化，执行scroll、scrollTo方法滚动
+     */
+    action: "initial" | "size" | "scroll" | "other";
+
+    /**
+     * 前一次状态
+     * - 初始化时，为`now`的值
+     */
+    pre: ScrollStatus;
+    /**
+     * 当前状态
+     */
+    now: ScrollStatus;
+}
+/**
  * 滚动状态信息
  * - 缓存滚动状态 和下次做比对，触发对应事件
  */
 export type ScrollStatus = {
     /**
-     * 水平滚动条是否显示
+     * 可视宽度
      */
-    xbar: boolean;
-    /**
-     * 垂直滚动条是否显示
+    clientWidth: number;
+    /***
+     * 可视高度
      */
-    ybar: boolean;
-
+    clientHeight: number;
     /**
-     * 滚动到【左侧】了
-     */
-    left: boolean;
-    /**
-     * 滚动到【右侧】了
-     */
-    right: boolean;
-    /**
-     * 滚动到【顶部】了
-     */
-    top: boolean;
-    /**
-     * 滚动到【底部】了
-     */
-    bottom: boolean;
-
-    /**
-     * 滚动视图宽度
+     * 宽度，包含溢出部分
      */
     scrollWidth: number;
     /**
-     * 滚动视图高度
+     * 高度，包含溢出部分
      */
     scrollHeight: number;
-
     /**
      * x轴滚动条的位置
      */
@@ -119,6 +112,37 @@ export type ScrollStatus = {
      * y轴滚动条的位置
      */
     scrollTop: number;
+
+    /**
+     * 水平方向是否溢出出滚动条了
+     */
+    xbar: boolean;
+    /**
+     * 垂直方向是否溢出出滚动条了
+     */
+    ybar: boolean;
+    /**
+     * 水平方向滚动条是否在最【左侧】
+     * - true表示在；false表示不在
+     * - {@link ScrollStatus.xbar}为true时生效
+     */
+    left: boolean;
+    /**
+     * 水平方向滚动条是否在最【右侧】
+     * - true表示在；false表示不在
+     * - {@link ScrollStatus.xbar}为true时生效
+     */
+    right: boolean;
+    /**
+     * 垂直方向滚动条是否在最【顶部】
+     * - true表示在；false表示不在
+     * - {@link ScrollStatus.ybar}为true时生效
+     */
+    top: boolean;
+    /**
+     * 垂直方向滚动条是否在最【底部】
+     * - true表示在；false表示不在
+     * - {@link ScrollStatus.ybar}为true时生效
+     */
+    bottom: boolean;
 }
-
-

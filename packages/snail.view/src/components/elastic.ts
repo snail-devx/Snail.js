@@ -26,7 +26,7 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
     /**     上一次的触摸移动信息，用于最后结束时计算惯性使用 */
     let preTouch: TouchDistance = undefined;
 
-    //#region ************************************* 接口方法：IObserver具体实现 *************************************
+    //#region ************************************* 接口方法：IElasticManager具体实现 *************************************
     // /**
     //  * 禁用弹性滚动
     //  * @param disabled 为true时禁用弹性滚动；否则启用弹性滚动
@@ -238,7 +238,7 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
 
     //  初始化+数据验证
     {
-        throwIfFalse(target instanceof Element, "onEvent: target must be a Element");
+        throwIfFalse(target instanceof Element, "useElastic: target must be a Element");
         fn = correctFunction(fn, undefined);
         //  配置选项校验，给默认值，整理完之后，锁定，避免改动
         options = isObject(options) ? { ...options } : Object.create(null);
