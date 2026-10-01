@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { correctString, newId, useKey, useScopes } from 'snail.core';
+import { correctString, newId, useKey } from 'snail.core';
 import { ScrollDetail, useObserver, useScroll, useStyle } from 'snail.view';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import Icon from '../base/icon.vue';
@@ -114,7 +114,6 @@ const manager = useTable(options, emits);
 const { onSize } = useObserver();
 const { getKey } = useKey<TableColumnOptions<any>>();
 const { namespace, build } = useStyle();
-const scopes = useScopes();
 //  2、参数解构，如覆盖props中属性
 const { border, columns, main, footer } = options;
 const emptyMessage = computed(() => correctString(props.emptyMessage, '暂无数据', true));
@@ -150,11 +149,7 @@ function onScrollDetail(detail: ScrollDetail) {
 onMounted(() => {
     //  事件监听处理
     onSize(rootDom.value, buildTableStyle);
-    scopes.add(useScroll(
-        rootDom.value,
-        { scroll: "both", barSize: "small" },
-        onScrollDetail)
-    );
+    useScroll(rootDom.value, { scroll: "both", barSize: "small" }, onScrollDetail);
     //  准备好了，进行数据加载
     emits("ready", handle);
     handle.loadData("init")

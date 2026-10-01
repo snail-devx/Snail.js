@@ -8,7 +8,6 @@
 </template>
 
 <script setup lang="ts">
-import { useScopes } from "snail.core";
 import { ScrollDetail, useScroll } from "snail.view";
 import { onMounted, useTemplateRef } from "vue";
 import { ScrollEvents, ScrollHandle, ScrollOptions } from "./models/scroll-model";
@@ -19,7 +18,6 @@ defineOptions({ name: "Scroll", inheritAttrs: false, });
 const props = defineProps<ScrollOptions>();
 const emits = defineEmits<ScrollEvents>();
 const rootDom = useTemplateRef("scroll-root");
-const scopes = useScopes();
 //  2、组件交互变量、常量
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -53,11 +51,7 @@ function onScrollDetail(detail: ScrollDetail) {
 
 // *****************************************   👉  组件渲染    *****************************************
 onMounted(() => {
-    const manager = scopes.add(useScroll(
-        rootDom.value,
-        props,
-        onScrollDetail)
-    );
+    const manager = useScroll(rootDom.value, props, onScrollDetail);
     const handle: ScrollHandle = {
         getStatus: manager.getStatus,
         scroll: manager.scroll,

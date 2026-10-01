@@ -434,7 +434,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
             //  选择数据行相关
             selectModeRef, isSelectable, isSelected, toggleSelect,
 
-        });
+        }, { type: "ITableManager" });
         manager.onDestroy(function () {
             //  清除定时器
             forceRowTimerId && clearTimeout(forceRowTimerId);
