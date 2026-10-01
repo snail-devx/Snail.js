@@ -23,6 +23,19 @@ export interface IAnimationManager {
      */
     transition(el: HTMLElement, effect: TransitionEffect<CSS>, time?: number): IScope;
 }
+/**
+ * 动画帧管理器
+ * - 封装 requestAnimationFrame 方法，进行一些css，视图更新操作
+ * - 如拖拽、弹性滚动时的视图更新，在requestAnimationFrame中执行更顺滑
+ * @typeparam T 要使用动画帧数据类型
+ */
+export interface IAnimationFrameManager<T> {
+    /**
+     * 添加要使用动画帧的数据
+     * @param data 数据信息
+     */
+    add(data: T): void;
+}
 
 /**
  * 过渡动画效果配置信息

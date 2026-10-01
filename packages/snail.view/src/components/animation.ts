@@ -6,8 +6,8 @@
  * 注意事项：
  *  1、不提供全局【观察者】对象；这个涉到不少子scope的销毁，在全局挂着始终不好
  */
-import { IScope, IScopes, isObject, mountScope, ScopeOptions, throwIfFalse, useScopes } from "snail.core";
-import { IAnimationManager, TransitionEffect } from "../models/animation-model";
+import { IScope, IScopes, isObject, mountScope, mustFunction, run, ScopeOptions, throwIfFalse, useScopes } from "snail.core";
+import { IAnimationFrameManager, IAnimationManager, TransitionEffect } from "../models/animation-model";
 import { CSS } from "../models/css-model";
 import { getAnimationScope } from "../utils/animation-util";
 import { css } from "./css";
@@ -69,4 +69,58 @@ export function useAnimation(options?: Pick<ScopeOptions, "global">): IAnimation
     );
     manager.onDestroy(scopes.destroy);
     return Object.freeze(manager);
+}
+
+/**
+ * 使用【动画管理器】
+ * - 内部使用`requestAnimationFrame`实现调度。推荐只用于dom视图操作和更新，不推荐内部执行耗时操作，否则会阻塞动画
+ * - 如拖拽、弹性滚动时的视图更新，在requestAnimationFrame中执行更顺滑
+ * @param mode 执行模式：singleton，单例模式，执行回调时，取最新数据执行一次，用于节流；queue，队列模式，执行回调时，取当前队列所有数据依次执行
+ * @param fn  回调方法，在`requestAnimationFrame`回调中执行此方法，执行次数根据{@link mode}而定
+ */
+export function useAnimationFrame<T>(mode: "singleton" | "queue", fn: (data: T) => void): IAnimationFrameManager<T> & IScope {
+    mustFunction(fn, "fn");
+    /** 队列模式 */
+    const queueMode: "singleton" | "queue" = mode == "singleton" ? "singleton" : "queue";
+    /** 数据队列 */
+    const queue: T[] = [];
+    /** 帧Id */
+    let frameId: number = undefined;
+
+    //#region *************************************实现接口：IAnimationFrameManager接口方法*************************************
+    /**
+     * 添加要使用动画帧的数据
+     * @param data 数据信息
+     */
+    function add(data: T): void {
+        //  单例模式时，清理队列再加入
+        queueMode == "singleton" && (queue.splice(0, queue.length));
+        queue.push(data);
+        //  启动动画帧
+        frameId == undefined && (frameId = requestAnimationFrame(animationFrame));
+    }
+    //#endregion
+
+    //#region *************************************内部方法：辅助结构实现的方法*************************************
+    /**
+     * 动画帧执行方法
+     */
+    function animationFrame() {
+        frameId = undefined;
+        //  将当前帧所有数据取出，依次执行
+        for (const data of queue) {
+            const { success, ex } = run(fn, data);
+            success != true && console.error("run animation frame error", ex);
+        }
+        queue.splice(0, queue.length);
+    }
+    //#endregion
+
+    //  构建管理器实例，挂载scope作用域
+    {
+        const manager = Object.freeze(mountScope<IAnimationFrameManager<T>>({ add }));
+        manager.onDestroy(() => frameId != undefined && cancelAnimationFrame(frameId));
+        return manager;
+    }
+
 }
