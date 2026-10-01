@@ -8,9 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import { IScope } from "snail.core";
-import { IScrollManager, ScrollDetail, useScroll } from "snail.view";
-import { onMounted, onUnmounted, useTemplateRef } from "vue";
+import { useScopes } from "snail.core";
+import { ScrollDetail, useScroll } from "snail.view";
+import { onMounted, useTemplateRef } from "vue";
 import { ScrollEvents, ScrollHandle, ScrollOptions } from "./models/scroll-model";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -19,6 +19,7 @@ defineOptions({ name: "Scroll", inheritAttrs: false, });
 const props = defineProps<ScrollOptions>();
 const emits = defineEmits<ScrollEvents>();
 const rootDom = useTemplateRef("scroll-root");
+const scopes = useScopes();
 //  2、组件交互变量、常量
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -51,21 +52,19 @@ function onScrollDetail(detail: ScrollDetail) {
 }
 
 // *****************************************   👉  组件渲染    *****************************************
-{
-    let manager: IScrollManager & IScope = undefined;
-    onMounted(() => {
-        manager = useScroll(rootDom.value, props, onScrollDetail);
-        const handle: ScrollHandle = {
-            getStatus: manager.getStatus,
-            scroll: manager.scroll,
-            scrollTo: manager.scrollTo,
-        };
-        emits("ready", Object.freeze(handle));
-    });
-    onUnmounted(() => {
-        manager && manager.destroy();
-    });
-}
+onMounted(() => {
+    const manager = scopes.add(useScroll(
+        rootDom.value,
+        props,
+        onScrollDetail)
+    );
+    const handle: ScrollHandle = {
+        getStatus: manager.getStatus,
+        scroll: manager.scroll,
+        scrollTo: manager.scrollTo,
+    };
+    emits("ready", Object.freeze(handle));
+});
 </script>
 
 <style lang="less">
