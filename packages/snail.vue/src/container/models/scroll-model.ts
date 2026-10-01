@@ -1,42 +1,28 @@
-import { ScrollbarOptions, ScrollStatus } from "snail.view";
+import { IScrollManager, ScrollBaseOptions, ScrollStatus } from "snail.view";
 
 /**
  * 滚动视图配置选项
  */
-export type ScrollOptions = ScrollbarOptions & {
+export type ScrollOptions = ScrollBaseOptions & {
     //  后期增加其他配置
 }
-
-/**
- * 滚动视图对外暴露方法
- */
-export type ScrollExpose = {
-    /**
-     * 获取滚动状态信息
-     * @returns 
-     */
-    getStatus(): ScrollStatus;
-
-    /**
-     * 进行滚动操作
-     * - 在当前的滚动条位置基础上，滚动指定单位
-     * @param left 水平滚动单位；null、undefined 表示水平不滚动；小于0向左滚动；大于0向右滚动
-     * @param top 垂直滚动单位；null、undefined 表示垂直不滚动；小于0向上滚动；大于0向下滚动
-     */
-    scroll(left?: number, top?: number): void;
-    /**
-     * 滚动到指定位置
-     * @param left 水平滚动条位置；null、undefined 表示水平不滚动
-     * @param top 垂直滚动条位置；null、undefined 表示垂直不滚动
-     */
-    scrollTo(left?: number, top?: number): void;
-}
-
-
 /**
  * 滚动视图事件
  */
 export type ScrollEvents = {
+    /**
+     * 滚动视图准备好了
+     * - 组件加载完成，可对外提供操作服务
+     * @param handle 滚动视图操作接口
+     */
+    ready: [handle: ScrollHandle];
+    /**
+     * 滚动视图状态变化时
+     * @param now 当前状态
+     * @param pre 之前状态
+     */
+    change: [now: ScrollStatus, pre: ScrollStatus];
+
     /**
      * 【x轴方向】滚动条变化时
      * @param show 是否显示。true 滚动条显示；false 滚动条隐藏
@@ -65,3 +51,8 @@ export type ScrollEvents = {
      */
     bottom: [];
 }
+
+/**
+ * 滚动视图对外操作句柄
+ */
+export type ScrollHandle = Required<Pick<IScrollManager, "getStatus" | "scroll" | "scrollTo">>;

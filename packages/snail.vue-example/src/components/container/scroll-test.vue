@@ -77,7 +77,7 @@
             </Scroll>
         </section>-->
         <!-- 事件相关 -->
-        <section style="width: 100%;height: 2px;">事件相关：看控制台输出</section>
+        <section style="width: 100%;height: 20px;">事件相关：看控制台输出</section>
         <section>
             <Scroll class="scroll-test" :class="tmpClassStyleRef" :scroll="'both'" @xbar="console.log"
                 @ybar="console.log" @left="console.log('滚动到最左侧')" @right="console.log('滚动到最右侧')"

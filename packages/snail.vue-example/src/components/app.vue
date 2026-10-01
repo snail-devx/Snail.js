@@ -54,6 +54,7 @@ import CardTest from "./other/card-test.vue";
 import FieldPanelTest from "./other/field-panel-test.vue";
 import FlashNumberTest from "./other/flash-number-test.vue";
 //  👉 其他组件
+import UseScrollTest from "./view/use-scroll.vue";
 import UseStyleTest from "./view/use-style.vue";
 
 //#endregion
@@ -151,6 +152,7 @@ const treeOptions: TreeOptions<Component> = {
         }, {
             text: "Snail.View",
             children: [
+                { text: "UseScroll 测试", data: UseScrollTest, clickable: true, searchable: true },
                 { text: "useStyle 测试", data: UseStyleTest, clickable: true, searchable: true }
             ]
         }
@@ -178,8 +180,13 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
-    onTreeNodeClick(treeOptions.nodes[1].children[8], undefined);
 
+    //  container 测试
+    onTreeNodeClick(treeOptions.nodes[1].children[8], undefined);
+    // other 测试
+    // onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
+    //  view 测试
+    // onTreeNodeClick(treeOptions.nodes[7].children[0], undefined);
 });
 </script>
 
