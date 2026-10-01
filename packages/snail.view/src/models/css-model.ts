@@ -141,6 +141,11 @@ export type BaseStyle = {
     backgroundColor?: string;
 
     /**
+     * 透明度
+     */
+    opacity?: number;
+
+    /**
      * 文本对齐方式
      * - left: 左对齐
      * - center: 居中对齐

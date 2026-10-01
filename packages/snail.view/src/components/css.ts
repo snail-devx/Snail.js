@@ -66,7 +66,7 @@ function useCSS(): ICSSManager {
         if (!!options) {
             const tmpFunc = (key: string) => options[key] != undefined && (style[key] = String(options[key]));
             //  BaseStyle
-            ["color", "background", "backgroundColor", "textAlign", "textAlign", "verticalAlign",].forEach(tmpFunc);
+            ["color", "background", "backgroundColor", "opacity", "textAlign", "textAlign", "verticalAlign",].forEach(tmpFunc);
             //  FlextBox
             ["justifyContent", "alignItems", "flex", "flexBasis", "flexGrow", "flexShrink", "order", "alignSelf"].forEach(tmpFunc);
             //  PositionStyle 
