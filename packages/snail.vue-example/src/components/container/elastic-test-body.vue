@@ -1,14 +1,15 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <div style="height: 500px;">
+    <div style="height: 500px;position: relative;">
         {{ counterRef }}
         下拉刷新、上拉加载更多 {{ Date.now() }}
+        <div style="position: fixed;bottom: 0;">底部靠弄</div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { useTimer } from "snail.core";
-import { ref, ShallowRef, shallowRef, } from "vue";
+import { ShallowRef, shallowRef } from "vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

@@ -182,7 +182,8 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
 
     //  container 测试
-    onTreeNodeClick(treeOptions.nodes[1].children[8], undefined);
+    // onTreeNodeClick(treeOptions.nodes[1].children[8], undefined);
+    onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
     // other 测试
     // onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
     //  view 测试

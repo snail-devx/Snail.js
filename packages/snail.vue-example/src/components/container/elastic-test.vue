@@ -18,7 +18,7 @@
     </section> -->
 
     <section style="height: 200px;margin-right: 10px;border: 1px solid red;">
-        <Elastic class="wh-fill" :scroll="'both'" bar-size="small" :spring="'y'">
+        <Elastic class="wh-fill" :elastic="'both'" :bar="true">
             <template #>
                 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
                 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶 顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶顶
@@ -33,40 +33,23 @@
     </section>
     <br />
     <section style="height: 400px;width: 100%;margin-right: 10px;border: 1px solid red;overflow: hidden;">
-        <Elastic class="wh-fill" :scroll="'both'" bar-size="mini" :spring="'y'" :down-refresh="true" :up-more="true"
-            @refresh="onLoadData" @more="onLoadData">
+        <Elastic class="wh-fill" :elastic="'y'" :bar="true">
             <ElasticTestBody />
         </Elastic>
     </section>
-    <!-- <br />
-    <section style="height: 300px;margin-right: 10px;border: 1px solid red;overflow: hidden;">
-        <Elastic class="wh-fill" :scroll="'both'" bar-size="none" :spring="'both'">
-            <template #>
-                <div style="background-color: gray;width: 520px;height: 400px;" />
-            </template>
+    <br />
+    <section style="height: 400px;width: 100%;margin-right: 10px;border: 1px solid red;overflow: hidden;">
+        <Elastic class="wh-fill" :elastic="'both'" :bar="true">
+            <div style="height: 200px;width: 50%;background-color: gray;">
+                测试内容视图小于容器时
+            </div>
         </Elastic>
-    </section> -->
-
-    <!-- <div style="float: left; width: 100%;height: 200px;" id="log_panel">
-
-    </div> -->
-    <!-- 
-    <div style="width: 300px;height: 300px;">
-        <Scroll class="wh-fill" :bar-size="'mini'" :scroll-y="true" :elastic="'y'">
-            <div style="height: 1000px;background-color: gray; margin: 10px;">内容区域</div>
-        </Scroll>
-    </div>
-    <div style="width: 300px;height: 300px;">
-        <Scroll class="wh-fill" :bar-size="'mini'" :scroll-x="true" :elastic="'x'">
-            <div style="width: 1000px;height: 100%;background-color: gray; margin: 10px;">内容区域</div>
-        </Scroll>
-    </div> -->
+    </section>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, ShallowRef, shallowRef, } from "vue";
-import { components, useReactive } from "../../libraries/snail_vue";
-import { useTimer } from "snail.core";
+import { onMounted } from "vue";
+import { components } from "../../libraries/snail_vue";
 import ElasticTestBody from "./elastic-test-body.vue";
 
 // *****************************************   👉  组件定义    *****************************************
