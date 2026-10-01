@@ -127,7 +127,8 @@ export function buildTableColStyle(columnAssist: HTMLDivElement): StyleClassItem
         const realWidth = columnAssist.clientWidth - 60;
         let autoWidthCount: number = 0;
         let colTotalWidth: number = 0;
-        for (const colDom of columnAssist.children) {
+        for (let index = 0; index < columnAssist.children.length; index++) {
+            const colDom = columnAssist.children[index];
             const colWidth: number = colDom.clientWidth;
             colWidths.push(colWidth);
             colWidth == 0 ? (++autoWidthCount) : (colTotalWidth += colWidth);

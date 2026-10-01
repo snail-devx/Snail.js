@@ -92,8 +92,8 @@
 </template>
 
 <script setup lang="ts">
-import { correctString, newId, useKey } from 'snail.core';
-import { useObserver, useStyle } from 'snail.view';
+import { correctString, newId, useKey, useScopes } from 'snail.core';
+import { ScrollDetail, useObserver, useScroll, useStyle } from 'snail.view';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import Icon from '../base/icon.vue';
 import Empty from '../prompt/empty.vue';
@@ -114,6 +114,7 @@ const manager = useTable(options, emits);
 const { onSize } = useObserver();
 const { getKey } = useKey<TableColumnOptions<any>>();
 const { namespace, build } = useStyle();
+const scopes = useScopes();
 //  2、参数解构，如覆盖props中属性
 const { border, columns, main, footer } = options;
 const emptyMessage = computed(() => correctString(props.emptyMessage, '暂无数据', true));
@@ -134,18 +135,30 @@ function buildTableStyle() {
     style.push(...colStyle);
     build(style);
 }
+/**
+ * 处理滚动事件
+ * - 触底加载更多数据
+ * @param detail 
+ */
+function onScrollDetail(detail: ScrollDetail) {
+    const { now, pre } = detail;
+    //  判断是否到底了,到底了触发加载更多数据
+    now.ybar && now.bottom && now.bottom != pre.bottom && handle.loadData("more");
+}
 
 // *****************************************   👉  组件渲染    *****************************************
-//  1、数据初始化、变化监听
-//  2、生命周期响应
 onMounted(() => {
-    emits("ready", handle);
-    // buildTableStyle();
+    //  事件监听处理
     onSize(rootDom.value, buildTableStyle);
-    //  开始加载数据
+    scopes.add(useScroll(
+        rootDom.value,
+        { scroll: "both", barSize: "small" },
+        onScrollDetail)
+    );
+    //  准备好了，进行数据加载
+    emits("ready", handle);
     handle.loadData("init")
 });
-
 </script>
 
 <style lang="less">

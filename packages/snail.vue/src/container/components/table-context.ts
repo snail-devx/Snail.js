@@ -20,6 +20,8 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
     /**     是否正在加载处理中的标记*/
     const loadingRef: ShallowRef<boolean> = shallowRef(false);
     //  数据行维护
+    /**     数据加载正在运行中：做标记位，避免重复加载*/
+    let dataLoadRunning: boolean = false;
     /**     表数据行 */
     const rowsRef: Ref<TableDataRow<any>[]> = ref([]);
     /**     数据主键Id字典，key为主键Id；用于确保row不重复 */
@@ -56,17 +58,21 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * @returns 异步任务，外部可感知加载进度
          */
         async loadData(type: TableLoadType): Promise<void> {
-            /*  后期这里需要验证是否正在加载中，避免任务重复调用 */
-
             //  如果已经没有更多数据了，则忽略 more 操作
-            if (type == "more" && noMoreDataRef.value == true) {
+            if (dataLoadRunning == true) {
                 return;
             }
+            if (type == "more" && noMoreDataRef.value == true) {
+                console.log(`no more data, ignore load more.`);
+                return;
+            }
+
             //  准备加载数据，维护好 loadingRef 效果
+            dataLoadRunning = true;
             loadingRef.value = true;
             try {
                 const rows = await options.load(type);
-                noMoreDataRef.value = isArray(rows) && rows.length >= options.pageSize;
+                noMoreDataRef.value = isArray(rows) == false || rows.length < options.pageSize;
                 //  基于type分发对旧数据做处理
                 switch (type) {
                     //  这几种情况，都做初始值处理，清空之前的数据
@@ -95,6 +101,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
                 });
             }
             finally {
+                dataLoadRunning = false;
                 loadingRef.value = false;
             }
         },

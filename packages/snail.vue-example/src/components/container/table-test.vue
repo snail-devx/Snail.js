@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { useTimer } from 'snail.core';
+import { delay, useTimer } from 'snail.core';
 import { components, TableColumnOptions, TableDataRow, TableHandle, TableLoadType, TableSlotHandle } from '../../libraries/snail_vue';
 
 
@@ -71,7 +71,9 @@ const columns: TableColumnOptions<any>[] = [
 
 
 // *****************************************   👉  方法+事件    ****************************************
-function loadData(type: TableLoadType): TableDataRow<any>[] {
+async function loadData(type: TableLoadType): Promise<TableDataRow<any>[]> {
+    await delay(2000);
+    console.log(type);
     return [
         { id: "1", data: 1 },
         { id: "2", data: 2 },
