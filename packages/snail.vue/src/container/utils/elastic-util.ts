@@ -23,6 +23,7 @@ export function buildBarStyle(target: HTMLElement, elastic: ElasticBaseOptions["
     }
     // 垂直滚动条
     if (elastic == "both" || elastic == "y") {
+        // console.log("--------------", target.clientHeight);
         const ybar = calcBarStyle(target.parentElement.clientHeight, target.clientHeight, detail.position.y);
         classes.push({
             mode: "nesting",
@@ -52,8 +53,8 @@ function calcBarStyle(parentSize: number, size: number, position: number): { siz
     }
     //  position <0 向上、向左时；到结束位置后，固定在结束为止，但尺寸要加上溢出的尺寸
     else {
-        //  计算溢出尺寸
-        const minOffset = parentSize - size;
+        //  计算溢出尺寸：若内容尺寸小于容器尺寸，则溢出尺寸为0
+        const minOffset = Math.min(0, parentSize - size);
         if (position < minOffset) {
             size += minOffset - position;
         }
@@ -62,6 +63,7 @@ function calcBarStyle(parentSize: number, size: number, position: number): { siz
         size = Math.floor(scale * parentSize);
         position = Math.floor((-position) * scale);
     }
-
+    //  超出最大尺寸时，忽略滚动条；如内容尺寸小于内容尺寸时
+    parentSize <= size && (size = 0);
     return { size, position };
 }

@@ -9,6 +9,11 @@
         <div class="main-area" ref="main-area">
             <slot />
         </div>
+        <!-- 下拉刷新、上拉加载更多：仅y轴弹性时才生效 -->
+        <template v-if="elastic == 'y'">
+            <div class="down-refresh">下拉刷新</div>
+            <div class="up-more">上拉加载</div>
+        </template>
     </div>
 </template>
 
@@ -70,20 +75,46 @@ onUnmounted(() => {
     position: relative;
     background-color: #F6F8FF;
     overflow: hidden;
-}
 
-//  主内容区域
-.snail-elastic {
+    //  主内容区域
     >div.main-area {
         position: relative;
         min-width: 100%;
         height: fit-content;
         z-index: 1;
         user-select: none;
+        background-color: white;
     }
+
 }
 
-//  滚动条区域：采用伪类绘制
+// 下拉刷新和上拉加载更多
+.snail-elastic {
+
+    >div.down-refresh,
+    >div.up-more {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        overflow: hidden;
+        z-index: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    >div.down-refresh {
+        top: 0;
+    }
+
+    >div.up-more {
+        bottom: 0;
+    }
+
+}
+
+//  滚动条区域：采用伪类绘制；并配合 useStyle 动态设置样式，完成滚动条尺寸和位置渲染
 .snail-elastic {
 
     &::before,
