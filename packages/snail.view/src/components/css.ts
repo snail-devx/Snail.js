@@ -81,6 +81,9 @@ function useCSS(): ICSSManager {
             ["padding", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft",].forEach(tmpFunc);
             //  过渡动画：transition
             ["transition", "transitionProperty", "transitionDuration", "transitionDelay", "transitionTimingFunction",].forEach(tmpFunc);
+            //  转换效果 transform
+            ["transform"].forEach(tmpFunc);
+
             // [].forEach(tmpFunc);
             // [].forEach(tmpFunc);
         }

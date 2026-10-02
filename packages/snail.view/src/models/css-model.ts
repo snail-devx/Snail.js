@@ -120,7 +120,7 @@ export type CSSClassOptions = {
  */
 export type AllStyle = BaseStyle & FlexBoxStyle & PositionStyle & OverflowStyle
     & WidthStyle & HeightStyle & MarginStyle & BorderStyle & PaddingStyle
-    & TransitionStyle;
+    & TransitionStyle & TransformStyle;
 
 // *****************************************   👉  基础样式：文本、布局  ****************************************
 /**
@@ -398,4 +398,14 @@ export type TransitionStyle = {
      */
     transitionTimingFunction?: ("ease" | "ease-in" | "ease-out" | "ease-in-out" | "linear" | "step-start" | "step-end");
 }
+
+/**
+ * 转化效果 样式
+ */
+export type TransformStyle = {
+    /**
+     * 转化效果
+     */
+    transform?: string;
+};
 //#endregion
