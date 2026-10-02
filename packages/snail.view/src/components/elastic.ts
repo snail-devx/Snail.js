@@ -16,14 +16,13 @@ import { useObserver } from "./observer";
  * @returns 弹性滚动管理器+作用域实例
  */
 export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?: (detail: ElasticDetail) => void): IElasticManager & IScope {
-    //  临时变量
-    // /**     当前禁用了弹性滚动 */
-    // let isDisabled: boolean = false;
-    /**     当前滚动位置*/
+    /** dock 停靠是否禁用了 */
+    let dockDisabled: boolean = false;
+    /** 当前滚动位置*/
     let curPosition: ElementPosition = Object.freeze<ElementPosition>({ x: 0, y: 0 });
-    /**     启动时的位置 */
+    /** 启动时的位置 */
     let startPosition: ElementPosition = Object.freeze<ElementPosition>({ x: 0, y: 0 });
-    /**     上一次的触摸移动信息，用于最后结束时计算惯性使用 */
+    /** 上一次的触摸移动信息，用于最后结束时计算惯性使用 */
     let preTouch: TouchDistance = undefined;
 
     //#region ************************************* 接口方法：IElasticManager具体实现 *************************************
@@ -42,9 +41,17 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
     function scrollTo(x: number | undefined, y: number | undefined): void {
         x = correctNumber(x, undefined);
         y = correctNumber(y, undefined);
-        ({ x, y } = calcEndPosition(x, y));
+        ({ x, y } = calcEndPosition(x, y, curPosition));
         updateTranslate(true, x, y);
     }
+    /**
+     * 停靠配置停启用
+     * @param enabled 是否启用；true时启用，false为停用
+     */
+    function dock(enabled: boolean): void {
+        dockDisabled = enabled == true ? false : true;
+    }
+
     /**
      * 刷新
      * - 重新计算位置，避免漂移出去
@@ -148,10 +155,11 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
      * - 基于当前位置做校验
      * @param x x轴位置
      * @param y y轴位置
+     * @param start 初始位置传入，用于判断移动方向，解决极端情况下：内容刚好在x/y轴填充满容器时，无法精确决定是停靠在哪一边
      * @returns 
      */
-    function calcEndPosition(x: number, y: number): ElementPosition {
-        // 核心规则：不能超过起始位置；不能超过结束位置
+    function calcEndPosition(x: number, y: number, start?: ElementPosition): ElementPosition {
+        // 计算x、y轴方向的实际位置（核心规则：不能超过起始位置；不能超过结束位置）
         const rootRect = target.parentElement.getBoundingClientRect();
         const targetRect = target.getBoundingClientRect();
         if (x != undefined) {
@@ -164,9 +172,39 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
                 ? 0
                 : Math.max(y, rootRect.height - targetRect.height);
         }
+        ({ x, y } = correctPosition(x, y));
+        //  处理结束之后的停靠位置：注意处理极端情况
+        if (dockDisabled != true) {
+            if (x != undefined) {
+                //  x轴停靠在左侧：容器和内容高度一致时，若想左移动了，则算是停到了最右侧；否则停到了最左侧
+                if (x == 0) {
+                    x = start != undefined && rootRect.width == targetRect.width && start.x > x
+                        ? -options.dock.right
+                        : options.dock.left;
+                }
+                //  判断是否停靠在最右侧
+                else {
+                    const minX = Math.min(0, rootRect.width - targetRect.width);
+                    x == minX && (x = minX - options.dock.right);
 
-        //  校验位置后范围        
-        return correctPosition(x, y);
+                }
+            }
+            if (y != undefined) {
+                //  y轴停靠在顶部：容器和内容高度一致时，若是向上移动的，则算是停到了最底部；否则停到了最顶部
+                if (y == 0) {
+                    y = start != undefined && rootRect.height == targetRect.height && start.y > y
+                        ? -options.dock.bottom
+                        : options.dock.top;
+                }
+                //  判断是否停靠在最底部
+                else {
+                    const minY = Math.min(0, rootRect.height - targetRect.height);
+                    y == minY && (y = minY - options.dock.bottom);
+                }
+            }
+        }
+
+        return { x, y }
     }
 
     /**
@@ -220,7 +258,7 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
                     runFn("inertia", curPosition, detail);
                 }
                 //  计算结束位置，100ms延迟后更新
-                const end = calcEndPosition(curPosition.x, curPosition.y);
+                const end = calcEndPosition(curPosition.x, curPosition.y, startPosition);
                 setTimeout(() => {
                     updateTranslate(true, end.x, end.y);
                     runFn("end", curPosition, detail);
@@ -236,25 +274,33 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
 
     //#endregion
 
-    //  初始化+数据验证
+    //  初始化+数据验证：配置选项校验，给默认值，整理完之后，锁定，避免改动
     {
         throwIfFalse(target instanceof Element, "useElastic: target must be a Element");
         fn = correctFunction(fn, undefined);
-        //  配置选项校验，给默认值，整理完之后，锁定，避免改动
-        options = isObject(options) ? { ...options } : Object.create(null);
-        options.elastic = correctString(options.elastic, "both", true) as any;
-        options.distance = Math.abs(correctNumber(options.distance, 100));
-        options.factor = isNumberInRange(options.factor, 0.1, 1) ? options.factor : 0.8;
+        // 基础配置校验
+        {
+            options = isObject(options) ? { ...options } : Object.create(null);
+            options.elastic = correctString(options.elastic, "both", true) as any;
+            options.distance = Math.abs(correctNumber(options.distance, 100));
+            options.factor = isNumberInRange(options.factor, 0.1, 1) ? options.factor : 0.8;
+        }
+        // dock配置
+        {
+            const dock = { ...options.dock }
+            dock.left = correctNumber(dock.left, 0);
+            dock.right = correctNumber(dock.right, 0);
+            dock.top = correctNumber(dock.top, 0);
+            dock.bottom = correctNumber(dock.bottom, 0);
+            options.dock = Object.freeze(dock);
+        }
+
         Object.freeze(options);
     }
-    //  初始化，构建管理器，并触摸事件监听
+    //  构建管理器，并触摸事件监听
     {
         const manager = Object.freeze(mountScope<IElasticManager>(
-            {
-                // disable, 后期提供
-                scrollTo,
-                refresh,
-            },
+            { scrollTo, dock, refresh, },
             { type: "IElasticManager" }
         ));
         //  监听触摸事件，并自动销毁

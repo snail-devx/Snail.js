@@ -10,17 +10,18 @@ import { ElementPosition, TouchDetail } from "./observer-model";
  * - 外部可基于管理器暴露方法，操作滚动效果
  */
 export interface IElasticManager {
-    // /**
-    //  * 禁用弹性滚动
-    //  * @param disabled 为true时禁用弹性滚动；否则启用弹性滚动
-    //  */
-    // disable(disabled: boolean): void;
     /**
      * 滚动到指定位置
      * @param x x轴位置，为空不滚动x轴
      * @param y y轴位置，为空不滚动y轴
      */
     scrollTo(x: number | undefined, y: number | undefined): void;
+    /**
+     * 停靠配置停启用
+     * @param enabled 是否启用；true时启用，false为停用
+     */
+    dock(enabled: boolean): void;
+
     /**
      * 刷新
      * - 重新计算位置，避免漂移出去
@@ -54,6 +55,13 @@ export type ElasticBaseOptions = {
      * - 默认 0.8
      */
     factor?: number;
+
+    /**
+     * 弹性停靠配置
+     * - 在滚动结束后，根据配置项，将滚动位置停靠到指定位置
+     * - 不传入则默认；无特殊需求不建议传入
+     */
+    dock?: ElasticDockOptions;
 }
 /**
  * 弹性滚动的详情
@@ -83,3 +91,41 @@ export type ElasticDetail = {
  * - end        弹性滚动结束
  */
 export type ElasticStatus = "start" | "scroll" | "inertia" | "end";
+
+/**
+ * 弹性滚动时的停靠配置
+ */
+export type ElasticDockOptions = {
+    /**
+     * 弹性滚动到最左侧停靠位置
+     * - 等于0：则贴合容器左侧
+     * - 大于0：则左侧留白指定距离
+     * - 小于0：则左侧遮住指定距离
+     * - 无效/未设置：按等于0处理
+     */
+    left?: number;
+    /**
+     * 弹性滚动到最右侧时的停靠位置
+     * - 等于0：则贴合容器右侧
+     * - 大于0：则右侧留白指定距离
+     * - 小于0：则右侧遮住指定距离
+     * - 无效/未设置：按等于0处理
+     */
+    right?: number;
+    /**
+     * 弹性滚动到最顶部时的停靠位置
+     * - 等于0：则贴合容器顶部
+     * - 大于0：则顶部留白指定距离
+     * - 小于0：则顶部遮住指定距离
+     * - 无效/未设置：按等于0处理
+     */
+    top?: number;
+    /**
+     * 弹性滚动到最底部时的停靠位置
+     * - 等于0：则贴合容器底部
+     * - 大于0：则底部留白指定距离
+     * - 小于0：则底部遮住指定距离
+     * - 无效/未设置：按等于0处理
+     */
+    bottom?: number;
+}
