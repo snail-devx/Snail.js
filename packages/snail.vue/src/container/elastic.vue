@@ -59,7 +59,6 @@ function onElasticDetail(detail: ElasticDetail) {
 //  1、数据初始化、变化监听
 //  2、生命周期响应
 onMounted(() => {
-    console.log({ ...props });
     useElastic(mainAreaDom.value, props, onElasticDetail);
 });
 onUnmounted(() => {
@@ -124,7 +123,7 @@ onUnmounted(() => {
         background-color: #c3c7cb;
         z-index: 2;
         border-radius: 2px;
-        transition: opacity 0.2s linear;
+        transition: all 0.2s linear;
         opacity: 1;
     }
 
