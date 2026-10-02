@@ -32,16 +32,18 @@
             <button @click="handle && onTimeout(scope => scope.destroy(), 1000, handle.showLoading())">loading</button>
         </div>
     </div>
-
-    <Table style="height: 200px;" :columns="columns" :load="loadData" :main="{ draggable: true }" :footer="{}"
-        @ready="h => handle = h" @move="console.log" @select="console.log">
+    <Table style="height: 200px;margin-top: 10px;" :border="true" :columns="columns" :load="loadData"
+        :main="{ draggable: true }" :footer="{}" @ready="h => handle = h" @move="console.log" @select="console.log">
+    </Table>
+    <Table style="height: 200px;margin-top: 10px;" :columns="columns" :load="loadData" :main="{ draggable: true }"
+        :footer="{}" @ready="h => handle = h" @move="console.log" @select="console.log">
         <template #="{ rowIndex, columnIndex, row }: TableSlotHandle<any, any>" :key="String(columnIndex)">
             {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
         </template>
     </Table>
     <Table style="height: 200px;margin-top: 10px;" :border="true" :columns="columns" :load="loadData"
         :main="{ draggable: true }" :footer="{}" @ready="h => handle = h" @move="console.log" @select="console.log">
-        <template #="{ rowIndex, columnIndex, row }: TableSlotHandle<any, any>" :key="String(columnIndex)">
+        <template #main="{ rowIndex, columnIndex, row }: TableSlotHandle<any, any>" :key="String(columnIndex)">
             {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
         </template>
     </Table>

@@ -42,12 +42,17 @@
                             </template>
                         </td>
                         <!-- 真实数据列 -->
-                        <td v-for="(column, columnIndex) in columns" :key="getKey(column)"
-                            :class="{ link: column.type == 'link' }"
-                            @click="column.type == 'link' && emits('click', row, column)">
-                            <slot v-if="$slots.main" :="{ column, columnIndex, row, rowIndex }" />
-                            <slot v-else :="{ column, columnIndex, row, rowIndex }" />
-                        </td>
+                        <template v-if="$slots.main || $slots.default">
+                            <td v-for="(column, columnIndex) in columns" :key="getKey(column)"
+                                :class="{ link: column.type == 'link' }"
+                                @click="column.type == 'link' && emits('click', row, column)">
+                                <slot name="main" v-if="$slots.main" :="{ column, columnIndex, row, rowIndex }" />
+                                <slot name="default" v-else :="{ column, columnIndex, row, rowIndex }" />
+                            </td>
+                        </template>
+                        <template v-else>
+                            <td :colspan="columns.length">无mian和default插槽，td无法渲染</td>
+                        </template>
                     </tr>
                 </Sort>
             </tbody>
