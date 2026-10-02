@@ -5,16 +5,16 @@
  *  3、发布npm包：后续看情况实现
  */
 
-import { fileURLToPath } from "url";
+import { execaSync } from "execa";
 import { cpSync, existsSync, rmSync } from "fs";
 import { resolve } from "path";
-import { execaSync } from "execa";
 import picocolors from "picocolors";
+import { fileURLToPath } from "url";
+import { argMap, buildPackage } from "./build.js";
 import {
-    reMakeDir, step, trace,
-    DIR_RELEASEROOT, DIR_TEMPROOT, allPackages, getPackages
+    DIR_RELEASEROOT, DIR_TEMPROOT, allPackages, getPackages,
+    reMakeDir, step, trace
 } from "./util.js";
-import { argMap, buildPackage } from "./build.js"
 
 /** 文件所处目录路径  */
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -25,7 +25,7 @@ const DEFAULT_SHARED = ["LICENSE"];
 /** 是否需要发布 */
 // const needPublish = existsSync(resolve(__dirname, "../.snail.publish"));
 var needPublish = true;
-// needPublish = false;
+needPublish = false;
 
 /**
  * 发布指定包；构建npm项目，自动版本号、自动publish
