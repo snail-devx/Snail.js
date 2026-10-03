@@ -17,10 +17,11 @@ export interface IElasticManager {
      */
     scrollTo(x: number | undefined, y: number | undefined): void;
     /**
-     * 停靠配置停启用
-     * @param enabled 是否启用；true时启用，false为停用
+     * 重置dock配置
+     * - 用于在下拉刷新和上拉加载时，进行二次控制
+     * @param options 新的dock配置，不传入则取消dock控制
      */
-    dock(enabled: boolean): void;
+    dock(options?: ElasticDockOptions): void;
 
     /**
      * 刷新

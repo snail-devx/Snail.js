@@ -3,7 +3,7 @@
  */
 
 import { correctFunction, correctNumber, correctString, IScope, isNumberInRange, isObject, mountScope, throwIfFalse } from "snail.core";
-import { ElasticBaseOptions, ElasticDetail, ElasticStatus, IElasticManager } from "../models/elastic-model";
+import { ElasticBaseOptions, ElasticDetail, ElasticDockOptions, ElasticStatus, IElasticManager } from "../models/elastic-model";
 import { ElementPosition, TouchDetail, TouchDistance, } from "../models/observer-model";
 import { useObserver } from "./observer";
 
@@ -16,8 +16,6 @@ import { useObserver } from "./observer";
  * @returns 弹性滚动管理器+作用域实例
  */
 export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?: (detail: ElasticDetail) => void): IElasticManager & IScope {
-    /** dock 停靠是否禁用了 */
-    let dockDisabled: boolean = false;
     /** 当前滚动位置*/
     let curPosition: ElementPosition = Object.freeze<ElementPosition>({ x: 0, y: 0 });
     /** 启动时的位置 */
@@ -44,12 +42,25 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
         ({ x, y } = calcEndPosition(x, y, curPosition));
         updateTranslate(true, x, y);
     }
+    // /**
+    //  * 停靠配置停启用
+    //  * @param enabled 是否启用；true时启用，false为停用
+    //  */
+    // function dock(enabled: boolean): void {
+    //     dockDisabled = enabled == true ? false : true;
+    // }
     /**
-     * 停靠配置停启用
-     * @param enabled 是否启用；true时启用，false为停用
+     * 重置dock配置
+     * - 用于在下拉刷新和上拉加载时，进行二次控制
+     * @param dock 新的dock配置，不传入则取消dock控制
      */
-    function dock(enabled: boolean): void {
-        dockDisabled = enabled == true ? false : true;
+    function dock(dock?: ElasticDockOptions): void {
+        dock = { ...dock }
+        dock.left = correctNumber(dock.left, 0);
+        dock.right = correctNumber(dock.right, 0);
+        dock.top = correctNumber(dock.top, 0);
+        dock.bottom = correctNumber(dock.bottom, 0);
+        Object.assign(options.dock, dock);
     }
 
     /**
@@ -159,22 +170,24 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
      * @returns 
      */
     function calcEndPosition(x: number, y: number, start?: ElementPosition): ElementPosition {
-        // 计算x、y轴方向的实际位置（核心规则：不能超过起始位置；不能超过结束位置）
         const rootRect = target.parentElement.getBoundingClientRect();
         const targetRect = target.getBoundingClientRect();
-        if (x != undefined) {
-            x = x > 0 || rootRect.width >= targetRect.width
-                ? 0
-                : Math.max(x, rootRect.width - targetRect.width);
+        // 计算x、y轴方向的实际位置（核心规则：不能超过起始位置；不能超过结束位置）
+        {
+            if (x != undefined) {
+                x = x > 0 || rootRect.width >= targetRect.width
+                    ? 0
+                    : Math.max(x, rootRect.width - targetRect.width);
+            }
+            if (y != undefined) {
+                y = y > 0 || rootRect.height >= targetRect.height
+                    ? 0
+                    : Math.max(y, rootRect.height - targetRect.height);
+            }
+            ({ x, y } = correctPosition(x, y));
         }
-        if (y != undefined) {
-            y = y > 0 || rootRect.height >= targetRect.height
-                ? 0
-                : Math.max(y, rootRect.height - targetRect.height);
-        }
-        ({ x, y } = correctPosition(x, y));
         //  处理结束之后的停靠位置：注意处理极端情况
-        if (dockDisabled != true) {
+        {
             if (x != undefined) {
                 //  x轴停靠在左侧：容器和内容高度一致时，若想左移动了，则算是停到了最右侧；否则停到了最左侧
                 if (x == 0) {
@@ -186,7 +199,6 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
                 else {
                     const minX = Math.min(0, rootRect.width - targetRect.width);
                     x == minX && (x = minX - options.dock.right);
-
                 }
             }
             if (y != undefined) {
@@ -285,14 +297,10 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
             options.distance = Math.abs(correctNumber(options.distance, 100));
             options.factor = isNumberInRange(options.factor, 0.1, 1) ? options.factor : 0.8;
         }
-        // dock配置
         {
-            const dock = { ...options.dock }
-            dock.left = correctNumber(dock.left, 0);
-            dock.right = correctNumber(dock.right, 0);
-            dock.top = correctNumber(dock.top, 0);
-            dock.bottom = correctNumber(dock.bottom, 0);
-            options.dock = Object.freeze(dock);
+            const dockOptions = options.dock;
+            options.dock = Object.create(null)
+            dock(dockOptions);
         }
 
         Object.freeze(options);
