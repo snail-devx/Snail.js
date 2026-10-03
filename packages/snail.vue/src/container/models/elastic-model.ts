@@ -65,3 +65,12 @@ export type ElasticUpdownOptions = {
      */
     readonly load: (mode: "refresh" | "more") => Promise<any>;
 };
+/**
+ * 弹性组件【上拉加载、下拉刷新】组件操作句柄
+ */
+export type ElasticUpdownHandle = {
+    /**
+     * 触发下拉刷新
+     */
+    refresh(): void;
+}

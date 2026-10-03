@@ -36,7 +36,7 @@
                 <ElasticTestBody style="width: 100%;" />
                 <!-- 启用此插件 -->
                 <template #plugin="handle">
-                    <ElasticUpdown :="handle" up down :load="loadData" />
+                    <ElasticUpdown :="handle" up down :load="loadData" @ready="onUpdownReady" />
                 </template>
             </Elastic>
         </section>
@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import { delay } from "snail.core";
 import { onMounted } from "vue";
-import { components } from "../../libraries/snail_vue";
+import { components, ElasticUpdownHandle } from "../../libraries/snail_vue";
 import ElasticTestBody from "./components/elastic-test-body.vue";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -65,6 +65,14 @@ const { Elastic, ElasticUpdown } = components;
 // *****************************************   👉  方法+事件    ****************************************
 async function loadData(mode: "refresh" | "more"): Promise<any> {
     await delay(1000 * 1);
+}
+
+/**
+ * 上拉加载、下拉刷新组件准备就绪后，测试操作句柄
+ * @param handle 
+ */
+async function onUpdownReady(handle: ElasticUpdownHandle) {
+    setTimeout(handle.refresh, 1000);
 }
 
 // *****************************************   👉  组件渲染    *****************************************

@@ -38,12 +38,14 @@ import { isFunction } from 'snail.core';
 import { ElasticDetail, ElasticDockOptions } from 'snail.view';
 import { onMounted, shallowRef, ShallowRef } from 'vue';
 import Icon from '../../base/icon.vue';
+import { ReadyEvents } from '../../base/models/base-event';
 import { useReactive } from '../../base/reactive';
-import { ElasticSlotHandle, ElasticUpdownOptions } from '../models/elastic-model';
+import { ElasticSlotHandle, ElasticUpdownHandle, ElasticUpdownOptions } from '../models/elastic-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<ElasticUpdownOptions & ElasticSlotHandle>();
+const emits = defineEmits<ReadyEvents<ElasticUpdownHandle>>();
 const { watcher } = useReactive();
 const { target } = props;
 //  2、组件交互变量、常量
@@ -143,7 +145,17 @@ function onDetailChange(detail: ElasticDetail) {
 onMounted(() => {
     props.dock(undefined);
     watcher(() => props.detail, onDetailChange);
-})
+    //  发送准备事件
+    const handle: ElasticUpdownHandle = Object.freeze<ElasticUpdownHandle>({
+        refresh() {
+            refreshRef.value = "running";
+            moreRef.value = undefined;
+            resetDock(true);
+            onRefreshOrMore("refresh");
+        }
+    });
+    emits("ready", handle);
+});
 </script>
 
 <style lang="less">
