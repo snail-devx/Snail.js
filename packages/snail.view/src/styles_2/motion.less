@@ -186,3 +186,23 @@
         animation: snail-right-in 0.2s ease reverse;
     }
 }
+
+//  -- 其他动画
+.snail-app {
+
+    //  一直转圈：1s
+    .circle-infinite {
+        transform-origin: center;
+        animation: snail-spin-infinite 1s linear infinite;
+
+        @keyframes snail-spin-infinite {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    }
+}
