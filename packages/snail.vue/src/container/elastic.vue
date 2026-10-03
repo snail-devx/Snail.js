@@ -4,65 +4,45 @@
     3、支持移动端橡皮筋效果，支持上拉加载更多、下拉刷新数据等功能
   -->
 <template>
-    <div :="$attrs" class="snail-elastic" :class="style.namespace">
+    <div :="$attrs" class="snail-elastic" :class="barStyle.namespace, updownStyle.namespace">
         <!-- 主内容区域 -->
         <div class="main-area" ref="main-area">
             <slot />
         </div>
-        <!-- 下拉刷新、上拉加载更多：仅y轴弹性时才生效 -->
-        <template v-if="elastic == 'y'">
-            <div class="down-refresh">下拉刷新</div>
-            <div class="up-more">上拉加载</div>
-        </template>
+        <!-- 插件挂载区域 -->
+        <!--    默认挂载插件：滚动条，在bar为true时生效 -->
+        <ElasticBar v-if="bar" :elastic="elastic" :target="mainAreaDom" :detail="detailRef" />
+        <!--    自定义插件：通过 plugin 插槽挂载一些自定义的组件过来，如下拉刷新、上拉加载 -->
+        <slot name="plugin" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { ElasticDetail, useElastic, useStyle } from "snail.view";
-import { onMounted, onUnmounted, useTemplateRef } from "vue";
+import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
+import ElasticBar from "./components/elastic-bar.vue";
 import { ElasticOptions } from "./models/elastic-model";
-import { buildBarStyle } from "./utils/elastic-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 defineOptions({ name: "Elastic", inheritAttrs: false });
 const props = defineProps<ElasticOptions>();
 const mainAreaDom = useTemplateRef("main-area");
-const style = useStyle();
+const barStyle = useStyle();
+const updownStyle = useStyle();
 //      解构属性
 const { elastic, bar } = props;
 //  2、组件交互变量、常量
-/** 滚动条结束时的定时器 */
-let barEndTimer: NodeJS.Timeout = undefined;
+/**     弹性滚动的详情信息：感知滚动状态 */
+const detailRef: ShallowRef<ElasticDetail> = shallowRef(undefined);
 
 // *****************************************   👉  方法+事件    ****************************************
-/**
- * 弹性滚动时的处理
- * @param detail 
- */
-function onElasticDetail(detail: ElasticDetail) {
-    //  计算水平滚动条和垂直滚动条的大小：后期这里进行 requestAnimationFrame 更新，让滚动条流畅跟手
-    if (bar == true) {
-        barEndTimer && clearTimeout(barEndTimer);
-        barEndTimer = undefined;
-        const classes = buildBarStyle(mainAreaDom.value, elastic, detail);
-        style.build(classes);
-        //  结束后，超时隐藏滚动条
-        if (detail.status == "end" && classes.length > 0) {
-            classes.forEach(item => item.style.opacity = 0);
-            barEndTimer = setTimeout(style.build, 400, classes);
-        }
-    }
-}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
 onMounted(() => {
-    useElastic(mainAreaDom.value, props, onElasticDetail);
-});
-onUnmounted(() => {
-    barEndTimer && clearTimeout(barEndTimer);
+    useElastic(mainAreaDom.value, props, detail => detailRef.value = detail);
 });
 </script>
 
@@ -83,60 +63,6 @@ onUnmounted(() => {
         z-index: 1;
         user-select: none;
         background-color: white;
-    }
-
-}
-
-// 下拉刷新和上拉加载更多
-.snail-elastic {
-
-    >div.down-refresh,
-    >div.up-more {
-        position: absolute;
-        left: 0;
-        width: 100%;
-        height: 60px;
-        overflow: hidden;
-        z-index: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    >div.down-refresh {
-        top: 0;
-    }
-
-    >div.up-more {
-        bottom: 0;
-    }
-
-}
-
-//  滚动条区域：采用伪类绘制；并配合 useStyle 动态设置样式，完成滚动条尺寸和位置渲染
-.snail-elastic {
-
-    &::before,
-    &::after {
-        position: absolute;
-        content: " ";
-        background-color: #c3c7cb;
-        z-index: 2;
-        border-radius: 2px;
-        transition: all 0.2s linear;
-        opacity: 1;
-    }
-
-    // 水平滚动条
-    &::before {
-        height: 4px;
-        bottom: 0;
-    }
-
-    // 垂直滚动条
-    &::after {
-        width: 4px;
-        right: 0;
     }
 }
 </style>

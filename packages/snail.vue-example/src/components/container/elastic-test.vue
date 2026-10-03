@@ -32,7 +32,7 @@
             </Elastic>
         </section>
         <section style="flex: none;width: 300px;  height: 400px;border: 1px solid red; ">
-            <Elastic class="wh-fill" :elastic="'y'" :bar="true" :distance="400">
+            <Elastic class="wh-fill" :elastic="'y'" :bar="true" :distance="400" :dock="{ top: 40 }">
                 <ElasticTestBody style="width: 100%;" />
             </Elastic>
         </section>
