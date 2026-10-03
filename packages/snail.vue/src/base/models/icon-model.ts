@@ -74,28 +74,29 @@ export type IconOptions = TitleOptions & {
 /**
  * 图标类型
  * - 状态类：
- * - - success      成功图标，对勾
- * - - error        错误 
- * - - warn         警告图标
+ * - - success          成功图标，对勾
+ * - - error            错误 
+ * - - warn             警告图标
  * - 操作类：
- * - - close        关闭 用作数据删除，弹窗关闭
- * - - trash        垃圾桶图标，常用于【删除】操作
- * - - download     下载
- * - - print        打印
- * - - edit         编辑
- * - - pause        暂停，两道竖线
+ * - - close            关闭 用作数据删除，弹窗关闭
+ * - - trash            垃圾桶图标，常用于【删除】操作
+ * - - download         下载
+ * - - print            打印
+ * - - edit             编辑
+ * - - pause            暂停，两道竖线
  * - 指向类：
- * - - arrow        向右箭头
- * - - datepicker   日期选择器
- * - - timepicker   时间选择器
+ * - - arrow            向右箭头
+ * - - datepicker       日期选择器
+ * - - timepicker       时间选择器
  * - 其他类：
- * - - plus         加号
- * - - subtract     减号
- * - - more         更多，默认垂直三个点
- * - - stats        统计图标
- * - - grip         紧握图标，垂直方向，一般用于拖动句柄
+ * - - plus             加号
+ * - - subtract         减号
+ * - - more             更多，默认垂直三个点
+ * - - stats            统计图标
+ * - - grip             紧握图标，垂直方向，一般用于拖动句柄
+ * -- circle-loading    圆圈loading图标
  */
 export type IconType = "success" | "error" | "warn"
     | "close" | "trash" | "download" | "print" | "edit" | "pause"
     | "arrow" | "datepicker" | "timepicker"
-    | "plus" | "subtract" | "more" | "stats" | "grip";
+    | "plus" | "subtract" | "more" | "stats" | "grip" | "circle-loading";

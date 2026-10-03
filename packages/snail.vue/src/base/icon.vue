@@ -17,11 +17,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, ShallowRef, shallowRef } from "vue";
+import { correctNumber, correctString, isObject } from "snail.core";
+import { computed } from "vue";
+import { ClickEvents } from "./models/base-event";
 import { IconOptions } from "./models/icon-model";
 import { getBuiltinIcon } from "./utils/icon-util";
-import { correctNumber, correctString, isObject } from "snail.core";
-import { ClickEvents } from "./models/base-event";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
