@@ -5,6 +5,7 @@
 import { IScope } from "snail.core";
 import { HeightStyle, WidthStyle } from "snail.view";
 import { Ref, ShallowRef } from "vue";
+import { ReadyEvents } from "../../base/models/base-event";
 
 /**
  * 表格组件配置选项
@@ -90,15 +91,7 @@ export type TableOptions<T> = {
 /**
  * 组件事件
  */
-export type TableEvents = {
-    /**
-     * 表格准备好了
-     * - 组件加载完成，可对外提供操作服务
-     * - 注意：此时数据还没加载完成，只是组件加载完成
-     * @param handle 表格句柄
-     */
-    ready: [handle: TableHandle<any>];
-
+export type TableEvents = ReadyEvents<TableHandle<any>> & {
     /**
      * 表格点击事件
      * - 数据行点击【link】列时触发
