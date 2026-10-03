@@ -1,5 +1,5 @@
 
-import { ElasticBaseOptions, ElasticDetail } from "snail.view";
+import { ElasticBaseOptions, ElasticDetail, IElasticManager } from "snail.view";
 
 /**
  * 弹性视图组件配置选项
@@ -37,4 +37,4 @@ export type ElasticSlotHandle = {
      * - 可监听此对象变化实时获取滚动状态
      */
     detail?: ElasticDetail,
-};
+} & Required<Pick<IElasticManager, "dock">>;

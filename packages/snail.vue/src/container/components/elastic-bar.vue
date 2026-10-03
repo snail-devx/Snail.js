@@ -9,13 +9,14 @@
 
 <script setup lang="ts">
 import { ElasticDetail } from 'snail.view';
-import { onMounted, onUnmounted, shallowRef, ShallowRef, watch } from 'vue';
+import { onMounted, shallowRef, ShallowRef } from 'vue';
+import { useReactive } from '../../base/reactive';
 import { ElasticSlotHandle } from '../models/elastic-model';
-
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<ElasticSlotHandle>();
+const { watcher } = useReactive();
 //  2、组件交互变量、常量
 /** 滚动条结束时的定时器 */
 let barEndTimer: NodeJS.Timeout = undefined;
@@ -94,15 +95,7 @@ function calcBarStyle(parentSize: number, size: number, position: number): { siz
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
-{
-    onMounted(() => {
-        const { stop } = watch(() => props.detail, onDetailChange);
-        onUnmounted(() => {
-            console.log('xxxxxxxxxxxxxxx');
-        });
-    });
-}
-
+onMounted(() => watcher(() => props.detail, onDetailChange));
 </script>
 
 <style lang="less">

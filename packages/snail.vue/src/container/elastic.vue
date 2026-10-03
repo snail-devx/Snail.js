@@ -11,9 +11,9 @@
         </div>
         <!-- 插件挂载区域 -->
         <!--    默认挂载插件：滚动条，在bar为true时生效 -->
-        <ElasticBar v-if="bar" :elastic="elastic" :target="mainAreaDom" :detail="detailRef" />
+        <ElasticBar v-if="bar" :="slotHandle" :detail="detailRef" />
         <!--    自定义插件：通过 plugin 插槽挂载一些自定义的组件过来，如下拉刷新、上拉加载 -->
-        <slot name="plugin" />
+        <slot name="plugin" :="slotHandle" :detail="detailRef" />
     </div>
 </template>
 
@@ -21,7 +21,7 @@
 import { ElasticDetail, useElastic, useStyle } from "snail.view";
 import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import ElasticBar from "./components/elastic-bar.vue";
-import { ElasticOptions } from "./models/elastic-model";
+import { ElasticOptions, ElasticSlotHandle } from "./models/elastic-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -33,6 +33,8 @@ const updownStyle = useStyle();
 //      解构属性
 const { elastic, bar } = props;
 //  2、组件交互变量、常量
+/**     插槽句柄 */
+const slotHandle: ElasticSlotHandle = Object.create(null);
 /**     弹性滚动的详情信息：感知滚动状态 */
 const detailRef: ShallowRef<ElasticDetail> = shallowRef(undefined);
 
@@ -42,7 +44,16 @@ const detailRef: ShallowRef<ElasticDetail> = shallowRef(undefined);
 //  1、数据初始化、变化监听
 //  2、生命周期响应
 onMounted(() => {
-    useElastic(mainAreaDom.value, props, detail => detailRef.value = detail);
+    const { dock } = useElastic(mainAreaDom.value, props, detail => detailRef.value = detail);
+    //  插槽句柄初始化
+    Object.assign<ElasticSlotHandle, ElasticSlotHandle>(slotHandle, {
+        elastic: elastic,
+        target: mainAreaDom.value,
+        dock: dock,
+        //  这属性直接绑定
+        detail: undefined,
+    });
+    Object.freeze(slotHandle);
 });
 </script>
 
