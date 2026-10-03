@@ -1,4 +1,5 @@
 import { IScrollManager, ScrollBaseOptions, ScrollStatus } from "snail.view";
+import { ReadyEvents } from "../../base/models/base-event";
 
 /**
  * 滚动视图配置选项
@@ -9,13 +10,7 @@ export type ScrollOptions = ScrollBaseOptions & {
 /**
  * 滚动视图事件
  */
-export type ScrollEvents = {
-    /**
-     * 滚动视图准备好了
-     * - 组件加载完成，可对外提供操作服务
-     * @param handle 滚动视图操作接口
-     */
-    ready: [handle: ScrollHandle];
+export type ScrollEvents = ReadyEvents<ScrollHandle> & {
     /**
      * 滚动视图状态变化时
      * @param now 当前状态

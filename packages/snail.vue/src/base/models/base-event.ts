@@ -16,6 +16,18 @@ export type ClickEvents = {
 }
 
 /**
+ * 事件：组件准备好了
+ * - 发送 ready 事件，并将自己的一些操作方法暴露出去
+ */
+export type ReadyEvents<Handle = void> = {
+    /**
+     * 组件准备好了
+     * @param handle 组件暴露的操作句柄
+     */
+    ready: [handle?: Handle];
+}
+
+/**
  * 事件：值改变
  * - 描述值的改变过程，新值是什么，改变前的旧值是什么
  */
