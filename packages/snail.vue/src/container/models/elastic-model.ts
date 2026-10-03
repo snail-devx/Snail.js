@@ -37,4 +37,31 @@ export type ElasticSlotHandle = {
      * - 可监听此对象变化实时获取滚动状态
      */
     detail?: ElasticDetail,
-} & Required<Pick<IElasticManager, "dock">>;
+} & Required<Pick<IElasticManager, "dock" | "refresh">>;
+
+
+/**
+ * 弹性组件【上拉加载、下拉刷新】组件配置选项
+ */
+export type ElasticUpdownOptions = {
+    /**
+     * 是否启用【上拉加载】功能
+     * - {@link ElasticOptions.elastic}  为 `y/both`时生效
+     * - 满足上拉加载条件后，触发`more`事件，处理完成后调用resolve函数，通知完成加载数据操作
+     */
+    up: boolean;
+    /**
+     * 是否启用【下拉刷新】功能
+     * - {@link ElasticOptions.elastic} 为 `y/both`时生效
+     * - 满足下拉刷新条件后，触发`refresh`事件，处理完成后调用resolve函数，通知完成刷新数据操作
+     */
+    down: boolean;
+
+    /**
+     * 数据加载方法
+     * - 触发上拉加载和下拉刷新时调用此方法通知外部加载数据
+     * @param mode 回调模式，`refresh`为下拉刷新，`more`为上拉加载
+     * @returns 异步任务，处理完成后通知完成操作
+     */
+    readonly load: (mode: "refresh" | "more") => Promise<any>;
+};

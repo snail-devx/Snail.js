@@ -111,7 +111,7 @@ watcher(() => props.detail, onDetailChange);
         background-color: #c3c7cb;
         z-index: 2;
         border-radius: 2px;
-        transition: opacity 0.2s linear;
+        transition: all 0.2s linear;
         opacity: 1;
     }
 

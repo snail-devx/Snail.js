@@ -1,6 +1,6 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <div style="height: 800px;position: relative;background-color: white;">
+    <div style="height: 500px;position: relative;background-color: white;">
         {{ counterRef }}
         下拉刷新、上拉加载更多 {{ Date.now() }}
         <div style="position: fixed;bottom: 0;">底部靠弄</div>

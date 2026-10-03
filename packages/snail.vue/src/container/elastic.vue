@@ -45,12 +45,13 @@ const detailRef: ShallowRef<ElasticDetail> = shallowRef(undefined);
 //  1、数据初始化、变化监听
 //  2、生命周期响应
 onMounted(() => {
-    const { dock } = useElastic(mainAreaDom.value, props, detail => detailRef.value = detail);
+    const em = useElastic(mainAreaDom.value, props, detail => detailRef.value = detail);
     //  插槽句柄初始化
     Object.assign<ElasticSlotHandle, ElasticSlotHandle>(slotHandle, {
         elastic: elastic,
         target: mainAreaDom.value,
-        dock: dock,
+        dock: em.dock,
+        refresh: em.refresh,
         //  这属性直接绑定
         detail: undefined,
     });
