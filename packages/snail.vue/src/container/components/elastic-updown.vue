@@ -19,7 +19,7 @@
         </span>
     </div>
     <!-- 上拉加载更多数据 -->
-    <div v-if="up == true && moreRef" class="up-more">
+    <div v-if="up == true && moreRef" class="up-more" :style="{ bottom: `${moreBottomRef}px` }">
         <Icon v-if="moreRef != 'running'" custom :size="16" :rotate="moreRef == 'release' ? 0 : 180">
             <path
                 d="M955.733333 460.8c-37.546667-40.96-105.813333-40.96-143.36-3.413333l-177.493333 170.666666V119.466667C631.466667 54.613333 576.853333 0 512 0s-119.466667 54.613333-119.466667 119.466667v505.173333l-177.493333-170.666667c-40.96-37.546667-105.813333-37.546667-143.36 3.413334-37.546667 40.96-37.546667 105.813333 3.413333 143.36l430.08 416.426666c-3.413333 6.826667 3.413333 6.826667 6.826667 6.826667s10.24 0 10.24-3.413333l430.08-416.426667c40.96-37.546667 40.96-102.4 3.413333-143.36z" />
@@ -51,6 +51,8 @@ const { target } = props;
 const refreshRef: ShallowRef<"initial" | "release" | "running"> = shallowRef('initial');
 /** 上拉加载状态：初始态、等待释放生效、加载中 */
 const moreRef: ShallowRef<"initial" | "release" | "running"> = shallowRef('initial');
+/** 上拉加载更多的bottom位置定位值 */
+const moreBottomRef: ShallowRef<number> = shallowRef(0);
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -98,17 +100,19 @@ function onDetailChange(detail: ElasticDetail) {
     if (detail.status != "end") {
         //  下拉时：看看是否开启了下拉刷新
         if (detail.touch.total.y > 0 && refreshRef.value != "running") {
-            refreshRef.value = detail.position.y >= 40
-                ? "release"
-                : "initial";
+            refreshRef.value = detail.position.y >= 40 ? "release" : "initial";
         }
-        //  上拉时：看看是否开启了上拉加载更多
+        //  上拉时：看看是否开启了上拉加载更多；判定处于释放状态时，【上拉加载更多】提示跟手往上移动
         else if (detail.touch.total.y < 0 && moreRef.value != "running") {
             const minY: number = target.parentElement.clientHeight - target.clientHeight;
-            console.log(detail.position.y - minY);
-            moreRef.value = detail.position.y - minY <= - 40
-                ? "release"
-                : "initial";
+            if (detail.position.y - minY <= - 40) {
+                moreRef.value = "release";
+                moreBottomRef.value = -(detail.position.y - minY + 40);
+            }
+            else {
+                moreRef.value = "initial";
+                moreBottomRef.value = 0;
+            }
         }
 
         resetDock(false);
@@ -123,6 +127,7 @@ function onDetailChange(detail: ElasticDetail) {
             moreRef.value = "running";
             setTimeout(onRefreshOrMore, 0, "more");
         }
+        moreBottomRef.value = 0;
     }
 }
 
@@ -177,6 +182,8 @@ onMounted(() => {
 
     .up-more {
         bottom: 0;
+        //  后期看情况启用动画效果
+        // transition: bottom 0.2s ease-out;
     }
 }
 </style>
