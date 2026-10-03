@@ -79,8 +79,8 @@
         <!-- 事件相关 -->
         <section style="width: 100%;height: 20px;">事件相关：看控制台输出</section>
         <section>
-            <Scroll class="scroll-test" :class="tmpClassStyleRef" :scroll="'both'" @xbar="console.log"
-                @ybar="console.log" @left="console.log('滚动到最左侧')" @right="console.log('滚动到最右侧')"
+            <Scroll class="scroll-test" :class="tmpClassStyleRef" :scroll="'both'" :bar-size="'small'"
+                @xbar="console.log" @ybar="console.log" @left="console.log('滚动到最左侧')" @right="console.log('滚动到最右侧')"
                 @top="console.log('滚动到最顶部')" @bottom="console.log('滚动到最底部')">
                 <div style="background-color: gray;">
                     200px;

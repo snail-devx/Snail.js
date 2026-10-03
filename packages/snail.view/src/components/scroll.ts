@@ -47,7 +47,7 @@ export function useScroll(target: HTMLElement, options: ScrollBaseOptions, fn?: 
         isNumberNotNaN(x) && (target.scrollLeft += x);
         isNumberNotNaN(y) && (target.scrollTop += y);
         //  刷新滚动状态
-        refreshStatus("other");
+        refresh("other");
     }
     /**
      * 滚动到制定位置
@@ -58,45 +58,53 @@ export function useScroll(target: HTMLElement, options: ScrollBaseOptions, fn?: 
         isNumberNotNaN(x) && (target.scrollLeft = x);
         isNumberNotNaN(y) && (target.scrollTop = y);
         //  刷新滚动状态
-        refreshStatus("other");
+        refresh("other");
     }
 
     /**
      * 刷新滚动视图
      * - 重新映射滚动容器上的class信息
+     * - 有变化时，进行回调通知
+     * @param action 什么动作触发的
      */
-    function refresh(): void {
-        //  映射溢出滚动样式
+    function refresh(action?: ScrollDetail["action"]): void {
+        //  计算出来的滚动条状态，构建详情数据；并冻结：计算左、右、顶、底时，对应方向需要有滚动条
+        let detail: ScrollDetail;
         {
-            target.classList.remove("scroll-x", "scroll-y", "scroll-none", "scroll-xy");
-            switch (options ? options.scroll : undefined) {
-                case "x":
-                case "y":
-                case "none":
-                    target.classList.add(`scroll-${options.scroll}`);
-                    break;
-                case "both":
-                    target.classList.add("scroll-xy");
-                    break;
-            }
+            const now: ScrollStatus = getStatus();
+            detail = Object.freeze<ScrollDetail>({
+                action: correctString(action, "other", true) as any,
+                pre: preStatus || now,
+                now,
+            });
+            preStatus = now;
         }
-        //  映射滚动条大小样式
-        {
-            target.classList.remove("normal-scrollbar", "small-scrollbar", "mini-scrollbar", "none-scrollbar");
-            const barSize: string = options
-                ? correctString(options.barSize, undefined, true)
-                : undefined;
-            barSize && target.classList.add(`${barSize}-scrollbar`);
+        //  滚动视图状态有变化时，进行回调通知；初次始终判定为有变化
+        const isChange: boolean = detail.pre == detail.now
+            || detail.pre.class != detail.now.class
+            || detail.pre.clientWidth != detail.now.clientWidth
+            || detail.pre.clientHeight != detail.now.clientHeight
+            || detail.pre.scrollWidth != detail.now.scrollWidth
+            || detail.pre.scrollHeight != detail.now.scrollHeight
+            || detail.pre.scrollLeft != detail.now.scrollLeft
+            || detail.pre.scrollTop != detail.now.scrollTop
+            || detail.pre.xbar != detail.now.xbar
+            || detail.pre.ybar != detail.now.ybar
+            || detail.pre.left != detail.now.left
+            || detail.pre.right != detail.now.right
+            || detail.pre.top != detail.now.top
+            || detail.pre.bottom != detail.now.bottom;
+        if (isChange == true) {
+            fn == undefined ? console.log(detail) : fn(detail)
         }
-        //  刷新滚动状态
-        refreshStatus("other");
     }
     /**
      * 获取滚动状态
      * @returns 
      */
     function getStatus(): Readonly<ScrollStatus> {
-        const status: ScrollStatus = {
+        const now: ScrollStatus = {
+            class: undefined,
             //  滚动视图相关信息
             clientWidth: target.clientWidth,
             clientHeight: target.clientHeight,
@@ -112,61 +120,38 @@ export function useScroll(target: HTMLElement, options: ScrollBaseOptions, fn?: 
             top: isScrollTop(target),
             bottom: isScrollBottom(target),
         };
-        return Object.freeze<ScrollStatus>(status);
+        //  初始化当前视图的class类样式
+        const classes: string[] = [];
+        {
+            //  映射滚动样式和滚动条大小
+            switch (options ? options.scroll : undefined) {
+                case "x":
+                case "y":
+                case "none":
+                    classes.push(`scroll-${options.scroll}`);
+                    break;
+                case "both":
+                    classes.push("scroll-xy");
+                    break;
+            }
+            const barSize: string = options
+                ? correctString(options.barSize, undefined, true)
+                : undefined;
+            barSize && classes.push(`${barSize}-scrollbar`);
+            //  映射视图状态信息：如是否出现滚动条
+            now.xbar == true && classes.push("x-bar");
+            now.xbar == true && classes.push("y-bar");
+        }
+        now.class = classes.join(" ");
+
+        //  冻结返回
+        return Object.freeze<ScrollStatus>(now);
     }
     //#endregion
 
 
     //#region ************************************* 内部方法：辅助结构实现的方法 *************************************
-    /**
-     * 刷新滚动条状态
-     * @param action 什么动作触发的
-     */
-    function refreshStatus(action: ScrollDetail["action"]) {
-        //  计算滚滚动条状态，并冻结：计算左、右、顶、底时，对应方向需要有滚动条
-        let detail: ScrollDetail;
-        {
-            const now: ScrollStatus = getStatus();
-            detail = Object.freeze<ScrollDetail>({
-                action,
-                pre: preStatus || now,
-                now,
-            });
-            preStatus = now;
-        }
-        //  水平垂直滚动条的变化反应状态到class上
-        {
-            if (detail.pre == detail.now || detail.pre.xbar != detail.now.xbar) {
-                detail.now.xbar == true
-                    ? target.classList.add("x-bar")
-                    : target.classList.remove("x-bar");
-            }
-            if (detail.pre == detail.now || detail.pre.ybar != detail.now.ybar) {
-                detail.now.ybar == true
-                    ? target.classList.add("y-bar")
-                    : target.classList.remove("y-bar");
-            }
-        }
-        //  滚动视图状态有变化时，进行回调通知；初次始终判定为有变化
-        {
-            const isChange: boolean = detail.pre == detail.now
-                || detail.pre.clientWidth != detail.now.clientWidth
-                || detail.pre.clientHeight != detail.now.clientHeight
-                || detail.pre.scrollWidth != detail.now.scrollWidth
-                || detail.pre.scrollHeight != detail.now.scrollHeight
-                || detail.pre.scrollLeft != detail.now.scrollLeft
-                || detail.pre.scrollTop != detail.now.scrollTop
-                || detail.pre.xbar != detail.now.xbar
-                || detail.pre.ybar != detail.now.ybar
-                || detail.pre.left != detail.now.left
-                || detail.pre.right != detail.now.right
-                || detail.pre.top != detail.now.top
-                || detail.pre.bottom != detail.now.bottom;
-            isChange == true && (
-                fn == undefined ? console.log(detail) : fn(detail)
-            );
-        }
-    }
+
     //#endregion
 
     //  初始化+数据验证；构建管理器，相关事件监听
@@ -181,11 +166,11 @@ export function useScroll(target: HTMLElement, options: ScrollBaseOptions, fn?: 
         //  事件监听：大小变化，滚动事件，定时器监听滚动视图内部内容变化
         {
             //  定时器监听滚动视图内部内容变化导致的滚动条变化
-            const timer = setInterval(() => preStatus && refreshStatus("other"), 100);
+            const timer = setInterval(() => preStatus && refresh("other"), 100);
             //  事件监听：大小变化，滚动事件
             const observer = useObserver();
-            observer.onSize(target, () => refreshStatus("size"));
-            observer.onEvent(target, "scroll", () => refreshStatus("scroll"));
+            observer.onSize(target, () => refresh("size"));
+            observer.onEvent(target, "scroll", () => refresh("scroll"));
             //      测试用
             // observer.onEvent(target, "scroll", console.log);
 
@@ -196,7 +181,7 @@ export function useScroll(target: HTMLElement, options: ScrollBaseOptions, fn?: 
         }
         //  滚动视图信息初始化
         refresh();
-        refreshStatus("initial");
+        refresh("initial");
 
         return manager;
     }

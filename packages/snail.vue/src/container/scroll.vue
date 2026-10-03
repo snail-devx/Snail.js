@@ -2,14 +2,14 @@
     1、通用逻辑封装到 ./utils/scroll-util.ts 中
 -->
 <template>
-    <div :="$attrs" class="snail-scroll" ref="scroll-root">
+    <div :="$attrs" class="snail-scroll" :class="classRef" ref="scroll-root">
         <slot></slot>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ScrollDetail, useScroll } from "snail.view";
-import { onMounted, useTemplateRef } from "vue";
+import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import { ScrollEvents, ScrollHandle, ScrollOptions } from "./models/scroll-model";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -19,6 +19,8 @@ const props = defineProps<ScrollOptions>();
 const emits = defineEmits<ScrollEvents>();
 const rootDom = useTemplateRef("scroll-root");
 //  2、组件交互变量、常量
+/**     自定义的类样式数组：在滚动详情变化时做实时更新 */
+const classRef: ShallowRef<string> = shallowRef(undefined);
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -27,6 +29,7 @@ const rootDom = useTemplateRef("scroll-root");
  * @param detail 
  */
 function onScrollDetail(detail: ScrollDetail) {
+    classRef.value = detail.now.class;
     const { now, pre } = detail;
     emits("change", now, pre);
     //  水平滚动条变化：初始状态若出现滚动条，也触发xbar事件

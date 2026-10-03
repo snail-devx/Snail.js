@@ -89,6 +89,13 @@ export type ScrollDetail = {
  */
 export type ScrollStatus = {
     /**
+     * 体现视图当前滚动状态的一些自定义样式
+     * - 通知外部后，自己加到视图class属性中
+     * - 多个类样式以空格分隔
+     */
+    class: string;
+
+    /**
      * 可视宽度
      */
     clientWidth: number;
