@@ -4,21 +4,23 @@
     3、支持移动端橡皮筋效果，支持上拉加载更多、下拉刷新数据等功能
   -->
 <template>
-    <div :="$attrs" class="snail-elastic" :class="barStyle.namespace, updownStyle.namespace">
+    <div :="$attrs" class="snail-elastic">
         <!-- 主内容区域 -->
         <div class="main-area" ref="main-area">
             <slot />
         </div>
         <!-- 插件挂载区域 -->
-        <!--    默认挂载插件：滚动条，在bar为true时生效 -->
-        <ElasticBar v-if="bar" :="slotHandle" :detail="detailRef" />
-        <!--    自定义插件：通过 plugin 插槽挂载一些自定义的组件过来，如下拉刷新、上拉加载 -->
-        <slot name="plugin" :="slotHandle" :detail="detailRef" />
+        <template v-if="readyRef">
+            <!-- 默认挂载插件：滚动条，在bar为true时生效 -->
+            <ElasticBar v-if="bar" :="slotHandle" :detail="detailRef" />
+            <!-- 自定义插件：通过 plugin 插槽挂载一些自定义的组件过来，如下拉刷新、上拉加载 -->
+            <slot name="plugin" :="slotHandle" :detail="detailRef" />
+        </template>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ElasticDetail, useElastic, useStyle } from "snail.view";
+import { ElasticDetail, useElastic } from "snail.view";
 import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import ElasticBar from "./components/elastic-bar.vue";
 import { ElasticOptions, ElasticSlotHandle } from "./models/elastic-model";
@@ -28,12 +30,11 @@ import { ElasticOptions, ElasticSlotHandle } from "./models/elastic-model";
 defineOptions({ name: "Elastic", inheritAttrs: false });
 const props = defineProps<ElasticOptions>();
 const mainAreaDom = useTemplateRef("main-area");
-const barStyle = useStyle();
-const updownStyle = useStyle();
-//      解构属性
 const { elastic, bar } = props;
 //  2、组件交互变量、常量
-/**     插槽句柄 */
+/**     是否准备好了，准备二区号了，进行插件插槽渲染 */
+const readyRef: ShallowRef<boolean> = shallowRef(false);
+/**     插槽句柄：初始化中赋值并锁定 */
 const slotHandle: ElasticSlotHandle = Object.create(null);
 /**     弹性滚动的详情信息：感知滚动状态 */
 const detailRef: ShallowRef<ElasticDetail> = shallowRef(undefined);
@@ -54,6 +55,8 @@ onMounted(() => {
         detail: undefined,
     });
     Object.freeze(slotHandle);
+
+    readyRef.value = true;
 });
 </script>
 

@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { ElasticDetail } from 'snail.view';
-import { onMounted, shallowRef, ShallowRef } from 'vue';
+import { shallowRef, ShallowRef } from 'vue';
 import { useReactive } from '../../base/reactive';
 import { ElasticSlotHandle } from '../models/elastic-model';
 
@@ -17,6 +17,7 @@ import { ElasticSlotHandle } from '../models/elastic-model';
 //  1、props、event、model、components
 const props = defineProps<ElasticSlotHandle>();
 const { watcher } = useReactive();
+const { target, elastic } = props;
 //  2、组件交互变量、常量
 /** 滚动条结束时的定时器 */
 let barEndTimer: NodeJS.Timeout = undefined;
@@ -40,16 +41,16 @@ function onDetailChange(detail: ElasticDetail) {
     xbarStyleRef.value = undefined;
     ybarStyleRef.value = undefined;
     // 水平滚动条
-    if (props.elastic == "both" || props.elastic == "x") {
-        const xbar = calcBarStyle(props.target.parentElement.clientWidth, props.target.clientWidth, detail.position.x);
+    if (elastic == "both" || elastic == "x") {
+        const xbar = calcBarStyle(target.parentElement.clientWidth, target.clientWidth, detail.position.x);
         xbarStyleRef.value = {
             width: xbar.size == undefined ? "0" : `${xbar.size}px`,
             left: xbar.position == undefined ? "0" : `${xbar.position}px`,
         }
     }
     // 垂直滚动条
-    if (props.elastic == "both" || props.elastic == "y") {
-        const ybar = calcBarStyle(props.target.parentElement.clientHeight, props.target.clientHeight, detail.position.y);
+    if (elastic == "both" || elastic == "y") {
+        const ybar = calcBarStyle(target.parentElement.clientHeight, target.clientHeight, detail.position.y);
         ybarStyleRef.value = {
             height: ybar.size == undefined ? "0" : `${ybar.size}px`,
             top: ybar.position == undefined ? "0" : `${ybar.position}px`,
@@ -94,8 +95,8 @@ function calcBarStyle(parentSize: number, size: number, position: number): { siz
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
+watcher(() => props.detail, onDetailChange);
 //  2、生命周期响应
-onMounted(() => watcher(() => props.detail, onDetailChange));
 </script>
 
 <style lang="less">
@@ -110,7 +111,7 @@ onMounted(() => watcher(() => props.detail, onDetailChange));
         background-color: #c3c7cb;
         z-index: 2;
         border-radius: 2px;
-        transition: all 0.2s linear;
+        transition: opacity 0.2s linear;
         opacity: 1;
     }
 
