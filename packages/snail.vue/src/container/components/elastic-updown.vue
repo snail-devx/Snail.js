@@ -58,36 +58,6 @@ const moreBottomRef: ShallowRef<number> = shallowRef(0);
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
- * 重置停靠位置
- * @param refreshView 是否刷新视图
- */
-function resetDock(refreshView: boolean) {
-    //  基于状态重置dock配置
-    const options: ElasticDockOptions = Object.create(null);
-    options.top = refreshRef.value == "running" || refreshRef.value == "release" ? 40 : 0;
-    options.bottom = moreRef.value == "running" || moreRef.value == "release" ? 40 : 0;
-    props.dock(options);
-
-    refreshView && props.refresh();
-}
-/**
- * 执行刷新或者加载更多
- * @param mode 
- */
-async function onRefreshOrMore(mode: "refresh" | "more") {
-    //  通知外面，但需要等待上一次操作完成了
-    try { await props.load(mode); }
-    catch (ex) {
-        console.error("elastic-up-down: load function run error", ex);
-    }
-    finally {
-        refreshRef.value = undefined;
-        moreRef.value = undefined;
-        resetDock(true);
-    }
-}
-
-/**
  * 弹性视图状态详情变化时
  * @param detail 
  */
@@ -101,11 +71,11 @@ function onDetailChange(detail: ElasticDetail) {
     //  弹性过程中，判断是否需要进行上拉加载和下拉刷新
     if (detail.status != "end") {
         //  下拉时：看看是否开启了下拉刷新
-        if (detail.touch.total.y > 0 && refreshRef.value != "running") {
+        if (props.down == true && detail.touch.total.y > 0 && refreshRef.value != "running") {
             refreshRef.value = detail.position.y >= 40 ? "release" : "initial";
         }
         //  上拉时：看看是否开启了上拉加载更多；判定处于释放状态时，【上拉加载更多】提示跟手往上移动
-        else if (detail.touch.total.y < 0 && moreRef.value != "running") {
+        else if (props.up == true && detail.touch.total.y < 0 && moreRef.value != "running") {
             const minY: number = target.parentElement.clientHeight - target.clientHeight;
             if (detail.position.y - minY <= - 40) {
                 moreRef.value = "release";
@@ -133,6 +103,38 @@ function onDetailChange(detail: ElasticDetail) {
     }
 }
 
+/**
+ * 重置停靠位置
+ * @param refreshView 是否刷新视图
+ */
+function resetDock(refreshView: boolean) {
+    //  基于状态重置dock配置
+    const options: ElasticDockOptions = Object.create(null);
+    options.top = refreshRef.value == "running" || refreshRef.value == "release" ? 40 : 0;
+    options.bottom = moreRef.value == "running" || moreRef.value == "release" ? 40 : 0;
+    props.dock(options);
+
+    refreshView && props.refresh();
+}
+/**
+ * 执行刷新或者加载更多
+ * @param mode 
+ */
+async function onRefreshOrMore(mode: "refresh" | "more") {
+    //  通知外面，但需要等待上一次操作完成了
+    try {
+        await props.load(mode);
+    }
+    catch (ex) {
+        console.error("elastic-up-down: load function run error", ex);
+    }
+    finally {
+        refreshRef.value = undefined;
+        moreRef.value = undefined;
+        resetDock(true);
+    }
+}
+
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 {
@@ -148,6 +150,11 @@ onMounted(() => {
     //  发送准备事件
     const handle: ElasticUpdownHandle = Object.freeze<ElasticUpdownHandle>({
         refresh() {
+            if (props.down != true) {
+                console.warn("elastic-up-down: down is false, can not refresh");
+                return;
+            }
+            //  执行刷新处理；后续看情况，如果刷新中，则不进行刷新
             refreshRef.value = "running";
             moreRef.value = undefined;
             resetDock(true);

@@ -36,7 +36,7 @@
                 <ElasticTestBody style="width: 100%;" />
                 <!-- 启用此插件 -->
                 <template #plugin="handle">
-                    <ElasticUpdown :="handle" up down :load="loadData" @ready="onUpdownReady" />
+                    <ElasticUpdown :="handle" up :down="true" :load="loadData" @ready="onUpdownReady" />
                 </template>
             </Elastic>
         </section>
