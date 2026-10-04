@@ -7,7 +7,7 @@
         :viewBox="correctString(viewBox, '0 0 1024 1024', false)" :="sizeRef" :style="styleRef"
         @click="evt => emits('click', evt)">
         <title v-text="title || ''" />
-        <!-- 定义图标绘制时 -->
+        <!-- 自定义图标绘制 -->
         <template v-if="custom == true">
             <slot />
         </template>
