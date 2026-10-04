@@ -1,30 +1,83 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <button @click="changeMode()">切换模式</button>：{{ modeRef }}
+    <button @click="loadingRef = !loadingRef">切换loading</button><br />
     <br />
-    <PageInner :="modeRef" v-if="modeRef" :key="newId()" />
+    <!-- 桌面环境 测试 -->
+    <Env :mode="'desktop'">
+        桌面模式，默认：
+        <button @click="loadingRef = !loadingRef">切换loading</button><br />
+        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef">
+            <template #desktop>
+                destktop区域
+            </template>
+        </Page>
+        <br />
+        桌面模式，配置头部和底部：
+        <Page class="no-xxx" style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef" :desktop="{
+            header: { useTo: 'dialog', title: '测试', divider: true },
+            footer: {
+                align: 'center',
+                divider: true,
+                buttons: [
+                    { code: 'xx', name: '测试', size: 'max' },
+                    { code: 'xx1', name: '测试2', type: 'primary', size: 'max' }
+                ]
+            }
+        }">
+            <template #desktop>
+                destktop区域:
+            </template>
+        </Page>
+        <br />
+        桌面模式，无实现
+        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef" />
+    </Env>
+    <!-- 移动端环境测试 -->
+    <br />
+    <br />
+    <Env :mode="'mobile'">
+        移动端模式，默认：
+        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef">
+            <template #mobile>
+                mobile区域:
+            </template>
+        </Page>
+        <br />
+        移动端模式，配置头部和底部：
+        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :mobile="{
+            main: { class: 'scroll-y' },
+            footer: {
+                disabled: false,
+                buttons: [
+                    { code: 'xx', name: '测试', size: 'max' },
+                    { code: 'xx1', name: '测试2', type: 'primary', size: 'max' }
+                ]
+            }
+        }" :loading="loadingRef">
+            <template #mobile>
+                mobile区域
+            </template>
+        </Page>
+        <br />
+        <Page style="width: 100%;height: 200px;border: 1px solid gray;">
+            <div style="color: red;">默认插槽实现，PC、移动端共享一个插槽</div>
+        </Page>
+        移动端模式，无实现
+        <Page style="width: 100%;height: 200px;border: 1px solid gray;" />
+    </Env>
 </template>
 
 <script setup lang="ts">
-import { provide, shallowRef, ShallowRef } from "vue";
-import { components, AppOptions, INJECTKEY_AppOptions } from "../../libraries/snail_vue";
-import PageInner from "./components/page-inner.vue";
-import { newId } from "snail.core";
+import { shallowRef, ShallowRef } from "vue";
+import { components } from "../../libraries/snail_vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const { Page } = components;
+const { Page, Env } = components;
 //  2、组件交互变量、常量
-const modeRef: ShallowRef<AppOptions> = shallowRef({ mode: "desktop" });
+const loadingRef: ShallowRef<boolean> = shallowRef(true);
 
 // *****************************************   👉  方法+事件    ****************************************
-function changeMode() {
-    const mode = modeRef.value.mode == "desktop" ? "mobile" : "desktop";
-    modeRef.value = { mode };
-    // provide(INJECTKEY_AppOptions, Object.freeze(modeRef.value) as any);
-    // modeRef.value = undefined;
-    // setTimeout(() => modeRef.value = { mode }, 1000);
-}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
