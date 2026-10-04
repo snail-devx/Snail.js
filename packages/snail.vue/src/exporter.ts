@@ -27,6 +27,7 @@ export * from "./base/models/tree-base";
 //  组件导出
 import Button from "./base/button.vue";
 import Choose from "./base/choose.vue";
+import Env from "./base/env.vue";
 import Footer from "./base/footer.vue";
 import Header from "./base/header.vue";
 import Icon from "./base/icon.vue";
@@ -119,7 +120,7 @@ import Loading from "./prompt/loading.vue";
 // *****************************************   👉  组件合并导出    ****************************************
 export const components = {
     //  base下的组件
-    Button, Choose, Footer, Header, Icon, Input, Number, Search, Select, Switch, Textarea,
+    Button, Choose, Env, Footer, Header, Icon, Input, Number, Search, Select, Switch, Textarea,
     //  container 下的组件
     Dynamic, Elastic, ElasticBar, ElasticUpdown, Flex, Fold, Motion, Layout, Page, Scroll, Sort, Table, Tree, Wrapper,
     //  other   下的组件
