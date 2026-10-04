@@ -21,9 +21,7 @@ export const INJECTKEY_AppOptions = Symbol() as InjectionKey<Readonly<Required<A
  */
 export function correctAppOptions(options?: AppOptions): Readonly<Required<AppOptions>> {
     const page: Required<AppOptions> = Object.create(null);
-    if (options != undefined) {
-        page.mode = options.mode == "mobile" ? "mobile" : "desktop";
-    }
+    page.mode = options && options.mode == "mobile" ? "mobile" : "desktop";
     return Object.freeze(page);
 }
 /**
