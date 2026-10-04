@@ -2,30 +2,42 @@
     1、文本输入框，集成日期选择功能
  -->
 <template>
-    <div class="snail-datepicker" :class="{ readonly, 'simple': mode == 'simple' }" :title="valueRef" ref="datepicker"
-        @click="showPicker">
-        <span v-if="mode != 'simple' || isStringNotEmpty(valueRef)" class="ellipsis"
-            :class="{ 'flex-1': mode != 'simple' }" v-text="valueRef" />
-        <Icon v-if="readonly != true" type="datepicker" button :size="16" :color="'#aeb6c2'" :hover-color="'#279bf1'" />
+    <div class="snail-datepicker" :class="[app.mode, readonly ? 'readonly' : '', mode == 'simple' ? 'simple' : '']"
+        :title="valueRef" ref="datepicker" @click="showPicker">
+        <!-- 桌面端渲染 -->
+        <template v-if="app.mode != 'mobile'">
+            <span v-if="mode != 'simple' || isStringNotEmpty(valueRef)" class="ellipsis"
+                :class="{ 'flex-1': mode != 'simple' }" v-text="valueRef" />
+            <Icon v-if="readonly != true" type="datepicker" button :size="16" :color="'#aeb6c2'"
+                :hover-color="'#279bf1'" />
+        </template>
+        <!-- 移动端渲染 -->
+        <template v-else>
+            <span class="ellipsis flex-1" v-text="valueRef" />
+            <Icon v-if="readonly != true" type="arrow" button :size="20" :color="'#aeb6c2'" :hover-color="'#279bf1'" />
+        </template>
     </div>
 </template>
 
 <script setup lang="ts">
+import { formatDateValue, IAsyncScope, isStringNotEmpty, parseDateValue } from "snail.core";
 import { ShallowRef, shallowRef, useTemplateRef, } from "vue";
 import Icon from "../base/icon.vue";
-import { DatePickerOptions } from "./models/datetime-model";
-import { ReadonlyOptions } from "../base/models/base-model";
 import { ChangeEvents } from "../base/models/base-event";
-import { usePicker } from "./manager";
-import { formatDateValue, IAsyncScope, isStringNotEmpty, parseDateValue } from "snail.core";
+import { ReadonlyOptions } from "../base/models/base-model";
 import { useReactive } from "../base/reactive";
-import { PickerPopupOptions } from "./models/picker-model.js";
+import { useApp } from "../base/utils/app-util";
+import { usePicker } from "./manager";
+import { DatePickerOptions } from "./models/datetime-model";
+import { PickerPopupOptions } from "./models/picker-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<ReadonlyOptions & DatePickerOptions & { popup?: PickerPopupOptions }>();
 const emits = defineEmits<ChangeEvents<string>>();
 const pickerDom = useTemplateRef("datepicker");
+const app = useApp();
+console.log(app);
 const { showDate } = usePicker();
 const { watcher } = useReactive();
 //  2、组件交互变量、常量

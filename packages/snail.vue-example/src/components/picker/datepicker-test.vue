@@ -178,18 +178,24 @@
             弹窗模式
             <DatePicker :popup="{ mode: 'dialog' }" :mode="'simple'" :value="valueRef" @change="console.log" />
         </section>
+        <section class="">
+            移动端模式
+            <Env :mode="'mobile'">
+                <DatePicker :mode="'simple'" :value="valueRef" @change="console.log" />
+            </Env>
+        </section>
     </article>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, } from "vue";
-import { usePicker, DatePickerOptions, components } from "../../libraries/snail_vue";
 import { IAsyncScope } from "snail.core";
+import { shallowRef } from "vue";
+import { DatePickerOptions, components, usePicker } from "../../libraries/snail_vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const { showDate } = usePicker();
-const { DatePicker } = components;
+const { DatePicker, Env } = components;
 //  2、组件交互变量、常量
 /** 选择器弹出组件 */
 let pickerScope: IAsyncScope<string>;
