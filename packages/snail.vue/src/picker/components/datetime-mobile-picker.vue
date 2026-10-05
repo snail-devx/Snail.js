@@ -148,7 +148,7 @@ function onConfirmSelect() {
         >.button {
             flex-shrink: 0;
             cursor: pointer;
-            color: #0188FD;
+            color: #007bff;
             //  取消移动端点击高亮色
             -webkit-tap-highlight-color: transparent;
         }
