@@ -5,12 +5,12 @@
     <div class="snail-datetime-mobile-picker">
         <!-- 标题头部 -->
         <div class="header-area">
-            <span class="button" v-text="'取消'" />
-            <span class="button" v-text="'清空'" />
+            <span class="button" v-text="'取消'" @click="closePopup(undefined)" />
+            <span class="button" v-text="'清空'" @click="closePopup('')" />
             <span class="title ellipsis flex-1" v-text="timeFormat == undefined
                 ? (dateFormat == 'yyyy-MM-dd HH:mm' || dateFormat == 'yyyy-MM-dd HH:mm:ss' ? '选择让日期时间' : '选择日期')
                 : '选择时间'" />
-            <span class="button" v-text="'确定'" />
+            <span class="button" v-text="'确定'" @click="onConfirmSelect" />
         </div>
         <!-- 选择内容区域 年月日 时分秒 -->
         <div class="main-area">
@@ -49,14 +49,14 @@
 </template>
 
 <script setup lang="ts">
-import { DateValue, getDateByValue, parseDateValue } from "snail.core";
+import { DateValue, parseDateValue } from "snail.core";
 import { Ref, ref, shallowRef, ShallowRef } from "vue";
 import { DialogHandle } from "../../popup/models/dialog-model";
 import { DateTimePickerBaseOptions } from "../models/datetime-model";
 import { PickerExtend } from "../models/picker-model";
 import { ScrollPickItem } from "../models/scroll-piker-model";
 import ScrollPicker from "../scroll-picker.vue";
-import { correctFormat, validateDay, validateHour, validateMinute, validateMonth, validateSecond, validateYear } from "../utils/datetime-util";
+import { buildDayScrollItems, buildHourScrollItems, buildMinuteScrollItems, buildMonthScrollItems, buildSecondScrollItems, buildYearScrollItems, correctFormat } from "../utils/datetime-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -89,94 +89,10 @@ const secondItemsRef: ShallowRef<ScrollPickItem[]> = shallowRef();
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
- * 构建【年】选择项
+ * 确认选择：梳理出最终选中的值，并关闭弹窗
  */
-function buildYearItems(): void {
-    const items: ScrollPickItem[] = [];
-    for (let index = -1000; index < 1000; index++) {
-        const tmpYear: number = Math.max(0, dateRef.value.year + index);
-        items.push({
-            code: String(tmpYear),
-            name: String(tmpYear),
-            disabled: validateYear(tmpYear, minDate, maxDate) == false,
-        });
-    }
-    yearItemsRef.value = items;
-}
-/**
- * 构建【月】选择项
- */
-function buildMonthItems(): void {
-    const items: ScrollPickItem[] = [];
-    for (let index = 1; index <= 12; index++) {
-        items.push({
-            code: String(index),
-            name: String(index),
-            disabled: validateMonth(dateRef.value.year, index, minDate, maxDate) == false,
-        });
-    }
-    monthItemsRef.value = items;
-}
-/**
- * 构建【日】选择项
- */
-function buildDayItems(): void {
-    const items: ScrollPickItem[] = [];
-    const date = getDateByValue({ year: dateRef.value.year, month: dateRef.value.month, day: 1 });
-    for (let index = 1; index <= 31; index++) {
-        index == 1 || date.setDate(1);
-        if (date.getMonth() + 1 != dateRef.value.month) {
-            break;
-        }
-        items.push({
-            code: String(index),
-            name: String(index),
-            disabled: validateDay(dateRef.value.year, dateRef.value.month, index, minDate, maxDate) == false,
-        });
-    }
-    dayItemsRef.value = items;
-}
-/**
- * 构建【小时】选择项
- */
-function buildHourItems(): void {
-    const items: ScrollPickItem[] = [];
-    for (let index = 0; index < 24; index++) {
-        items.push({
-            code: String(index),
-            name: String(index),
-            disabled: validateHour(index, minTime, maxTime) == false,
-        });
-    }
-    hourItemsRef.value = items;
-}
-/**
- * 构建【分钟】选择项
- */
-function buildMinuteItems(): void {
-    const items: ScrollPickItem[] = [];
-    for (let index = 0; index < 60; index++) {
-        items.push({
-            code: String(index),
-            name: String(index),
-            disabled: validateMinute(dateRef.value.hour, index, minTime, maxTime) == false,
-        });
-    }
-    minuteItemsRef.value = items;
-}
-/**
- * 构建【秒】选择项
- */
-function buildSecondItems(): void {
-    const items: ScrollPickItem[] = [];
-    for (let index = 0; index < 60; index++) {
-        items.push({
-            code: String(index),
-            name: String(index),
-            disabled: validateSecond(dateRef.value.hour, dateRef.value.minute, index, minTime, maxTime) == false,
-        });
-    }
-    secondItemsRef.value = items;
+function onConfirmSelect() {
+    alert("还没实现呢");
 }
 
 // *****************************************   👉  组件渲染    *****************************************
@@ -190,12 +106,12 @@ function buildSecondItems(): void {
     dateRef.value.minute = 12;
     dateRef.value.second = 12;
 
-    buildYearItems();
-    buildMonthItems();
-    buildDayItems();
-    buildHourItems();
-    buildMinuteItems();
-    buildSecondItems();
+    yearItemsRef.value = buildYearScrollItems(dateRef.value.year, minDate, maxDate);
+    monthItemsRef.value = buildMonthScrollItems(dateRef.value.year, minDate, maxDate);
+    dayItemsRef.value = buildDayScrollItems(dateRef.value.year, dateRef.value.month, minDate, maxDate);
+    hourItemsRef.value = buildHourScrollItems(minTime, maxTime);
+    minuteItemsRef.value = buildMinuteScrollItems(dateRef.value.hour, minTime, maxTime);
+    secondItemsRef.value = buildSecondScrollItems(dateRef.value.hour, dateRef.value.minute, minTime, maxTime);
 }
 //  2、生命周期响应
 

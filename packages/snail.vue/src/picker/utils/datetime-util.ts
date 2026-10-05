@@ -4,7 +4,9 @@
 
 import { correctDateFormat, DateFormat, DateValue, formatDateValue, getDateByValue, getDateValue, getTimeNumber, parseDate, TimeFormat, TimeValue } from "snail.core";
 import { DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, DatetimeFormatCorrectResult, DateTimePickerOptions, TimePickerHourItem, TimePickerMinuteItem, TimePickerSecondItem } from "../models/datetime-model";
+import { ScrollPickItem } from "../models/scroll-piker-model";
 
+//#region *************************************        日期时间验证相关        ***********************************
 /**
  * 校正日期时间格式
  * @param format 
@@ -143,8 +145,9 @@ export function validateSecond(hour: number, minute: number, second: number, min
     }
     return true;
 }
+//#endregion
 
-//#region *************************************        日期选择器相关        ***********************************
+//#region *************************************        日期时间桌面段        ***********************************
 /**
  * 根据日期格式，初始化选择步骤
  * - year - 年份选择
@@ -258,9 +261,6 @@ export function buildDayItems(monthItem: DatePickerMonthItem, min: DateValue, ma
     }
     return items;
 }
-//#endregion
-
-//#region *************************************        时间选择器相关        ***********************************
 /**
  * 构建小时选择项目
  * @param min 时间最小值
@@ -334,6 +334,123 @@ export function buildSecondItems(minuteItem: TimePickerMinuteItem, min: TimeValu
             item.disabled = (minNumber != undefined && number < minNumber) || (maxNumber != undefined && number > maxNumber);
         }
         items[index] = Object.freeze(item);
+    }
+    return items;
+}
+//#endregion
+
+//#region *************************************        日期时间移动端        ***********************************
+/**
+ * 构建【年】滚动选择项
+ * @param year 年份值，以此为基准构建前后选项 
+ * @param min 
+ * @param max 
+ * @returns 选项项数组
+ */
+export function buildYearScrollItems(year: number, min: DateValue, max: DateValue): ScrollPickItem[] {
+    const items: ScrollPickItem[] = [];
+    for (let index = -1000; index < 1000; index++) {
+        const tmpYear: number = Math.max(0, year + index);
+        items.push({
+            code: String(tmpYear),
+            name: String(tmpYear),
+            disabled: validateYear(tmpYear, min, max) == false,
+        });
+    }
+    return items;
+}
+/**
+ * 构建【月】滚动选择项
+ * @param min 
+ * @param max 
+ * @returns 选项项数组
+ */
+export function buildMonthScrollItems(year: number, min: DateValue, max: DateValue): ScrollPickItem[] {
+    const items: ScrollPickItem[] = [];
+    for (let index = 1; index <= 12; index++) {
+        items.push({
+            code: String(index),
+            name: String(index),
+            disabled: validateMonth(year, index, min, max) == false,
+        });
+    }
+    return items;
+}
+/**
+ * 构建【日】滚动选择项
+ * @param year 
+ * @param month 
+ * @param min 
+ * @param max 
+ * @returns 选项项数组
+ */
+export function buildDayScrollItems(year: number, month: number, min: DateValue, max: DateValue): ScrollPickItem[] {
+    const items: ScrollPickItem[] = [];
+    const date = getDateByValue({ year: year, month: month, day: 1 });
+    for (let index = 1; index <= 31; index++) {
+        index == 1 || date.setDate(1);
+        if (date.getMonth() + 1 != month) {
+            break;
+        }
+        items.push({
+            code: String(index),
+            name: String(index),
+            disabled: validateDay(year, month, index, min, max) == false,
+        });
+    }
+    return items;
+}
+/**
+ * 构建【小时】滚动选择项
+ * @param min 
+ * @param max 
+ * @returns 选项项数组
+ */
+export function buildHourScrollItems(min: TimeValue, max: TimeValue): ScrollPickItem[] {
+    const items: ScrollPickItem[] = [];
+    for (let index = 0; index < 24; index++) {
+        items.push({
+            code: String(index),
+            name: String(index),
+            disabled: validateHour(index, min, max) == false,
+        });
+    }
+    return items;
+}
+/**
+ * 构建【分钟】滚动选择项
+ * @param hour 
+ * @param min 
+ * @param max 
+ * @returns 选项项数组
+ */
+export function buildMinuteScrollItems(hour: number, min: TimeValue, max: TimeValue): ScrollPickItem[] {
+    const items: ScrollPickItem[] = [];
+    for (let index = 0; index < 60; index++) {
+        items.push({
+            code: String(index),
+            name: String(index),
+            disabled: validateMinute(hour, index, min, max) == false,
+        });
+    }
+    return items;
+}
+/**
+ * 构建【秒】滚动选择项
+ * @param hour 
+ * @param minute 
+ * @param min 
+ * @param max 
+ * @returns 选项项数组
+ */
+export function buildSecondScrollItems(hour: number, minute: number, min: TimeValue, max: TimeValue): ScrollPickItem[] {
+    const items: ScrollPickItem[] = [];
+    for (let index = 0; index < 60; index++) {
+        items.push({
+            code: String(index),
+            name: String(index),
+            disabled: validateSecond(hour, minute, index, min, max) == false,
+        });
     }
     return items;
 }
