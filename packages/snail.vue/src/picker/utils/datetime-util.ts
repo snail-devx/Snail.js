@@ -22,6 +22,24 @@ export function correctFormat(format: DateTimePickerOptions["format"]): Datetime
 }
 
 /**
+ * 验证年月日有效性
+ * - 仅验证年月日，不验证时分秒
+ * - 不作为通用方法，尽限日期时间选择器使用
+ * @param format 
+ * @param date 
+ * @param min 
+ * @param max 
+ * @returns 有效返回true，否则false
+ */
+export function validateDate(format: DateFormat, date: DateValue, min: DateValue, max: DateValue): boolean {
+    switch (format) {
+        case "yyyy": return validateYear(date.year, min, max);
+        case "yyyy-MM": return validateMonth(date.year, date.minute, min, max);
+        default: return validateDay(date.year, date.month, date.day, min, max);
+    }
+}
+
+/**
  * 验证年份的有效性
  * @param year 
  * @param min 

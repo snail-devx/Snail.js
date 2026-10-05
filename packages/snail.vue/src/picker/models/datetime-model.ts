@@ -1,4 +1,4 @@
-import { DateFormat, DateValue, TimeFormat, TimeValue } from "snail.core";
+import { DateFormat, DateValue, TimeValue } from "snail.core";
 import { DisabledOptions, ReadonlyOptions } from "../../base/models/base-model";
 
 /**
@@ -78,6 +78,7 @@ export type DateTimePickerToolbarOptions = {
     /**
      * 禁用【现在】按钮
      * - 为true时不显示【现在】按钮
+     * - 移动端时，此配置项无效，始终不显示【现在】按钮
      */
     nowDisabled?: boolean;
     /**
@@ -85,6 +86,24 @@ export type DateTimePickerToolbarOptions = {
      * - 为true时不显示【清空】按钮
      */
     clearDisabled?: boolean;
+}
+/**
+ * 日期时间格式校正结果
+ * - 基于组件传入的 `formart` 校正
+ */
+export type DatetimeFormatCorrectResult = {
+    /** 
+     * 日期格式
+     * - 传入格式为 TimeFormat 时，此值为undefined
+     * - 传入无效格式，或者空时，此值为 yyyy-MM-dd
+     */
+    dateFormat: DateFormat | undefined;
+
+    /** 
+     * 时间格式
+     * - 传入格式为 DateFormat 时，此值为undefined
+     */
+    timeFormat: "HH:mm" | "HH:mm:ss" | undefined;
 }
 
 
@@ -110,25 +129,6 @@ export type DatetimeDisabledOptions = {
      */
     clearDisabled?: boolean;
 }
-/**
- * 日期时间格式校正结果
- * - 基于组件传入的 `formart` 校正
- */
-export type DatetimeFormatCorrectResult = {
-    /** 
-     * 日期格式
-     * - 传入格式为 TimeFormat 时，此值为undefined
-     * - 传入无效格式，或者空时，此值为 yyyy-MM-dd
-     */
-    dateFormat: DateFormat | undefined;
-
-    /** 
-     * 时间格式
-     * - 传入格式为 DateFormat 时，此值为undefined
-     */
-    timeFormat: TimeFormat | undefined;
-}
-
 /**
  * 日期选择器 配置选项
  */
