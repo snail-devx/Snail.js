@@ -388,7 +388,7 @@ export function buildDayScrollItems(year: number, month: number, min: DateValue,
     const items: ScrollPickItem[] = [];
     const date = getDateByValue({ year: year, month: month, day: 1 });
     for (let index = 1; index <= 31; index++) {
-        index == 1 || date.setDate(1);
+        date.setDate(index);
         if (date.getMonth() + 1 != month) {
             break;
         }

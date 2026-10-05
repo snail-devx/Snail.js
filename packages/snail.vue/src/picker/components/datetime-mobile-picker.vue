@@ -16,32 +16,32 @@
         <div class="main-area">
             <!-- 年份选择 -->
             <div v-if="dateFormat">
-                <ScrollPicker :items="yearItemsRef" :value="String(dateRef.year)" />
+                <ScrollPicker :items="yearItemsRef" :value="String(dateRef.year)" @select="onYearSelect" />
                 <span class="year">年</span>
             </div>
             <!-- 月份选择 -->
             <div v-if="dateFormat && dateFormat != 'yyyy'">
-                <ScrollPicker :items="monthItemsRef" :value="String(dateRef.month)" />
+                <ScrollPicker :items="monthItemsRef" :value="String(dateRef.month)" @select="onMonthSelect" />
                 <span>月</span>
             </div>
             <!-- 天数选择 -->
             <div v-if="dateFormat && dateFormat.indexOf('-dd') != -1">
-                <ScrollPicker :items="dayItemsRef" :value="String(dateRef.day)" />
+                <ScrollPicker :items="dayItemsRef" :value="String(dateRef.day)" @select="onDaySelect" />
                 <span>日</span>
             </div>
             <!-- 时钟选择 -->
             <div v-if="timeFormat || (dateFormat && dateFormat.indexOf(' HH') != -1)">
-                <ScrollPicker :items="hourItemsRef" :value="String(dateRef.hour)" />
+                <ScrollPicker :items="hourItemsRef" :value="String(dateRef.hour)" @select="onHourSelect" />
                 <span>时</span>
             </div>
             <!-- 分钟选择 -->
             <div v-if="(timeFormat && timeFormat != 'HH') || (dateFormat && dateFormat.indexOf(':mm') != -1)">
-                <ScrollPicker :items="minuteItemsRef" :value="String(dateRef.minute)" />
+                <ScrollPicker :items="minuteItemsRef" :value="String(dateRef.minute)" @select="onMinuteSelect" />
                 <span>分</span>
             </div>
             <!-- 秒钟选择 -->
             <div v-if="(timeFormat == 'HH:mm:ss') || (dateFormat == 'yyyy-MM-dd HH:mm:ss')">
-                <ScrollPicker :items="secondItemsRef" :value="String(dateRef.second)" />
+                <ScrollPicker :items="secondItemsRef" :value="String(dateRef.second)" @select="onSecondSelect" />
                 <span>秒</span>
             </div>
         </div>
@@ -93,6 +93,79 @@ const secondItemsRef: ShallowRef<ScrollPickItem[]> = shallowRef();
  */
 function onConfirmSelect() {
     alert("还没实现呢");
+    // 验证选择的日期时间是否有效
+}
+
+/**
+ * 年份选择时
+ */
+function onYearSelect(code: string) {
+    dateRef.value.year = Number(code);
+    //  需要判断当前年份是否有效，无效则重新赋值
+
+    dateFormat != 'yyyy' && onMonthSelect(String(dateRef.value.month));
+}
+/**
+ * 月份选择时
+ * @param code 
+ */
+function onMonthSelect(code: string) {
+    dateRef.value.month = Number(code);
+    monthItemsRef.value = buildMonthScrollItems(dateRef.value.year, minDate, maxDate);
+    //  需要验证当前月份是否有效，无效则重新赋值
+
+    dateFormat != "yyyy-MM" && onDaySelect(String(dateRef.value.day));
+}
+/**
+ * 天数选择时
+ * @param code 
+ */
+function onDaySelect(code: string) {
+    dateRef.value.day = Number(code);
+    dayItemsRef.value = buildDayScrollItems(dateRef.value.year, dateRef.value.month, minDate, maxDate);
+    //  需要验证天数是否有效：如2月28,day不能是30日
+    {
+        const dayItem = dayItemsRef.value.find(item => item.code == code);
+        dayItem || (dateRef.value.day = Number(dayItemsRef.value[0].code));
+    }
+    //  需要验证当前天数是否有效，无效则重新赋值
+
+    console.log(dayItemsRef.value, dateRef.value)
+    dateFormat != "yyyy-MM-dd" && onHourSelect(String(dateRef.value.hour));
+}
+/**
+ * 小时选择时
+ * @param code 
+ */
+function onHourSelect(code: string) {
+    dateRef.value.hour = Number(code);
+    hourItemsRef.value = buildHourScrollItems(minTime, maxTime);
+    //  验证当前小时是否有效，无效则重新赋值
+
+    const needMinute = (timeFormat && timeFormat != "HH") || (dateFormat && dateFormat != "yyyy-MM-dd");
+    needMinute && onMinuteSelect(String(dateRef.value.minute));
+}
+/**
+ * 分钟选择时
+ * @param code 
+ */
+function onMinuteSelect(code: string) {
+    dateRef.value.minute = Number(code);
+    minuteItemsRef.value = buildMinuteScrollItems(dateRef.value.hour, minTime, maxTime);
+    //  验证当前分钟是否有效，无效则重新赋值
+
+    const needSecond = (timeFormat && timeFormat != "HH:mm") || (dateFormat && dateFormat != "yyyy-MM-dd HH:mm");
+    needSecond && onSecondSelect(String(dateRef.value.second));
+}
+/**
+ * 秒选择时
+ * @param code 
+ */
+function onSecondSelect(code: string) {
+    dateRef.value.second = Number(code);
+    secondItemsRef.value = buildSecondScrollItems(dateRef.value.hour, dateRef.value.minute, minTime, maxTime);
+    //  验证当前秒是否有效，无效则重新赋值
+
 }
 
 // *****************************************   👉  组件渲染    *****************************************
