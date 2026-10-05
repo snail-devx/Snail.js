@@ -36,7 +36,7 @@ const emits = defineEmits<ChangeEvents<string>>();
 const rootDom = useTemplateRef("root");
 const { mode } = useApp();
 const { watcher } = useReactive();
-const { showDate, showTime, showScroll } = usePicker();
+const { showDateTime } = usePicker();
 // 2、组件交互变量、常量
 const { timeFormat, dateFormat } = correctFormat(props.format);
 /** 选择的值 */
@@ -73,26 +73,15 @@ async function onShowPicker(evt: MouseEvent) {
     }
     //  弹窗选择日期时间
     const target = (evt.target as HTMLElement) || rootDom.value;
-    if (timeFormat != undefined) {
-        dialogScope = showTime(target, {
-            format: timeFormat as any,
-            value: valueRef.value,
-            min: props.minTime,
-            max: props.maxTime,
-            ...props.toolbar,
-        });
-    }
-    else {
-        dialogScope = showDate(target, {
-            format: dateFormat,
-            value: valueRef.value,
-            min: props.minDate,
-            max: props.maxDate,
-            minPickTime: props.minTime,
-            maxPickTime: props.maxTime,
-            ...props.toolbar
-        });
-    }
+    dialogScope = showDateTime(target, {
+        format: props.format,
+        value: valueRef.value,
+        minDate: props.minDate,
+        maxDate: props.maxDate,
+        minTime: props.minTime,
+        maxTime: props.maxTime,
+        toolbar: { ...props.toolbar }
+    });
     const value = await dialogScope;
     dialogScope = undefined;
     if (value !== undefined && value != valueRef.value) {

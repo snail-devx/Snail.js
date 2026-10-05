@@ -5,7 +5,19 @@ import { DisabledOptions, ReadonlyOptions } from "../../base/models/base-model";
  * 日期时间选择器 配置项
  * - 支持选择日期、时间、日期时间
  */
-export type DateTimePickerOptions = ReadonlyOptions & {
+export type DateTimePickerOptions = ReadonlyOptions & DateTimePickerBaseOptions & {
+    /**
+     * 显示风格
+     * - default    默认模式，文本框+图标，文本框填充满+边框
+     * - simple     简单模式，有值时才显示文本框，且无边框+不填充满
+     * @remarks     移动端时，此配置项无效，始终显示为 default 模式
+     */
+    display?: "default" | "simple";
+};
+/**
+ * 日期时间选择器 基础配置选项
+ */
+export type DateTimePickerBaseOptions = {
     /**
      * 日期时间格式
      * - 默认为日期格式 “yyyy-MM-dd"
@@ -33,7 +45,6 @@ export type DateTimePickerOptions = ReadonlyOptions & {
      * - `formart`为日期`DateFormat`格式时生效
      */
     maxDate?: string;
-
     /**
      * 时间最小值
      * - 格式为 "时:分:秒"
@@ -53,14 +64,7 @@ export type DateTimePickerOptions = ReadonlyOptions & {
      * 工具条配置
      */
     toolbar?: DateTimePickerToolbarOptions;
-    /**
-     * 显示风格
-     * - default    默认模式，文本框+图标，文本框填充满+边框
-     * - simple     简单模式，有值时才显示文本框，且无边框+不填充满
-     * @remarks     移动端时，此配置项无效，始终显示为 default 模式
-     */
-    display?: "default" | "simple";
-};
+}
 /**
  * 日期时间选择器 工具条配置项
  */

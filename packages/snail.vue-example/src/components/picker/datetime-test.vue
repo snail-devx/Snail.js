@@ -86,6 +86,94 @@
             <!-- 补充工具栏、最大值、最小值 -->
         </article>
     </Env>
+    <hr />
+    <!-- 移动端模式 -->
+    <Env :mode="'mobile'">
+        <article>
+            <h1>移动端：选择日期</h1>
+            <section>
+                默认情况
+                <DateTimePicker />
+            </section>
+            <section>
+                年：yyyy
+                <DateTimePicker :format="'yyyy'" />
+            </section>
+            <section>
+                年月：yyyy-MM
+                <DateTimePicker :format="'yyyy-MM'" />
+            </section>
+            <section>
+                年月日：yyyy-MM-dd
+                <DateTimePicker :format="'yyyy-MM-dd'" />
+            </section>
+            <section>
+                年月日时分：yyyy-MM-dd HH:mm
+                <DateTimePicker :format="'yyyy-MM-dd HH:mm'" />
+            </section>
+            <section>
+                年月日时分秒：yyyy-MM-dd HH:mm:ss
+                <DateTimePicker :format="'yyyy-MM-dd HH:mm:ss'" />
+            </section>
+            <!-- 只读情况 -->
+            <section>
+                年月：只读
+                <DateTimePicker :format="'yyyy-MM'" readonly />
+            </section>
+            <section>
+                年月日：只读
+                <DateTimePicker :format="'yyyy-MM-dd'" readonly />
+            </section>
+            <section>
+                年月日时分秒：只读
+                <DateTimePicker :format="'yyyy-MM-dd HH:mm:ss'" readonly />
+            </section>
+            <!-- 简化模式渲染 -->
+            <section>
+                年月：简化模式
+                <DateTimePicker :format="'yyyy-MM'" display="simple" />
+            </section>
+            <section>
+                年月日：简化模式
+                <DateTimePicker :format="'yyyy-MM-dd'" display="simple" />
+            </section>
+            <section>
+                年月日时分秒：简化模式
+                <DateTimePicker :format="'yyyy-MM-dd HH:mm:ss'" display="simple" s />
+            </section>
+            <!-- 补充工具栏、最大值、最小值 -->
+        </article>
+        <article>
+            <h1>移动端：选择时间</h1>
+            <section>
+                时分：HH-mm
+                <DateTimePicker :format="'HH:mm'" />
+            </section>
+            <section>
+                时分秒：HH-mm-ss
+                <DateTimePicker :format="'HH:mm:ss'" />
+            </section>
+            <!-- 只读 -->
+            <section>
+                时分：只读
+                <DateTimePicker :format="'HH:mm'" readonly />
+            </section>
+            <section>
+                时分秒：只读
+                <DateTimePicker :format="'HH:mm:ss'" readonly />
+            </section>
+            <!-- 简化模式 -->
+            <section>
+                时分：简化模式
+                <DateTimePicker :format="'HH:mm'" display="simple" />
+            </section>
+            <section>
+                时分秒：简化模式
+                <DateTimePicker :format="'HH:mm:ss'" display="simple" />
+            </section>
+            <!-- 补充工具栏、最大值、最小值 -->
+        </article>
+    </Env>
 </template>
 
 <script setup lang="ts">

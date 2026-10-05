@@ -1,4 +1,4 @@
-<!-- 日期时间 的滚动选择器
+<!-- 日期时间 移动端选择器
     1、支持选择日期时间，日期，时间 三种模式，通过 format区分
   -->
 <template>
@@ -7,7 +7,9 @@
         <Flex class="picker-header" :cross="'center'">
             <span class="pick-button" v-text="'取消'" />
             <span class="pick-button" v-text="'清空'" />
-            <span class="pick-title ellipsis" v-text="title" />
+            <span class="pick-title ellipsis" v-text="timeFormat == undefined
+                ? (dateFormat == 'yyyy-MM-dd HH:mm' || dateFormat == 'yyyy-MM-dd HH:mm:ss' ? '选择让日期时间' : '选择日期')
+                : '选择时间'" />
             <span class="pick-button" v-text="'确定'" />
         </Flex>
         <!-- 选择内容区域 年月日 时分秒 -->
@@ -18,17 +20,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, } from "vue";
 import Flex from "../../container/flex.vue";
+import { DateTimePickerBaseOptions } from "../models/datetime-model.js";
 import ScrollPicker from "../scroll-picker.vue";
-import { TitleOptions } from "../../base/models/base-model.js";
+import { correctFormat } from "../utils/datetime-util.js";
 
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-defineProps<TitleOptions>();
-
-
+const props = defineProps<DateTimePickerBaseOptions>();
+const { dateFormat, timeFormat } = correctFormat(props.format);
 //  2、组件交互变量、常量
 
 

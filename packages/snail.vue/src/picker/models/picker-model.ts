@@ -3,10 +3,10 @@
  */
 
 import { IAsyncScope } from "snail.core";
-import { DatePickerOptions, TimePickerOptions } from "./datetime-model";
+import { DialogOptions, FollowPositionOptions } from "../../popup/manager";
 import { IPopupManager } from "../../popup/models/manager-model";
-import { FollowOptions, FollowPositionOptions, DialogOptions } from "../../popup/manager";
-import { ScrollPickerOptions, ScrollPickerPopupOptions, ScrollPickItem } from "./scroll-piker-model";
+import { DatePickerOptions, DateTimePickerBaseOptions, TimePickerOptions } from "./datetime-model";
+import { ScrollPickerOptions, ScrollPickerPopupOptions } from "./scroll-piker-model";
 
 /**
  * 接口：选择器管理器
@@ -29,6 +29,17 @@ export interface IPickerManager {
      */
     showTime(target: HTMLElement, options?: TimePickerOptions, popupOptions?: PickerPopupOptions): IAsyncScope<string>;
 
+    /**
+     * 显示【日期时间】选择器
+     * - 根据配置的format，自动选择【日期】或【时间】选择器
+     * - 自动识别当前环境是桌面客户端还是移动端,进行区分处理
+     * - - 支持桌面端，选择时出follow弹窗，在当前位置跟随选择
+     * - - 支持移动端，选择时出dialog弹窗，在底部滚动选择
+     * @param target 哪个元素触发，基于此元素计算位置
+     * @param options 选择控件配置选项
+     * @returns 一部人物,可销毁选择器;可接收选择器的选择结果
+     */
+    showDateTime(target: HTMLElement, options?: DateTimePickerBaseOptions): IAsyncScope<string>;
     /**
      * 显示【滚动】选择器
      * - 通过滚动选择数据项；默认强制在底部弹出
