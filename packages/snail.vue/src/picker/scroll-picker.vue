@@ -25,12 +25,15 @@
                 <span class="layer-selection" />
                 <span class="layer-bottom" />
             </div>
+            <!-- 后缀显示 -->
+            <span v-if="isStringNotEmpty(suffix)" class="pick-suffix"
+                :style="{ left: `calc(50% + 10px + ${correctNumber(suffixOffset, 0)}px)` }" v-text="suffix" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { useTimer } from "snail.core";
+import { correctNumber, isStringNotEmpty, useTimer } from "snail.core";
 import { ElasticDetail, IElasticManager, useElastic, useObserver } from "snail.view";
 import { onMounted, ref, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import { DialogHandle } from "../popup/models/dialog-model";
@@ -230,6 +233,15 @@ onMounted(async () => {
                 background: linear-gradient(0deg, #fff 10%, rgba(255, 255, 255, .6));
                 border-top: 1px solid rgba(0, 0, 0, 0.1);
             }
+        }
+
+        // 后缀显示
+        >.pick-suffix {
+            position: absolute;
+            line-height: 32px;
+            top: calc(50% - 16px);
+            left: calc(50% + 10px);
+            color: #007bff;
         }
     }
 }

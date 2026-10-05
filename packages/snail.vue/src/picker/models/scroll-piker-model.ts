@@ -3,9 +3,6 @@
  */
 
 import { TitleOptions } from "../../base/models/base-model";
-import { DialogHandle } from "../../popup/models/dialog-model";
-import { PopupStatusOptions } from "../../popup/models/popup-model";
-import { PickerExtend } from "./picker-model";
 
 /**
  * 滚动选择器 组件配置选项
@@ -20,6 +17,17 @@ export type ScrollPickerOptions = {
      * - 选择项的`code`值
      */
     value?: string;
+
+    /**
+     * 选中项的后缀值
+     * - 如年月日选择，在选中值后面追加 年 月 日
+     */
+    suffix?: string;
+    /** 
+     * 选中项的后缀值偏移量
+     * - 解决选项文本较多的时候，后缀和选项文本重合问题
+     */
+    suffixOffset?: number;
 }
 /**
  * 滚动选择器 组件弹窗时配置选项

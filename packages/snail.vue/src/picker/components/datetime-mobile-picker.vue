@@ -15,35 +15,23 @@
         <!-- 选择内容区域 年月日 时分秒 -->
         <div class="main-area">
             <!-- 年份选择 -->
-            <div v-if="dateFormat">
-                <ScrollPicker :items="yearItemsRef" :value="String(dateRef.year)" @select="onYearSelect" />
-                <span class="year">年</span>
-            </div>
+            <ScrollPicker v-if="dateFormat" :items="yearItemsRef" :value="String(dateRef.year)" :suffix="'年'"
+                :suffix-offset="10" @select="onYearSelect" />
             <!-- 月份选择 -->
-            <div v-if="dateFormat && dateFormat != 'yyyy'">
-                <ScrollPicker :items="monthItemsRef" :value="String(dateRef.month)" @select="onMonthSelect" />
-                <span>月</span>
-            </div>
+            <ScrollPicker v-if="dateFormat && dateFormat != 'yyyy'" :items="monthItemsRef"
+                :value="String(dateRef.month)" :suffix="'月'" @select="onMonthSelect" />
             <!-- 天数选择 -->
-            <div v-if="dateFormat && dateFormat.indexOf('-dd') != -1">
-                <ScrollPicker :items="dayItemsRef" :value="String(dateRef.day)" @select="onDaySelect" />
-                <span>日</span>
-            </div>
+            <ScrollPicker v-if="dateFormat && dateFormat.indexOf('-dd') != -1" :items="dayItemsRef"
+                :value="String(dateRef.day)" :suffix="'日'" @select="onDaySelect" />
             <!-- 时钟选择 -->
-            <div v-if="timeFormat || (dateFormat && dateFormat.indexOf(' HH') != -1)">
-                <ScrollPicker :items="hourItemsRef" :value="String(dateRef.hour)" @select="onHourSelect" />
-                <span>时</span>
-            </div>
+            <ScrollPicker v-if="timeFormat || (dateFormat && dateFormat.indexOf(' HH') != -1)" :items="hourItemsRef"
+                :value="String(dateRef.hour)" :suffix="'时'" @select="onHourSelect" />
             <!-- 分钟选择 -->
-            <div v-if="(timeFormat && timeFormat != 'HH') || (dateFormat && dateFormat.indexOf(':mm') != -1)">
-                <ScrollPicker :items="minuteItemsRef" :value="String(dateRef.minute)" @select="onMinuteSelect" />
-                <span>分</span>
-            </div>
+            <ScrollPicker v-if="(timeFormat && timeFormat != 'HH') || (dateFormat && dateFormat.indexOf(':mm') != -1)"
+                :items="minuteItemsRef" :value="String(dateRef.minute)" :suffix="'分'" @select="onMinuteSelect" />
             <!-- 秒钟选择 -->
-            <div v-if="(timeFormat == 'HH:mm:ss') || (dateFormat == 'yyyy-MM-dd HH:mm:ss')">
-                <ScrollPicker :items="secondItemsRef" :value="String(dateRef.second)" @select="onSecondSelect" />
-                <span>秒</span>
-            </div>
+            <ScrollPicker v-if="(timeFormat == 'HH:mm:ss') || (dateFormat == 'yyyy-MM-dd HH:mm:ss')"
+                :items="secondItemsRef" :value="String(dateRef.second)" :suffix="'秒'" @select="onSecondSelect" />
         </div>
     </div>
 </template>
@@ -101,6 +89,10 @@ function onConfirmSelect() {
  */
 function onYearSelect(code: string) {
     dateRef.value.year = Number(code);
+    //  若年份无值，则先构建一下，兼容初始化的情况
+    if (yearItemsRef.value == undefined || yearItemsRef.value.length == 0) {
+        yearItemsRef.value = buildYearScrollItems(dateRef.value.year, minDate, maxDate);
+    }
     //  需要判断当前年份是否有效，无效则重新赋值
 
     dateFormat != 'yyyy' && onMonthSelect(String(dateRef.value.month));
@@ -179,12 +171,7 @@ function onSecondSelect(code: string) {
     dateRef.value.minute = 12;
     dateRef.value.second = 12;
 
-    yearItemsRef.value = buildYearScrollItems(dateRef.value.year, minDate, maxDate);
-    monthItemsRef.value = buildMonthScrollItems(dateRef.value.year, minDate, maxDate);
-    dayItemsRef.value = buildDayScrollItems(dateRef.value.year, dateRef.value.month, minDate, maxDate);
-    hourItemsRef.value = buildHourScrollItems(minTime, maxTime);
-    minuteItemsRef.value = buildMinuteScrollItems(dateRef.value.hour, minTime, maxTime);
-    secondItemsRef.value = buildSecondScrollItems(dateRef.value.hour, dateRef.value.minute, minTime, maxTime);
+    onYearSelect(String(dateRef.value.year));
 }
 //  2、生命周期响应
 
@@ -239,29 +226,9 @@ function onSecondSelect(code: string) {
     >.main-area {
         background-color: white;
         position: relative;
+        height: 320px;
         display: flex;
         align-items: stretch;
-
-        >div {
-            height: 230px;
-            position: relative;
-            flex: 1;
-            display: flex;
-            align-items: center;
-
-            // 固定汉字：年月日时分秒,年份因为是4位数，偏倚多一些
-            >span {
-                position: absolute;
-                line-height: 32px;
-                top: calc(50% - 16px);
-                left: calc(50% + 10px);
-                color: #007bff;
-
-                &.year {
-                    left: calc(50% + 20px);
-                }
-            }
-        }
     }
 }
 </style>
