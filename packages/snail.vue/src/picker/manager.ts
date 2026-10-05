@@ -1,11 +1,11 @@
 import { correctNumber, IAsyncScope, IScope, mountScope, ScopeOptions } from "snail.core";
-import { IPickerManager, PickerExtend, PickerPopupOptions } from "./models/picker-model";
-import { TimePickerOptions, DatePickerOptions } from "./models/datetime-model";
-import { PropsType } from "../container/models/component-model";
-import { FollowOptions, FollowPositionOptions, usePopup } from "../popup/manager";
+import { Component } from "vue";
+import { useApp } from "../base/utils/app-util";
+import { FollowPositionOptions, usePopup } from "../popup/manager";
 import DatePopup from "./components/date-popup.vue";
 import TimePopup from "./components/time-popup.vue";
-import { Component } from "vue";
+import { DatePickerOptions, TimePickerOptions } from "./models/datetime-model";
+import { IPickerManager, PickerExtend, PickerPopupOptions } from "./models/picker-model";
 import { ScrollPickerOptions, ScrollPickerPopupOptions } from "./models/scroll-piker-model";
 import ScrollPicker from "./scroll-picker.vue";
 
@@ -18,6 +18,9 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
     const global = options ? options.global : false;
     /** 弹窗管理器 */
     const popup = usePopup({ global });
+    /** 应用配置：PC、还是移动端 */
+    const { mode } = useApp();
+
 
     //#region *************************************实现接口：IPickerManager接口方法*************************************
     /**

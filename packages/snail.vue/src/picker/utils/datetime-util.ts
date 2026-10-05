@@ -2,8 +2,24 @@
  * 日期/时间 选择器助手方法
  */
 
-import { DateFormat, DateValue, formatDateValue, getDateByValue, getDateValue, getTimeNumber, parseDate, TimeValue } from "snail.core";
-import { DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, TimePickerHourItem, TimePickerMinuteItem, TimePickerSecondItem } from "../models/datetime-model";
+import { correctDateFormat, DateFormat, DateValue, formatDateValue, getDateByValue, getDateValue, getTimeNumber, parseDate, TimeFormat, TimeValue } from "snail.core";
+import { DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, DatetimeFormatCorrectResult, DateTimePickerOptions, TimePickerHourItem, TimePickerMinuteItem, TimePickerSecondItem } from "../models/datetime-model";
+
+/**
+ * 校正日期时间格式
+ * @param format 
+ * @returns 若为日期格式，则 timeFormat 为undefined；若为时间格式，则 dateFormat 为undefined
+ */
+export function correctFormat(format: DateTimePickerOptions["format"]): DatetimeFormatCorrectResult {
+    /** 先验证是否是有效的时间格式，不是时间格式，再校正日期格式 */
+    const timeFormat: TimeFormat = format == "HH:mm" || format == "HH:mm:ss" ? format : undefined;
+    const dateFormat: DateFormat = timeFormat == undefined
+        ? correctDateFormat(format as any, "yyyy-MM-dd")
+        : undefined;
+    return { dateFormat, timeFormat }
+}
+
+
 
 //#region *************************************        日期选择器相关        ***********************************
 /**

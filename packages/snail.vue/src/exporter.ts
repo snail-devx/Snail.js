@@ -94,6 +94,7 @@ export * from "./picker/models/picker-model";
 export * from "./picker/models/scroll-piker-model";
 //  组件导出
 import DatePicker from "./picker/date-picker.vue";
+import DateTimePicker from "./picker/datetime-picker.vue";
 import ScrollPicker from "./picker/scroll-picker.vue";
 import TimePicker from "./picker/time-picker.vue";
 
@@ -126,7 +127,7 @@ export const components = {
     //  other   下的组件
     Action, Card, FieldPanel, FlashNumber,
     //  picker    下的组件
-    DatePicker, ScrollPicker, TimePicker,
+    DatePicker, DateTimePicker, ScrollPicker, TimePicker,
     //  prompt 下的组件
     DragVerify, Empty, Loading
 };

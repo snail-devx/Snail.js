@@ -1,7 +1,89 @@
-import { DateFormat, DateValue, IAsyncScope, TimeValue } from "snail.core";
-import { DisabledOptions, ValueOptions } from "../../base/models/base-model";
-import { FollowOptions } from "../../popup/models/follow-model";
-import { PickerPopupOptions } from "./picker-model";
+import { DateFormat, DateValue, TimeFormat, TimeValue } from "snail.core";
+import { DisabledOptions, ReadonlyOptions } from "../../base/models/base-model";
+
+/**
+ * 日期时间选择器 配置项
+ * - 支持选择日期、时间、日期时间
+ */
+export type DateTimePickerOptions = ReadonlyOptions & {
+    /**
+     * 日期时间格式
+     * - 默认为日期格式 “yyyy-MM-dd"
+     * - 不支持 “HH” 格式,容易和“yyyy”冲突，后期看情况考虑
+     */
+    format?: DateFormat | "HH:mm" | "HH:mm:ss";
+    /**
+     * 已选日期时间值
+     * - 传入和`formart`格式对应值
+     * - 传入值和格式不对应时，会忽略
+     */
+    value?: string;
+
+    /**
+     * 日期最小值
+     * - 格式为 "年-月-日"
+     * - 选择年月日时，早于此值的年月日不可选
+     * - `formart`为日期`DateFormat`格式时生效
+     */
+    minDate?: string;
+    /**
+     * 日期最大值
+     * - 格式为 "年-月-日"
+     * - 选择年月日时，晚于此值的年月日不可选
+     * - `formart`为日期`DateFormat`格式时生效
+     */
+    maxDate?: string;
+
+    /**
+     * 时间最小值
+     * - 格式为 "时:分:秒"
+     * - 选择时分秒时，早于此值的时间不可选
+     * - `formart`为时间`TimeFormat`格式、或者`DateFormat`包含时间部分时生效
+     */
+    minTime?: string;
+    /**
+     * 时间最大值
+     * - 格式为 "时:分:秒"
+     * - 选择时分秒时，晚于此值的时间不可选
+     * - `formart`为时间`TimeFormat`格式、或者`DateFormat`包含时间部分时生效
+     */
+    maxTime?: string;
+
+    /**
+     * 工具条配置
+     */
+    toolbar?: DateTimePickerToolbarOptions;
+    /**
+     * 显示风格
+     * - default    默认模式，文本框+图标，文本框填充满+边框
+     * - simple     简单模式，有值时才显示文本框，且无边框+不填充满
+     * @remarks     移动端时，此配置项无效，始终显示为 default 模式
+     */
+    display?: "default" | "simple";
+};
+/**
+ * 日期时间选择器 工具条配置项
+ */
+export type DateTimePickerToolbarOptions = {
+    /**
+     * 禁用【工具条】
+     * - 为true则不显示【确定】、【现在】等按钮的工具条区域
+     * - 移动端时，此配置项无效，工具条区域始终显示
+     */
+    disabled?: boolean;
+    /**
+     * 禁用【现在】按钮
+     * - 为true时不显示【现在】按钮
+     */
+    nowDisabled?: boolean;
+    /**
+     * 禁用【清空】按钮
+     * - 为true时不显示【清空】按钮
+     */
+    clearDisabled?: boolean;
+}
+
+
 
 /**
  * 日期时间的功能禁用配置选项
@@ -10,6 +92,7 @@ export type DatetimeDisabledOptions = {
     /**
      * 禁用【工具条】
      * - 为true则不显示【确定】、【现在】等按钮的工具条区域
+     * - 移动端时，此配置项无效，工具条区域始终显示
      */
     toolbarDisabled?: boolean;
     /**
@@ -23,21 +106,39 @@ export type DatetimeDisabledOptions = {
      */
     clearDisabled?: boolean;
 }
+/**
+ * 日期时间格式校正结果
+ * - 基于组件传入的 `formart` 校正
+ */
+export type DatetimeFormatCorrectResult = {
+    /** 
+     * 日期格式
+     * - 传入格式为 TimeFormat 时，此值为undefined
+     * - 传入无效格式，或者空时，此值为 yyyy-MM-dd
+     */
+    dateFormat: DateFormat | undefined;
+
+    /** 
+     * 时间格式
+     * - 传入格式为 DateFormat 时，此值为undefined
+     */
+    timeFormat: TimeFormat | undefined;
+}
 
 /**
  * 日期选择器 配置选项
  */
 export type DatePickerOptions = {
     /**
-     * 已选日期值
-     * -格式为 "年-月-日 时:分:秒"
-     */
-    value?: string;
-    /**
      * 日期格式
      * - 默认 “yyyy-MM-dd"
      */
     format?: DateFormat;
+    /**
+     * 已选日期值
+     * -格式为 "年-月-日 时:分:秒"
+     */
+    value?: string;
     /**
      * 渲染模式
      * - default    默认模式，文本框+图标，文本框填充满+边框
@@ -76,14 +177,14 @@ export type DatePickerOptions = {
  */
 export type TimePickerOptions = {
     /**
+     * 时间格式
+     */
+    format?: "HH:mm:ss" | "HH:mm";
+    /**
      * 已选值
      * - 格式为 “时:分:秒"
      */
     value?: string;
-    /**
-     * 时间格式
-     */
-    format?: "HH:mm:ss" | "HH:mm";
     /**
      * 渲染模式
      * - default    默认模式，文本框+图标，文本框填充满+边框
