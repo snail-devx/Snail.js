@@ -41,14 +41,14 @@
 </template>
 
 <script setup lang="ts">
-import { TimeValue, parseTimeValue, getTimeValue, padStart, TimeFormat, formatTimeValue } from "snail.core";
-import { onMounted, ref, ShallowRef, shallowRef, useTemplateRef, nextTick, Ref, computed } from "vue";
-import { FollowExtend, FollowHandle } from "../../popup/manager";
-import { DatetimePickerEvents, TimePickerHourItem, TimePickerMinuteItem, TimePickerOptions, TimePickerSecondItem } from "../models/datetime-model";
-import Motion from "../../container/motion.vue";
-import { MOTION } from "../../container/utils/motion-util";
+import { formatTimeValue, getTimeValue, padStart, parseTimeValue, TimeValue } from "snail.core";
+import { computed, nextTick, onMounted, ref, Ref, ShallowRef, shallowRef, useTemplateRef } from "vue";
 import Button from "../../base/button.vue";
 import Layout from "../../container/layout.vue";
+import Motion from "../../container/motion.vue";
+import { MOTION } from "../../container/utils/motion-util";
+import { FollowExtend, FollowHandle } from "../../popup/manager";
+import { DatetimePickerEvents, TimePickerHourItem, TimePickerMinuteItem, TimePickerOptions, TimePickerSecondItem } from "../models/datetime-model";
 import { PickerExtend } from "../models/picker-model";
 import { buildHourItems, buildMinuteItems, buildSecondItems } from "../utils/datetime-util";
 
@@ -142,15 +142,17 @@ function onMinuteClick(item: TimePickerMinuteItem, dbClick?: true) {
      * 2、其他情况，构建 秒 选项
      */
     if (item.disabled != true) {
-        timeRef.value.minute = item.minute;
         if (format == "HH:mm") {
+            timeRef.value.minute = item.minute;
             // const value = formatTimeValue(item, "HH:mm");
             // emits("confirm", value);
             // props.inPopup && props.closePopup(value);
             dbClick && onConfirm();
         }
         else if (timeRef.value.minute != item.minute) {
+            timeRef.value.minute = item.minute;
             secondItems.value = buildSecondItems(item, min, max);
+            console.log(secondItems.value);
         }
     }
 }
