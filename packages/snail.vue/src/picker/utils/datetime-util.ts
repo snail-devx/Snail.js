@@ -19,7 +19,130 @@ export function correctFormat(format: DateTimePickerOptions["format"]): Datetime
     return { dateFormat, timeFormat }
 }
 
-
+/**
+ * 验证年份的有效性
+ * @param year 
+ * @param min 
+ * @param max 
+ * @returns 有效返回true，否则false
+ */
+export function validateYear(year: number, min: DateValue, max: DateValue): boolean {
+    const lessMin = min && min.year != undefined && year < min.year;
+    const moreMax = max && max.year != undefined && year > max.year;
+    return lessMin != true && moreMax != true;
+}
+/**
+ * 验证月份的有效性，需结合年份一起验证
+ * @param year 
+ * @param month 
+ * @param min 
+ * @param max 
+ * @returns 有效返回true，否则false
+ */
+export function validateMonth(year: number, month: number, min: DateValue, max: DateValue): boolean {
+    //  年月转换成Date格式，进行大小比较
+    if (min != undefined || max != undefined) {
+        const date = getDateByValue({ year, month });
+        // 最小值
+        const minDate = min ? parseDate(formatDateValue(min, "yyyy-MM"), "min") : undefined;
+        if (minDate != undefined && date < minDate) {
+            return false
+        }
+        // 最大值
+        const maxDate = max ? parseDate(formatDateValue(max, "yyyy-MM"), "max") : undefined;
+        if (maxDate != undefined && date > maxDate) {
+            return false;
+        }
+    }
+    return true;
+}
+/**
+ * 验证天数的有效性
+ * @param year 
+ * @param month 
+ * @param day 
+ * @param min 
+ * @param max 
+ * @returns 有效返回true，否则false
+ */
+export function validateDay(year: number, month: number, day: number, min: DateValue, max: DateValue): boolean {
+    //  转换成Date格式，进行大小比较
+    if (min != undefined || max != undefined) {
+        const date = getDateByValue({ year, month, day });
+        //  最小值
+        const minDate = min ? parseDate(formatDateValue(min, "yyyy-MM-dd"), "min") : undefined;
+        if (minDate != undefined && date < minDate) {
+            return false
+        }
+        //  最大值
+        const maxDate = max ? parseDate(formatDateValue(max, "yyyy-MM-dd"), "max") : undefined;
+        if (maxDate != undefined && date > maxDate) {
+            return false;
+        }
+    }
+    return true;
+}
+/**
+ * 验证小时的有效性
+ * @param hour 
+ * @param min 
+ * @param max 
+ * @returns 有效返回true，否则false
+ */
+export function validateHour(hour: number, min: TimeValue, max: TimeValue): boolean {
+    const lessMin = min && min.hour != undefined && hour < min.hour;
+    const moreMax = max && max.hour != undefined && hour > max.hour;
+    return lessMin != true && moreMax != true;
+}
+/**
+ * 验证分钟的有效性
+ * @param hour 
+ * @param minute 
+ * @param min 
+ * @param max 
+ * @returns 有效返回true，否则false
+ */
+export function validateMinute(hour: number, minute: number, min: TimeValue, max: TimeValue): boolean {
+    if (min != undefined || max != undefined) {
+        const time = getTimeNumber(hour, minute, 0);
+        // 最小值
+        const minTime = min ? getTimeNumber(min.hour, min.minute, 0) : undefined;
+        if (minTime != undefined && time < minTime) {
+            return false;
+        }
+        // 最大值
+        const maxTime = max ? getTimeNumber(max.hour, max.minute, 0) : undefined;
+        if (maxTime != undefined && time > maxTime) {
+            return false;
+        }
+    }
+    return true;
+}
+/**
+ * 验证秒钟的有效性
+ * @param hour 
+ * @param minute 
+ * @param second 
+ * @param min 
+ * @param max 
+ * @returns 有效返回true，否则false
+ */
+export function validateSecond(hour: number, minute: number, second: number, min: TimeValue, max: TimeValue): boolean {
+    if (min != undefined || max != undefined) {
+        const time = getTimeNumber(hour, minute, second);
+        // 最小值
+        const minTime = min ? getTimeNumber(min.hour, min.minute, min.second) : undefined;
+        if (minTime != undefined && time < minTime) {
+            return false;
+        }
+        // 最大值
+        const maxTime = max ? getTimeNumber(max.hour, max.minute, max.second) : undefined;
+        if (maxTime != undefined && time > maxTime) {
+            return false;
+        }
+    }
+    return true;
+}
 
 //#region *************************************        日期选择器相关        ***********************************
 /**
@@ -53,8 +176,8 @@ export function electDateValue(min: DateValue, max: DateValue): DateValue {
 /**
  * 基于年构建年份选择项目
  * @param year 基准年
- * @param min 日期最大值
- * @param max 日期最小值
+ * @param min 日期最小值
+ * @param max 日期最大值
  * @returns 年份选项（24项目）
  */
 export function buildYearItems(year: number, min: DateValue, max: DateValue): DatePickerYearItem[] {
@@ -78,8 +201,8 @@ export function buildYearItems(year: number, min: DateValue, max: DateValue): Da
 /**
  * 构建月份选择项目
  * @param year 年选项
- * @param min 日期最大值
- * @param max 日期最小值
+ * @param min 日期最小值
+ * @param max 日期最大值
  * @returns 月份选择项目集合
  */
 export function buildMonthItems(yearItem: DatePickerYearItem, min: DateValue, max: DateValue): DatePickerMonthItem[] {
@@ -103,8 +226,8 @@ export function buildMonthItems(yearItem: DatePickerYearItem, min: DateValue, ma
 /**
  * 构建天选择项目
  * @param monthItem 月份选择项
- * @param min 日期最大值
- * @param max 日期最小值
+ * @param min 日期最小值
+ * @param max 日期最大值
  * @returns 天选择项集合
  */
 export function buildDayItems(monthItem: DatePickerMonthItem, min: DateValue, max: DateValue): DatePickerDayItem[] {

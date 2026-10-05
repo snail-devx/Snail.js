@@ -21,9 +21,9 @@
             </div>
             <!-- 选择区域：上面留白、中间选中结果、下面留白 -->
             <div class="pick-layer">
-                <span class="layer-top"></span>
-                <span class="layer-selection"></span>
-                <span class="layer-bottom"></span>
+                <span class="layer-top" />
+                <span class="layer-selection" />
+                <span class="layer-bottom" />
             </div>
         </div>
     </div>
@@ -31,12 +31,12 @@
 
 <script setup lang="ts">
 import { useTimer } from "snail.core";
-import { ref, onMounted, useTemplateRef, shallowRef, ShallowRef } from "vue";
-import { ScrollPickerEvents, ScrollPickerOptions, ScrollPickerPopupOptions } from "./models/scroll-piker-model";
 import { ElasticDetail, IElasticManager, useElastic, useObserver } from "snail.view";
+import { onMounted, ref, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import { DialogHandle } from "../popup/models/dialog-model";
 import { PopupStatusOptions } from "../popup/models/popup-model";
 import { PickerExtend } from "./models/picker-model";
+import { ScrollPickerEvents, ScrollPickerOptions, ScrollPickerPopupOptions } from "./models/scroll-piker-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
