@@ -33,9 +33,10 @@
 </template>
 
 <script setup lang="ts">
-import { correctNumber, isStringNotEmpty, useTimer } from "snail.core";
+import { correctNumber, isArrayNotEmpty, isStringNotEmpty, useTimer } from "snail.core";
 import { ElasticDetail, IElasticManager, useElastic, useObserver } from "snail.view";
-import { onMounted, ref, shallowRef, ShallowRef, useTemplateRef } from "vue";
+import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
+import { useReactive } from "../base/reactive";
 import { DialogHandle } from "../popup/models/dialog-model";
 import { PopupStatusOptions } from "../popup/models/popup-model";
 import { PickerExtend } from "./models/picker-model";
@@ -47,6 +48,7 @@ const props = defineProps<ScrollPickerOptions & ScrollPickerPopupOptions & Parti
 const emits = defineEmits<ScrollPickerEvents>();
 const { onSize } = useObserver();
 const { onTimeout } = useTimer();
+const { watcher } = useReactive();
 /** 选择项根容器 */
 const pickItemsDom = useTemplateRef("pick-items");
 /** 弹性滚动实例引用 */
@@ -55,13 +57,22 @@ const elasticRef: ShallowRef<IElasticManager> = shallowRef();
 /** 每个选项的高度*/
 const itemHeight = 32;
 /** 当前选中项的值 */
-const valueRef = ref(props.value ?? props.items[0]?.code ?? "");
+const valueRef: ShallowRef<string> = shallowRef<string>();
 /** 备份值 */
 let backValue: string = undefined;
 
-//  需要支持监听value值变化和items变化，实现响应式
-
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * props属性变化时
+ */
+function onPropsChange() {
+    //  基于外部传入值，进行选中滚动处理；加点延迟，避免样式问题影响
+    let index = props.items.findIndex(item => item.code == props.value);
+    index == -1 && (index = 0);
+    onTimeout(() => elasticRef.value.scrollTo(undefined, -itemHeight * index), 50);
+    valueRef.value = isArrayNotEmpty(props.items) ? props.items[index].code : undefined;
+}
+
 /**
  * 选举选中项
  * - 若选中项为禁用，则继续往下推荐
@@ -109,9 +120,10 @@ onMounted(async () => {
     });
     //  使用弹性滚动 进行选项选择
     elasticRef.value = useElastic(pickItemsDom.value, { elastic: "y", distance: 100, }, onElastic);
-    //  基于外部传入值，进行选中滚动处理；加点延迟，避免样式问题影响
-    const index = props.items.findIndex(item => item.code == valueRef.value);
-    index != -1 && onTimeout(() => elasticRef.value.scrollTo(undefined, -itemHeight * index), 50);
+    //  监听值改变，进行滚动响应处理
+    watcher(() => props.value, newValue => newValue != valueRef.value && onPropsChange());
+    watcher(() => props.items, onPropsChange);
+    onPropsChange();
 });
 </script>
 
