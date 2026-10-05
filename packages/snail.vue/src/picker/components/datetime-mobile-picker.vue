@@ -16,29 +16,29 @@
         <!-- 选择内容区域 年月日 时分秒 -->
         <div class="main-area">
             <!-- 年份选择 -->
-            <ScrollPicker v-if="dateFormat" :items="yearItemsRef" :value="String(dateRef.year)" :suffix="'年'"
-                :suffix-offset="10" @select="onYearSelect" />
+            <ScrollPicker v-if="dateFormat != undefined" :key="'year-picker'" :items="yearItemsRef"
+                :value="String(dateRef.year)" :suffix="'年'" :suffix-offset="10" @select="onYearSelect" />
             <!-- 月份选择 -->
-            <ScrollPicker v-if="dateFormat && dateFormat != 'yyyy'" :items="monthItemsRef"
-                :value="String(dateRef.month)" :suffix="'月'" @select="onMonthSelect" />
+            <ScrollPicker v-if="dateFormat != undefined && dateFormat != 'yyyy'" :key="'month-picker'"
+                :items="monthItemsRef" :value="String(dateRef.month)" :suffix="'月'" @select="onMonthSelect" />
             <!-- 天数选择 -->
-            <ScrollPicker v-if="dateFormat && dateFormat.indexOf('-dd') != -1" :items="dayItemsRef"
-                :value="String(dateRef.day)" :suffix="'日'" @select="onDaySelect" />
+            <ScrollPicker v-if="dateFormat != undefined && dateFormat.indexOf('-dd') != -1" :key="'day-picker'"
+                :items="dayItemsRef" :value="String(dateRef.day)" :suffix="'日'" @select="onDaySelect" />
             <!-- 时钟选择 -->
-            <ScrollPicker v-if="timeFormat || (dateFormat && dateFormat.indexOf(' HH') != -1)" :items="hourItemsRef"
-                :value="String(dateRef.hour)" :suffix="'时'" @select="onHourSelect" />
+            <ScrollPicker v-if="timeFormat || (dateFormat && dateFormat.indexOf(' HH') != -1)" :key="'hour-picker'"
+                :items="hourItemsRef" :value="String(dateRef.hour)" :suffix="'时'" @select="onHourSelect" />
             <!-- 分钟选择 timeFormat != 'HH' 暂时不验证 仅可选择小时的情况，不支持 -->
-            <ScrollPicker v-if="(timeFormat) || (dateFormat && dateFormat.indexOf(':mm') != -1)" :items="minuteItemsRef"
-                :value="String(dateRef.minute)" :suffix="'分'" @select="onMinuteSelect" />
+            <ScrollPicker v-if="timeFormat || (dateFormat && dateFormat.indexOf(':mm') != -1)" :key="'minute-picker'"
+                :items="minuteItemsRef" :value="String(dateRef.minute)" :suffix="'分'" @select="onMinuteSelect" />
             <!-- 秒钟选择 -->
-            <ScrollPicker v-if="(timeFormat == 'HH:mm:ss') || (dateFormat == 'yyyy-MM-dd HH:mm:ss')"
+            <ScrollPicker v-if="timeFormat == 'HH:mm:ss' || dateFormat == 'yyyy-MM-dd HH:mm:ss'" :key="'second-picker'"
                 :items="secondItemsRef" :value="String(dateRef.second)" :suffix="'秒'" @select="onSecondSelect" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { correctString, DateValue, formatDateValue, formatTimeValue, getDateValue, getTimeValue, isValidTime, parseDateValue, parseTimeValue } from "snail.core";
+import { correctString, DateValue, formatDateValue, formatTimeValue, getDateValue, getFromArray, getTimeValue, isValidTime, parseDateValue, parseTimeValue } from "snail.core";
 import { Ref, ref, shallowRef, ShallowRef } from "vue";
 import { usePopup } from "../../popup/manager";
 import { DialogHandle } from "../../popup/models/dialog-model";
@@ -134,14 +134,13 @@ function onMonthSelect(code: string) {
 function onDaySelect(code: string) {
     dateRef.value.day = Number(code);
     dayItemsRef.value = buildDayScrollItems(dateRef.value.year, dateRef.value.month, minDate, maxDate);
-    //  需要验证天数是否有效：如2月28,day不能是30日
+    //  需要验证天数是否有效：无效则取最后一天；如2月28,day不能是30日
     {
         const dayItem = dayItemsRef.value.find(item => item.code == code);
-        dayItem || (dateRef.value.day = Number(dayItemsRef.value[0].code));
+        dayItem || (dateRef.value.day = Number(getFromArray(dayItemsRef.value, -1).code));
     }
     //  需要验证当前天数是否有效，无效则重新赋值
 
-    console.log(dayItemsRef.value, dateRef.value)
     dateFormat != "yyyy-MM-dd" && onHourSelect(String(dateRef.value.hour));
 }
 /**
