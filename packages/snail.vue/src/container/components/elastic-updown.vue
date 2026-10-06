@@ -48,9 +48,9 @@ const { watcher } = useReactive();
 const { target } = props;
 //  2、组件交互变量、常量
 /** 下拉刷新状态：开始态、等待释放生效、刷新中 */
-const refreshRef: ShallowRef<"initial" | "release" | "running"> = shallowRef('initial');
+const refreshRef: ShallowRef<"initial" | "release" | "running"> = shallowRef();
 /** 上拉加载状态：初始态、等待释放生效、加载中 */
-const moreRef: ShallowRef<"initial" | "release" | "running"> = shallowRef('initial');
+const moreRef: ShallowRef<"initial" | "release" | "running"> = shallowRef();
 /** 上拉加载更多的bottom位置定位值 */
 const moreBottomRef: ShallowRef<number> = shallowRef(0);
 /** 向下的图标绘制路径 */
@@ -64,8 +64,8 @@ const downIconPath: string = "M955.733333 460.8c-37.546667-40.96-105.813333-40.9
 function onDetailChange(detail: ElasticDetail) {
     //  启动时，进行初始化操作：后续看情况，如下拉刷新和上拉加载正在进行中，应该停止继续判断上拉加载和下拉刷新
     if (detail.status == "start") {
-        refreshRef.value != "running" && (refreshRef.value = "initial");
-        moreRef.value != "running" && (moreRef.value = "initial");
+        refreshRef.value != "running" && (refreshRef.value = undefined);
+        moreRef.value != "running" && (moreRef.value = undefined);
     }
     //  弹性过程中，判断是否需要进行上拉加载和下拉刷新
     else if (detail.status != "end") {
@@ -172,6 +172,7 @@ onMounted(() => {
 
     .down-refresh,
     .up-more {
+        user-select: none;
         position: absolute;
         left: 0;
         width: 100%;
