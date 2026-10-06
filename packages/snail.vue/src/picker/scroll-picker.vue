@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { correctNumber, isArrayNotEmpty, isStringNotEmpty, useTimer } from "snail.core";
+import { correctNumber, isArrayNotEmpty, isStringNotEmpty } from "snail.core";
 import { ElasticDetail, IElasticManager, useElastic, useObserver } from "snail.view";
 import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import { useReactive } from "../base/reactive";
@@ -47,7 +47,6 @@ import { ScrollPickerEvents, ScrollPickerOptions, ScrollPickerPopupOptions } fro
 const props = defineProps<ScrollPickerOptions & ScrollPickerPopupOptions & Partial<DialogHandle<string> & PopupStatusOptions & PickerExtend>>();
 const emits = defineEmits<ScrollPickerEvents>();
 const { onSize } = useObserver();
-const { onTimeout } = useTimer();
 const { watcher } = useReactive();
 /** 选择项根容器 */
 const pickItemsDom = useTemplateRef("pick-items");
@@ -66,10 +65,11 @@ let backValue: string = undefined;
  * props属性变化时
  */
 function onPropsChange() {
+    // console.log("props属性变化时");
     //  基于外部传入值，进行选中滚动处理；加点延迟，避免样式问题影响
     let index = props.items.findIndex(item => item.code == props.value);
     index == -1 && (index = 0);
-    onTimeout(() => elasticRef.value.scrollTo(undefined, -itemHeight * index), 50);
+    setTimeout(elasticRef.value.scrollTo, 0, undefined, -itemHeight * index);
     valueRef.value = isArrayNotEmpty(props.items) ? props.items[index].code : undefined;
 }
 
@@ -101,8 +101,8 @@ function onElastic(detail: ElasticDetail) {
         //  结束时，进行位置偏移计算，确保显示完整行
         if (detail.status == "end") {
             elasticRef.value.scrollTo(undefined, index * itemHeight);
-            //  选中值发生改变时，进行事件通知
-            backValue != valueRef.value && emits("select", valueRef.value);
+            //  选中值发生改变时，进行事件通知（异步模式，避免滚动卡顿）
+            backValue != valueRef.value && setTimeout(emits, 0, "select", valueRef.value);
         }
         //  滚动过程中，这里考虑每移动32px的角度，只要还在滚动区域内，就给一次振动；后期再做
         else {
@@ -121,9 +121,9 @@ onMounted(async () => {
     //  使用弹性滚动 进行选项选择
     elasticRef.value = useElastic(pickItemsDom.value, { elastic: "y", distance: 100, }, onElastic);
     //  监听值改变，进行滚动响应处理
-    watcher(() => props.value, newValue => newValue != valueRef.value && onPropsChange());
-    watcher(() => props.items, onPropsChange);
     onPropsChange();
+    watcher(() => props.items, onPropsChange);
+    watcher(() => props.value, newValue => newValue != valueRef.value && onPropsChange());
 });
 </script>
 
