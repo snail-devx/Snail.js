@@ -33,7 +33,7 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
      */
     function onEvent(target: Element | Window, name: string, fn: (...args: any[]) => void, useCapture?: boolean): IScope {
         checkScope(manager, "onEvent: observer destroyed.");
-        throwIfFalse(target instanceof Element || target === window, "onEvent: target must be a Element or Window");
+        throwIfFalse(target instanceof Element || target === window, "onEvent: target must be an Element or Window");
         mustString(name, "onEvent: name");
         mustFunction(fn, "onEvent: fn");
         target.addEventListener(name, fn, useCapture);
@@ -51,7 +51,7 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
      */
     function onTouch(el: Element, options: TouchOptions, fn: (detail: TouchDetail) => void): IScope {
         checkScope(manager, "onEvent: observer destroyed.");
-        throwIfFalse(el instanceof Element, "onEvent: target must be a Element");
+        throwIfFalse(el instanceof Element, "onEvent: target must be an Element");
         mustFunction(fn, "onTouch: fn");
         const animationFrame = useAnimationFrame<TouchDetail>("queue", fn);
         //  1、进行触摸事件处理的相关方法，变量
@@ -161,7 +161,7 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
      */
     function onSize(el: Element, fn: (size: Readonly<ElementSize>) => void): IScope {
         checkScope(manager, "onSize: observer destroyed.");
-        throwIfFalse(el instanceof Element, "onSize: el must be a Element.");
+        throwIfFalse(el instanceof Element, "onSize: el must be an Element.");
         const scope = scopes.get();
         //  计算元素的size值；优先ResizeObserver ，否则定时器100ms计算一次（requestAnimationFrame浪费性能）
         var preSize: Readonly<ElementSize> = undefined;
@@ -196,7 +196,7 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
      */
     function onClient(el: Element, fn: (rect: DOMRectReadOnly) => void): IScope {
         checkScope(manager, "onClient: observer destroyed.");
-        throwIfFalse(el instanceof Element, "onClient: el must be a Element.");
+        throwIfFalse(el instanceof Element, "onClient: el must be an Element.");
         const scope = scopes.get();
         //  监听rect变化，并尝试自动销毁：使用requestAnimationFrame有点浪费性能，采用定时器100ms执行一次
         var preRect: DOMRectReadOnly = undefined;
@@ -228,7 +228,7 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
      */
     function onMutation(el: Element, options: MutationObserverInit, fn: (record: MutationRecord[], observer: MutationObserver) => void): IScope {
         checkScope(manager, "onClient: observer destroyed.");
-        throwIfFalse(el instanceof Element, "onClient: el must be a Element.");
+        throwIfFalse(el instanceof Element, "onClient: el must be an Element.");
         mustFunction(fn, "onMutation: fn")
         const observe = new MutationObserver(fn);
         observe.observe(el, options);

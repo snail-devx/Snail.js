@@ -156,7 +156,7 @@ export function useScroll(target: HTMLElement, options: ScrollBaseOptions, fn?: 
 
     //  初始化+数据验证；构建管理器，相关事件监听
     {
-        throwIfFalse(target instanceof Element, "useScroll: target must be a Element");
+        throwIfFalse(target instanceof Element, "useScroll: target must be an Element");
         fn = correctFunction(fn, undefined);
         //  构建管理器
         const manager = Object.freeze(mountScope<IScrollManager>(

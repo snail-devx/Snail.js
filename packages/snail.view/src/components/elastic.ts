@@ -288,7 +288,7 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
 
     //  初始化+数据验证：配置选项校验，给默认值，整理完之后，锁定，避免改动
     {
-        throwIfFalse(target instanceof Element, "useElastic: target must be a Element");
+        throwIfFalse(target instanceof Element, "useElastic: target must be an Element");
         fn = correctFunction(fn, undefined);
         // 基础配置校验
         {
