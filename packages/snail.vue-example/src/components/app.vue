@@ -37,10 +37,8 @@ import TreeTest from "./container/tree-test.vue";
 import DesignerTest from "./form/designer-test.vue";
 import RendererTest from "./form/renderer-test.vue";
 //  👉 选择器组件
-import DatepickerTest from "./picker/datepicker-test.vue";
 import DateTimeTest from "./picker/datetime-test.vue";
 import ScrollpikcerTest from "./picker/scrollpikcer-test.vue";
-import TimepickerTest from "./picker/timepicker-test.vue";
 //  👉 弹窗组件
 import DialogTest from "./popup/dialog-test.vue";
 import FollowTest from "./popup/follow-test.vue";
@@ -123,8 +121,6 @@ const treeOptions: TreeOptions<Component> = {
             children: [
                 { text: "滚动选择器", data: ScrollpikcerTest, clickable: true, searchable: true },
                 { text: "DateTime 选择器", data: DateTimeTest, clickable: true, searchable: true },
-                { text: "日期选择器", data: DatepickerTest, clickable: true, searchable: true },
-                { text: "时间选择器", data: TimepickerTest, clickable: true, searchable: true },
             ]
         },
         {

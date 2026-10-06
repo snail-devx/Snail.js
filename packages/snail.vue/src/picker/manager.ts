@@ -1,4 +1,4 @@
-import { correctNumber, IAsyncScope, IScope, mountScope, ScopeOptions } from "snail.core";
+import { correctNumber, IAsyncScope, IScope, mountScope, ScopeOptions, throwIfFalse } from "snail.core";
 import { Component } from "vue";
 import { useApp } from "../base/utils/app-util";
 import { FollowPositionOptions, usePopup } from "../popup/manager";
@@ -24,53 +24,6 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
     const { mode } = useApp();
 
     //#region *************************************实现接口：IPickerManager接口方法*************************************
-    /**
-     * 显示【日期】选择器
-     * @param target 哪个元素触发，基于此元素计算位置
-     * @param options 日期选择器配置选项
-    * @param popupOptions 弹窗配置选项;内部根据情况选择属性使用
-     * @returns 异步任务，可销毁日期选择器；可接收日期选择器的选择值
-     */
-    function showDate(target: HTMLElement, options?: DatePickerOptions, popupOptions?: PickerPopupOptions): IAsyncScope<string> {
-        if (mode != "mobile") {
-            options = { ...options };
-            return showPicker<string, DatePickerOptions>(target, DatePopup, options, popupOptions);
-        }
-        else {
-            const dtOptions: DateTimePickerBaseOptions = {
-                format: options.format,
-                minDate: options.min,
-                maxDate: options.max,
-                minTime: options.minPickTime,
-                maxTime: options.maxPickTime,
-                toolbar: {
-                    disabled: options.toolbarDisabled,
-                    nowDisabled: options.nowDisabled,
-                    clearDisabled: options.clearDisabled
-                }
-            };
-            const popupOptions: PickerPopupOptions = {
-                mode: "dialog",
-                dialog: {
-                    closeOnEscape: true,
-                    closeOnMask: true
-                }
-            }
-            return showPicker<string, DateTimePickerBaseOptions>(target, DatetimeMobilePicker, dtOptions, popupOptions);
-        }
-    }
-    /**
-     * 显示【时间】选择器
-     * @param target 哪个元素触发，基于此元素计算位置
-     * @param options 时间选择器配置选项
-    * @param popupOptions 弹窗配置选项;内部根据情况选择属性使用
-     * @returns 异步任务，可销毁时间选择器；可接收时间选择器的选择值
-     */
-    function showTime(target: HTMLElement, options?: TimePickerOptions, popupOptions?: PickerPopupOptions): IAsyncScope<string> {
-        options = { ...options };
-        return showPicker<string, TimePickerOptions>(target, TimePopup, options, popupOptions);
-    }
-
     /**
      * 显示【日期时间】选择器
      * - 根据配置的format，自动选择【日期】或【时间】选择器
@@ -158,10 +111,6 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
      * @returns 异步任务，可销毁选择器；可接收选择器的选择值
      */
     function showPicker<Value, Props extends Record<string, any>>(target: HTMLElement, component: Component, options: Props, popupOptions?: PickerPopupOptions): IAsyncScope<Value> {
-        /**
-         * 判断弹出PC还是移动端选择；后期判断target是否存在，不存在则使用模态弹窗
-         */
-
         //  模态弹窗
         if (popupOptions && popupOptions.mode == "dialog") {
             return popup.dialog<Value, Props & PickerExtend>({
@@ -180,6 +129,7 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
         }
         //  跟随弹窗：跟随效果给一些默认值
         else {
+            throwIfFalse(target instanceof Element, "showPicker: target must be an Element");
             const follow: FollowPositionOptions = (popupOptions ? popupOptions.follow : undefined) || Object.create(null);
             {
                 follow.followX = follow.followX || ["center", "start", "end", "before", "after"];
@@ -204,10 +154,7 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
 
     //  初始化管理器并返回
     const manager = Object.freeze(mountScope<IPickerManager>(
-        {
-            showDate, showTime,
-            showDateTime, showScroll,
-        },
+        { showDateTime, showScroll, },
         { global, type: "IPickerManager" }
     ));
     manager.onDestroy(popup.destroy);
