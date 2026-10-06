@@ -106,116 +106,65 @@ export type DatetimeFormatCorrectResult = {
     timeFormat: "HH:mm" | "HH:mm:ss" | undefined;
 }
 
-
-
 /**
- * 日期时间的功能禁用配置选项
+ * 日期桌面客户端 弹窗配置选项
+ * - 用于弹出日期选择器，桌面端使用
  */
-export type DatetimeDisabledOptions = {
+export type DateDesktopPopupOptions = DateTimeDesktopPopupBaseOptions<DateFormat> & {
     /**
-     * 禁用【工具条】
-     * - 为true则不显示【确定】、【现在】等按钮的工具条区域
-     * - 移动端时，此配置项无效，工具条区域始终显示
+     * 日期最小值
+     * - 格式为 "年-月-日"
+     * - 选择年月日时，早于此值的年月日不可选
      */
-    toolbarDisabled?: boolean;
+    minDate?: string;
     /**
-     * 禁用【现在】按钮
-     * - 为true时不显示【现在】按钮
+     * 日期最大值
+     * - 格式为 "年-月-日"
+     * - 选择年月日时，晚于此值的年月日不可选
      */
-    nowDisabled?: boolean;
-    /**
-     * 禁用【清空】按钮
-     * - 为true时不显示【清空】按钮
-     */
-    clearDisabled?: boolean;
+    maxDate?: string;
 }
 /**
- * 日期选择器 配置选项
+ * 时间桌面客户端 弹窗配置选项
  */
-export type DatePickerOptions = {
+export type TimeDesktopPopupOptions = DateTimeDesktopPopupBaseOptions<"HH:mm" | "HH:mm:ss">;
+/**
+ * 日期时间桌面客户端 弹窗基础配置选项
+ */
+type DateTimeDesktopPopupBaseOptions<Format> = {
     /**
      * 日期格式
      * - 默认 “yyyy-MM-dd"
      */
-    format?: DateFormat;
+    format?: Format;
     /**
      * 已选日期值
      * -格式为 "年-月-日 时:分:秒"
      */
     value?: string;
-    /**
-     * 渲染模式
-     * - default    默认模式，文本框+图标，文本框填充满+边框
-     * - simple     简单模式，有值时才显示文本框，且无边框+不填充满
-     */
-    mode?: "default" | "simple";
 
     /**
-     * 日期最小值
-     * - 选择年月日时，早于此值的年月日不可选
-     * - 确定时，组合时间选取值，晚于此值的日期+时间选择值无效
+     * 时间最小值
+     * - 格式为 "时:分:秒"
+     * - 选择时分秒时，早于此值的时间不可选
      */
-    min?: string;
+    minTime?: string;
     /**
-     * 日期最大值
-     * - 选择年月日时，晚于此值的年月日不可选
-     * - 组合时间选取值，晚于此值的日期+时间选择值无效
+     * 时间最大值
+     * - 格式为 "时:分:秒"
+     * - 选择时分秒时，晚于此值的时间不可选
      */
-    max?: string;
+    maxTime?: string;
 
     /**
-     * 最小选择时间
-     * - 早于此值的时间不可选
-     * - 不参与日期最小值验证，仅在选择时间时框定起始时间
+     * 工具条配置
      */
-    minPickTime?: string;
-    /**
-     * 最大选择时间
-     * - 不参与日期最大值验证，仅在选择时间时框定结束时间
-     */
-    maxPickTime?: string;
-} & DatetimeDisabledOptions;
-
-/**
- * 时间选择控件配置项
- */
-export type TimePickerOptions = {
-    /**
-     * 时间格式
-     */
-    format?: "HH:mm:ss" | "HH:mm";
-    /**
-     * 已选值
-     * - 格式为 “时:分:秒"
-     */
-    value?: string;
-    /**
-     * 渲染模式
-     * - default    默认模式，文本框+图标，文本框填充满+边框
-     * - simple     简单模式，有值时才显示文本框，且无边框+不填充满
-     */
-    mode?: "default" | "simple";
-
-    /**
-     * 最小时间
-     * - 传入值格式为 "时:分:秒" 
-     * - 如 "08:30:00"，则08:30:00为最小时间，之前的时间不可选择
-     * - 如 "08" ，则 08:00:00为最小时间，之前的时间不可选择
-     */
-    min?: string;
-    /**
-     * 最大时间
-     * - 传入值格式为 "时:分:秒"
-     * - 如 "08:30:00"，则08:30:00为最大时间，之后的时间不可选择
-     * - 如 "08" ，则 08:00:00为最大时间，之后时间不可选择
-     */
-    max?: string;
-} & DatetimeDisabledOptions;
-
+    toolbar?: DateTimePickerToolbarOptions;
+}
 /**
  * 日期时间选择 事件
  */
-export type DatetimePickerEvents = {
+export type DateTimePickerEvents = {
     /**
      * 清空
      */

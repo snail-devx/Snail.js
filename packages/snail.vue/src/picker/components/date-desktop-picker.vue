@@ -1,9 +1,9 @@
-<!-- 日期选择器 弹窗组件
+<!-- 日期桌面客户端跟随弹窗
     1、外部使用 follow弹窗打开
     2、内部集成 time-popup.vue时间选择，但时间的最大、最小值单独设置，不从日期的最大、最小值中提取
-  -->
+-->
 <template>
-    <Layout class="snail-date-picker-popup" :class="{ 'time-now': pinned && pinned.value == true }"
+    <Layout class="snail-date-desktop-picker" :class="{ 'time-now': pinned && pinned.value == true }"
         :direction="'vertical'" :top="{ height: '40px' }" :bottom="{ height: '30px' }">
         <!-- 顶部导航区域：展示左右切换等功能 -->
         <template #top>
@@ -52,14 +52,15 @@
             </template>
         </template>
         <!-- 操作区域：只有是最后一个操作步骤时才显示，此时若有时间操作时，必须得有个确定 -->
-        <template #bottom v-if="endStep == stepRef && (toolbarDisabled != true || timeFormat != undefined)">
+        <template #bottom v-if="endStep == stepRef && (toolbar.disabled != true || timeFormat != undefined)">
             <div class="time-area" ref="time-area" v-if="timeFormat != undefined"
                 :class="{ placeholder: dateRef.hour == undefined }"
                 v-text="formatTimeValue(dateRef, timeFormat) || '选择时间'" @click="onSelectTime" />
-            <template v-if="toolbarDisabled != true">
-                <Button :type="'link'" :size="'small'" v-if="clearDisabled != true" v-text="'清空'"
+            <template v-if="toolbar.disabled != true">
+                <Button :type="'link'" :size="'small'" v-if="toolbar.clearDisabled != true" v-text="'清空'"
                     @click="emits('clear'), inPopup && closePopup('')" />
-                <Button :type="'link'" :size="'small'" v-if="nowDisabled != true" v-text="'现在'" @click="onNow" />
+                <Button :type="'link'" :size="'small'" v-if="toolbar.nowDisabled != true" v-text="'现在'"
+                    @click="onNow" />
             </template>
             <Button :type="'link'" :size="'small'" v-text="'确定'" :class="{ 'disabled': isValidDateRef != true }"
                 @click="onConfirm" />
@@ -68,31 +69,30 @@
 </template>
 
 <script setup lang="ts">
-import { DateValue, correctDateFormat, formatDateValue, getDateByValue, getDateValue, parseDateValue } from "snail.core";
-import { TimeValue, formatTimeValue, parseTimeValue, isValidTime, getFromArray, } from "snail.core";
-import { computed, Ref, ref, ShallowRef, shallowRef, useTemplateRef, } from "vue";
-import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
-import { DatePickerDayItem, DatePickerMonthItem, DatePickerOptions, DatePickerYearItem, DatetimePickerEvents } from "../models/datetime-model";
-import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initStepByFormat } from "../utils/datetime-util";
-import Layout from "../../container/layout.vue";
-import Icon from "../../base/icon.vue";
+import { correctDateFormat, DateValue, formatDateValue, formatTimeValue, getDateByValue, getDateValue, getFromArray, isValidTime, parseDateValue, parseTimeValue, TimeValue } from 'snail.core';
+import { computed, ref, Ref, shallowRef, ShallowRef, useTemplateRef } from 'vue';
 import Button from "../../base/button.vue";
-import { PickerExtend, PickerPopupOptions } from "../models/picker-model";
+import Icon from "../../base/icon.vue";
+import Layout from '../../container/layout.vue';
+import { FollowExtend, FollowHandle } from '../../popup/models/follow-model';
+import { DateDesktopPopupOptions, DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, DateTimePickerEvents, DateTimePickerToolbarOptions } from '../models/datetime-model';
+import { PickerExtend } from '../models/picker-model';
+import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initStepByFormat } from '../utils/datetime-util';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<DatePickerOptions & PickerExtend & FollowExtend & FollowHandle<string>>();
-const emits = defineEmits<DatetimePickerEvents>();
-const { inPopup } = props;
+const props = defineProps<DateDesktopPopupOptions & PickerExtend & FollowExtend & FollowHandle<string>>();
+const emits = defineEmits<DateTimePickerEvents>();
+const { inPopup, toolbar = Object.create(null) as DateTimePickerToolbarOptions } = props;
 //  2、整理传入属性值
 /**   选择的日期值：年月日时分秒*/
 const dateRef: Ref<DateValue> = ref(parseDateValue(props.value, "min"));
 /**   日期格式 */
 const format = correctDateFormat(props.format, "yyyy-MM-dd");
 /**   最小日期值 */
-const min: DateValue = Object.freeze(parseDateValue(props.min, "min"));
+const minDate: DateValue = Object.freeze(parseDateValue(props.minDate, "min"));
 /**   最大日期值 */
-const max: DateValue = Object.freeze(parseDateValue(props.max, "max"));
+const maxDate: DateValue = Object.freeze(parseDateValue(props.maxDate, "max"));
 //  3、组件交互变量、常量
 /**   选择操作的最后是什么 */
 const endStep: "year" | "month" | "day" = initStepByFormat(format);
@@ -108,9 +108,9 @@ const dayItemsRef: ShallowRef<DatePickerDayItem[]> = shallowRef([]);
 const isValidDateRef = computed(validateDate);
 //  4、时间处理相关
 /**   最小选择时间值 */
-const minPickTime: TimeValue = Object.freeze(parseTimeValue(props.minPickTime, "min"));
+const minTime: TimeValue = Object.freeze(parseTimeValue(props.minTime, "min"));
 /**    最大选择时间值 */
-const maxPickTime: TimeValue = Object.freeze(parseTimeValue(props.maxPickTime, "max"));
+const maxTime: TimeValue = Object.freeze(parseTimeValue(props.minTime, "max"));
 /**   时间格式 */
 const timeFormat: "HH:mm" | "HH:mm:ss" = format == "yyyy-MM-dd HH:mm"
     ? "HH:mm"
@@ -142,9 +142,9 @@ function validateDate(): boolean {
         //  包含时间时，需要同步进行时间值验证
         case "yyyy-MM-dd HH:mm":
         case "yyyy-MM-dd HH:mm:ss": {
-            if (isValidTime(timeFormat, dateRef.value, minPickTime, maxPickTime) == true) {
+            if (isValidTime(timeFormat, dateRef.value, minTime, maxTime) == true) {
                 const date = getDateByValue(dateRef.value);
-                const disabled = (min && date < getDateByValue(min)) || (max && date > getDateByValue(max));
+                const disabled = (minDate && date < getDateByValue(minDate)) || (maxDate && date > getDateByValue(maxDate));
                 return disabled != true;
             }
             return false;
@@ -164,7 +164,7 @@ function buildPickerItems(step: typeof stepRef.value, basis: 0 | 1 | -1) {
         //  选择年份：每次切换18个年份
         case "year": {
             dateRef.value.year += basis * 18;
-            yearItems.value = buildYearItems(dateRef.value.year, min, max);
+            yearItems.value = buildYearItems(dateRef.value.year, minDate, maxDate);
             if (basis != 0) {
                 dateRef.value.month = 1;
                 dateRef.value.day = 1;
@@ -179,7 +179,7 @@ function buildPickerItems(step: typeof stepRef.value, basis: 0 | 1 | -1) {
                 buildPickerItems("year", 0);
                 yearItem = yearItems.value[9];
             }
-            monthItems.value = buildMonthItems(yearItem, min, max);
+            monthItems.value = buildMonthItems(yearItem, minDate, maxDate);
             basis != 0 && (dateRef.value.day = 1);
             break;
         }
@@ -194,7 +194,7 @@ function buildPickerItems(step: typeof stepRef.value, basis: 0 | 1 | -1) {
                 buildPickerItems("month", 0);
                 monthItem = monthItems.value[dateRef.value.month - 1];
             }
-            dayItemsRef.value = buildDayItems(monthItem, min, max);
+            dayItemsRef.value = buildDayItems(monthItem, minDate, maxDate);
             basis != 0 && (dateRef.value.day = 1);
             break;
         }
@@ -229,7 +229,7 @@ function onYearItemClick(item: DatePickerYearItem, dbClick?: boolean) {
         }
         else {
             dateRef.value.month = 1;
-            monthItems.value = buildMonthItems(item, min, max);
+            monthItems.value = buildMonthItems(item, minDate, maxDate);
             onSwitchStepClick("month");
         }
     }
@@ -254,7 +254,7 @@ function onMonthItemClick(item: DatePickerMonthItem, dbClick?: boolean) {
         }
         else {
             dateRef.value.day = 1;
-            dayItemsRef.value = buildDayItems(item, min, max);
+            dayItemsRef.value = buildDayItems(item, minDate, maxDate);
             onSwitchStepClick("day");
         }
     }
@@ -282,7 +282,6 @@ function onDayItemClick(item: DatePickerDayItem, dbClick?: boolean) {
         }
     }
 }
-
 /**
  * 选择时间
  * @param evt 
@@ -291,19 +290,17 @@ async function onSelectTime() {
     if (props.picker != undefined && timeAreaDom.value != undefined && props.pinned.value != true) {
         props.pinned.value = true;
         //  这里后期需要优化一下,需要分析 日期的最大值/最小值中的时间值,然后和时间选择最大值/最小值比对,选出最贴切的最大值/最小值
-        const task = props.picker.showTime(timeAreaDom.value,
+        const task = props.picker.showDateTime(
+            timeAreaDom.value,
             {
                 //  时间选择器相关配置
                 format: timeFormat,
                 value: formatTimeValue(dateRef.value, timeFormat),
-                min: props.minPickTime,
-                max: props.minPickTime,
-                nowDisabled: props.nowDisabled,
-                clearDisabled: props.clearDisabled,
-                toolbarDisabled: props.toolbarDisabled,
+                minTime: props.minTime,
+                maxTime: props.maxTime,
+                toolbar: props.toolbar
             },
             {
-                mode: "follow",
                 follow: {
                     followX: "start",
                     followY: "before",
@@ -350,7 +347,7 @@ function onConfirm() {
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //    若无值，则选举一个适合的值出来做选择：先始终使用现在值
-dateRef.value == undefined && (dateRef.value = electDateValue(min, max));
+dateRef.value == undefined && (dateRef.value = electDateValue(minDate, maxDate));
 buildPickerItems(stepRef.value, 0);
 //  2、生命周期响应
 </script>
@@ -359,7 +356,7 @@ buildPickerItems(stepRef.value, 0);
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
 
-.snail-date-picker-popup {
+.snail-date-desktop-picker {
     width: 280px !important;
     height: 300px !important;
     background-color: #fff;

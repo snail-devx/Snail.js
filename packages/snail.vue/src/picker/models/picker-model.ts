@@ -20,13 +20,14 @@ export interface IPickerManager {
      * - - 支持移动端，选择时出dialog弹窗，在底部滚动选择
      * @param target 哪个元素触发，基于此元素计算位置
      * @param options 选择控件配置选项
-     * @returns 一部人物,可销毁选择器;可接收选择器的选择结果
+     * @param popupOptions 选择器弹窗的一些扩展配置
+     * @returns 异步任务,可销毁选择器;可接收选择器的选择结果
      */
-    showDateTime(target: HTMLElement, options?: DateTimePickerBaseOptions): IAsyncScope<string>;
+    showDateTime(target: HTMLElement, options?: DateTimePickerBaseOptions, popupOptions?: Pick<PickerPopupOptions, "follow" | "dialog">): IAsyncScope<string>;
     /**
      * 显示【滚动】选择器
      * - 通过滚动选择数据项；默认强制在底部弹出
-     * @param options 
+     * @param options 选择控件配置选项
      * @returns 异步任务，可销毁选择组件；可接受组件选择值
      */
     showScroll(options: ScrollPickerOptions & ScrollPickerPopupOptions): IAsyncScope<string>;
@@ -37,24 +38,23 @@ export interface IPickerManager {
  */
 export type PickerPopupOptions = {
     /**
-     * 弹窗模式
-     * - follow     【默认值】跟随弹窗，跟随制定的target
-     * - dialog     模态弹窗
+     * 弹窗类型
+     * - dialog: 模态弹窗
+     * - follow: 跟随弹窗
      */
-    mode?: "dialog" | "follow";
-
+    type: "dialog" | "follow";
     /**
      * 跟随效果
-     * - mode 为 `follow` 生效
+     * - 跟随弹窗时生效，如客户端弹出日期选择器跟随弹窗时
      */
     follow?: FollowPositionOptions;
     /**
      * 弹窗配置
-     * - mode 为 `dialog` 生效
+     * - 模态弹窗时生效，如移动端弹出日期滚动选择器时
      */
     dialog?: Pick<DialogOptions, "closeOnEscape" | "closeOnMask" | "rootClass">;
 
-} /** & FollowPositionOptions */;
+};
 
 /**
  * 选择器扩展

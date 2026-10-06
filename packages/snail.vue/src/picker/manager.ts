@@ -2,10 +2,10 @@ import { correctNumber, IAsyncScope, IScope, mountScope, ScopeOptions, throwIfFa
 import { Component } from "vue";
 import { useApp } from "../base/utils/app-util";
 import { FollowPositionOptions, usePopup } from "../popup/manager";
-import DatePopup from "./components/date-popup.vue";
+import DateDesktopPicker from "./components/date-desktop-picker.vue";
 import DatetimeMobilePicker from "./components/datetime-mobile-picker.vue";
-import TimePopup from "./components/time-popup.vue";
-import { DatePickerOptions, DatetimeDisabledOptions, DateTimePickerBaseOptions, TimePickerOptions } from "./models/datetime-model";
+import TimeDesktopPicker from "./components/time-desktop-picker.vue";
+import { DateTimePickerBaseOptions, TimeDesktopPopupOptions } from "./models/datetime-model";
 import { IPickerManager, PickerExtend, PickerPopupOptions } from "./models/picker-model";
 import { ScrollPickerOptions, ScrollPickerPopupOptions } from "./models/scroll-piker-model";
 import ScrollPicker from "./scroll-picker.vue";
@@ -29,69 +29,51 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
      * - 根据配置的format，自动选择【日期】或【时间】选择器
      * - 自动识别当前环境是桌面客户端还是移动端,进行区分处理
      * @param target 哪个元素触发，基于此元素计算位置
-     * @param options 选择控件配置选项
-     * @returns 一部人物,可销毁选择器;可接收选择器的选择结果
+     * @param popupOptions 选择器弹窗的一些扩展配置
+     * @returns 异步任务,可销毁选择器;可接收选择器的选择结果
      */
-    function showDateTime(target: HTMLElement, options?: DateTimePickerBaseOptions): IAsyncScope<string> {
+    function showDateTime(target: HTMLElement, options?: DateTimePickerBaseOptions, popupOptions?: Pick<PickerPopupOptions, "follow" | "dialog">): IAsyncScope<string> {
         options = { ...options };
         options.toolbar = { ...options.toolbar }
         // 桌面客户端：看看是选时间，还是选日期做一下分发
         if (mode != "mobile") {
             const { timeFormat, dateFormat } = correctFormat(options ? options.format : undefined);
             //  选择时间
-            let props: any = undefined;
-            if (timeFormat != undefined) {
-                const timeOptions: TimePickerOptions = {
+            let props: any = timeFormat != undefined
+                ? {
                     format: timeFormat as any,
                     value: options.value,
-                    min: options.minTime,
-                    max: options.maxTime,
-                };
-                props = timeOptions;
-            }
-            //  选择日期
-            else {
-                const dateOptions: DatePickerOptions = {
-                    format: dateFormat,
-                    value: options.value,
-                    min: options.minDate,
-                    max: options.maxDate,
-                    minPickTime: options.minTime,
-                    maxPickTime: options.maxTime,
-                };
-                props = dateOptions;
-            }
-            //  工具条配置
-            Object.assign<any, DatetimeDisabledOptions>(props, {
-                toolbarDisabled: options.toolbar.disabled,
-                nowDisabled: options.toolbar.nowDisabled,
-                clearDisabled: options.toolbar.clearDisabled
-            });
-
-            return showPicker(target, timeFormat ? TimePopup : DatePopup, props, {
-                mode: "follow"
+                    minTime: options.minTime,
+                    maxTime: options.maxTime,
+                    toolbar: options.toolbar,
+                } as TimeDesktopPopupOptions
+                : options;
+            return showPicker(target, timeFormat ? TimeDesktopPicker : DateDesktopPicker, props, {
+                ...popupOptions,
+                type: "follow",
             });
         }
         //  移动端
         else {
             return showPicker(target, DatetimeMobilePicker, options, {
-                mode: "dialog",
                 dialog: {
                     closeOnEscape: true,
                     closeOnMask: true
-                }
+                },
+                ...popupOptions,
+                type: "dialog",
             });
         }
     }
     /**
      * 显示【滚动】选择器
      * - 通过滚动选择数据项；默认强制在底部弹出
-     * @param options 
+     * @param options 组件配置选项
      * @returns 异步任务，可销毁选择组件；可接受组件选择值（清空时返回空字符串）
      */
     function showScroll(options: ScrollPickerOptions & ScrollPickerPopupOptions): IAsyncScope<string> {
         const popupOptions: PickerPopupOptions = {
-            mode: "dialog",
+            type: "dialog",
             dialog: {
                 closeOnEscape: true,
                 closeOnMask: true
@@ -112,7 +94,7 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
      */
     function showPicker<Value, Props extends Record<string, any>>(target: HTMLElement, component: Component, options: Props, popupOptions?: PickerPopupOptions): IAsyncScope<Value> {
         //  模态弹窗
-        if (popupOptions && popupOptions.mode == "dialog") {
+        if (popupOptions && popupOptions.type == "dialog") {
             return popup.dialog<Value, Props & PickerExtend>({
                 component: component,
                 ...(popupOptions.dialog || {

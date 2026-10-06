@@ -1,8 +1,8 @@
-<!-- 时间选择器  弹窗组件
+<!-- 时间桌面客户端选择器
     1、实现上，参照效果【zane-calendar】库效果
-  -->
+-->
 <template>
-    <Layout class="snail-time-picker-popup" :class="{ 'second-disabled': format != 'HH:mm:ss' }"
+    <Layout class="snail-time-desktop-picker" :class="{ 'second-disabled': format != 'HH:mm:ss' }"
         :direction="'vertical'">
         <!-- 时分秒选择区域-->
         <template #main>
@@ -29,10 +29,10 @@
             </Motion>
         </template>
         <!-- 操作区域 -->
-        <template #bottom v-if="toolbarDisabled != true">
-            <Button :type="'link'" :size="'small'" v-if="clearDisabled != true" v-text="'清空'"
+        <template #bottom v-if="toolbar.disabled != true">
+            <Button :type="'link'" :size="'small'" v-if="toolbar.clearDisabled != true" v-text="'清空'"
                 @click="emits('clear'), inPopup && closePopup('')" />
-            <Button :type="'link'" :size="'small'" v-if="nowDisabled != true" v-text="'现在'"
+            <Button :type="'link'" :size="'small'" v-if="toolbar.nowDisabled != true" v-text="'现在'"
                 @click="rebuildItems(getTimeValue(new Date()))" />
             <Button :type="'link'" :size="'small'" v-text="'确定'" :class="{ disabled: isValidTimeRef != true }"
                 @click="onConfirm" />
@@ -41,28 +41,28 @@
 </template>
 
 <script setup lang="ts">
-import { formatTimeValue, getTimeValue, padStart, parseTimeValue, TimeValue } from "snail.core";
-import { computed, nextTick, onMounted, ref, Ref, ShallowRef, shallowRef, useTemplateRef } from "vue";
+import { formatTimeValue, getTimeValue, padStart, parseTimeValue, TimeValue } from 'snail.core';
+import { computed, nextTick, onMounted, ref, Ref, ShallowRef, shallowRef, useTemplateRef } from 'vue';
 import Button from "../../base/button.vue";
 import Layout from "../../container/layout.vue";
 import Motion from "../../container/motion.vue";
-import { MOTION } from "../../container/utils/motion-util";
-import { FollowExtend, FollowHandle } from "../../popup/manager";
-import { DatetimePickerEvents, TimePickerHourItem, TimePickerMinuteItem, TimePickerOptions, TimePickerSecondItem } from "../models/datetime-model";
-import { PickerExtend } from "../models/picker-model";
-import { buildHourItems, buildMinuteItems, buildSecondItems } from "../utils/datetime-util";
-
+import { MOTION } from '../../container/utils/motion-util';
+import { FollowExtend, FollowHandle } from '../../popup/models/follow-model';
+import { DateTimePickerEvents, DateTimePickerToolbarOptions, TimeDesktopPopupOptions, TimePickerHourItem, TimePickerMinuteItem, TimePickerSecondItem } from '../models/datetime-model';
+import { PickerExtend } from '../models/picker-model';
+import { buildHourItems, buildMinuteItems, buildSecondItems } from '../utils/datetime-util';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<TimePickerOptions & PickerExtend & FollowHandle<string> & FollowExtend>();
-const emits = defineEmits<DatetimePickerEvents>();
+const props = defineProps<TimeDesktopPopupOptions & PickerExtend & FollowHandle<string> & FollowExtend>();
+const emits = defineEmits<DateTimePickerEvents>();
 /**     时间格式 */
 const format = props.format == "HH:mm" ? "HH:mm" : "HH:mm:ss";
 /**     时间最小值 */
-const min = parseTimeValue(props.min, "min");
+const min = parseTimeValue(props.minTime, "min");
 /**     时间最大值 */
-const max = parseTimeValue(props.max, "max");
+const max = parseTimeValue(props.maxTime, "max");
+const { toolbar = Object.create(null) as DateTimePickerToolbarOptions } = props;
 //  2、组件交互变量、常量
 /**     已选择的时间值 */
 const timeRef: Ref<TimeValue> = ref(parseTimeValue(props.value, "min") || getTimeValue(new Date()));
@@ -191,7 +191,7 @@ onMounted(rebuildItems);
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
 
-.snail-time-picker-popup {
+.snail-time-desktop-picker {
     width: 210px !important;
     height: 240px !important;
     background-color: #fff;
@@ -291,7 +291,7 @@ onMounted(rebuildItems);
 
 // *****************************************   👉  特定样式适配    *****************************************
 //  禁用秒选择
-.snail-time-picker-popup.second-disabled {
+.snail-time-desktop-picker.second-disabled {
     width: 180px;
 
     >.main-area {
