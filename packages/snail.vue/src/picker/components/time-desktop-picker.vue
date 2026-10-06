@@ -54,7 +54,7 @@ import { buildHourItems, buildMinuteItems, buildSecondItems } from '../utils/dat
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<TimeDesktopPopupOptions & PickerExtend & FollowHandle<string> & FollowExtend>();
+const props = defineProps<TimeDesktopPopupOptions & Partial<PickerExtend & FollowHandle<string> & FollowExtend>>();
 const emits = defineEmits<DateTimePickerEvents>();
 /**     时间格式 */
 const format = props.format == "HH:mm" ? "HH:mm" : "HH:mm:ss";

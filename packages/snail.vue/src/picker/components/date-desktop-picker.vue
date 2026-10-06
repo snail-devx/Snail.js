@@ -3,8 +3,8 @@
     2、内部集成 time-popup.vue时间选择，但时间的最大、最小值单独设置，不从日期的最大、最小值中提取
 -->
 <template>
-    <Layout class="snail-date-desktop-picker" :class="{ 'time-now': pinned && pinned.value == true }"
-        :direction="'vertical'" :top="{ height: '40px' }" :bottom="{ height: '30px' }">
+    <Layout class="snail-date-desktop-picker" :class="{ 'time-now': showTimePicker }" :direction="'vertical'"
+        :top="{ height: '40px' }" :bottom="{ height: '30px' }">
         <!-- 顶部导航区域：展示左右切换等功能 -->
         <template #top>
             <Icon type="arrow" button :rotate="180" :size="26" :color="'#8a9099'" :hover-color="'#58a4fd'"
@@ -55,7 +55,7 @@
         <template #bottom v-if="endStep == stepRef && (toolbar.disabled != true || timeFormat != undefined)">
             <div class="time-area" ref="time-area" v-if="timeFormat != undefined"
                 :class="{ placeholder: dateRef.hour == undefined }"
-                v-text="formatTimeValue(dateRef, timeFormat) || '选择时间'" @click="onSelectTime" />
+                v-text="formatTimeValue(dateRef, timeFormat) || '选择时间'" @click="showTimePicker = true" />
             <template v-if="toolbar.disabled != true">
                 <Button :type="'link'" :size="'small'" v-if="toolbar.clearDisabled != true" v-text="'清空'"
                     @click="emits('clear'), inPopup && closePopup('')" />
@@ -64,6 +64,10 @@
             </template>
             <Button :type="'link'" :size="'small'" v-text="'确定'" :class="{ 'disabled': isValidDateRef != true }"
                 @click="onConfirm" />
+            <!-- 时间选择器组件区域：position 放到此区域绝对定位；放到main区域，会受到样式影响，没仔细查 -->
+            <TimeDesktopPicker v-if="showTimePicker == true" class="time-picker" :format="timeFormat"
+                :min-time="props.minTime" :max-time="props.maxTime" :value="formatTimeValue(dateRef, timeFormat)"
+                :toolbar="toolbar" @clear="onConfirmTime('')" @confirm="onConfirmTime" />
         </template>
     </Layout>
 </template>
@@ -78,6 +82,7 @@ import { FollowExtend, FollowHandle } from '../../popup/models/follow-model';
 import { DateDesktopPopupOptions, DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, DateTimePickerEvents, DateTimePickerToolbarOptions } from '../models/datetime-model';
 import { PickerExtend } from '../models/picker-model';
 import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initStepByFormat } from '../utils/datetime-util';
+import TimeDesktopPicker from './time-desktop-picker.vue';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -107,6 +112,8 @@ const dayItemsRef: ShallowRef<DatePickerDayItem[]> = shallowRef([]);
 /**   是否是有效日期 */
 const isValidDateRef = computed(validateDate);
 //  4、时间处理相关
+/**   是否显示时间选择器 */
+const showTimePicker: ShallowRef<boolean> = shallowRef(false);
 /**   最小选择时间值 */
 const minTime: TimeValue = Object.freeze(parseTimeValue(props.minTime, "min"));
 /**    最大选择时间值 */
@@ -114,9 +121,7 @@ const maxTime: TimeValue = Object.freeze(parseTimeValue(props.minTime, "max"));
 /**   时间格式 */
 const timeFormat: "HH:mm" | "HH:mm:ss" = format == "yyyy-MM-dd HH:mm"
     ? "HH:mm"
-    : format == "yyyy-MM-dd HH:mm:ss"
-        ? "HH:mm:ss"
-        : undefined;
+    : (format == "yyyy-MM-dd HH:mm:ss" ? "HH:mm:ss" : undefined);
 /**   时间选择区域：显示已选使时间，并触发时间选择器 */
 const timeAreaDom = timeFormat ? useTemplateRef("time-area") : undefined;
 
@@ -283,48 +288,18 @@ function onDayItemClick(item: DatePickerDayItem, dbClick?: boolean) {
     }
 }
 /**
- * 选择时间
- * @param evt 
+ * 确认选择时间时
+ * @param text 
  */
-async function onSelectTime() {
-    if (props.picker != undefined && timeAreaDom.value != undefined && props.pinned.value != true) {
-        props.pinned.value = true;
-        //  这里后期需要优化一下,需要分析 日期的最大值/最小值中的时间值,然后和时间选择最大值/最小值比对,选出最贴切的最大值/最小值
-        const task = props.picker.showDateTime(
-            timeAreaDom.value,
-            {
-                //  时间选择器相关配置
-                format: timeFormat,
-                value: formatTimeValue(dateRef.value, timeFormat),
-                minTime: props.minTime,
-                maxTime: props.maxTime,
-                toolbar: props.toolbar
-            },
-            {
-                follow: {
-                    followX: "start",
-                    followY: "before",
-                    spaceX: -2,
-                    spaceY: 4,
-                }
-            }
-        );
-        task.finally(() => setTimeout(() => props.pinned.value = false))
-            .then(
-                text => {
-                    if (text != undefined) {
-                        const time = parseTimeValue(text, "min") || Object.create(null);
-                        dateRef.value.hour = time.hour;
-                        dateRef.value.minute = time.minute;
-                        dateRef.value.second = time.second;
-                    }
-                },
-                reason => {
-                    console.error(reason);
-                }
-            );
-    }
+function onConfirmTime(text) {
+    const time = parseTimeValue(text, "min") || Object.create(null);
+    dateRef.value.hour = time.hour;
+    dateRef.value.minute = time.minute;
+    dateRef.value.second = time.second;
+    //  不使用异步，会自动把弹窗销毁掉，具体原因未知，后续待查，可能和 onSwitchStepClick 原因一致
+    setTimeout(() => showTimePicker.value = false, 0);
 }
+
 /**
  * 【现在】按钮点击时
  */
@@ -524,6 +499,14 @@ buildPickerItems(stepRef.value, 0);
                 // color: #999;
                 opacity: 0.6;
             }
+        }
+
+        // 时间选择器
+        >.time-picker {
+            position: absolute;
+            left: 8px;
+            bottom: 24px;
+            z-index: 1;
         }
     }
 }
