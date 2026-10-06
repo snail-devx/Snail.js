@@ -68,6 +68,8 @@ onMounted(() => {
 .snail-elastic {
     position: relative;
     background-color: #F6F8FF;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
 
     //  主内容区域
