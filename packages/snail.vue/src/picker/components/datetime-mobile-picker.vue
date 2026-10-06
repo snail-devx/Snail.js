@@ -107,75 +107,108 @@ function onConfirmSelect() {
  * 年份选择时
  */
 function onYearSelect(code: string) {
-    dateRef.value.year = Number(code);
-    //  若年份无值，则先构建一下，兼容初始化的情况
-    if (yearItemsRef.value == undefined || yearItemsRef.value.length == 0) {
-        yearItemsRef.value = buildYearScrollItems(dateRef.value.year, minDate, maxDate);
-    }
     //  需要判断当前年份是否有效，无效则重新赋值
+    {
+        let year: number = Number(code);
 
-    dateFormat != 'yyyy' && onMonthSelect(String(dateRef.value.month));
+        year != dateRef.value.year && (dateRef.value.year = year);
+    }
+    //  构建月份：按需构建，然后进行月份选择实时刷新选项
+    if (dateFormat != "yyyy") {
+        if (monthItemsRef.value == undefined || minDate != undefined || maxDate != undefined) {
+            monthItemsRef.value = buildMonthScrollItems(dateRef.value.year, minDate, maxDate);
+        }
+        onMonthSelect(String(dateRef.value.month));
+    }
 }
 /**
  * 月份选择时
  * @param code 
  */
 function onMonthSelect(code: string) {
-    dateRef.value.month = Number(code);
-    monthItemsRef.value = buildMonthScrollItems(dateRef.value.year, minDate, maxDate);
     //  需要验证当前月份是否有效，无效则重新赋值
+    {
+        let month: number = Number(code);
 
-    dateFormat != "yyyy-MM" && onDaySelect(String(dateRef.value.day));
+        month != dateRef.value.month && (dateRef.value.month = month);
+    }
+    //  构建天数：实时构建，不同月份天数不一样，2月还要考虑闰年的情况
+    if (dateFormat != "yyyy-MM") {
+        dayItemsRef.value = buildDayScrollItems(dateRef.value.year, dateRef.value.month, minDate, maxDate);
+        onDaySelect(String(dateRef.value.day));
+    }
 }
 /**
  * 天数选择时
  * @param code 
  */
 function onDaySelect(code: string) {
-    dateRef.value.day = Number(code);
-    dayItemsRef.value = buildDayScrollItems(dateRef.value.year, dateRef.value.month, minDate, maxDate);
-    //  需要验证天数是否有效：无效则取最后一天；如2月28,day不能是30日
+    //  需要验证天数是否有效：无效则重新赋值，找不到当前天时取最后一天；如2月28,day不能是30日
     {
+        let day: number = Number(code);
         const dayItem = dayItemsRef.value.find(item => item.code == code);
-        dayItem || (dateRef.value.day = Number(getFromArray(dayItemsRef.value, -1).code));
-    }
-    //  需要验证当前天数是否有效，无效则重新赋值
+        dayItem || (day = Number(getFromArray(dayItemsRef.value, -1).code));
 
-    dateFormat != "yyyy-MM-dd" && onHourSelect(String(dateRef.value.hour));
+        day != dateRef.value.day && (dateRef.value.day = day);
+    }
+    //  构建小时：按需构建，然后进行小时选择实时刷新选项
+    if (dateFormat != "yyyy-MM-dd") {
+        if (hourItemsRef.value == undefined || minTime != undefined || maxTime != undefined) {
+            hourItemsRef.value = buildHourScrollItems(minTime, maxTime);
+        }
+        onHourSelect(String(dateRef.value.hour));
+    }
 }
 /**
  * 小时选择时
  * @param code 
  */
 function onHourSelect(code: string) {
-    dateRef.value.hour = Number(code);
-    hourItemsRef.value = buildHourScrollItems(minTime, maxTime);
     //  验证当前小时是否有效，无效则重新赋值
+    {
+        let hour: number = Number(code);
 
-    const needMinute = (timeFormat /* && timeFormat != "HH" */) || (dateFormat && dateFormat != "yyyy-MM-dd");
-    needMinute && onMinuteSelect(String(dateRef.value.minute));
+        hour != dateRef.value.hour && (dateRef.value.hour = hour);
+    }
+    //  构建分钟：按需构建，然后进行分钟选择实时刷新选项 && timeFormat != "HH"
+    const needMinute = (timeFormat != undefined) || (dateFormat && dateFormat != "yyyy-MM-dd");
+    if (needMinute == true) {
+        if (minuteItemsRef.value == undefined || minTime != undefined || maxTime != undefined) {
+            minuteItemsRef.value = buildMinuteScrollItems(dateRef.value.hour, minTime, maxTime);
+        }
+        onMinuteSelect(String(dateRef.value.minute))
+    }
 }
 /**
  * 分钟选择时
  * @param code 
  */
 function onMinuteSelect(code: string) {
-    dateRef.value.minute = Number(code);
-    minuteItemsRef.value = buildMinuteScrollItems(dateRef.value.hour, minTime, maxTime);
     //  验证当前分钟是否有效，无效则重新赋值
+    {
+        let minute: number = Number(code);
 
+        minute != dateRef.value.minute && (dateRef.value.minute = minute);
+    }
+
+    //  构建秒：按需构建，然后进行秒选择实时刷新选项
     const needSecond = (timeFormat && timeFormat != "HH:mm") || (dateFormat && dateFormat != "yyyy-MM-dd HH:mm");
-    needSecond && onSecondSelect(String(dateRef.value.second));
+    if (needSecond == true) {
+        if (secondItemsRef.value == undefined || minTime != undefined || maxTime != undefined) {
+            secondItemsRef.value = buildSecondScrollItems(dateRef.value.hour, dateRef.value.minute, minTime, maxTime);
+        }
+        onSecondSelect(String(dateRef.value.second));
+    }
 }
 /**
  * 秒选择时
  * @param code 
  */
 function onSecondSelect(code: string) {
-    dateRef.value.second = Number(code);
-    secondItemsRef.value = buildSecondScrollItems(dateRef.value.hour, dateRef.value.minute, minTime, maxTime);
     //  验证当前秒是否有效，无效则重新赋值
+    let second: number = Number(code);
 
+    second != dateRef.value.second && (dateRef.value.second = second);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
@@ -185,11 +218,13 @@ function onSecondSelect(code: string) {
     if (timeFormat != undefined) {
         const time = parseTimeValue(value, "min") || getTimeValue(new Date());
         dateRef.value = { year: 0, month: 0, day: 0, ...time };
+        hourItemsRef.value = buildHourScrollItems(minTime, maxTime);
         onHourSelect(String(dateRef.value.hour));
     }
     else {
         const date = parseDateValue(value, "min") || getDateValue(new Date());
         dateRef.value = date;
+        yearItemsRef.value = buildYearScrollItems(dateRef.value.year, minDate, maxDate);
         onYearSelect(String(dateRef.value.year));
     }
 }
