@@ -10,7 +10,7 @@
             <span class="pick-button" v-text="'取消'" @click="closePopup(undefined)" />
             <span class="pick-button" v-text="'清空'" v-if="clearDisabled != true" @click="closePopup('')" />
             <span class="pick-title ellipsis" v-text="title" />
-            <span class="pick-button" v-text="'确定'" @click="closePopup(valueRef)" />
+            <span class="pick-button" v-text="'确定'" @click="onConfirmSelect()" />
         </div>
         <!-- 实际的选择内容区域 -->
         <div class="pick-body">
@@ -33,10 +33,11 @@
 </template>
 
 <script setup lang="ts">
-import { correctNumber, isArrayNotEmpty, isStringNotEmpty } from "snail.core";
+import { correctNumber, correctString, isArrayNotEmpty, isStringNotEmpty } from "snail.core";
 import { ElasticDetail, IElasticManager, useElastic, useObserver } from "snail.view";
 import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import { useReactive } from "../base/reactive";
+import { usePopup } from "../popup/manager";
 import { DialogHandle } from "../popup/models/dialog-model";
 import { PopupStatusOptions } from "../popup/models/popup-model";
 import { PickerExtend } from "./models/picker-model";
@@ -48,6 +49,7 @@ const props = defineProps<ScrollPickerOptions & ScrollPickerPopupOptions & Parti
 const emits = defineEmits<ScrollPickerEvents>();
 const { onSize } = useObserver();
 const { watcher } = useReactive();
+const toast = props.inPopup ? usePopup().toast : undefined;
 /** 选择项根容器 */
 const pickItemsDom = useTemplateRef("pick-items");
 /** 弹性滚动实例引用 */
@@ -72,6 +74,18 @@ function onPropsChange() {
     setTimeout(elasticRef.value.scrollTo, 0, undefined, -itemHeight * index);
     valueRef.value = isArrayNotEmpty(props.items) ? props.items[index].code : undefined;
 }
+/**
+ * 点击【确定】时
+ */
+function onConfirmSelect() {
+    const code = correctString(valueRef.value, undefined, false);
+    const item = props.items.find(item => item.code == code);
+    if (item == undefined) {
+        toast("warn", "请选择一个选项");
+        return;
+    }
+    props.closePopup(code);
+}
 
 /**
  * 选举选中项
@@ -80,8 +94,36 @@ function onPropsChange() {
  * @param direction 滚动方向，1 向下；-1 向上；推荐时作为优先方向
  * @returns 选择项编码
  */
-function electItem(itemIndex: number, direction: 1 | -1): string {
-    throw new Error("还没实现，后期做实现");
+function electItem(itemIndex: number, direction: 1 | -1): { index: number, code: string } {
+    // 看看是否禁用，禁用了，根据滚动方向，继续向上或者向下选举推荐
+    let item = props.items[itemIndex];
+    if (item && item.disabled == true) {
+        item = undefined;
+        //  向下滚动时，向上查找；向上滚动时，向下查找。找不到的时候，再反向查找一次，看看有没有可用的
+        function electItemByIndex(tmpIndex: number, offset: number) {
+            while (true) {
+                tmpIndex += offset;
+                const tmpItem = props.items[tmpIndex];
+                if (tmpItem == undefined) {
+                    return false;
+                }
+                if (tmpItem.disabled != true) {
+                    item = tmpItem;
+                    itemIndex = tmpIndex;
+                    return true;
+                }
+            }
+        }
+        electItemByIndex(itemIndex, direction == 1 ? -1 : 1) || electItemByIndex(itemIndex, direction == 1 ? 1 : -1);
+        //  还没找到，走一个默认值，若还找不到，则保持现状
+        if (item == undefined) {
+            const tmpIndex = props.items.findIndex(item => item.disabled != true);
+            tmpIndex != -1 && (itemIndex = tmpIndex);
+            item = props.items[tmpIndex];
+        }
+    }
+    //  返回结果：若选举失败，则保持现状选项返回；
+    return { index: itemIndex, code: item ? item.code : undefined };
 }
 
 /**
@@ -96,11 +138,13 @@ function onElastic(detail: ElasticDetail) {
     else {
         const index = parseInt((detail.position.y / itemHeight).toFixed(0));
         const item = props.items[-index];
-        //  后期还需要判断选项是否禁用，若禁用则不允许被选择，
         valueRef.value = item ? item.code : undefined;
         //  结束时，进行位置偏移计算，确保显示完整行
         if (detail.status == "end") {
-            elasticRef.value.scrollTo(undefined, index * itemHeight);
+            //  进行可用选项选举（禁用选项不可选择）；即使选举失败（全是禁用的）也要触发事件，否则可能导致年月日等组合选择无法联动
+            const rt = electItem(-index, detail.touch.total.y >= 0 ? 1 : -1)
+            rt.code != valueRef.value && (valueRef.value = rt.code);
+            elasticRef.value.scrollTo(undefined, -rt.index * itemHeight);
             //  选中值发生改变时，进行事件通知（异步模式，避免滚动卡顿）
             backValue != valueRef.value && setTimeout(emits, 0, "select", valueRef.value);
         }
@@ -222,6 +266,7 @@ onMounted(async () => {
                 &.disabled {
                     color: #ccc;
                     pointer-events: none;
+                    opacity: 0.6;
                 }
             }
         }
