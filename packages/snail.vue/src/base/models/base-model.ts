@@ -77,6 +77,16 @@ export type ValueOptions<T> = {
      */
     value?: T;
 }
+/**
+ * 点击 配置选项
+ */
+export type ClickOptions = {
+    /**
+     * 是否可点击
+     * - true 时，可点击
+     */
+    clickable?: boolean;
+}
 
 /**
  * 确认区域 配置选项
