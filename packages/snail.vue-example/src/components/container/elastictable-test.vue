@@ -28,28 +28,33 @@
             <button @click="handle && onTimeout(scope => scope.destroy(), 1000, handle.showLoading())">loading</button>
         </div>
     </div>
-    <Env :mode="'desktop'">
-        <DataTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
-            :main="{ draggable: true }" :footer="{}" @ready="han => handle = han" @click="console.log"
-            @move="console.log" @select="console.log">
-        </DataTable>
-        <DataTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
-            :main="{ draggable: true }" @ready="han => handle = han" @click="console.log" @move="console.log"
-            @select="console.log">
-            <template #="{ rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>" :key="String(columnIndex)">
-                {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
-            </template>
-        </DataTable>
+    <div style="background-color: gray;display: flex;gap: 20px;flex-direction: column;">
+        <Env :mode="'mobile'">
+            <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
+                :main="{ draggable: true }" :footer="{}" @ready="han => handle = han" @click="console.log"
+                @move="console.log" @select="console.log">
+            </ElasticTable>
+            <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
+                :main="{ draggable: true }" @ready="han => handle = han" @click="console.log" @move="console.log"
+                @select="console.log">
+                <template #="{ rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>"
+                    :key="String(columnIndex)">
+                    {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
+                </template>
+            </ElasticTable>
 
-        <DataTable style="width: 100%;height: 250px;margin-top: 20px;" index :load="loadData" :columns="columns"
-            :main="{ draggable: true }" @ready="han => handle = han" @click="console.log" @move="console.log"
-            @select="console.log">
-            <template #main="{ rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>"
-                :key="String(columnIndex)">
-                {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
-            </template>
-        </DataTable>
-    </Env>
+            <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns" refresh load-more
+                @ready="han => handle = han" @click="console.log" @move="console.log" @select="console.log">
+                <template #="{ column, rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>"
+                    :key="String(columnIndex)">
+                    {{ column.name }}： {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
+                </template>
+                <template #footer>
+                    <Icon button type="arrow" />
+                </template>
+            </ElasticTable>
+        </Env>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -59,11 +64,11 @@ import { components, DataTableColumnOptions, DataTableColumnSlotProps, DataTable
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const { Env, DataTable } = components;
+const { Env, ElasticTable, Icon } = components;
 const { onTimeout } = useTimer();
 //  2、组件交互变量、常量
 const columns: DataTableColumnOptions<any>[] = [
-    { name: "标题", type: "link" },
+    { name: "标题", type: "title" },
     { name: "创建时间1", width: "400px" },
     { name: "创建时间1", width: "400px" },
     // { name: "创建时间2", width: "400px" },

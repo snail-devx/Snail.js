@@ -292,7 +292,7 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
          * - 启用排序模式时生效
          * @returns 排序状态数组
          */
-        getSortStatus<T>(): DataTableSortStatus<any>[] {
+        getSortStatus(): DataTableSortStatus<any>[] {
             throw new Error("getSortStatus:not implement");
         }
     });

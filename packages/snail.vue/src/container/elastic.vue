@@ -67,7 +67,7 @@ onMounted(() => {
 
 .snail-elastic {
     position: relative;
-    background-color: #F6F8FF;
+    background-color: #f7f8f9;
     width: 100%;
     height: 100%;
     overflow: hidden;

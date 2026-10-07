@@ -1,4 +1,4 @@
-<!-- 弹性视图表
+<!-- 弹性视图数据表
     1、基于 Elastic 组件封装，在移动端实现数据管理能力
     2、支持上拉加载，下拉刷新能力
     3、支持数据选择能力，添加数据行、删除数据行、更新数据行等能力
@@ -7,26 +7,60 @@
         2、其他列按照配置宽度渲染
 -->
 <template>
-    <Elastic bar elastic="y">
+    <Elastic class="snail-elastic-table" bar elastic="y" :distance="150"
+        :class="[namespace, selectModeRef && selectModeRef != 'none' ? 'select-mode' : '']">
         <template #default>
-
+            <Empty v-if="rowsRef.length == 0" :message="emptyMessage" />
+            <template v-else>
+                <div v-for="(row, rowIndex) in rowsRef" :key="row.id" class="data-row"
+                    :class="{ 'force-row': forceRowIdRef == row.id }" :id="context.buildRowDomId(row)">
+                    <!-- 选择模式预留 -->
+                    <div class="row-select" v-show="selectModeRef != 'none'"
+                        :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
+                        @click="toggleSelect(row)">
+                        <Icon :type="'success'" :color="'white'" :size="14" />
+                    </div>
+                    <!-- 实际内容区域：默认插槽逻辑 -->
+                    <div class="row-body" @click="selectModeRef == 'none' && emits('click', row, undefined)">
+                        <div v-for="(column, columnIndex) in columns" :key="getKey(column)" class="column-item ellipsis"
+                            :class="column.type" :style="{ width: column.width }">
+                            <slot name="default" :="{ row, rowIndex, column, columnIndex }">
+                                无default插槽，{{ column.name }} 无法渲染
+                            </slot>
+                        </div>
+                    </div>
+                    <!-- 尾部区域：使用插槽渲染 -->
+                    <div class="row-footer" v-if="$slots.footer">
+                        <slot name="footer" :="{ row, rowIndex }" />
+                    </div>
+                </div>
+                <!-- 没有更多数据了：这个需要再琢磨一下，需要在没有数据后的下一次加载更多触发时才显示出来 -->
+                <!-- <div class="no-more-data" v-if="noMoreDataRef && options.loadMore == true">没有更多数据了...</div> -->
+            </template>
         </template>
         <template #plugin="handle">
-            <ElasticUpdown :="handle" :up="true" :down="true" :load="onUpdownLoad"
-                @ready="handle => updownHandleRef = handle" />
+            <!-- 这个需要琢磨一下，需要在没有数据后的下一次触发后，再禁用，并配合【没有更多数据了】的提示 -->
+            <ElasticUpdown :="handle" :up="noMoreDataRef != true && options.loadMore == true" :down="options.refresh"
+                :load="onUpdownLoad" @ready="handle => updownHandleRef = handle" />
+            <!-- Loading提示能力 -->
+            <Loading :show="loadingRef" />
         </template>
     </Elastic>
 </template>
 
 <script setup lang="ts">
-import { shallowRef, ShallowRef } from 'vue';
+import { correctString, useKey } from 'snail.core';
+import { useStyle } from 'snail.view';
+import { computed, nextTick, onMounted, shallowRef, ShallowRef } from 'vue';
+import Icon from '../base/icon.vue';
+import Empty from '../prompt/empty.vue';
+import Loading from '../prompt/loading.vue';
 import ElasticUpdown from './components/elastic-updown.vue';
 import { useDataTable } from './components/table-context.js';
 import Elastic from './elastic.vue';
 import { ElasticUpdownHandle } from './models/elastic-model';
-import { DataTableEvents, ElasticTableOptions } from './models/table-model';
+import { DataTableEvents, DataTableLoadType, ElasticTableOptions } from './models/table-model';
 import { correctElasticTableOptions } from './utils/table-util.js';
-
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -34,9 +68,16 @@ const props = defineProps<ElasticTableOptions<any>>();
 const emits = defineEmits<DataTableEvents>();
 const options = correctElasticTableOptions(props);
 const context = useDataTable("mobile", options, emits);
-//  2、组件交互变量、常量
+const { getKey } = useKey();
+const { namespace, build } = useStyle();
+//  2、参数解构，如覆盖props中属性
+const emptyMessage = computed(() => correctString(props.emptyMessage, '暂无数据', true));
+const { loadingRef, handle, rowsRef, forceRowIdRef, selectModeRef, isSelectable, isSelected, toggleSelect, noMoreDataRef } = context;
+//  3、组件交互变量、常量
 /**     下拉刷新、上拉加载的操作句柄 */
 const updownHandleRef: ShallowRef<ElasticUpdownHandle> = shallowRef();
+/**     是否已经初始化数据了 */
+let hasInitData: boolean = undefined;
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -44,16 +85,157 @@ const updownHandleRef: ShallowRef<ElasticUpdownHandle> = shallowRef();
  * @param type 
  */
 function onUpdownLoad(type: "refresh" | "more"): Promise<void> {
-    return undefined;
+    let loadType: DataTableLoadType = type == "refresh" ? "refresh" : "more";
+    if (loadType == "refresh" && hasInitData != true) {
+        loadType = "init";
+        hasInitData = true;
+    }
+    return handle.loadData(loadType);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
+onMounted(async () => {
+    await nextTick();
+    emits("ready", handle);
+    options.refresh == true
+        ? updownHandleRef.value.refresh("数据加载中...")
+        : handle.loadData("init");
+});
 
 </script>
 
 <style lang="less">
 // 引入基础Mixins样式
 @import "snail.view/dist/styles/mixins.less";
+
+.snail-elastic-table {
+    >.main-area {
+        background-color: #f7f8f9;
+
+        // 数据行基础样式
+        >.data-row {
+            flex: none;
+            position: relative;
+            padding: 12px 14px 0;
+            width: 100%;
+            overflow-x: hidden;
+            min-height: 40px;
+            padding-bottom: 10px;
+            background: white;
+            //  flex布局
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            // 来个底部边框
+            &::after {
+                position: absolute;
+                content: " ";
+                left: 14px;
+                right: 12px;
+                bottom: 0;
+                height: 1px;
+                opacity: 0.4;
+                background-color: #d4d6d9;
+            }
+
+            //  聚焦行的特定样式
+            &.force-row {
+                animation: snail-elastic-table-force-row 0.6s linear;
+
+                @keyframes snail-elastic-table-force-row {
+
+                    0%,
+                    50% {
+                        opacity: 1;
+                        transform: translateX(-10px);
+                    }
+
+                    25%,
+                    75% {
+                        opacity: 0;
+                        transform: translateX(0);
+                    }
+                }
+            }
+        }
+
+        //  数据行的选择数据区域
+        >.data-row>.row-select {
+            flex: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 20px;
+            margin-right: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &.off {
+                border: solid 1px #dcdfe6;
+
+                >svg {
+                    display: none;
+                }
+            }
+
+            &.on {
+                border: solid 1px #4c9aff;
+                background-color: #4c9aff;
+            }
+
+            &.disabled {
+                cursor: not-allowed;
+            }
+
+            &:not(.disabled) {
+                cursor: pointer;
+            }
+        }
+
+        //  数据行实际渲染
+        >.data-row>.row-body {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            color: #8a8f99;
+
+            >.column-item {
+                flex: none;
+                width: 100%;
+                height: 22px;
+                line-height: 22px;
+
+                // 特定样式列
+                &.title {
+                    font-size: 16px;
+                    color: #2e3033;
+                    height: 22px;
+                    line-height: 22px;
+                    margin-bottom: 6px;
+                }
+            }
+        }
+
+        // 行的默认区域
+        >.data-row>.row-footer {
+            flex: none;
+        }
+
+        // 没有更多数据了
+        >.no-more-data {
+            background-color: #f7f8f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777777;
+            font-size: 14px;
+            font-weight: bold;
+            height: 30px;
+        }
+    }
+}
 </style>

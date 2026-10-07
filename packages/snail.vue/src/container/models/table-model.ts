@@ -159,9 +159,9 @@ export type DataTableEvents = ReadyEvents<DataTableHandle<any>> & {
      * 表格点击事件
      * - 数据行点击【link】列时触发
      * @param row 行数据
-     * @param column 列配置
+     * @param column 列配置,移动端整行点击时，为undefined
      */
-    click: [row: DataTableRow<any>, column: DataTableColumnOptions<any>];
+    click: [row: DataTableRow<any>, column?: DataTableColumnOptions<any>];
 
     /**
      * 数据行移动了
