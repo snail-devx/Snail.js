@@ -1,4 +1,4 @@
-<!-- 表格组件
+<!-- 基础表格组件
     1、采用原生table标签渲染；外部传入列配置，自动管理列宽度，并根据列配置生成表头
     2、对外提供插槽（从 tr 标签开始渲染）：
         1、header       表头行渲染，若内部渲染出tr-td
@@ -17,7 +17,7 @@
             <tbody>
                 <slot name="main">
                     <tr>
-                        <td :colspan="columns.length">无main插槽，tbody中tr无法渲染</td>
+                        <td :colspan="columns.length">无[main]插槽，tbody中tr无法渲染</td>
                     </tr>
                 </slot>
             </tbody>
@@ -36,12 +36,14 @@
                 <slot name="footer">
                     <tr>
                         <td :colspan="columns.length">
-                            无footer插槽，tfooter中tr无法渲染
+                            无[footer]插槽，tfooter中tr无法渲染
                         </td>
                     </tr>
                 </slot>
             </tfoot>
         </table>
+        <!-- loading提示效果 -->
+        <Loading :show="true" />
         <!-- 做一个列宽度辅助元素：将列表中配置的固定值放到这里自动计算出来实际宽度，用于辅助【buildTableColStyle】方法计算列宽度样式-->
         <div v-if="hasColumnsRef" class="column-assist" ref="column-assist">
             <span v-for="col in columns" :style="{ width: col.width }" />
@@ -54,6 +56,7 @@ import { correctString, isArrayNotEmpty } from 'snail.core';
 import { AllStyle, StyleClassItem, useObserver, useStyle } from 'snail.view';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import Empty from '../prompt/empty.vue';
+import Loading from '../prompt/loading.vue';
 import { TableEvents, TableOptions, TableRowOptions } from './models/table-model';
 import Scroll from './scroll.vue';
 
@@ -261,6 +264,12 @@ onMounted(() => { //  事件监听处理
                 overflow-y: visible;
             }
         }
+    }
+
+    >div.snail-loading {
+        position: sticky;
+        width: 100%;
+        height: 100%;
     }
 
     //  宽度辅助元素：不显示出来，给高度0。加绝对优先级处理，防止外部做通用化标签处理影响
