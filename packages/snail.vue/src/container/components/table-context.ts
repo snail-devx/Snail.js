@@ -3,15 +3,16 @@ import { scrollIntoView } from "snail.view";
 import { Ref, ref, shallowRef, ShallowRef } from "vue";
 import { AppOptions } from "../../exporter";
 import { EmitterType } from "../models/component-model";
-import { DataTableBaseOptions, DataTableEvents, DataTableHandle, DataTableLoadType, DataTableRow, DataTableRowDetail, DataTableRowPosition, DataTableSelectMode, DataTableSelectResult, DataTableSortStatus, IDataTableContext } from "../models/table-model";
+import { DataTableBaseOptions, DataTableContextUseExt, DataTableEvents, DataTableHandle, DataTableLoadType, DataTableRow, DataTableRowDetail, DataTableRowPosition, DataTableSelectMode, DataTableSelectResult, DataTableSortStatus, IDataTableContext } from "../models/table-model";
 
 /**
  * 数据表上下文
  * @param mode 应用模式，客户端还是移动端
  * @param options 数据表配置选项，请先校验好，避免出问题
  * @param emits 
+ * @param ext 扩展配置
  */
-export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readonly<DataTableBaseOptions<any>>, emits: EmitterType<DataTableEvents>): IDataTableContext & IScope {
+export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readonly<DataTableBaseOptions<any>>, emits: EmitterType<DataTableEvents>, ext?: DataTableContextUseExt): IDataTableContext & IScope {
     /**     数据加载类型 */
     const loadTypeRef: ShallowRef<DataTableLoadType> = shallowRef();
     /**     是否正在加载处理中的标记*/
@@ -185,8 +186,13 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
                 }, 1000);
                 //  记录聚焦，并滚动到可视区域
                 forceRowIdRef.value = row.id;
-                const rowDomId = buildRowDomId(row);
-                scrollIntoView(rowDomId, { block: "end", behavior: "smooth" });
+                if (mode == "desktop") {
+                    const rowDomId = buildRowDomId(row);
+                    scrollIntoView(rowDomId, { block: "end", behavior: "smooth" });
+                }
+                else if (ext && ext.forceRow) {
+                    ext.forceRow(row);
+                }
             }
             return row;
         },

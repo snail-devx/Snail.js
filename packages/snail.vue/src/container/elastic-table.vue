@@ -8,7 +8,8 @@
 -->
 <template>
     <Elastic class="snail-elastic-table" bar elastic="y" :distance="150"
-        :class="[namespace, selectModeRef && selectModeRef != 'none' ? 'select-mode' : '']">
+        :class="[namespace, selectModeRef && selectModeRef != 'none' ? 'select-mode' : '']"
+        @ready="h => elasticHandleRef = h">
         <template #default>
             <Empty v-if="rowsRef.length == 0" :message="emptyMessage" />
             <template v-else>
@@ -58,8 +59,8 @@ import Loading from '../prompt/loading.vue';
 import ElasticUpdown from './components/elastic-updown.vue';
 import { useDataTable } from './components/table-context.js';
 import Elastic from './elastic.vue';
-import { ElasticUpdownHandle } from './models/elastic-model';
-import { DataTableEvents, DataTableLoadType, ElasticTableOptions } from './models/table-model';
+import { ElasticHandle, ElasticUpdownHandle } from './models/elastic-model';
+import { DataTableContextUseExt, DataTableEvents, DataTableLoadType, DataTableRow, ElasticTableOptions } from './models/table-model';
 import { correctElasticTableOptions } from './utils/table-util.js';
 
 // *****************************************   👉  组件定义    *****************************************
@@ -67,19 +68,32 @@ import { correctElasticTableOptions } from './utils/table-util.js';
 const props = defineProps<ElasticTableOptions<any>>();
 const emits = defineEmits<DataTableEvents>();
 const options = correctElasticTableOptions(props);
-const context = useDataTable("mobile", options, emits);
+const context = useDataTable("mobile", options, emits, Object.freeze<DataTableContextUseExt>({ forceRow }));
 const { getKey } = useKey();
 const { namespace, build } = useStyle();
 //  2、参数解构，如覆盖props中属性
 const emptyMessage = computed(() => correctString(props.emptyMessage, '暂无数据', true));
 const { loadTypeRef, loadingRef, handle, rowsRef, forceRowIdRef, selectModeRef, isSelectable, isSelected, toggleSelect, noMoreDataRef } = context;
 //  3、组件交互变量、常量
+/**     Elastic组件操作句柄 */
+const elasticHandleRef: ShallowRef<ElasticHandle> = shallowRef();
 /**     下拉刷新、上拉加载的操作句柄 */
 const updownHandleRef: ShallowRef<ElasticUpdownHandle> = shallowRef();
 /**     是否已经初始化数据了 */
 let hasInitData: boolean = undefined;
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * 聚焦制定行
+ * @param row 
+ */
+async function forceRow(row: DataTableRow<any>) {
+    await nextTick();
+    const domId = context.buildRowDomId(row);
+    const el = document.getElementById(domId);
+    elasticHandleRef.value && elasticHandleRef.value.scrollIntoView(el);
+}
+
 /**
  * 移动端：上拉加载、下拉刷新事件处理
  * @param type 

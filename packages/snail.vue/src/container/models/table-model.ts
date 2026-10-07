@@ -533,6 +533,19 @@ export interface IDataTableContext {
 }
 
 /**
+ * 数据表组件上下文使用时，传入的扩展
+ * - 满足一些特定情况下，内部无法完成交互时的通知
+ */
+export type DataTableContextUseExt = {
+    /**
+     * 聚焦数据行
+     * - 移动端使用 Elstic 组件渲染，无法直接用原生scrollIntoView，需要外部传入此方法
+     * @param row 
+     */
+    forceRow?(row: DataTableRow<any>): void;
+}
+
+/**
  * 数据表的列渲染插槽绑定属性
  */
 export type DataTableColumnSlotProps<Col, Row> = {

@@ -31,16 +31,7 @@
     <div style="background-color: gray;display: flex;gap: 20px;flex-direction: column;">
         <Env :mode="'mobile'">
             <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
-                :main="{ draggable: true }" :footer="{}" @ready="han => handle = han" @click="console.log"
-                @move="console.log" @select="console.log">
-            </ElasticTable>
-            <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
-                :main="{ draggable: true }" @ready="han => handle = han" @click="console.log" @move="console.log"
-                @select="console.log">
-                <template #="{ rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>"
-                    :key="String(columnIndex)">
-                    {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
-                </template>
+                @ready="han => handle = han" @click="console.log" @move="console.log" @select="console.log">
             </ElasticTable>
 
             <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns" refresh load-more
@@ -51,6 +42,14 @@
                 </template>
                 <template #footer>
                     <Icon button type="arrow" />
+                </template>
+            </ElasticTable>
+
+            <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
+                @click="console.log" @move="console.log" @select="console.log">
+                <template #="{ rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>"
+                    :key="String(columnIndex)">
+                    {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
                 </template>
             </ElasticTable>
         </Env>
