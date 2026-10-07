@@ -62,6 +62,7 @@ import Scroll from './scroll.vue';
 const props = defineProps<TableOptions<any>>();
 const emits = defineEmits<TableEvents>();
 const colAssistDom = useTemplateRef("column-assist");
+const { index = false } = props;
 const { namespace, build } = useStyle();
 const { onSize } = useObserver();
 //  2、组件交互变量、常量
@@ -126,8 +127,8 @@ function buildTableColStyle(): StyleClassItem[] {
     //  
     const colWidths: number[] = [];
     {
-        //  梳理宽度信息
-        const realWidth = colAssistDom.value.clientWidth;
+        //  梳理宽度信息：启用序号列，则排除60px固定宽度
+        const realWidth = colAssistDom.value.clientWidth - (index == true ? 60 : 0);
         let autoWidthCount: number = 0;
         let colTotalWidth: number = 0;
         for (let index = 0; index < colAssistDom.value.children.length; index++) {
@@ -163,9 +164,10 @@ function buildTableColStyle(): StyleClassItem[] {
     }
     /**
      * 生成没列的宽度样式配置
-     *  1、其他列按照上面的计算结果约束为固定宽度
+     *  1、启用序号列则固定一个60px列；其他列按照上面的计算结果约束为固定宽度
      *  2、生成的样式宽度，强制加上 width，min-width，max-width 做限制，避免出现宽度异常撑开的问题
      */
+    index == true && colWidths.splice(0, 0, 60);
     return colWidths.map<StyleClassItem>((width, index) => ({
         mode: "child",
         rule: `table>*>tr>td:nth-child(${index + 1})`,
