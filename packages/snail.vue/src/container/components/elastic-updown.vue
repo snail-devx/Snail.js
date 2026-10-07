@@ -14,7 +14,7 @@
         <span>
             <template v-if="refreshRef == 'initial'">下拉刷新数据</template>
             <template v-if="refreshRef == 'release'">释放立即刷新</template>
-            <template v-if="refreshRef == 'running'">正在刷新...</template>
+            <template v-if="refreshRef == 'running'">{{ refreshMessageRef }}</template>
         </span>
     </div>
     <!-- 上拉加载更多数据 -->
@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { isFunction } from 'snail.core';
+import { correctString, isFunction } from 'snail.core';
 import { ElasticDetail, ElasticDockOptions } from 'snail.view';
 import { onMounted, shallowRef, ShallowRef } from 'vue';
 import Icon from '../../base/icon.vue';
@@ -49,6 +49,8 @@ const { target } = props;
 //  2、组件交互变量、常量
 /** 下拉刷新状态：开始态、等待释放生效、刷新中 */
 const refreshRef: ShallowRef<"initial" | "release" | "running"> = shallowRef();
+/** 下拉刷新时的消息提示语，默认“刷新中" */
+const refreshMessageRef: ShallowRef<string> = shallowRef();
 /** 上拉加载状态：初始态、等待释放生效、加载中 */
 const moreRef: ShallowRef<"initial" | "release" | "running"> = shallowRef();
 /** 上拉加载更多的bottom位置定位值 */
@@ -92,6 +94,7 @@ function onDetailChange(detail: ElasticDetail) {
     else {
         if (refreshRef.value == "release") {
             refreshRef.value = "running";
+            refreshMessageRef.value = "正在刷新...";
             setTimeout(onRefreshOrMore, 0, "refresh");
         }
         else if (moreRef.value == "release") {
@@ -148,11 +151,12 @@ onMounted(() => {
     watcher(() => props.detail, onDetailChange);
     //  发送准备事件
     const handle: ElasticUpdownHandle = Object.freeze<ElasticUpdownHandle>({
-        refresh() {
+        refresh(message: string) {
             if (props.down != true) {
                 console.warn("elastic-up-down: down is false, can not refresh");
                 return;
             }
+            refreshMessageRef.value = correctString(message, "正在刷新...", true);
             //  执行刷新处理；后续看情况，如果刷新中，则不进行刷新
             refreshRef.value = "running";
             moreRef.value = undefined;

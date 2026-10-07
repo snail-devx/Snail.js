@@ -71,6 +71,7 @@ export type ElasticUpdownOptions = {
 export type ElasticUpdownHandle = {
     /**
      * 触发下拉刷新
+     * @param message 可制定刷新提示语，默认刷新中
      */
-    refresh(): void;
+    refresh(message?: string): void;
 }
