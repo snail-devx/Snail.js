@@ -43,7 +43,7 @@
             </tfoot>
         </table>
         <!-- loading提示效果 -->
-        <Loading :show="true" />
+        <Loading :show="loading" />
         <!-- 做一个列宽度辅助元素：将列表中配置的固定值放到这里自动计算出来实际宽度，用于辅助【buildTableColStyle】方法计算列宽度样式-->
         <div v-if="hasColumnsRef" class="column-assist" ref="column-assist">
             <span v-for="col in columns" :style="{ width: col.width }" />

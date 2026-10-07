@@ -46,6 +46,7 @@ export * from "./base/utils/icon-util";
 // *****************************************   👉  container 相关导出    ****************************************
 //  类型导出
 export * from "./container/models/component-model";
+export * from "./container/models/datatable-model";
 export * from "./container/models/elastic-model";
 export * from "./container/models/flex-model";
 export * from "./container/models/fold-model";
@@ -60,7 +61,9 @@ export * from "./container/models/wrapper-model";
 //  组件导出：赋值给 components
 import ElasticBar from "./container/components/elastic-bar.vue";
 import ElasticUpdown from "./container/components/elastic-updown.vue";
+import DataTable from "./container/data-table.vue";
 import Dynamic from "./container/dynamic.vue";
+import ElasticTable from "./container/elastic-table.vue";
 import Elastic from "./container/elastic.vue";
 import Flex from "./container/flex.vue";
 import Fold from "./container/fold.vue";
@@ -121,7 +124,8 @@ export const components = {
     //  base下的组件
     Button, Choose, Env, Footer, Header, Icon, Input, Number, Search, Select, Switch, Textarea,
     //  container 下的组件
-    Dynamic, Elastic, ElasticBar, ElasticUpdown, Flex, Fold, Motion, Layout, Page, Scroll, Sort, Table, Tree, Wrapper,
+    Dynamic, Elastic, ElasticBar, ElasticUpdown, Flex, Fold, Motion, Layout, Page, Scroll, Sort, Tree, Wrapper,
+    Table, ElasticTable, DataTable,
     //  other   下的组件
     Action, Card, FieldPanel, FlashNumber,
     //  picker    下的组件

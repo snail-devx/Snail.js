@@ -23,6 +23,7 @@ import SelectTest from "./base/select-test.vue";
 import SwitchTest from "./base/switch-test.vue";
 import TextareaTest from "./base/textarea-test.vue";
 //  👉 容器组件
+import DatatableTest from "./container/datatable-test.vue";
 import DynamicTest from "./container/dynamic-test.vue";
 import ElasticTest from "./container/elastic-test.vue";
 import FlexTest from "./container/flex-test.vue";
@@ -98,6 +99,7 @@ const treeOptions: TreeOptions<Component> = {
             text: "容器组件",
             children: [
                 { text: "Dynamic 动态组件", data: DynamicTest, clickable: true, searchable: true, },
+                { text: "Datatable 数据表", data: DatatableTest, clickable: true, searchable: true, },
                 { text: "Elastic 弹性组件", data: ElasticTest, clickable: true, searchable: true, },
                 { text: "Flex 弹性布局", data: FlexTest, clickable: true, searchable: true, },
                 { text: "Fold 折叠组件", data: FoldTest, clickable: true, searchable: true, },
@@ -180,10 +182,10 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
 
     //  container 测试
-    // onTreeNodeClick(treeOptions.nodes[1].children[8], undefined);
-    // onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
+    // onTreeNodeClick(treeOptions.nodes[1].children[9], undefined);
+    onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
     //  picker 测试
-    onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
+    // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
     // other 测试
     // onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
     //  view 测试
