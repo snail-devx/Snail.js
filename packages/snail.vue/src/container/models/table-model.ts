@@ -4,6 +4,13 @@ import { Ref, ShallowRef } from "vue";
 import { ReadyEvents } from "../../base/models/base-event";
 import { ScrollEvents } from "./scroll-model";
 
+/**
+ * 表系列组件 相关的数据结构
+ * 1、Table         组件，基础table的封装，进行td宽度管理和滚动触底能力
+ * 2、DataTable     组件，基于Table组件封装，增加数据管理能力，支持分页、排序等
+ * 3、ElasticTable  组件，基于Elastic组件封装，增加数据管理能力，用于移动端，对标DataTable组件能力
+ */
+
 //#region *************************************Table 组件数据结构*******************************************
 /**
  * 表格组件 配置选项
@@ -99,52 +106,6 @@ export type TableRowOptions = HeightStyle & {
 
 //#region *************************************DataTable 组件配置选项*******************************************
 /**
- * DataTable 组件基础配置选项
- */
-export type DataTableBaseOptions<T> = {
-    /**
-     * 列配置选项
-     * - 索引序号列不用配置
-     */
-    readonly columns: DataTableColumnOptions<any>[];
-    /**
-     * 加载数据的接口
-     * - 组件决定加载数据时，调用此方法完成数据加载
-     * @param type 加载触发类型，外部可根据类型做特定区分处理
-     * @returns 数据行数组，支持异步返回
-     */
-    readonly load: (type: DataTableLoadType) => DataTableRow<T>[] | Promise<DataTableRow<T>[]>;
-    /**
-     * 是否启用【加载更多】功能
-     * - 为true时，滚动条滚动到底部时，触发加载更多数据
-     * - 默认为false
-     */
-    readonly loadMore?: boolean;
-
-    /**
-     * 每页数据条数
-     * - 判断是否需要触发加载更多数据
-     * - 不配置则默认30
-     */
-    readonly pageSize?: number;
-    /**
-     * 判断行是否能够选择
-     * - 在进入选择模式时，调用此方法判断行是否可被选择
-     * - 若此方法为undefined,则表示所有行都可选
-     * @param action 是什么动作进入的选择模式，如打印、分享、删除等动作
-     * @param row 行数据
-     * @param rowIndex 行索引
-     * @returns 为true是表示可被选择，否则不可选择（如无权限）
-     */
-    readonly canSelect?: (action: string, row: DataTableRow<T>) => boolean;
-    /**
-     * 空数据时，显示的提示信息
-     * - 不配置则默认：暂无数据
-     */
-    emptyMessage?: string;
-}
-
-/**
  * DataTable 组件配置选项
  */
 export type DataTableOptions<T> = DataTableBaseOptions<T> & {
@@ -218,128 +179,51 @@ export type DataTableEvents = ReadyEvents<DataTableHandle<any>> & {
     select: [result: Readonly<DataTableSelectResult>];
 }
 
-//#endregion
-
-//#region *************************************ElasticTable 组件配置选项*******************************************
 /**
- * ElasticTable 组件配置选项
+ * DataTable 组件基础配置选项
  */
-export type ElasticTableOptions<T> = DataTableBaseOptions<T> & {
+export type DataTableBaseOptions<T> = {
     /**
-     * 是否启动【刷新数据】功能
-     * - 为true时，下拉滚动到顶部时，触发刷新数据
+     * 列配置选项
+     * - 索引序号列不用配置
+     */
+    readonly columns: DataTableColumnOptions<any>[];
+    /**
+     * 加载数据的接口
+     * - 组件决定加载数据时，调用此方法完成数据加载
+     * @param type 加载触发类型，外部可根据类型做特定区分处理
+     * @returns 数据行数组，支持异步返回
+     */
+    readonly load: (type: DataTableLoadType) => DataTableRow<T>[] | Promise<DataTableRow<T>[]>;
+    /**
+     * 是否启用【加载更多】功能
+     * - 为true时，滚动条滚动到底部时，触发加载更多数据
      * - 默认为false
      */
-    readonly refresh?: boolean;
-}
-//#endregion
-
-
-//#region *************************************数据表 相关组件的基础数据结构构*******************************************
-/**
- * 数据表的加载数据的类型
- * - init:初始化加载，组件首次加载数据
- * - search:搜索加载，用户触发搜索，重新加载数据
- * - refresh:刷新数据，重新加载数据
- * - more:加载更多数据
- */
-export type DataTableLoadType = "init" | "search" | "refresh" | "more";
-/**
- * 数据表选择模式
- * - none：非选择状态
- * - single:单选模式
- * - multiple:多选模式
- */
-export type DataTableSelectMode = "none" | "single" | "multiple"
-/**
- * 数据表列配置选项
- * @typeParam T 列附带数据的数据类型
- */
-export type DataTableColumnOptions<T> = TableColumnOptions<T> & {
-    /** @see TableColumnOptions 属性
-     *      name        列名称
-     *      width       宽度配置
-     *      data        列附带数据
-     */
+    readonly loadMore?: boolean;
 
     /**
-     * 列类型
-     * - normal:【默认值】普通列，支持所有模式
-     * - link:链接列。桌面端鼠标移入时，显示链接样式；移动端出“>”标记；点击时触发“列点击”事件
-     * - title:标题列。桌面端和link效果一致；移动端强制100%宽度，文本加粗、颜色区分，推荐一个放到首列
-     * - operate:操作列；操作列，在【选择】模式下不显示
+     * 每页数据条数
+     * - 判断是否需要触发加载更多数据
+     * - 不配置则默认30
      */
-    type?: "normal" | "link" | "title" | "operate";
-
+    readonly pageSize?: number;
     /**
-     * 是否支持排序
-     * - 仅【桌面客户端】生效
-     * - true时，此列支持切换排序（升级、降序）
-     * - false时，此列不支持排序
+     * 判断行是否能够选择
+     * - 在进入选择模式时，调用此方法判断行是否可被选择
+     * - 若此方法为undefined,则表示所有行都可选
+     * @param action 是什么动作进入的选择模式，如打印、分享、删除等动作
+     * @param row 行数据
+     * @param rowIndex 行索引
+     * @returns 为true是表示可被选择，否则不可选择（如无权限）
      */
-    sortable?: boolean;
+    readonly canSelect?: (action: string, row: DataTableRow<T>) => boolean;
+    /**
+     * 空数据时，显示的提示信息
+     * - 不配置则默认：暂无数据
+     */
+    emptyMessage?: string;
 }
-/**
- * 数据表的行配置选项
- * - 约束高度和背景色等一些特定配置，后期逐级加码
- */
-export type DataTableRowOptions = TableRowOptions & {
-    // /**
-    //  * 行渲染插槽类型
-    //  * - column      列自定义插槽，列内部内容由外部自定义渲染
-    //  * - row         行自定义插槽，行内部内容由外部自定义渲染
-    //  * - 默认值为 column
-    //  */
-    // slot?: "column" | "row";
-}
-/**
- * 数据表行的拖拽配置
- */
-export type DataTableRowDragOptions = {
-    /**
-     * 是否可拖拽
-     * - true时，可拖拽调整行位置
-     * - false时，不支持调整行位置
-     */
-    draggable?: boolean;
-    /**
-     * 拖拽时，拖拽手柄的类名
-     * - 不传入则默认 整行 可拖拽
-     */
-    dragHandle?: string;
-}
-/**
- * 数据表行数据
- */
-export type DataTableRow<T> = {
-    /**
-     * 行主键Id
-     * - 避免行重复加载
-     */
-    readonly id: string;
-    /**
-     * 行附带数据
-     * - 可基于此数据进行渲染配置
-     */
-    readonly data?: T;
-}
-/**
- * 数据表行详情信息
- * - 附带上行的索引位置
- */
-export type DataTableRowDetail<T> = {
-    /**
-     * 所在索引位置
-     */
-    readonly index: number;
-} & DataTableRow<T>;
-/**
- * 数据表行位置
- * - number：索引位置
- * - string：数据行Id
- * - function：断言函数，返回true时，表示符合条件
- */
-export type DataTableRowPosition<T> = number | string | ((row: DataTableRow<T>) => boolean);
 
 /**
  * 数据表的操作句柄
@@ -444,6 +328,113 @@ export type DataTableHandle<T> = {
      */
     getSortStatus<T>(): DataTableSortStatus<T>[];
 }
+
+/**
+ * 数据表的加载数据的类型
+ * - init:初始化加载，组件首次加载数据
+ * - search:搜索加载，用户触发搜索，重新加载数据
+ * - refresh:刷新数据，重新加载数据
+ * - more:加载更多数据
+ */
+export type DataTableLoadType = "init" | "search" | "refresh" | "more";
+/**
+ * 数据表选择模式
+ * - none：非选择状态
+ * - single:单选模式
+ * - multiple:多选模式
+ */
+export type DataTableSelectMode = "none" | "single" | "multiple"
+
+/**
+ * 数据表列配置选项
+ * @typeParam T 列附带数据的数据类型
+ */
+export type DataTableColumnOptions<T> = TableColumnOptions<T> & {
+    /** @see TableColumnOptions 属性
+     *      name        列名称
+     *      width       宽度配置
+     *      data        列附带数据
+     */
+
+    /**
+     * 列类型
+     * - normal:【默认值】普通列，支持所有模式
+     * - link:链接列。桌面端鼠标移入时，显示链接样式；移动端出“>”标记；点击时触发“列点击”事件
+     * - title:标题列。桌面端和link效果一致；移动端强制100%宽度，文本加粗、颜色区分，推荐一个放到首列
+     * - operate:操作列；操作列，在【选择】模式下不显示
+     */
+    type?: "normal" | "link" | "title" | "operate";
+
+    /**
+     * 是否支持排序
+     * - 仅【桌面客户端】生效
+     * - true时，此列支持切换排序（升级、降序）
+     * - false时，此列不支持排序
+     */
+    sortable?: boolean;
+}
+/**
+ * 数据表的行配置选项
+ * - 约束高度和背景色等一些特定配置，后期逐级加码
+ */
+export type DataTableRowOptions = TableRowOptions & {
+    // /**
+    //  * 行渲染插槽类型
+    //  * - column      列自定义插槽，列内部内容由外部自定义渲染
+    //  * - row         行自定义插槽，行内部内容由外部自定义渲染
+    //  * - 默认值为 column
+    //  */
+    // slot?: "column" | "row";
+}
+/**
+ * 数据表行的拖拽配置
+ */
+export type DataTableRowDragOptions = {
+    /**
+     * 是否可拖拽
+     * - true时，可拖拽调整行位置
+     * - false时，不支持调整行位置
+     */
+    draggable?: boolean;
+    /**
+     * 拖拽时，拖拽手柄的类名
+     * - 不传入则默认 整行 可拖拽
+     */
+    dragHandle?: string;
+}
+/**
+ * 数据表行数据
+ */
+export type DataTableRow<T> = {
+    /**
+     * 行主键Id
+     * - 避免行重复加载
+     */
+    readonly id: string;
+    /**
+     * 行附带数据
+     * - 可基于此数据进行渲染配置
+     */
+    readonly data?: T;
+}
+/**
+ * 数据表行详情信息
+ * - 附带上行的索引位置
+ */
+export type DataTableRowDetail<T> = {
+    /**
+     * 所在索引位置
+     */
+    readonly index: number;
+} & DataTableRow<T>;
+/**
+ * 数据表行位置
+ * - number：索引位置
+ * - string：数据行Id
+ * - function：断言函数，返回true时，表示符合条件
+ */
+export type DataTableRowPosition<T> = number | string | ((row: DataTableRow<T>) => boolean);
+
 /**
  * 数据表的选择结果信息
  */
@@ -534,5 +525,44 @@ export interface IDataTableContext {
      * @param row 当前行，为undefined时，表示切换全选状态
      */
     toggleSelect(row?: DataTableRow<any>): void;
+}
+
+/**
+ * 数据表的列渲染插槽绑定属性
+ */
+export type DataTableColumnSlotProps<Col, Row> = {
+    /**
+     * 当前列配置
+     */
+    column: DataTableColumnOptions<Col>;
+    /**
+     * 列索引
+     */
+    columnIndex: number;
+
+    /**
+     * 当前行数据
+     * - 为undefined则表示渲染的是header和footer中的列
+     */
+    row?: DataTableRow<Row>;
+    /**
+     * 当前行索引
+     * - 为undefined则表示渲染的是header和footer中的列
+     */
+    rowIndex?: number;
+}
+//#endregion
+
+//#region *************************************ElasticTable 组件配置选项*******************************************
+/**
+ * ElasticTable 组件配置选项
+ */
+export type ElasticTableOptions<T> = DataTableBaseOptions<T> & {
+    /**
+     * 是否启动【刷新数据】功能
+     * - 为true时，下拉滚动到顶部时，触发刷新数据
+     * - 默认为false
+     */
+    readonly refresh?: boolean;
 }
 //#endregion

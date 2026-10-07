@@ -101,11 +101,11 @@ import { correctString, newId, useKey } from 'snail.core';
 import { computed, nextTick, onMounted } from 'vue';
 import Icon from '../base/icon.vue';
 import Empty from '../prompt/empty.vue';
-import { useDataTable } from './components/datatable-context';
+import { useDataTable } from './components/table-context';
 import { DataTableEvents, DataTableOptions } from './models/table-model';
 import Sort from './sort.vue';
 import Table from './table.vue';
-import { correctDataTableOptions } from './utils/datatable-util';
+import { correctDataTableOptions } from './utils/table-util';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

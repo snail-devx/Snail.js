@@ -20,12 +20,12 @@
 
 <script setup lang="ts">
 import { shallowRef, ShallowRef } from 'vue';
-import { useDataTable } from './components/datatable-context.js';
 import ElasticUpdown from './components/elastic-updown.vue';
+import { useDataTable } from './components/table-context.js';
 import Elastic from './elastic.vue';
 import { ElasticUpdownHandle } from './models/elastic-model';
 import { DataTableEvents, ElasticTableOptions } from './models/table-model';
-import { correctElasticTableOptions } from './utils/datatable-util.js';
+import { correctElasticTableOptions } from './utils/table-util.js';
 
 
 // *****************************************   👉  组件定义    *****************************************

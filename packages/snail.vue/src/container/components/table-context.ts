@@ -3,7 +3,7 @@ import { scrollIntoView } from "snail.view";
 import { Ref, ref, shallowRef, ShallowRef } from "vue";
 import { AppOptions } from "../../exporter";
 import { EmitterType } from "../models/component-model";
-import { DataTableEvents, DataTableHandle, DataTableLoadType, DataTableOptions, DataTableRow, DataTableRowDetail, DataTableRowPosition, DataTableSelectMode, DataTableSelectResult, DataTableSortStatus, IDataTableContext } from "../models/table-model";
+import { DataTableBaseOptions, DataTableEvents, DataTableHandle, DataTableLoadType, DataTableRow, DataTableRowDetail, DataTableRowPosition, DataTableSelectMode, DataTableSelectResult, DataTableSortStatus, IDataTableContext } from "../models/table-model";
 
 /**
  * 数据表上下文
@@ -11,7 +11,7 @@ import { DataTableEvents, DataTableHandle, DataTableLoadType, DataTableOptions, 
  * @param options 数据表配置选项，请先校验好，避免出问题
  * @param emits 
  */
-export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readonly<DataTableOptions<any>>, emits: EmitterType<DataTableEvents>): IDataTableContext & IScope {
+export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readonly<DataTableBaseOptions<any>>, emits: EmitterType<DataTableEvents>): IDataTableContext & IScope {
     /**     是否正在加载处理中的标记*/
     const loadingRef: ShallowRef<boolean> = shallowRef(false);
     //  数据行维护

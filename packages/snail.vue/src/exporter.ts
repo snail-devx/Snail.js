@@ -46,7 +46,6 @@ export * from "./base/utils/icon-util";
 // *****************************************   👉  container 相关导出    ****************************************
 //  类型导出
 export * from "./container/models/component-model";
-export * from "./container/models/datatable-model";
 export * from "./container/models/elastic-model";
 export * from "./container/models/flex-model";
 export * from "./container/models/fold-model";
