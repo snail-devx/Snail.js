@@ -7,7 +7,7 @@ import { correctNumber, isArray, isArrayNotEmpty, IScope, isFunction, isNumberNo
 import { scrollIntoView } from "snail.view";
 import { Ref, ref, ShallowRef, shallowRef } from "vue";
 import { EmitterType } from "../models/component-model";
-import { ITableManager, TableDataRow, TableDataRowDetail, TableDataRowPosition, TableEvents, TableHandle, TableLoadType, TableOptions, TableSelectMode, TableSelectResult, TableSortStatus } from "../models/table-model";
+import { ITable2Manager, Table2DataRow, Table2DataRowDetail, Table2DataRowPosition, Table2Events, Table2Handle, Table2LoadType, Table2Options, Table2SelectMode, Table2SelectResult, Table2SortStatus } from "../models/table-model";
 import { buildRowDomId, correctOptions } from "../utils/table-util";
 
 /**
@@ -16,14 +16,14 @@ import { buildRowDomId, correctOptions } from "../utils/table-util";
  * @param emits 事件发射器，用于通知外面数据发生变化了
  * @returns 管理器对象+Scope作用域
  */
-export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterType<TableEvents>): ITableManager & IScope {
+export function useTable(options: Readonly<Table2Options<any>>, emits: EmitterType<Table2Events>): ITable2Manager & IScope {
     /**     是否正在加载处理中的标记*/
     const loadingRef: ShallowRef<boolean> = shallowRef(false);
     //  数据行维护
     /**     数据加载正在运行中：做标记位，避免重复加载*/
     let dataLoadRunning: boolean = false;
     /**     表数据行 */
-    const rowsRef: Ref<TableDataRow<any>[]> = ref([]);
+    const rowsRef: Ref<Table2DataRow<any>[]> = ref([]);
     /**     数据主键Id字典，key为主键Id；用于确保row不重复 */
     const idMap: Map<string, boolean> = new Map<string, boolean>();
     /**     是否没有更多数据了*/
@@ -34,7 +34,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
     let forceRowTimerId: NodeJS.Timeout = undefined;
     //  选择数据相关
     /**     选择模式*/
-    const selectModeRef: ShallowRef<TableSelectMode> = shallowRef("none");
+    const selectModeRef: ShallowRef<Table2SelectMode> = shallowRef("none");
     /**     选择模式动作：标记是什么动作触发的选择模式*/
     let selectModeAction: string = undefined;
     /**     可选择的数据字典，key为行数据Id,value为是否可选择 */
@@ -49,15 +49,15 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
      * 操作句柄，对外一些表格操作能力
      * - 提前定义好，并冻结，避免外部干扰
      */
-    const handle: TableHandle<any> = Object.freeze<TableHandle<any>>({
+    const handle: Table2Handle<any> = Object.freeze<Table2Handle<any>>({
         /**
          * 加载数据
-         * - 组件准备好以后，实际调用{@link TableOptions.load}方法加载数据
+         * - 组件准备好以后，实际调用{@link Table2Options.load}方法加载数据
          * - 备注：组件第一次初始化时，不用外部调用，组件内部会自动调用
          * @param type 类型，可基于此类型做特定区分处理
          * @returns 异步任务，外部可感知加载进度
          */
-        async loadData(type: TableLoadType): Promise<void> {
+        async loadData(type: Table2LoadType): Promise<void> {
             //  如果已经没有更多数据了，则忽略 more 操作
             if (dataLoadRunning == true) {
                 return;
@@ -121,10 +121,10 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * @param position 数据行位置
          * @returns 数据行详情,包含行索引位置和行对象；不存在则返回undefined
          */
-        getRow(position: TableDataRowPosition<any>): TableDataRowDetail<any> | undefined {
+        getRow(position: Table2DataRowPosition<any>): Table2DataRowDetail<any> | undefined {
             /** 位置信息，支持索引数值、字符串数据行主键Id,函数断言 */
             let index: number = undefined;
-            let row: TableDataRow<any> = undefined;
+            let row: Table2DataRow<any> = undefined;
             if (isString(position) == true) {
                 index = rowsRef.value.findIndex(row => row.id == position);
                 index != undefined && (row = rowsRef.value[index]);
@@ -144,9 +144,9 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * @param predicate 断言函数，返回true时，表示符合条件
          * @returns 符合条件的数据行详情数组；不存在则返回undefined
          */
-        getRows(predicate: (row: TableDataRow<any>) => boolean): TableDataRowDetail<any>[] {
+        getRows(predicate: (row: Table2DataRow<any>) => boolean): Table2DataRowDetail<any>[] {
             mustFunction(predicate, "predicate");
-            const rows: TableDataRowDetail<any>[] = [];
+            const rows: Table2DataRowDetail<any>[] = [];
             rowsRef.value.forEach((row, index) => {
                 predicate(row) && rows.push(Object.freeze({ index, ...row }))
             });
@@ -160,13 +160,13 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * @param data 行附带数据
          * @returns 数据行详情; 不存在则返回undefined
          */
-        addRow(index: number | undefined, id: string, data?: any): TableDataRowDetail<any> {
+        addRow(index: number | undefined, id: string, data?: any): Table2DataRowDetail<any> {
             selectModeRef.value == "none" || throwError("cannot add row when select mode.");
             //  验证Id的存在性
             index = correctNumber(index, undefined);
             mustString(id, "id");
             throwIfTrue(idMap.has(id), `id is exist. id: ${id}.`);
-            const row: TableDataRow<any> = Object.freeze({ id, data });
+            const row: Table2DataRow<any> = Object.freeze({ id, data });
             index == undefined
                 ? rowsRef.value.push(row)
                 : rowsRef.value.splice(index, 0, row);
@@ -180,7 +180,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * @param position 数据行位置
          * @returns 数据行详情; 不存在则返回undefined
          */
-        forceRow(position: TableDataRowPosition<any>): TableDataRowDetail<any> | undefined {
+        forceRow(position: Table2DataRowPosition<any>): Table2DataRowDetail<any> | undefined {
             const row = handle.getRow(position);
             if (row != undefined) {
                 forceRowTimerId && clearTimeout(forceRowTimerId);
@@ -201,7 +201,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * @param newPosition 新位置
          * @returns 数据行移动后的详情；否则返回undefined
          */
-        moveRow(oldPosition: TableDataRowPosition<any>, newPosition: TableDataRowPosition<any>): TableDataRowDetail<any> | undefined {
+        moveRow(oldPosition: Table2DataRowPosition<any>, newPosition: Table2DataRowPosition<any>): Table2DataRowDetail<any> | undefined {
             const oldRow = handle.getRow(oldPosition);
             let newRow = oldRow ? handle.getRow(newPosition) : undefined;
             if (newRow != undefined) {
@@ -217,7 +217,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * @param data 行附带的数据
          * @returns 数据行详情; 不存在则返回undefined
          */
-        refreshRow(position: TableDataRowPosition<any>, data?: any): TableDataRowDetail<any> | undefined {
+        refreshRow(position: Table2DataRowPosition<any>, data?: any): Table2DataRowDetail<any> | undefined {
             /** 先删除后插入 */
             selectModeRef.value == "none" || throwError("cannot refresh row when select mode.");
             const row = handle.deleteRow(position);
@@ -228,7 +228,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * @param position 数据行位置
          * @returns 数据行详情; 不存在则返回undefined
          */
-        deleteRow(position: TableDataRowPosition<any>): TableDataRowDetail<any> | undefined {
+        deleteRow(position: Table2DataRowPosition<any>): Table2DataRowDetail<any> | undefined {
             selectModeRef.value == "none" || throwError("cannot delete row when select mode.");
             const row = handle.getRow(position);
             if (row != undefined) {
@@ -260,9 +260,9 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * - 【多选模式】下，可传undefined表示切换【全选】按钮
          * @param position 数据行详情，传undefined表示切换全选
          */
-        toggleRowSelect(position?: TableDataRowPosition<any>): void {
+        toggleRowSelect(position?: Table2DataRowPosition<any>): void {
             selectModeRef.value == "none" && throwError("table is not in select mode.");
-            let row: TableDataRow<any> = undefined;
+            let row: Table2DataRow<any> = undefined;
             if (position != undefined) {
                 row = handle.getRow(position);
                 throwIfUndefined(row, `row is not exist. position: ${position}.`);
@@ -278,7 +278,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * - 启用选择模式时生效
          * @returns 选择结果
          */
-        getSelectResult(): TableSelectResult {
+        getSelectResult(): Table2SelectResult {
             throwIfTrue(selectModeRef.value == "none", "table is not in select mode.");
             return buildSelectResult();
         },
@@ -297,7 +297,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
          * - 启用排序模式时生效
          * @returns 排序状态数组
          */
-        getSortStatus<T>(): TableSortStatus<any>[] {
+        getSortStatus<T>(): Table2SortStatus<any>[] {
             throw new Error("getSortStatus:not implement");
         }
     });
@@ -310,7 +310,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
      * @param row 当前行，为undefined时，表示全选状态
      * @returns true:表示可以选中；false:表示不可以选中
      */
-    function isSelectable(row?: TableDataRow<any>): boolean {
+    function isSelectable(row?: Table2DataRow<any>): boolean {
         const id: string = row ? row.id : selectIdOfAllSelect;
         if (selectableRowMap.has(id) == false) {
             if (row == undefined) {
@@ -330,7 +330,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
      * @param row 
      * @param row 当前行，为undefined时，表示全选状态
      */
-    function isSelected(row?: TableDataRow<any>): boolean {
+    function isSelected(row?: Table2DataRow<any>): boolean {
         const id: string = row ? row.id : selectIdOfAllSelect;
         //  1、非全选时，直接判断字典中状态
         if (id != selectIdOfAllSelect) {
@@ -351,7 +351,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
      * 切换选择状态
      * @param row 当前行，为undefined时，表示切换全选状态
      */
-    function toggleSelect(row?: TableDataRow<any>): void {
+    function toggleSelect(row?: Table2DataRow<any>): void {
         //  不可选择列，做忽略处理
         if (isSelectable(row) == false) {
             console.warn(`row is not selectable. row: ${row}`);
@@ -395,7 +395,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
     /**
      * 构建选择结果
      */
-    function buildSelectResult(): TableSelectResult {
+    function buildSelectResult(): Table2SelectResult {
         switch (selectModeRef.value) {
             // 单选时，取第一个
             case "single": {
@@ -404,7 +404,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
                     const [id, isSelected] = selectedRowMapRef.value.entries().next().value;
                     isSelected == true && selectedIds.push(id);
                 }
-                return Object.freeze<TableSelectResult>({ isSelectAll: false, selectedIds, unSelectedIds: [] });
+                return Object.freeze<Table2SelectResult>({ isSelectAll: false, selectedIds, unSelectedIds: [] });
             }
             //  多选时，取全部，判断全选是否选中了
             case "multiple": {
@@ -417,7 +417,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
                         : (isSelected == true && selectedIds.push(id));
                 }
 
-                return Object.freeze<TableSelectResult>({ isSelectAll, selectedIds, unSelectedIds });
+                return Object.freeze<Table2SelectResult>({ isSelectAll, selectedIds, unSelectedIds });
             }
             //  其他情况不支持，undefined
             default: return undefined;
@@ -427,7 +427,7 @@ export function useTable(options: Readonly<TableOptions<any>>, emits: EmitterTyp
 
     //  管理器初始化构建
     {
-        const manager = mountScope<ITableManager>({
+        const manager = mountScope<ITable2Manager>({
             rowsRef, loadingRef, noMoreDataRef,
             forceRowIdRef,
             handle,

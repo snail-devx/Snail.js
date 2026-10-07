@@ -1,163 +1,187 @@
-<!--表格组件：
-    1、使用原生 table 标签进行绘制，实现数据表能力
-    2、支持列头排序能力：支持单列、多列排序（升级、降序）操作
-    3、支持拖拽行调整顺序能力：支持列的触发handle，不指定则整行、、
-    4、集成数据管理能力，为行、列提供附加数据管理能力，主动加载行数据，而不是被动调用
-    5、对外暴露操作数据能力，如选择数据、刷新、添加数据等等
-    6、数据行渲染，完全交给外部，通过插槽实现，插槽绑定行、列相关信息
-    7、支持事件能力，让外部能感知到表格组件状态，如渲染完成时将handle句柄暴露出去
+<!-- 表格组件
+    1、采用原生table标签渲染；外部传入列配置，自动管理列宽度，并根据列配置生成表头
+    2、对外提供插槽（从 tr 标签开始渲染）：
+        1、header       表头行渲染，若内部渲染出tr-td
+        2、main         表格主体行渲染，若无则提示无main插槽
+        3、footer       表格底部行渲染，若无则提示无footer插槽
+    3、对外提供事件：
+        1、ready        表格组件准备好了
+        2、bottom       滚动到底部时触发
 -->
 <template>
-    <div class="snail-table small-scrollbar" :class="namespace, border ? 'start-border' : ''" ref="table-root">
-        <!-- 实际内容表格渲染 -->
-        <table cellpadding="0" cellspacing="0">
-            <!-- 无数据提醒 -->
-            <tbody v-if="rowsRef.length == 0">
-                <tr class="empty-message">
-                    <td :colspan="columns.length + 1">
-                        <Empty :message="emptyMessage" />
-                    </td>
-                </tr>
-            </tbody>
-            <!-- 真实数据行:main或者default插槽；启用拖拽调整行顺序时，不允许和其他容器拖出、拖出-->
-            <tbody v-else>
-                <Sort :group="{ name: dragId, pull: false, put: false }" :changer="rowsRef.length"
-                    :draggable="'.tbody-row'" :ghost-class="'drag-ghost'" :drag-class="'dragging'"
-                    :handle="main.dragHandle"
-                    :disabled="main ? (selectModeRef != 'none' || main.draggable != true) : true"
-                    @update="handle.moveRow">
-                    <tr v-for="(row, rowIndex) in rowsRef" :key="row.id" class="tbody-row"
-                        :class="{ 'force-row': forceRowIdRef == row.id }" :id="buildRowDomId(row.id)">
-                        <!-- 序号列 -->
-                        <td class="index">
-                            <template v-if="selectModeRef == 'single' || selectModeRef == 'multiple'">
-                                <div class="row-select"
-                                    :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
-                                    @click="toggleSelect(row)">
-                                    <Icon :type="'success'" :color="'white'" :size="12" />
-                                </div>
-                            </template>
-                            <template v-else>
-                                {{ rowIndex + 1 }}
-                            </template>
-                        </td>
-                        <!-- 真实数据列 -->
-                        <template v-if="$slots.main || $slots.default">
-                            <td v-for="(column, columnIndex) in columns" :key="getKey(column)"
-                                :class="{ link: column.type == 'link' }"
-                                @click="column.type == 'link' && emits('click', row, column)">
-                                <slot name="main" v-if="$slots.main" :="{ column, columnIndex, row, rowIndex }" />
-                                <slot name="default" v-else :="{ column, columnIndex, row, rowIndex }" />
-                            </td>
-                        </template>
-                        <template v-else>
-                            <td :colspan="columns.length">无mian和default插槽，td无法渲染</td>
-                        </template>
+    <Scroll class="snail-table" :class="namespace, border ? 'start-border' : ''" :scroll="'both'"
+        :bar-size="barSize || 'small'" @bottom="emits('bottom')">
+        <Empty v-if="hasColumnsRef != true" :message="'无columns配置，无法进行表格渲染'" />
+        <!-- 主内容区域 -->
+        <table v-if="hasColumnsRef" cellpadding="0" cellspacing="0">
+            <tbody>
+                <slot name="main">
+                    <tr>
+                        <td :colspan="columns.length">无main插槽，tbody中tr无法渲染</td>
                     </tr>
-                </Sort>
+                </slot>
             </tbody>
             <!-- 表头：放到 tbody 的后面，这样固定列头就不用 index 值了 -->
             <thead>
-                <tr>
-                    <td class="index">
-                        <template v-if="selectModeRef == 'none'">序号</template>
-                        <template v-else-if="selectModeRef == 'multiple'">
-                            <div class="row-select" :class="[isSelected(undefined) == true ? 'on' : 'off']"
-                                @click="toggleSelect(undefined)">
-                                <Icon :type="'success'" :color="'white'" :size="12" />
-                            </div>
-                        </template>
-                    </td>
-                    <td v-for="(column, columnIndex) in columns" :key="getKey(column)">
-                        <slot name="header" :="{ column, columnIndex }">
-                            <span v-text="column.name" />
-                        </slot>
-                    </td>
-                </tr>
+                <slot name="header">
+                    <tr>
+                        <td v-for="col in columns">
+                            <span v-text="col.name" />
+                        </td>
+                    </tr>
+                </slot>
             </thead>
             <!-- 底部数据行:用于统计合计,序号列,给各图标 -->
-            <tfoot v-if="!!footer && rowsRef.length > 0" v-show="selectModeRef == 'none'">
-                <tr>
-                    <td>
-                        <Icon :type="'stats'" :title="'合计'" :size="20" :color="'#4c94ff'" />
-                    </td>
-                    <td v-for="(column, columnIndex) in columns" :key="getKey(column)">
-                        <slot name="footer" :="{ column, columnIndex }" />
-                    </td>
-                </tr>
+            <tfoot v-if="footer">
+                <slot name="footer">
+                    <tr>
+                        <td :colspan="columns.length">
+                            无footer插槽，tfooter中tr无法渲染
+                        </td>
+                    </tr>
+                </slot>
             </tfoot>
         </table>
-        <!-- loading提示 -->
-        <Loading :show="loadingRef" />
         <!-- 做一个列宽度辅助元素：将列表中配置的固定值放到这里自动计算出来实际宽度，用于辅助【buildTableColStyle】方法计算列宽度样式-->
-        <div class="column-assist" ref="column-assist">
+        <div v-if="hasColumnsRef" class="column-assist" ref="column-assist">
             <span v-for="col in columns" :style="{ width: col.width }" />
         </div>
-    </div>
+    </Scroll>
 </template>
 
 <script setup lang="ts">
-import { correctString, newId, useKey } from 'snail.core';
-import { ScrollDetail, useObserver, useScroll, useStyle } from 'snail.view';
+import { correctString, isArrayNotEmpty } from 'snail.core';
+import { AllStyle, StyleClassItem, useObserver, useStyle } from 'snail.view';
 import { computed, onMounted, useTemplateRef } from 'vue';
-import Icon from '../base/icon.vue';
 import Empty from '../prompt/empty.vue';
-import Loading from '../prompt/loading.vue';
-import { useTable } from './components/table-context.js';
-import { TableColumnOptions, TableEvents, TableOptions } from './models/table-model';
-import Sort from './sort.vue';
-import { buildRowDomId, buildTableBaseStyle, buildTableColStyle, correctOptions } from './utils/table-util';
+import { TableEvents, TableOptions, TableRowOptions } from './models/table-model';
+import Scroll from './scroll.vue';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<TableOptions<any>>();
 const emits = defineEmits<TableEvents>();
-const rootDom = useTemplateRef("table-root");
 const colAssistDom = useTemplateRef("column-assist");
-const options = correctOptions(props);
-const manager = useTable(options, emits);
-const { onSize } = useObserver();
-const { getKey } = useKey<TableColumnOptions<any>>();
 const { namespace, build } = useStyle();
-//  2、参数解构，如覆盖props中属性
-const { border, columns, main, footer } = options;
-const emptyMessage = computed(() => correctString(props.emptyMessage, '暂无数据', true));
-const { rowsRef, loadingRef, noMoreDataRef, forceRowIdRef, handle } = manager;
-const { selectModeRef, isSelectable, isSelected, toggleSelect } = manager;
-//  3、界面交互属性变量
-/**     拖拽组件分类的Id值，避免界面有多个Table组件时，相互拖入 */
-const dragId: string = newId();
+const { onSize } = useObserver();
+//  2、组件交互变量、常量
+/**     是否有表格列配置 */
+const hasColumnsRef = computed(() => isArrayNotEmpty(props.columns));
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
- * 构建表格自定义样式
- * - 主要限定表格宽度
+ * 构建表格的样式信息
  */
 function buildTableStyle() {
-    const style = buildTableBaseStyle(options);
-    const colStyle = buildTableColStyle(colAssistDom.value);
-    style.push(...colStyle);
+    const style: StyleClassItem[] = [];
+    //  基础样式构建
+    props.header && style.push({
+        mode: "child",
+        rule: "table>thead>tr",
+        style: correctRowStyle(props.header),
+    });
+    props.main && style.push({
+        mode: "child",
+        rule: "table>tbody>tr",
+        style: correctRowStyle(props.main),
+    });
+    props.footer && style.push({
+        mode: "child",
+        rule: "table>tfoot>tr",
+        style: correctRowStyle(props.footer),
+    });
+    //  列样式构建
+    style.push(...buildTableColStyle());
+
     build(style);
 }
+
 /**
- * 处理滚动事件
- * - 触底加载更多数据
- * @param detail 
+ * 矫正行样式
+ * @param row 
+ * @returns 行样式配置
  */
-function onScrollDetail(detail: ScrollDetail) {
-    const { now, pre } = detail;
-    //  判断是否到底了,到底了触发加载更多数据
-    now.ybar && now.bottom && now.bottom != pre.bottom && handle.loadData("more");
+function correctRowStyle(row: TableRowOptions): AllStyle {
+    const style: AllStyle = Object.create(null);
+    style.minHeight = correctString(row.minHeight, undefined, true);
+    style.height = correctString(row.height, undefined, true);
+    style.maxHeight = correctString(row.maxHeight, undefined, true);
+    style.background = correctString(row.background, undefined, true);
+
+    return style;
+}
+/**
+ * 构建表格的列样式
+ * @returns 列的类样式配置
+ */
+function buildTableColStyle(): StyleClassItem[] {
+    /**
+     * 表格列宽计算规则：
+     *  1、使用辅助元素做处理，遍历辅助元素下的子元素，计算每列的宽度，并记录自动宽度列的数量和列的总宽度
+     *      1、辅助元素下的子元素，会自动把固定值和百分比的实际宽度计算出来；未指定宽度的列宽度为0,判定为自适应列
+     *  2、校正生成列宽度配置：根据是否有自适应列判断
+     *      1、有自适应列；未出横向滚动条时，自适应列平分剩余宽度，最小值为150px；出了横向滚动条时，自适应列固定宽度为150px
+     *      2、无自适应列：出了横向滚动条，则忽略计算，保持现有宽度；没出滚动条时，将这些固定宽度进行等比例放大求百分比 ，实现填充满
+     */
+    //  
+    const colWidths: number[] = [];
+    {
+        //  梳理宽度信息
+        const realWidth = colAssistDom.value.clientWidth;
+        let autoWidthCount: number = 0;
+        let colTotalWidth: number = 0;
+        for (let index = 0; index < colAssistDom.value.children.length; index++) {
+            const colDom = colAssistDom.value.children[index];
+            const colWidth: number = colDom.clientWidth;
+            colWidths.push(colWidth);
+            colWidth == 0 ? (++autoWidthCount) : (colTotalWidth += colWidth);
+        }
+        // 计算自适应列
+        if (autoWidthCount > 0) {
+            const autoWidth = realWidth > colTotalWidth
+                ? Math.max(Math.floor((realWidth - colTotalWidth) / autoWidthCount), 150)
+                : 150;
+            for (let index = 0; index < colWidths.length; index++) {
+                colWidths[index] == 0 && (colWidths[index] = autoWidth);
+            }
+        }
+        // 等比例放到列宽；等比例放大后，如果还有剩余宽度，则分割最后一列
+        else if (realWidth > colTotalWidth) {
+            const scale: number = realWidth / colTotalWidth;
+            colTotalWidth = 0;
+            for (let index = 0; index < colWidths.length; index++) {
+                const newWidth = Math.floor(colWidths[index] * scale);
+                colWidths[index] = newWidth;
+                colTotalWidth += newWidth;
+            }
+            const offsetWidth = realWidth - colTotalWidth;
+            if (offsetWidth > 0) {
+                const lastColIndex = colWidths.length - 1;
+                colWidths[lastColIndex] = colWidths[lastColIndex] + offsetWidth;
+            }
+        }
+    }
+    /**
+     * 生成没列的宽度样式配置
+     *  1、其他列按照上面的计算结果约束为固定宽度
+     *  2、生成的样式宽度，强制加上 width，min-width，max-width 做限制，避免出现宽度异常撑开的问题
+     */
+    return colWidths.map<StyleClassItem>((width, index) => ({
+        mode: "child",
+        rule: `table>*>tr>td:nth-child(${index + 1})`,
+        style: {
+            width: `${width}px`,
+            minWidth: `${width}px`,
+            maxWidth: `${width}px`
+        }
+    }));
 }
 
 // *****************************************   👉  组件渲染    *****************************************
-onMounted(() => {
-    //  事件监听处理
-    onSize(rootDom.value, buildTableStyle);
-    useScroll(rootDom.value, { scroll: "both", barSize: "small" }, onScrollDetail);
-    //  准备好了，进行数据加载
-    emits("ready", handle);
-    handle.loadData("init")
+//  1、数据初始化、变化监听
+//  2、生命周期响应
+onMounted(() => { //  事件监听处理
+    onSize(colAssistDom.value, buildTableStyle);
 });
 </script>
 
@@ -167,7 +191,8 @@ onMounted(() => {
 
 .snail-table {
     position: relative;
-    overflow: auto;
+    min-width: 100%;
+    max-width: 100%;
     box-shadow: 0px 0px 6px 0px rgba(46, 48, 51, 0.14);
 
     // 表格内容渲染
@@ -208,39 +233,6 @@ onMounted(() => {
                     left: 0;
                 }
             }
-
-            //  序号列的特定处理
-            >td.index {
-                >div.row-select {
-                    width: 14px;
-                    height: 14px;
-                    margin: 0 auto;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-
-                    &.off {
-                        border: solid 1px #dcdfe6;
-
-                        >svg {
-                            display: none;
-                        }
-                    }
-
-                    &.on {
-                        border: solid 1px #4c9aff;
-                        background-color: #4c9aff;
-                    }
-
-                    &.disabled {
-                        cursor: not-allowed;
-                    }
-
-                    &:not(.disabled) {
-                        cursor: pointer;
-                    }
-                }
-            }
         }
 
         >tbody {
@@ -249,53 +241,6 @@ onMounted(() => {
             >tr {
                 height: 40px;
                 overflow-y: visible;
-                // box-shadow: rgba(66, 185, 131, 0.1) 0px 0px 2px 0px;
-
-                //  拖拽的时候 取消边框，避免因此出现滚动条
-                &.drag-ghost {
-                    border: none !important;
-                }
-
-                &.dragging {
-                    line-height: 40px;
-                }
-
-                >td {
-                    // border-bottom: 0.5px solid rgba(220, 223, 230, 0.8);
-
-                    &.link:hover {
-                        cursor: pointer;
-                        color: #58a4fd;
-                        text-decoration: underline;
-                    }
-                }
-            }
-
-            // 无数据提醒行样式
-            >tr.empty-message {
-                >td {
-                    border-bottom: none !important;
-                }
-            }
-
-            //  聚焦行样式，进行动画提醒
-            >tr.force-row {
-                animation: snail-table-force-row 0.6s linear;
-
-                @keyframes snail-table-force-row {
-
-                    0%,
-                    50% {
-                        opacity: 1;
-                        transform: translateX(-10px);
-                    }
-
-                    25%,
-                    75% {
-                        opacity: 0;
-                        transform: translateX(0);
-                    }
-                }
             }
         }
 

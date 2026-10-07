@@ -5,14 +5,14 @@
 
 import { correctFunction, correctString, mustArray, mustFunction, mustString } from "snail.core";
 import { AllStyle, StyleClassItem } from "snail.view";
-import { TableMainAreaOptions, TableOptions, TableRowOptions } from "../models/table-model";
+import { Table2MainAreaOptions, Table2Options, Table2RowOptions } from "../models/table-model";
 
 /**
  * 校验表格组件配置参数
  * @param options 
  * @returns 
  */
-export function correctOptions(options: TableOptions<any>): Readonly<TableOptions<any>> {
+export function correctOptions(options: Table2Options<any>): Readonly<Table2Options<any>> {
     options = { ...options };
     //  校验 width
     const width = { ...options.width };
@@ -41,9 +41,9 @@ export function correctOptions(options: TableOptions<any>): Readonly<TableOption
     });
     Object.freeze(columns);
     //  header、main、footer：先不完全校验，后续构建样式时再处理
-    const header: TableRowOptions = Object.freeze({ ...options.header });
-    const main: TableMainAreaOptions = Object.freeze({ ...options.main });
-    const footer: TableRowOptions = options.footer ? Object.freeze({ ...options.footer }) : undefined;
+    const header: Table2RowOptions = Object.freeze({ ...options.header });
+    const main: Table2MainAreaOptions = Object.freeze({ ...options.main });
+    const footer: Table2RowOptions = options.footer ? Object.freeze({ ...options.footer }) : undefined;
     //  其他参数校验
     const columnSort = correctString(options.columnSort, "none", true) as any;
     const pageSize = options.pageSize > 0 ? options.pageSize : 30;
@@ -51,7 +51,7 @@ export function correctOptions(options: TableOptions<any>): Readonly<TableOption
     const canSelect = correctFunction(options.canSelect, undefined);
 
     //  冻结再返回
-    return Object.freeze<TableOptions<any>>({
+    return Object.freeze<Table2Options<any>>({
         width,
         border: options.border == true,
         columns, columnSort,
@@ -78,7 +78,7 @@ export function buildRowDomId(rowId: string): string {
  * @param options 
  * @returns 
  */
-export function buildTableBaseStyle(options: Readonly<TableOptions<any>>): StyleClassItem[] {
+export function buildTableBaseStyle(options: Readonly<Table2Options<any>>): StyleClassItem[] {
     const classes: StyleClassItem[] = [];
     //  table 高度配置
     classes.push({
@@ -181,7 +181,7 @@ export function buildTableColStyle(columnAssist: HTMLDivElement): StyleClassItem
  * @param row 
  * @returns 行样式配置
  */
-function correctRowStyle(row: TableRowOptions): AllStyle {
+function correctRowStyle(row: Table2RowOptions): AllStyle {
     const style: AllStyle = Object.create(null);
     style.minHeight = correctString(row.minHeight, undefined, true);
     style.height = correctString(row.height, undefined, true);
