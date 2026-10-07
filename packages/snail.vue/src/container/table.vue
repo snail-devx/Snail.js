@@ -13,7 +13,7 @@
         :bar-size="barSize || 'small'" @bottom="emits('bottom')">
         <Empty v-if="hasColumnsRef != true" :message="'无columns配置，无法进行表格渲染'" />
         <!-- 主内容区域 -->
-        <table v-if="hasColumnsRef" cellpadding="0" cellspacing="0">
+        <table v-if="hasColumnsRef" cellpadding="0" cellspacing="0" :class="index == true ? 'start-index' : ''">
             <tbody>
                 <slot name="main">
                     <tr>
@@ -217,13 +217,7 @@ onMounted(() => { //  事件监听处理
                 overflow-x: hidden;
                 text-overflow: ellipsis;
 
-                &:nth-child(1) {
-                    text-align: center;
-                }
 
-                &:nth-child(n+2) {
-                    padding: 0 10px;
-                }
 
                 // 使用伪类构建一个下边框线，不占用实际高度
                 &::after {
@@ -284,6 +278,29 @@ onMounted(() => { //  事件监听处理
         // 子元素禁止缩放，列配置的宽度是多少就是多少，自适应列在flex布局下不指定宽度则为0
         >span {
             flex: none !important;
+        }
+    }
+}
+
+//  启用序号列和不启用序号列的样式区别
+.snail-table {
+    >table {
+        &.start-index {
+            tr>td {
+                &:nth-child(1) {
+                    text-align: center;
+                }
+
+                &:nth-child(n+2) {
+                    padding: 0 10px;
+                }
+            }
+        }
+
+        &:not(.start-index) {
+            tr>td {
+                padding: 0 10px;
+            }
         }
     }
 }
