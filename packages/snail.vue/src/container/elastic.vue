@@ -22,13 +22,15 @@
 <script setup lang="ts">
 import { ElasticDetail, useElastic } from "snail.view";
 import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
+import { ReadyEvents } from "../base/models/base-event";
 import ElasticBar from "./components/elastic-bar.vue";
-import { ElasticOptions, ElasticSlotHandle } from "./models/elastic-model";
+import { ElasticHandle, ElasticOptions, ElasticSlotHandle } from "./models/elastic-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 defineOptions({ name: "Elastic", inheritAttrs: false });
 const props = defineProps<ElasticOptions>();
+const emits = defineEmits<ReadyEvents<ElasticHandle>>();
 const mainAreaDom = useTemplateRef("main-area");
 const { elastic, bar } = props;
 //  2、组件交互变量、常量
@@ -58,6 +60,16 @@ onMounted(() => {
     Object.freeze(slotHandle);
 
     readyRef.value = true;
+    //  准备完毕，通知父组件
+    emits("ready", Object.freeze<ElasticHandle>({
+        scrollIntoView(el) {
+            if (mainAreaDom.value.contains(el) == true) {
+                const rootRect = mainAreaDom.value.getBoundingClientRect();
+                const elRect = el.getBoundingClientRect();
+                em.scrollTo(rootRect.left - elRect.left, rootRect.top - elRect.top);
+            }
+        },
+    }));
 });
 </script>
 
