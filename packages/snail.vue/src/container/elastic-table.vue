@@ -43,7 +43,7 @@
             <ElasticUpdown :="handle" :up="noMoreDataRef != true && options.loadMore == true" :down="options.refresh"
                 :load="onUpdownLoad" @ready="handle => updownHandleRef = handle" />
             <!-- Loading提示能力 -->
-            <Loading :show="loadingRef" />
+            <Loading :show="loadTypeRef == undefined && loadingRef" />
         </template>
     </Elastic>
 </template>
@@ -72,7 +72,7 @@ const { getKey } = useKey();
 const { namespace, build } = useStyle();
 //  2、参数解构，如覆盖props中属性
 const emptyMessage = computed(() => correctString(props.emptyMessage, '暂无数据', true));
-const { loadingRef, handle, rowsRef, forceRowIdRef, selectModeRef, isSelectable, isSelected, toggleSelect, noMoreDataRef } = context;
+const { loadTypeRef, loadingRef, handle, rowsRef, forceRowIdRef, selectModeRef, isSelectable, isSelected, toggleSelect, noMoreDataRef } = context;
 //  3、组件交互变量、常量
 /**     下拉刷新、上拉加载的操作句柄 */
 const updownHandleRef: ShallowRef<ElasticUpdownHandle> = shallowRef();

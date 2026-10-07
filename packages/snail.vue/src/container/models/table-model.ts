@@ -483,6 +483,11 @@ export interface IDataTableContext {
      */
     readonly handle: DataTableHandle<any>;
     /**
+     * 数据表加载数据的类型
+     * - 加载中时有值，加载完成后为undefined
+     */
+    readonly loadTypeRef: ShallowRef<DataTableLoadType>;
+    /**
      * 是否正在加载处理中的标记
      */
     readonly loadingRef: ShallowRef<boolean>;

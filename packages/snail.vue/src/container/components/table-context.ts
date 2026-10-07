@@ -12,11 +12,11 @@ import { DataTableBaseOptions, DataTableEvents, DataTableHandle, DataTableLoadTy
  * @param emits 
  */
 export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readonly<DataTableBaseOptions<any>>, emits: EmitterType<DataTableEvents>): IDataTableContext & IScope {
+    /**     数据加载类型 */
+    const loadTypeRef: ShallowRef<DataTableLoadType> = shallowRef();
     /**     是否正在加载处理中的标记*/
     const loadingRef: ShallowRef<boolean> = shallowRef(false);
     //  数据行维护
-    /**     数据加载正在运行中：做标记位，避免重复加载*/
-    let dataLoadRunning: boolean = false;
     /**     表数据行 */
     const rowsRef: Ref<DataTableRow<any>[]> = ref([]);
     /**     数据主键Id字典，key为主键Id；用于确保row不重复 */
@@ -54,7 +54,7 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
          */
         async loadData(type: DataTableLoadType): Promise<void> {
             //  如果已经没有更多数据了，则忽略 more 操作
-            if (dataLoadRunning == true) {
+            if (loadTypeRef.value != undefined) {
                 return;
             }
             if (type == "more" && noMoreDataRef.value == true) {
@@ -63,7 +63,7 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
             }
 
             //  准备加载数据，维护好 loadingRef 效果
-            dataLoadRunning = true;
+            loadTypeRef.value = type;
             loadingRef.value = true;
             try {
                 const rows = await options.load(type);
@@ -96,7 +96,7 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
                 });
             }
             finally {
-                dataLoadRunning = false;
+                loadTypeRef.value = undefined;
                 loadingRef.value = false;
             }
         },
@@ -432,7 +432,7 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
     //  管理器初始化构建
     {
         const manager = mountScope<IDataTableContext>({
-            handle, loadingRef, noMoreDataRef,
+            handle, loadTypeRef, loadingRef, noMoreDataRef,
             rowsRef, forceRowIdRef, buildRowDomId,
             //  选择数据行相关
             selectModeRef, isSelectable, isSelected, toggleSelect,
