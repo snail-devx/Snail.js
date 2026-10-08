@@ -13,7 +13,7 @@
 <template>
     <Table class="snail-data-table" :class="{ 'select-mode': selectModeRef && selectModeRef != 'none' }"
         :columns="columns" :index="options.index" :border="options.border" :header="header" :main="main"
-        :footer="footer" :loading="context.loadingRef.value">
+        :footer="footer" :loading="context.loadingRef.value" :bar-size="options.barSize">
         <!-- 表头 -->
         <template #header>
             <tr>
@@ -27,7 +27,7 @@
                     </template>
                 </td>
                 <!-- 自定义渲染列：无配置则使用默认的渲染方式 -->
-                <td v-for="(column, columnIndex) in columns" :key="getKey(column)">
+                <td v-for="(column, columnIndex) in columns" :key="getKey(column)" :data-role="column.role">
                     <slot name="header" :="{ column, columnIndex }">
                         <span v-text="column.name" />
                     </slot>
@@ -44,35 +44,38 @@
             </tr>
             <!-- 真实数据行：main插槽；启用拖拽调整行顺序时，不允许和其他容器拖出、拖出-->
             <Sort :group="{ name: dragId, pull: false, put: false }" :changer="rowsRef.length" :draggable="'.tbody-row'"
-                :ghost-class="'drag-ghost'" :drag-class="'dragging'" :handle="main ? main.dragHandle : undefined"
-                :disabled="main ? (selectModeRef != 'none' || main.draggable != true) : true" @update="handle.moveRow">
-                <tr v-for="(row, rowIndex) in rowsRef" :key="row.id" class="tbody-row"
-                    :class="{ 'force-row': forceRowIdRef == row.id }" :id="context.buildRowDomId(row)">
-                    <!-- 序号列 -->
-                    <td class="index" v-if="index == true">
-                        <template v-if="selectModeRef == 'single' || selectModeRef == 'multiple'">
-                            <div class="row-select"
-                                :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
-                                @click="toggleSelect(row)">
-                                <Icon :type="'success'" :color="'white'" :size="12" />
-                            </div>
+                :disabled="main ? (selectModeRef != 'none' || main.draggable != true) : true"
+                :handle="main ? main.dragHandle : undefined" @update="handle.moveRow">
+                <Motion :multiple="true" :effect="motion" :duration="options.motion ? undefined : 0">
+                    <tr v-for="(row, rowIndex) in rowsRef" :key="row.id" class="tbody-row"
+                        :class="{ 'force-row': forceRowIdRef == row.id }" :id="context.buildRowDomId(row)">
+                        <!-- 序号列 -->
+                        <td class="index" v-if="index == true">
+                            <template v-if="selectModeRef == 'single' || selectModeRef == 'multiple'">
+                                <div class="row-select"
+                                    :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
+                                    @click="toggleSelect(row)">
+                                    <Icon :type="'success'" :color="'white'" :size="12" />
+                                </div>
+                            </template>
+                            <template v-else>
+                                {{ rowIndex + 1 }}
+                            </template>
+                        </td>
+                        <!-- 真实数据列：无main/default插槽时，提示出来;操作列，在选择模式下不现实出来-->
+                        <template v-if="$slots.main || $slots.default">
+                            <td v-for="(column, columnIndex) in columns" :key="getKey(column)" :class="column.type"
+                                :data-role="column.role"
+                                @click="(column.type == 'link' || column.type == 'title') && emits('click', row, column)">
+                                <slot name="main" v-if="$slots.main" :="{ column, columnIndex, row, rowIndex }" />
+                                <slot name="default" v-else :="{ column, columnIndex, row, rowIndex }" />
+                            </td>
                         </template>
                         <template v-else>
-                            {{ rowIndex + 1 }}
+                            <td :colspan="columns.length">无[mian]/[default]插槽，td无法渲染</td>
                         </template>
-                    </td>
-                    <!-- 真实数据列：无main/default插槽时，提示出来;操作列，在选择模式下不现实出来-->
-                    <template v-if="$slots.main || $slots.default">
-                        <td v-for="(column, columnIndex) in columns" :class="column.type" :key="getKey(column)"
-                            @click="(column.type == 'link' || column.type == 'title') && emits('click', row, column)">
-                            <slot name="main" v-if="$slots.main" :="{ column, columnIndex, row, rowIndex }" />
-                            <slot name="default" v-else :="{ column, columnIndex, row, rowIndex }" />
-                        </td>
-                    </template>
-                    <template v-else>
-                        <td :colspan="columns.length">无mian和default插槽，td无法渲染</td>
-                    </template>
-                </tr>
+                    </tr>
+                </Motion>
             </Sort>
         </template>
         <!-- 底部数据行:用于统计合计,序号列,给个图标 -->
@@ -84,7 +87,7 @@
                 </td>
                 <!-- 自定义渲染 -->
                 <template v-if="$slots.footer">
-                    <td v-for="(column, columnIndex) in columns" :key="getKey(column)">
+                    <td v-for="(column, columnIndex) in columns" :key="getKey(column)" :data-role="column.role">
                         <slot name="footer" :="{ column, columnIndex }" />
                     </td>
                 </template>
@@ -103,6 +106,7 @@ import Icon from '../base/icon.vue';
 import Empty from '../prompt/empty.vue';
 import { useDataTable } from './components/table-context';
 import { DataTableEvents, DataTableOptions } from './models/table-model';
+import Motion from './motion.vue';
 import Sort from './sort.vue';
 import Table from './table.vue';
 import { correctDataTableOptions } from './utils/table-util';
@@ -139,11 +143,10 @@ onMounted(async () => {
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-data-table {
-    flex: none;
     position: relative;
-    width: 100%;
-    height: 100%;
     overflow: hidden;
+    max-width: 100%;
+    max-height: 100%;
 
     // 序号列的处理
     >table {
@@ -185,13 +188,6 @@ onMounted(async () => {
 
         //  无数据提醒行
         // &.empty-message>td {}
-
-        //  拖拽的时候 取消边框，避免因此出现滚动条
-        // &.drag-ghost {}
-
-        &.dragging {
-            line-height: 40px;
-        }
 
         //  聚焦行的特定样式
         &.force-row {

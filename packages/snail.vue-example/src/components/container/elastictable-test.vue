@@ -34,8 +34,9 @@
                 @ready="han => handle = han" @click="console.log" @move="console.log" @select="console.log">
             </ElasticTable>
 
-            <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns" refresh load-more
-                @ready="han => handle = han" @click="console.log" @move="console.log" @select="console.log">
+            <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
+                :motion="MOTION.rotate" refresh load-more @ready="han => handle = han" @click="console.log"
+                @move="console.log" @select="console.log">
                 <template #="{ column, rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>"
                     :key="String(columnIndex)">
                     {{ column.name }}： {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
@@ -47,9 +48,15 @@
 
             <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
                 @click="console.log" @move="console.log" @select="console.log">
-                <template #="{ rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>"
+                <template #column="{ rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>"
                     :key="String(columnIndex)">
                     {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
+                </template>
+            </ElasticTable>
+            <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
+                @click="console.log" @move="console.log" @select="console.log">
+                <template #row="{ row }: DataTableRowSlotProps<any, any>" :key="String(columnIndex)">
+                    row插槽：{{ row }}
                 </template>
             </ElasticTable>
         </Env>
@@ -58,7 +65,7 @@
 
 <script setup lang="ts">
 import { delay, useTimer } from 'snail.core';
-import { components, DataTableColumnOptions, DataTableColumnSlotProps, DataTableHandle, DataTableLoadType, DataTableRow } from '../../libraries/snail_vue';
+import { components, DataTableColumnOptions, DataTableColumnSlotProps, DataTableHandle, DataTableLoadType, DataTableRow, DataTableRowSlotProps, MOTION } from '../../libraries/snail_vue';
 
 
 // *****************************************   👉  组件定义    *****************************************
@@ -67,7 +74,7 @@ const { Env, ElasticTable, Icon } = components;
 const { onTimeout } = useTimer();
 //  2、组件交互变量、常量
 const columns: DataTableColumnOptions<any>[] = [
-    { name: "标题", type: "title" },
+    { name: "标题", type: "title", role: "title-txt" },
     { name: "创建时间1", width: "400px" },
     { name: "创建时间1", width: "400px" },
     // { name: "创建时间2", width: "400px" },

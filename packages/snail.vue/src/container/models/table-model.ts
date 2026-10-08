@@ -2,6 +2,7 @@ import { IScope } from "snail.core";
 import { HeightStyle, ScrollBaseOptions } from "snail.view";
 import { Ref, ShallowRef } from "vue";
 import { ReadyEvents } from "../../base/models/base-event";
+import { MotionOptions } from "./motion-model";
 import { ScrollEvents } from "./scroll-model";
 
 /**
@@ -21,6 +22,13 @@ export type TableOptions<T> = {
      * - 索引序号列不用配置
      */
     readonly columns: TableColumnOptions<T>[];
+
+    /**
+     * 表格显示模式
+     * - default    默认模式，会自动加上行下划线和一些阴影效果
+     * - simple     简单模式，不显示行下划线和阴影效果，纯净的表格渲染
+     */
+    readonly display?: "default" | "simple";
 
     /**
      * loading提示是否显示
@@ -62,6 +70,13 @@ export type TableOptions<T> = {
      */
     readonly footer?: TableRowOptions;
 
+    /**
+     * 空数据时，显示的提示信息
+     * - 非空时，不进行数据行渲染
+     * - 为空则不显示，进行数据行渲染
+     * @remark 这是一个辅助代码，减少外部使用Table组件时【为空】提示的样板代码
+     */
+    emptyMessage?: string;
 } & Pick<ScrollBaseOptions, "barSize">;
 /**
  * 表格组件 事件配置
@@ -150,7 +165,7 @@ export type DataTableOptions<T> = DataTableBaseOptions<T> & {
      * - multiple:多列排序，可保留多列的排序状态
      */
     readonly columnSort?: "none" | "single" | "multiple";
-}
+} & Pick<ScrollBaseOptions, "barSize">;
 /**
  * 组件事件
  */
@@ -208,6 +223,14 @@ export type DataTableBaseOptions<T> = {
      * - 不配置则默认30
      */
     readonly pageSize?: number;
+
+    /**
+     * 动效配置
+     * - 在添加、删除等操作数据行时起作用
+     * - 默认无动画
+     */
+    motion?: MotionOptions["effect"];
+
     /**
      * 判断行是否能够选择
      * - 在进入选择模式时，调用此方法判断行是否可被选择
@@ -354,7 +377,7 @@ export type DataTableColumnOptions<T> = TableColumnOptions<T> & {
      *      name        列名称
      *      width       宽度配置
      *      data        列附带数据
-     */
+    */
 
     /**
      * 列类型
@@ -364,6 +387,13 @@ export type DataTableColumnOptions<T> = TableColumnOptions<T> & {
      * - operate:操作列；操作列，在【选择】模式下不显示
      */
     type?: "normal" | "link" | "title" | "operate";
+
+    /**
+     * 列的角色
+     * - 会挂载到 列的 `data-role` 属性上
+     * - 用于区分列类型，如：操作列、标题列等
+     */
+    role?: string;
 
     /**
      * 是否支持排序
@@ -557,6 +587,27 @@ export type DataTableColumnSlotProps<Col, Row> = {
      * 列索引
      */
     columnIndex: number;
+
+    /**
+     * 当前行数据
+     * - 为undefined则表示渲染的是header和footer中的列
+     */
+    row?: DataTableRow<Row>;
+    /**
+     * 当前行索引
+     * - 为undefined则表示渲染的是header和footer中的列
+     */
+    rowIndex?: number;
+}
+
+/**
+ * 数据表的行渲染插槽绑定属性
+ */
+export type DataTableRowSlotProps<Col, Row> = {
+    /**
+     * 当前列配置
+     */
+    columns: DataTableColumnOptions<Col>[];
 
     /**
      * 当前行数据

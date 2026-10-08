@@ -31,9 +31,7 @@
         </template>
         <Empty v-else :message="`不支持[${mode}]端渲染`" />
         <!-- loading提示效果，显示头部时，在弹窗中时增加 头部逃逸 效果 -->
-        <Loading
-            :class="{ 'header-escape': header && header.disabled != true, 'dialog': header && header.useTo == 'dialog' }"
-            :show="loading == true" />
+        <Loading :show="loading == true" />
     </div>
 </template>
 <script setup lang="ts">
@@ -128,17 +126,6 @@ function onFooterButtonClick(button: PageFooterButton) {
         >.footer-area {
             height: 72px;
             padding: 0 40px;
-        }
-
-        // loading提示效果，显示头部时，在弹窗中时增加 头部逃逸 效果
-        >div.snail-loading.header-escape {
-            &.dialog {
-                top: 64px;
-            }
-
-            &:not(.dialog) {
-                top: 48px;
-            }
         }
     }
 

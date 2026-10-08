@@ -16,7 +16,8 @@ export function correctDataTableOptions(options: DataTableOptions<any>): Readonl
         main: options.main ? Object.freeze({ ...options.main }) : undefined,
         footer: options.footer ? Object.freeze({ ...options.footer }) : undefined,
         //  其他参数
-        columnSort: correctString(options.columnSort, "none", true) as any
+        columnSort: correctString(options.columnSort, "none", true) as any,
+        barSize: correctString(options.barSize, undefined, true) as any,
     });
 
     return Object.freeze(options);

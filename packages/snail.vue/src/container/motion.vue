@@ -11,9 +11,9 @@
 </template>
 
 <script setup lang="ts">
+import { correctNumber, isString } from "snail.core";
 import { computed, Transition, TransitionGroup, TransitionProps } from "vue";
 import { MotionEffectOptions, MotionOptions } from "./models/motion-model";
-import { correctNumber, correctString, isString, } from "snail.core";
 import { MOTION } from "./utils/motion-util";
 
 // *****************************************   👉  组件定义    *****************************************

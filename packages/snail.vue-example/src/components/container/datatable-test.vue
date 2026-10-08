@@ -33,7 +33,7 @@
             :main="{ draggable: true }" :footer="{}" @ready="han => handle = han" @click="console.log"
             @move="console.log" @select="console.log">
         </DataTable>
-        <DataTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
+        <DataTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns" :motion="MOTION.scale"
             :main="{ draggable: true }" @ready="han => handle = han" @click="console.log" @move="console.log"
             @select="console.log">
             <template #="{ rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>" :key="String(columnIndex)">
@@ -42,8 +42,8 @@
         </DataTable>
 
         <DataTable style="width: 100%;height: 250px;margin-top: 20px;" index :load="loadData" :columns="columns"
-            :main="{ draggable: true }" @ready="han => handle = han" @click="console.log" @move="console.log"
-            @select="console.log">
+            :motion="MOTION.scale" :main="{ draggable: true }" @ready="han => handle = han" @click="console.log"
+            @move="console.log" @select="console.log">
             <template #main="{ rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>"
                 :key="String(columnIndex)">
                 {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { delay, useTimer } from 'snail.core';
-import { components, DataTableColumnOptions, DataTableColumnSlotProps, DataTableHandle, DataTableLoadType, DataTableRow } from '../../libraries/snail_vue';
+import { components, DataTableColumnOptions, DataTableColumnSlotProps, DataTableHandle, DataTableLoadType, DataTableRow, MOTION } from '../../libraries/snail_vue';
 
 
 // *****************************************   👉  组件定义    *****************************************
@@ -63,7 +63,7 @@ const { Env, DataTable } = components;
 const { onTimeout } = useTimer();
 //  2、组件交互变量、常量
 const columns: DataTableColumnOptions<any>[] = [
-    { name: "标题", type: "link" },
+    { name: "标题", type: "link", role: 'tx-title' },
     { name: "创建时间1", width: "400px" },
     { name: "创建时间1", width: "400px" },
     // { name: "创建时间2", width: "400px" },

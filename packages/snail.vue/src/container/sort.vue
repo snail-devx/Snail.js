@@ -4,10 +4,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, getCurrentInstance, onUnmounted, onBeforeUnmount, nextTick, shallowRef } from "vue";
-import { SortEvents, SortOptions, SortGroupOptions, SortEvent } from "./models/sort-model";
-import { IScope, isFunction, isObject, isStringNotEmpty, newId, script, useTimer } from "snail.core";
+import { IScope, isObject, isStringNotEmpty, newId, script, useTimer } from "snail.core";
+import { getCurrentInstance, onBeforeUnmount, onMounted } from "vue";
 import { useReactive } from "../base/reactive";
+import { SortEvent, SortEvents, SortGroupOptions, SortOptions } from "./models/sort-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -107,7 +107,7 @@ onBeforeUnmount(() => sortInstance && sortInstance.destroy());
     background: white;
 }
 
-//  幽灵元素：推动元素 在排序面板中的占位元素
+//  幽灵元素：拖动元素 在排序面板中的占位元素
 .snail-sort-ghost {
     border-radius: 4px;
     border: dashed 1px #4c9aff;

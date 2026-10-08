@@ -9,17 +9,26 @@
         2、bottom       滚动到底部时触发
 -->
 <template>
-    <Scroll class="snail-table" :class="namespace, border ? 'start-border' : ''" :scroll="'both'"
-        :bar-size="barSize || 'small'" @bottom="emits('bottom')">
+    <Scroll class="snail-table" :class="namespace, border ? 'start-border' : '', display == 'simple' ? 'simple' : ''"
+        :scroll="'both'" :bar-size="barSize || 'small'" @bottom="emits('bottom')">
         <Empty v-if="hasColumnsRef != true" :message="'无columns配置，无法进行表格渲染'" />
         <!-- 主内容区域 -->
         <table v-if="hasColumnsRef" cellpadding="0" cellspacing="0" :class="index == true ? 'start-index' : ''">
-            <tbody>
-                <slot name="main">
-                    <tr>
-                        <td :colspan="columns.length">无[main]插槽，tbody中tr无法渲染</td>
-                    </tr>
-                </slot>
+            <!-- 空数据行消息 -->
+            <tbody v-if="isStringNotEmpty(emptyMessage)">
+                <tr class="empty-message">
+                    <td :colspan="columns.length">
+                        <Empty :message="emptyMessage" />
+                    </td>
+                </tr>
+            </tbody>
+            <!-- 数据行非空时进行渲染 -->
+            <tbody v-else>
+                <slot name="main" v-if="$slots.main" />
+                <slot name="default" v-else-if="$slots.default" />
+                <tr v-else>
+                    <td :colspan="columns.length">无[main]/[default]插槽，tbody中tr无法渲染</td>
+                </tr>
             </tbody>
             <!-- 表头：放到 tbody 的后面，这样固定列头就不用 index 值了 -->
             <thead>
@@ -52,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { correctString, isArrayNotEmpty } from 'snail.core';
+import { correctString, isArrayNotEmpty, isStringNotEmpty } from 'snail.core';
 import { AllStyle, StyleClassItem, useObserver, useStyle } from 'snail.view';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import Empty from '../prompt/empty.vue';
@@ -130,13 +139,13 @@ function buildTableColStyle(): StyleClassItem[] {
     //  
     const colWidths: number[] = [];
     {
-        //  梳理宽度信息：启用序号列，则排除60px固定宽度
-        const realWidth = colAssistDom.value.clientWidth - (index == true ? 60 : 0);
+        //  梳理宽度信息：启用序号列，则排除60px固定宽度；使用getBoundingClientRect计算宽度，避免 clientWidht 时小数自动四舍五入的问题
+        const realWidth = colAssistDom.value.getBoundingClientRect().width - (index == true ? 60 : 0);
         let autoWidthCount: number = 0;
         let colTotalWidth: number = 0;
         for (let index = 0; index < colAssistDom.value.children.length; index++) {
             const colDom = colAssistDom.value.children[index];
-            const colWidth: number = colDom.clientWidth;
+            const colWidth: number = colDom.getBoundingClientRect().width;
             colWidths.push(colWidth);
             colWidth == 0 ? (++autoWidthCount) : (colTotalWidth += colWidth);
         }
@@ -220,8 +229,6 @@ onMounted(() => { //  事件监听处理
                 overflow-x: hidden;
                 text-overflow: ellipsis;
 
-
-
                 // 使用伪类构建一个下边框线，不占用实际高度
                 &::after {
                     content: "";
@@ -266,6 +273,7 @@ onMounted(() => { //  事件监听处理
         }
     }
 
+    // 使用粘性定位，避免出现滚动条时，loading效果显示异常，遮不全
     >div.snail-loading {
         position: sticky;
         width: 100%;
@@ -358,5 +366,59 @@ onMounted(() => { //  事件监听处理
             top: -1px;
         }
     }
+}
+
+//  启用简单模式时：移除所有的边框线和阴影效果
+.snail-table.simple {
+
+    //  取消用到的阴影效果
+    &,
+    >table>thead {
+        box-shadow: unset !important;
+    }
+
+    //  取消用到的边框线
+    thead::after,
+    tfoot::after,
+    tr::before,
+    tr::after,
+    td::before,
+    td::after {
+        content: unset !important;
+    }
+}
+
+// 兼容 sort 组件拖拽行时，sort组件的border样式导致出现横向滚动条的情况
+.snail-table {
+    >table {
+        >tbody.sortable {
+            >tr {
+
+                &.snail-sort-drag,
+                &.snail-sort-ghost {
+                    border: none !important;
+
+                    &::after {
+                        position: absolute;
+                        content: " ";
+                        left: 0;
+                        right: 0;
+                        top: 0;
+                        bottom: 0;
+                        border: solid 1px #4c9aff;
+                        z-index: 1;
+                    }
+                }
+
+                //  幽灵元素：拖动元素 在排序面板中的占位元素
+                &.snail-sort-ghost {
+                    &::after {
+                        border-style: dashed;
+                    }
+                }
+            }
+        }
+    }
+
 }
 </style>

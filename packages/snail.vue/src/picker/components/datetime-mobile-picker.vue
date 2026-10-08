@@ -281,7 +281,7 @@ function onSecondSelect(code: string) {
     >.main-area {
         background-color: white;
         position: relative;
-        height: 320px;
+        height: 200px;
         display: flex;
         align-items: stretch;
     }

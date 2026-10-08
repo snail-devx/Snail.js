@@ -116,12 +116,12 @@ watcher(() => props.detail, onDetailChange);
     }
 
     .x-bar {
-        height: 4px;
+        height: 2px;
         bottom: 0;
     }
 
     .y-bar {
-        width: 4px;
+        width: 2px;
         right: 0;
     }
 }

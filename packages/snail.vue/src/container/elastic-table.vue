@@ -13,28 +13,42 @@
         <template #default>
             <Empty v-if="rowsRef.length == 0" :message="emptyMessage" />
             <template v-else>
-                <div v-for="(row, rowIndex) in rowsRef" :key="row.id" class="data-row"
-                    :class="{ 'force-row': forceRowIdRef == row.id }" :id="context.buildRowDomId(row)">
-                    <!-- 选择模式预留 -->
-                    <div class="row-select" v-show="selectModeRef != 'none'"
-                        :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
-                        @click="toggleSelect(row)">
-                        <Icon :type="'success'" :color="'white'" :size="14" />
-                    </div>
-                    <!-- 实际内容区域：默认插槽逻辑 -->
-                    <div class="row-body" @click="selectModeRef == 'none' && emits('click', row, undefined)">
-                        <div v-for="(column, columnIndex) in columns" :key="getKey(column)" class="column-item ellipsis"
-                            :class="column.type" :style="{ width: column.width }">
-                            <slot name="default" :="{ row, rowIndex, column, columnIndex }">
-                                无default插槽，{{ column.name }} 无法渲染
-                            </slot>
+                <Motion :multiple="true" :effect="options.motion" :duration="options.motion ? undefined : 0">
+                    <div v-for="(row, rowIndex) in rowsRef" :key="row.id" class="data-row"
+                        :class="{ 'force-row': forceRowIdRef == row.id }" :id="context.buildRowDomId(row)">
+                        <!-- 选择模式预留 -->
+                        <div class="row-select" v-show="selectModeRef != 'none'"
+                            :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
+                            @click="toggleSelect(row)">
+                            <Icon :type="'success'" :color="'white'" :size="14" />
+                        </div>
+                        <!-- 实际内容区域：默认插槽逻辑。区分行插槽还是列插槽 -->
+                        <div class="row-body" @click="selectModeRef == 'none' && emits('click', row, undefined)">
+                            <template v-if="$slots.row">
+                                <slot name="row" :="{ columns, row, rowIndex }">
+                                    无[row]插槽，无法渲染数据行
+                                </slot>
+                            </template>
+                            <template v-else>
+                                <div v-for="(column, columnIndex) in columns" :key="getKey(column)"
+                                    class="column-item ellipsis" :class="column.type" :style="{ width: column.width }"
+                                    :data-role="column.role">
+                                    <slot name="column" v-if="$slots.column"
+                                        :="{ row, rowIndex, column, columnIndex }" />
+                                    <slot name="default" v-else-if="$slots.default"
+                                        :="{ row, rowIndex, column, columnIndex }" />
+                                    <template v-else>
+                                        无[column]/[default]插槽，{{ column.name }} 无法渲染
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                        <!-- 尾部区域：使用插槽渲染 -->
+                        <div class="row-footer" v-if="$slots.footer">
+                            <slot name="footer" :="{ row, rowIndex }" />
                         </div>
                     </div>
-                    <!-- 尾部区域：使用插槽渲染 -->
-                    <div class="row-footer" v-if="$slots.footer">
-                        <slot name="footer" :="{ row, rowIndex }" />
-                    </div>
-                </div>
+                </Motion>
                 <!-- 没有更多数据了：这个需要再琢磨一下，需要在没有数据后的下一次加载更多触发时才显示出来 -->
                 <!-- <div class="no-more-data" v-if="noMoreDataRef && options.loadMore == true">没有更多数据了...</div> -->
             </template>
@@ -61,6 +75,7 @@ import { useDataTable } from './components/table-context.js';
 import Elastic from './elastic.vue';
 import { ElasticHandle, ElasticUpdownHandle } from './models/elastic-model';
 import { DataTableContextUseExt, DataTableEvents, DataTableLoadType, DataTableRow, ElasticTableOptions } from './models/table-model';
+import Motion from './motion.vue';
 import { correctElasticTableOptions } from './utils/table-util.js';
 
 // *****************************************   👉  组件定义    *****************************************
@@ -126,18 +141,16 @@ onMounted(async () => {
 
 .snail-elastic-table {
     >.main-area {
-        background-color: #f7f8f9;
+        display: flex;
+        flex-direction: column;
 
         // 数据行基础样式
         >.data-row {
-            flex: none;
             position: relative;
-            padding: 12px 14px 0;
-            width: 100%;
+            background: white;
             overflow-x: hidden;
             min-height: 40px;
-            padding-bottom: 10px;
-            background: white;
+            flex: none;
             //  flex布局
             display: flex;
             flex-direction: row;
@@ -147,8 +160,8 @@ onMounted(async () => {
             &::after {
                 position: absolute;
                 content: " ";
-                left: 14px;
-                right: 12px;
+                left: 0;
+                right: 0;
                 bottom: 0;
                 height: 1px;
                 opacity: 0.4;
@@ -212,24 +225,26 @@ onMounted(async () => {
         //  数据行实际渲染
         >.data-row>.row-body {
             flex: 1;
+            overflow-x: hidden !important;
+            color: #8a8f99;
+            // flex布局，列自动根据宽度布局，超出则放到下一行
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
-            color: #8a8f99;
 
+            // 每列默认100%宽度，且最大100%宽度超出隐藏；高度最小22px
             >.column-item {
                 flex: none;
                 width: 100%;
-                height: 22px;
-                line-height: 22px;
+                max-width: 100% !important;
+                overflow-x: hidden !important;
+                min-height: 22px;
 
                 // 特定样式列
                 &.title {
+                    margin-bottom: 6px;
                     font-size: 16px;
                     color: #2e3033;
-                    height: 22px;
-                    line-height: 22px;
-                    margin-bottom: 6px;
                 }
             }
         }

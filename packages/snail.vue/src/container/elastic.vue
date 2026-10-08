@@ -4,7 +4,7 @@
     3、支持移动端橡皮筋效果，支持上拉加载更多、下拉刷新数据等功能
   -->
 <template>
-    <div :="$attrs" class="snail-elastic">
+    <div class="snail-elastic">
         <!-- 主内容区域 -->
         <div class="main-area" ref="main-area">
             <slot />
@@ -28,7 +28,7 @@ import { ElasticHandle, ElasticOptions, ElasticSlotHandle } from "./models/elast
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-defineOptions({ name: "Elastic", inheritAttrs: false });
+defineOptions({ name: "Elastic" });
 const props = defineProps<ElasticOptions>();
 const emits = defineEmits<ReadyEvents<ElasticHandle>>();
 const mainAreaDom = useTemplateRef("main-area");
@@ -80,8 +80,8 @@ onMounted(() => {
 .snail-elastic {
     position: relative;
     background-color: #f7f8f9;
-    width: 100%;
-    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     overflow: hidden;
 
     //  主内容区域
@@ -91,7 +91,6 @@ onMounted(() => {
         height: fit-content;
         z-index: 1;
         user-select: none;
-        background-color: white;
     }
 }
 </style>
