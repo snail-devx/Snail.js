@@ -12,7 +12,7 @@ import { ScrollEvents } from "./scroll-model";
  * 3、ElasticTable  组件，基于Elastic组件封装，增加数据管理能力，用于移动端，对标DataTable组件能力
  */
 
-//#region *************************************Table 组件数据结构*******************************************
+//#region *************************************Table 系列组件直属属性、事件*****************************************
 /**
  * 表格组件 配置选项
  */
@@ -81,45 +81,8 @@ export type TableOptions<T> = {
 /**
  * 表格组件 事件配置
  */
-export type TableEvents = ReadyEvents & Pick<ScrollEvents, "bottom"> & {
-}
+export type TableEvents = ReadyEvents & Pick<ScrollEvents, "bottom">;
 
-/**
- * 表格的列配置选项
- * @typeParam T 列附带数据的数据类型
- */
-export type TableColumnOptions<T> = {
-    /**
-     * 列名称
-     */
-    name: string;
-    /**
-     * 列宽度
-     * - 不指定则自适应
-     */
-    width?: string;
-
-    /**
-    * 列数据
-    * - 列的自定义数据，方便自定义渲染时做区分
-    * - 如传入列的编码，插槽中基于此编码做区分template
-    */
-    data?: T;
-}
-/**
- * 表格行的配置选项
- */
-export type TableRowOptions = HeightStyle & {
-    /**
-     * 背景颜色
-     * - 默认白色
-     */
-    background?: string;
-}
-//#endregion
-
-
-//#region *************************************DataTable 组件配置选项*******************************************
 /**
  * DataTable 组件配置选项
  */
@@ -167,7 +130,7 @@ export type DataTableOptions<T> = DataTableBaseOptions<T> & {
     readonly columnSort?: "none" | "single" | "multiple";
 } & Pick<ScrollBaseOptions, "barSize">;
 /**
- * 组件事件
+ * DataTable 组件事件
  */
 export type DataTableEvents = ReadyEvents<DataTableHandle<any>> & {
     /**
@@ -195,6 +158,18 @@ export type DataTableEvents = ReadyEvents<DataTableHandle<any>> & {
 }
 
 /**
+ * ElasticTable 组件配置选项
+ */
+export type ElasticTableOptions<T> = DataTableBaseOptions<T> & {
+    /**
+     * 是否启动【刷新数据】功能
+     * - 为true时，下拉滚动到顶部时，触发刷新数据
+     * - 默认为false
+     */
+    readonly refresh?: boolean;
+}
+
+/**
  * DataTable 组件基础配置选项
  */
 export type DataTableBaseOptions<T> = {
@@ -211,18 +186,18 @@ export type DataTableBaseOptions<T> = {
      */
     readonly load: (type: DataTableLoadType) => DataTableRow<T>[] | Promise<DataTableRow<T>[]>;
     /**
-     * 是否启用【加载更多】功能
-     * - 为true时，滚动条滚动到底部时，触发加载更多数据
-     * - 默认为false
-     */
-    readonly loadMore?: boolean;
-
-    /**
-     * 每页数据条数
+     * 页大小：每页数据条数
      * - 判断是否需要触发加载更多数据
      * - 不配置则默认30
      */
-    readonly pageSize?: number;
+    readonly page?: number;
+    /**
+     * 是否启用【加载更多】功能
+     * - 为true时，滚动到底部时，触发加载更多数据
+     * - 默认为false
+     * @remark 桌面端为滚动条滚动到底部，移动端为上拉滚动到底部
+     */
+    readonly more?: boolean;
 
     /**
      * 动效配置
@@ -247,7 +222,6 @@ export type DataTableBaseOptions<T> = {
      */
     emptyMessage?: string;
 }
-
 /**
  * 数据表的操作句柄
  * - 暴露给使用方进行数据操作使用
@@ -280,15 +254,6 @@ export type DataTableHandle<T> = {
      * @returns 符合条件的数据行详情数组；不存在则返回undefined
      */
     getRows(predicate: (row: DataTableRow<T>) => boolean): DataTableRowDetail<T>[];
-
-    /**
-     * 添加数据行
-     * @param index 索引位置，为undefined时，添加到最后一行
-     * @param id 行数据主键Id之
-     * @param data 行附带数据
-     * @returns 数据行详情; 不存在则返回undefined
-     */
-    addRow(index: number | undefined, id: string, data?: T): DataTableRowDetail<T>;
     /**
      * 聚焦数据行
      * - 将行显示到可视区域
@@ -297,26 +262,39 @@ export type DataTableHandle<T> = {
      * @returns 数据行详情; 不存在则返回undefined
      */
     forceRow(position: DataTableRowPosition<T>): DataTableRowDetail<T> | undefined;
+
     /**
-     * 移动行到指定位置
-     * @param oldPosition 旧位置
-     * @param newPosition 新位置
-     * @returns 数据行移动后的详情；否则返回undefined
+     * 添加数据行
+     * @param index 索引位置，为undefined时，添加到最后一行
+     * @param id 行数据主键Id之
+     * @param data 行附带数据
+     * @param autoForce 是否自动聚焦行：为true时，执行 {@link DataTableHandle.forceRow} 方法
+     * @returns 数据行详情; 不存在则返回undefined
      */
-    moveRow(oldPosition: DataTableRowPosition<T>, newPosition: DataTableRowPosition<T>): DataTableRowDetail<T> | undefined;
+    addRow(index: number | undefined, id: string, data?: T, autoForce?: boolean): DataTableRowDetail<T>;
     /**
      * 刷新数据行：重新渲染对应数据行
      * @param position 数据行位置
      * @param data 行附带的数据
+     * @param autoForce 是否自动聚焦行：为true时，刷新后执行 {@link DataTableHandle.forceRow} 方法聚焦行
      * @returns 数据行详情; 不存在则返回undefined
      */
-    refreshRow(position: DataTableRowPosition<T>, data?: T): DataTableRowDetail<T> | undefined;
+    refreshRow(position: DataTableRowPosition<T>, data?: T, autoForce?: boolean): DataTableRowDetail<T> | undefined;
+    /**
+     * 移动行到指定位置
+     * @param oldPosition 旧位置
+     * @param newPosition 新位置
+     * @param autoForce 是否自动聚焦行：为true时，添加后执行 {@link DataTableHandle.forceRow} 方法
+     * @returns 数据行移动后的详情；否则返回undefined
+     */
+    moveRow(oldPosition: DataTableRowPosition<T>, newPosition: DataTableRowPosition<T>, autoForce?: boolean): DataTableRowDetail<T> | undefined;
     /**
      * 删除数据行
      * @param position 数据行位置
+     * @param autoForce 是否自动聚焦行：为true时，先执行 {@link DataTableHandle.forceRow} 方法聚焦行，再删除
      * @returns 数据行详情; 不存在则返回undefined
      */
-    deleteRow(position: DataTableRowPosition<T>): DataTableRowDetail<T> | undefined;
+    deleteRow(position: DataTableRowPosition<T>, autoForce?: boolean): DataTableRowDetail<T> | undefined;
 
     /**
      * 开启选择模式
@@ -350,6 +328,41 @@ export type DataTableHandle<T> = {
      * @returns 排序状态数组
      */
     getSortStatus<T>(): DataTableSortStatus<T>[];
+}
+//#endregion
+
+//#region *************************************Table 系列基础通用数据结构******************************************
+/**
+ * 表格的列配置选项
+ * @typeParam T 列附带数据的数据类型
+ */
+export type TableColumnOptions<T> = {
+    /**
+     * 列名称
+     */
+    name: string;
+    /**
+     * 列宽度
+     * - 不指定则自适应
+     */
+    width?: string;
+
+    /**
+    * 列数据
+    * - 列的自定义数据，方便自定义渲染时做区分
+    * - 如传入列的编码，插槽中基于此编码做区分template
+    */
+    data?: T;
+}
+/**
+ * 表格行的配置选项
+ */
+export type TableRowOptions = HeightStyle & {
+    /**
+     * 背景颜色
+     * - 默认白色
+     */
+    background?: string;
 }
 
 /**
@@ -503,7 +516,57 @@ export type DataTableSortStatus<T> = {
      */
     readonly column: DataTableColumnOptions<T>;
 }
+//#endregion
 
+//#region *************************************Table 系列组件插槽属性、句柄数据结构*******************************************
+/**
+ * 数据表的列渲染插槽绑定属性
+ */
+export type DataTableColumnSlotProps<Col, Row> = {
+    /**
+     * 当前列配置
+     */
+    column: DataTableColumnOptions<Col>;
+    /**
+     * 列索引
+     */
+    columnIndex: number;
+
+    /**
+     * 当前行数据
+     * - 为undefined则表示渲染的是header和footer中的列
+     */
+    row?: DataTableRow<Row>;
+    /**
+     * 当前行索引
+     * - 为undefined则表示渲染的是header和footer中的列
+     */
+    rowIndex?: number;
+}
+
+/**
+ * 数据表的行渲染插槽绑定属性
+ */
+export type DataTableRowSlotProps<Col, Row> = {
+    /**
+     * 当前列配置
+     */
+    columns: DataTableColumnOptions<Col>[];
+
+    /**
+     * 当前行数据
+     * - 为undefined则表示渲染的是header和footer中的列
+     */
+    row?: DataTableRow<Row>;
+    /**
+     * 当前行索引
+     * - 为undefined则表示渲染的是header和footer中的列
+     */
+    rowIndex?: number;
+}
+//#endregion
+
+//#region *************************************Table 系列组件 其他数据结构*******************************************
 /**
  * 接口：数据表 组件上下文
  */
@@ -561,7 +624,6 @@ export interface IDataTableContext {
      */
     toggleSelect(row?: DataTableRow<any>): void;
 }
-
 /**
  * 数据表组件上下文使用时，传入的扩展
  * - 满足一些特定情况下，内部无法完成交互时的通知
@@ -573,65 +635,5 @@ export type DataTableContextUseExt = {
      * @param row 
      */
     forceRow?(row: DataTableRow<any>): void;
-}
-
-/**
- * 数据表的列渲染插槽绑定属性
- */
-export type DataTableColumnSlotProps<Col, Row> = {
-    /**
-     * 当前列配置
-     */
-    column: DataTableColumnOptions<Col>;
-    /**
-     * 列索引
-     */
-    columnIndex: number;
-
-    /**
-     * 当前行数据
-     * - 为undefined则表示渲染的是header和footer中的列
-     */
-    row?: DataTableRow<Row>;
-    /**
-     * 当前行索引
-     * - 为undefined则表示渲染的是header和footer中的列
-     */
-    rowIndex?: number;
-}
-
-/**
- * 数据表的行渲染插槽绑定属性
- */
-export type DataTableRowSlotProps<Col, Row> = {
-    /**
-     * 当前列配置
-     */
-    columns: DataTableColumnOptions<Col>[];
-
-    /**
-     * 当前行数据
-     * - 为undefined则表示渲染的是header和footer中的列
-     */
-    row?: DataTableRow<Row>;
-    /**
-     * 当前行索引
-     * - 为undefined则表示渲染的是header和footer中的列
-     */
-    rowIndex?: number;
-}
-//#endregion
-
-//#region *************************************ElasticTable 组件配置选项*******************************************
-/**
- * ElasticTable 组件配置选项
- */
-export type ElasticTableOptions<T> = DataTableBaseOptions<T> & {
-    /**
-     * 是否启动【刷新数据】功能
-     * - 为true时，下拉滚动到顶部时，触发刷新数据
-     * - 默认为false
-     */
-    readonly refresh?: boolean;
 }
 //#endregion

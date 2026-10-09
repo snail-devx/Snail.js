@@ -68,7 +68,7 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
             loadingRef.value = true;
             try {
                 const rows = await options.load(type);
-                noMoreDataRef.value = isArray(rows) == false || rows.length < options.pageSize;
+                noMoreDataRef.value = isArray(rows) == false || rows.length < options.page;
                 //  基于type分发对旧数据做处理
                 switch (type) {
                     //  这几种情况，都做初始值处理，清空之前的数据
@@ -148,27 +148,6 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
             });
             return rows;
         },
-
-        /**
-         * 添加数据行
-         * @param index 索引位置，为undefined时，添加到最后一行
-         * @param id 行数据主键Id之
-         * @param data 行附带数据
-         * @returns 数据行详情; 不存在则返回undefined
-         */
-        addRow(index: number | undefined, id: string, data?: any): DataTableRowDetail<any> {
-            selectModeRef.value == "none" || throwError("cannot add row when select mode.");
-            //  验证Id的存在性
-            index = correctNumber(index, undefined);
-            mustString(id, "id");
-            throwIfTrue(idMap.has(id), `id is exist. id: ${id}.`);
-            const row: DataTableRow<any> = Object.freeze({ id, data });
-            index == undefined
-                ? rowsRef.value.push(row)
-                : rowsRef.value.splice(index, 0, row);
-            //  强制聚焦当前添加行
-            return handle.forceRow(id);
-        },
         /**
          * 聚焦数据行
          * - 将行显示到可视区域
@@ -196,13 +175,48 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
             }
             return row;
         },
+
+        /**
+         * 添加数据行
+         * @param index 索引位置，为undefined时，添加到最后一行
+         * @param id 行数据主键Id之
+         * @param data 行附带数据
+         * @param autoForce 是否自动聚焦行：为true时，执行 {@link DataTableHandle.forceRow} 方法
+         * @returns 数据行详情; 不存在则返回undefined
+         */
+        addRow(index: number | undefined, id: string, data?: any, autoForce?: boolean): DataTableRowDetail<any> {
+            selectModeRef.value == "none" || throwError("cannot add row when select mode.");
+            //  验证Id的存在性
+            index = correctNumber(index, undefined);
+            mustString(id, "id");
+            throwIfTrue(idMap.has(id), `id is exist. id: ${id}.`);
+            const row: DataTableRow<any> = Object.freeze({ id, data });
+            index == undefined ? rowsRef.value.push(row) : rowsRef.value.splice(index, 0, row);
+            autoForce && handle.forceRow(id);
+            return handle.getRow(id);
+        },
+        /**
+         * 刷新数据行：重新渲染对应数据行
+         * @param position 数据行位置
+         * @param data 行附带的数据
+         * @param autoForce 是否自动聚焦行：为true时，刷新后执行 {@link DataTableHandle.forceRow} 方法聚焦行
+         * @returns 数据行详情; 不存在则返回undefined
+         */
+        refreshRow(position: DataTableRowPosition<any>, data?: any, autoForce?: boolean): DataTableRowDetail<any> | undefined {
+            /** 先删除后插入 */
+            selectModeRef.value == "none" || throwError("cannot refresh row when select mode.");
+            let row = handle.deleteRow(position, autoForce);
+            row && (row = handle.addRow(row.index, row.id, data, autoForce));
+            return row;
+        },
         /**
          * 移动行到指定位置
          * @param oldPosition 旧位置
          * @param newPosition 新位置
+         * @param autoForce 是否自动聚焦行：为true时，添加后执行 {@link DataTableHandle.forceRow} 方法
          * @returns 数据行移动后的详情；否则返回undefined
          */
-        moveRow(oldPosition: DataTableRowPosition<any>, newPosition: DataTableRowPosition<any>): DataTableRowDetail<any> | undefined {
+        moveRow(oldPosition: DataTableRowPosition<any>, newPosition: DataTableRowPosition<any>, autoForce?: boolean): DataTableRowDetail<any> | undefined {
             const oldRow = handle.getRow(oldPosition);
             let newRow = oldRow ? handle.getRow(newPosition) : undefined;
             if (newRow != undefined) {
@@ -210,29 +224,20 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
                 newRow = handle.getRow(oldRow.id);
                 newRow && emits("move", newRow, oldRow.index, newRow.index)
             }
+            oldRow && autoForce && handle.forceRow(oldRow.id);
             return newRow;
-        },
-        /**
-         * 刷新数据行：重新渲染对应数据行
-         * @param position 数据行位置
-         * @param data 行附带的数据
-         * @returns 数据行详情; 不存在则返回undefined
-         */
-        refreshRow(position: DataTableRowPosition<any>, data?: any): DataTableRowDetail<any> | undefined {
-            /** 先删除后插入 */
-            selectModeRef.value == "none" || throwError("cannot refresh row when select mode.");
-            const row = handle.deleteRow(position);
-            return row != undefined ? handle.addRow(row.index, row.id, data) : undefined;
         },
         /**
          * 删除数据行
          * @param position 数据行位置
+         * @param autoForce 是否自动聚焦行：为true时，先执行 {@link DataTableHandle.forceRow} 方法聚焦行，再删除
          * @returns 数据行详情; 不存在则返回undefined
          */
-        deleteRow(position: DataTableRowPosition<any>): DataTableRowDetail<any> | undefined {
+        deleteRow(position: DataTableRowPosition<any>, autoForce?: boolean): DataTableRowDetail<any> | undefined {
             selectModeRef.value == "none" || throwError("cannot delete row when select mode.");
             const row = handle.getRow(position);
             if (row != undefined) {
+                autoForce && handle.forceRow(row.id);
                 idMap.delete(row.id);
                 rowsRef.value.splice(row.index, 1);
                 //  清理聚焦行
@@ -450,5 +455,4 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
         });
         return Object.freeze(manager);
     }
-
 }

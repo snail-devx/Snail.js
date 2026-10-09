@@ -46,8 +46,8 @@ function correctBaseOptions(options: DataTableBaseOptions<any>): DataTableBaseOp
     mustFunction(options.load, "correctBaseOptions: options.load");
     // 默认值处理
     Object.assign<DataTableBaseOptions<any>, Partial<DataTableBaseOptions<any>>>(options, {
-        loadMore: options.loadMore === true,
-        pageSize: options.pageSize > 0 ? options.pageSize : 30,
+        more: options.more === true,
+        page: options.page > 0 ? options.page : 30,
         canSelect: correctFunction(options.canSelect, undefined),
         //  空消息提示，需要响应式，不在这里使用，强制空
         emptyMessage: undefined,
