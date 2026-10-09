@@ -2,6 +2,9 @@
  * 卡片组件相关数据实体
  */
 
+import { DisabledOptions } from "../../base/models/base-model";
+
+
 /**
  * 卡片组件配置选项
  */
@@ -13,7 +16,7 @@ export type CardOptions = {
     /**
      * 卡片详情信息项
      */
-    details: CardInfoItem[];
+    details: Array<CardInfoItem & DisabledOptions>;
     /**
      * 卡片底部信息项
      */
@@ -43,4 +46,4 @@ export type CardInfoItem = {
      * @returns 
      */
     click?: () => void;
-}
+};

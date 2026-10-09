@@ -13,18 +13,18 @@
         </div>
         <!-- 详细信息信息项，每个信息项支持自定义插槽 -->
         <div class="main-area">
-            <div class="card-item" v-for="item in details || []" :key="getKey(item)"
-                @click="evt => onCardItemClick(item, evt)">
-                <slot v-if="item.custom == true" name="detail-item" :item="item">
-                    <span>自定义信息项,但无插槽[detail-item]</span>
-                </slot>
-                <template v-else>
-                    <span class="title ellipsis" :title="item.title" v-text="item.title" />
-                    <span class="text ellipsis" :title="item.text" v-text="item.text" />
-                    <Icon v-if="isFunction(item.click)" :type="'arrow'" />
-                </template>
-
-            </div>
+            <template v-for="item in details || []" :key="getKey(item)">
+                <div class="card-item" v-show="item.disabled != true" @click="evt => onCardItemClick(item, evt)">
+                    <slot v-if="item.custom == true" name="detail-item" :item="item">
+                        <span>自定义信息项,但无插槽[detail-item]</span>
+                    </slot>
+                    <template v-else>
+                        <span class="title ellipsis" :title="item.title" v-text="item.title" />
+                        <span class="text ellipsis" :title="item.text" v-text="item.text" />
+                        <Icon v-if="isFunction(item.click)" :type="'arrow'" />
+                    </template>
+                </div>
+            </template>
         </div>
         <!-- 底部区域 -->
         <div v-if="footer" class="footer-area card-item" @click="evt => onCardItemClick(footer, evt)">
@@ -98,28 +98,8 @@ function onCardItemClick(item: CardInfoItem, evt: PointerEvent) {
             flex: 1;
             font-weight: bold;
             font-size: 16px;
-            color: #2E3033;
+            color: #2e3033;
         }
-    }
-
-    // 详情信息项区域
-    >.main-area {
-        margin-top: 8px;
-
-        >.card-item {
-            min-height: 32px;
-
-            >span.title {
-                color: #8A9099;
-            }
-        }
-    }
-
-    // 底部可操作区域
-    >.footer-area {
-        margin-top: 6px;
-        min-height: 40px;
-        border-top: 1px solid #D9D9D9;
     }
 
     // 详情和底部的信息项通用样式 
@@ -131,16 +111,38 @@ function onCardItemClick(item: CardInfoItem, evt: PointerEvent) {
         gap: 12px;
 
         >span.title {
-            width: 80px;
+            width: 100px;
+            color: #8a9099;
             flex-shrink: 0;
         }
 
         >span.text {
+            color: #2e3033;
             flex: 1;
         }
 
         >svg {
             justify-self: flex-end;
+        }
+    }
+
+    // 详情信息项区域
+    >.main-area {
+        margin-top: 8px;
+
+        >.card-item {
+            min-height: 32px;
+        }
+    }
+
+    // 底部可操作区域：标题颜色和main区域区别一下
+    >.footer-area {
+        margin-top: 6px;
+        min-height: 40px;
+        border-top: 1px solid #d9d9d9;
+
+        >span.title {
+            color: #2e3033;
         }
     }
 }
