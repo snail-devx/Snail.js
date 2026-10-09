@@ -205,8 +205,8 @@ onMounted(() => { //  事件监听处理
 
 .snail-table {
     position: relative;
-    min-width: 100%;
     max-width: 100%;
+    max-height: 100%;
     box-shadow: 0px 0px 6px 0px rgba(46, 48, 51, 0.14);
 
     // 表格内容渲染
@@ -247,6 +247,17 @@ onMounted(() => { //  事件监听处理
             >tr {
                 height: 40px;
                 overflow-y: visible;
+            }
+
+            // 无数据行样式
+            >tr.empty-message {
+                height: 250px;
+
+                &::after,
+                td::before,
+                td::after {
+                    content: unset;
+                }
             }
         }
 
@@ -419,6 +430,5 @@ onMounted(() => { //  事件监听处理
             }
         }
     }
-
 }
 </style>
