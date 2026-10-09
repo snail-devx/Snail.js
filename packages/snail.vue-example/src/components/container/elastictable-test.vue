@@ -35,7 +35,7 @@
             </ElasticTable>
 
             <ElasticTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
-                :motion="MOTION.rotate" refresh load-more @ready="han => handle = han" @click="console.log"
+                :motion="MOTION.rotate" refresh more @ready="han => handle = han" @click="console.log"
                 @move="console.log" @select="console.log">
                 <template #="{ column, rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>"
                     :key="String(columnIndex)">

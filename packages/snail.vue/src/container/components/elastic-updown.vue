@@ -32,18 +32,17 @@
 </template>
 
 <script setup lang="ts">
-import { correctString, isFunction } from 'snail.core';
+import { correctString, useScope } from 'snail.core';
 import { ElasticDetail, ElasticDockOptions } from 'snail.view';
 import { onMounted, shallowRef, ShallowRef } from 'vue';
 import Icon from '../../base/icon.vue';
-import { ReadyEvents } from '../../base/models/base-event';
 import { useReactive } from '../../base/reactive';
-import { ElasticSlotHandle, ElasticUpdownHandle, ElasticUpdownOptions } from '../models/elastic-model';
+import { ElasticSlotHandle, ElasticUpdownEvents, ElasticUpdownHandle, ElasticUpdownOptions } from '../models/elastic-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<ElasticUpdownOptions & ElasticSlotHandle>();
-const emits = defineEmits<ReadyEvents<ElasticUpdownHandle>>();
+const emits = defineEmits<ElasticUpdownEvents>();
 const { watcher } = useReactive();
 const { target } = props;
 //  2、组件交互变量、常量
@@ -106,6 +105,43 @@ function onDetailChange(detail: ElasticDetail) {
 }
 
 /**
+ * 显示刷新或加载更多效果
+ * @param mode 模式：具体显示下拉刷新还是上拉加载
+ * @param message refresh 模式时生效（可制定刷新提示语，不传入则使用默认的)
+ */
+function showEffect(mode: "refresh" | "more", message: string) {
+    if (mode == "more") {
+        if (props.up != true) {
+            console.warn("elastic-up-down: up is false, can not more");
+            return;
+        }
+        refreshRef.value = undefined;
+        moreRef.value = "running";
+        resetDock(false);
+        props.scrollTo(undefined, -Number.MAX_SAFE_INTEGER);
+    }
+    else {
+        if (props.down != true) {
+            console.warn("elastic-up-down: down is false, can not refresh");
+            return;
+        }
+        refreshMessageRef.value = correctString(message, "正在刷新...", true);
+        refreshRef.value = "running";
+        moreRef.value = undefined;
+        resetDock(false);
+        props.scrollTo(undefined, 40);
+    }
+}
+/**
+ * 清理上拉加载和下拉刷新效果
+ */
+function clearEffect() {
+    refreshRef.value = undefined;
+    moreRef.value = undefined;
+    resetDock(true);
+}
+
+/**
  * 重置停靠位置
  * @param refreshView 是否刷新视图
  */
@@ -115,7 +151,6 @@ function resetDock(refreshView: boolean) {
     options.top = refreshRef.value == "running" || refreshRef.value == "release" ? 40 : 0;
     options.bottom = moreRef.value == "running" || moreRef.value == "release" ? 40 : 0;
     props.dock(options);
-
     refreshView && props.refresh();
 }
 /**
@@ -125,45 +160,24 @@ function resetDock(refreshView: boolean) {
 async function onRefreshOrMore(mode: "refresh" | "more") {
     //  通知外面，但需要等待上一次操作完成了
     try {
-        await props.load(mode);
+        const scope = useScope();
+        mode == "refresh" ? emits("refresh", scope) : emits("more", scope);
+        scope.onDestroy(clearEffect);
     }
     catch (ex) {
         console.error("elastic-up-down: load function run error", ex);
-    }
-    finally {
-        refreshRef.value = undefined;
-        moreRef.value = undefined;
-        resetDock(true);
     }
 }
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
-{
-    props.elastic != "both" && props.elastic != "y"
-        && console.warn("elastic-up-down: elastic must be 'both' or 'y'");
-    isFunction(props.load) != true
-        && console.warn("elastic-up-down: load must be a function");
-}
+props.elastic != "both" && props.elastic != "y" && console.warn("elastic-up-down: elastic must be 'both' or 'y'");
 //  2、生命周期响应：挂载后，禁用dock（在下拉刷新和上拉加载时再启用）,并进行弹性状态监听（挂载前监听无意义）
 onMounted(() => {
     props.dock(undefined);
     watcher(() => props.detail, onDetailChange);
     //  发送准备事件
-    const handle: ElasticUpdownHandle = Object.freeze<ElasticUpdownHandle>({
-        refresh(message: string) {
-            if (props.down != true) {
-                console.warn("elastic-up-down: down is false, can not refresh");
-                return;
-            }
-            refreshMessageRef.value = correctString(message, "正在刷新...", true);
-            //  执行刷新处理；后续看情况，如果刷新中，则不进行刷新
-            refreshRef.value = "running";
-            moreRef.value = undefined;
-            resetDock(true);
-            onRefreshOrMore("refresh");
-        }
-    });
+    const handle: ElasticUpdownHandle = Object.freeze<ElasticUpdownHandle>({ show: showEffect, clear: clearEffect, });
     emits("ready", handle);
 });
 </script>

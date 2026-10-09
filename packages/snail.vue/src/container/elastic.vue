@@ -54,6 +54,7 @@ onMounted(() => {
         target: mainAreaDom.value,
         dock: em.dock,
         refresh: em.refresh,
+        scrollTo: em.scrollTo,
         //  这属性直接绑定
         detail: undefined,
     });

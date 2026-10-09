@@ -1,5 +1,7 @@
 
+import { IScope } from "snail.core";
 import { ElasticBaseOptions, ElasticDetail, IElasticManager } from "snail.view";
+import { ReadyEvents } from "../../base/models/base-event";
 
 /**
  * 弹性视图组件配置选项
@@ -41,7 +43,7 @@ export type ElasticSlotHandle = {
      * - 可监听此对象变化实时获取滚动状态
      */
     detail?: ElasticDetail,
-} & Required<Pick<IElasticManager, "dock" | "refresh">>;
+} & Required<Pick<IElasticManager, "dock" | "refresh" | "scrollTo">>;
 
 
 /**
@@ -60,22 +62,35 @@ export type ElasticUpdownOptions = {
      * - 满足下拉刷新条件后，触发`refresh`事件，处理完成后调用resolve函数，通知完成刷新数据操作
      */
     down: boolean;
-
-    /**
-     * 数据加载方法
-     * - 触发上拉加载和下拉刷新时调用此方法通知外部加载数据
-     * @param mode 回调模式，`refresh`为下拉刷新，`more`为上拉加载
-     * @returns 异步任务，处理完成后通知完成操作
-     */
-    readonly load: (mode: "refresh" | "more") => Promise<any>;
 };
+/**
+ * 弹性组件【上拉加载、下拉刷新】组件事件
+ */
+export type ElasticUpdownEvents = ReadyEvents<ElasticUpdownHandle> & {
+    /**
+     * 下拉刷新事件
+     * @param scope 刷新完成后，销毁此作用域，取消刷新效果
+     */
+    refresh: [scope: IScope];
+    /**
+     * 上拉加载更多事件
+     * @param scope 加载完成后，销毁此作用域，取消加载效果
+     * @returns 
+     */
+    more: [scope: IScope];
+}
 /**
  * 弹性组件【上拉加载、下拉刷新】组件操作句柄
  */
 export type ElasticUpdownHandle = {
     /**
-     * 触发下拉刷新
-     * @param message 可制定刷新提示语，默认刷新中
+     * 显示上拉加载和下拉刷新效果
+     * @param mode 模式：具体显示下拉刷新还是上拉加载
+     * @param message refresh 模式时生效（可制定刷新提示语，不传入则使用默认的)
      */
-    refresh(message?: string): void;
+    show(mode: "refresh" | "more", message?: string): void;
+    /**
+     * 清理上拉加载和下拉刷新状态
+     */
+    clear(): void;
 }

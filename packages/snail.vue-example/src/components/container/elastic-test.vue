@@ -36,7 +36,8 @@
                 <ElasticTestBody style="width: 100%;" />
                 <!-- 启用此插件 -->
                 <template #plugin="handle">
-                    <ElasticUpdown :="handle" up :down="true" :load="loadData" @ready="onUpdownReady" />
+                    <ElasticUpdown :="handle" up :down="true" @ready="onUpdownReady" @refresh="loadData('refresh')"
+                        @more="loadData('more')" />
                 </template>
             </Elastic>
         </section>
@@ -72,7 +73,8 @@ async function loadData(mode: "refresh" | "more"): Promise<any> {
  * @param handle 
  */
 async function onUpdownReady(handle: ElasticUpdownHandle) {
-    setTimeout(handle.refresh, 1000);
+    setTimeout(handle.show, 1000, "refresh");
+    setTimeout(handle.clear, 2000);
 }
 
 // *****************************************   👉  组件渲染    *****************************************

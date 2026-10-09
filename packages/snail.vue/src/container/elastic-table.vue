@@ -55,8 +55,8 @@
         </template>
         <template #plugin="handle">
             <!-- 这个需要琢磨一下，需要在没有数据后的下一次触发后，再禁用，并配合【没有更多数据了】的提示 -->
-            <ElasticUpdown :="handle" :up="noMoreDataRef != true && options.loadMore == true" :down="options.refresh"
-                :load="onUpdownLoad" @ready="handle => updownHandleRef = handle" />
+            <ElasticUpdown :="handle" :up="noMoreDataRef != true && options.more == true" :down="options.refresh"
+                @ready="handle => updownHandleRef = handle" @refresh="onDownRefresh" @more="onUpMore" />
             <!-- Loading提示能力 -->
             <Loading :show="loadTypeRef == undefined && loadingRef" />
         </template>
@@ -64,10 +64,11 @@
 </template>
 
 <script setup lang="ts">
-import { correctString, useKey } from 'snail.core';
+import { correctString, IScope, useKey, wait } from 'snail.core';
 import { useStyle } from 'snail.view';
 import { computed, nextTick, onMounted, shallowRef, ShallowRef } from 'vue';
 import Icon from '../base/icon.vue';
+import { useReactive } from '../base/reactive.js';
 import Empty from '../prompt/empty.vue';
 import Loading from '../prompt/loading.vue';
 import ElasticUpdown from './components/elastic-updown.vue';
@@ -85,6 +86,7 @@ const emits = defineEmits<DataTableEvents>();
 const options = correctElasticTableOptions(props);
 const context = useDataTable("mobile", options, emits, Object.freeze<DataTableContextUseExt>({ forceRow }));
 const { getKey } = useKey();
+const { watcher } = useReactive();
 const { namespace, build } = useStyle();
 //  2、参数解构，如覆盖props中属性
 const emptyMessage = computed(() => correctString(props.emptyMessage, '暂无数据', true));
@@ -94,8 +96,8 @@ const { loadTypeRef, loadingRef, handle, rowsRef, forceRowIdRef, selectModeRef, 
 const elasticHandleRef: ShallowRef<ElasticHandle> = shallowRef();
 /**     下拉刷新、上拉加载的操作句柄 */
 const updownHandleRef: ShallowRef<ElasticUpdownHandle> = shallowRef();
-/**     是否已经初始化数据了 */
-let hasInitData: boolean = undefined;
+/**     上一次数据记载的scope */
+let preLoadScope: IScope = undefined;
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -110,27 +112,64 @@ async function forceRow(row: DataTableRow<any>) {
 }
 
 /**
- * 移动端：上拉加载、下拉刷新事件处理
+ * 触发下拉刷新时
+ * @param scope 
+ */
+async function onDownRefresh(scope: IScope) {
+    preLoadScope && preLoadScope.destroy();
+    preLoadScope = scope;
+    await wait(handle.loadData("refresh"));
+    scope.destroy();
+    preLoadScope = undefined;
+}
+/**
+ * 触发上拉加载更多时
+ * @param scope 
+ */
+async function onUpMore(scope: IScope) {
+    preLoadScope && preLoadScope.destroy();
+    preLoadScope = scope;
+    await wait(handle.loadData("more"));
+    scope.destroy();
+    preLoadScope = undefined;
+}
+
+/**
+ * loadType 值改变时，进行效果响应
+ * - 如外部搜索时，需要响应出刷新效果，而不是干巴的loading
  * @param type 
  */
-function onUpdownLoad(type: "refresh" | "more"): Promise<void> {
-    let loadType: DataTableLoadType = type == "refresh" ? "refresh" : "more";
-    if (loadType == "refresh" && hasInitData != true) {
-        loadType = "init";
-        hasInitData = true;
+function onLoadTypeChange(type: DataTableLoadType) {
+    //  如果是 updown 组件自身触发导致的改变，不进行响应
+    if (preLoadScope && preLoadScope.destroyed == false) {
+        return;
     }
-    return handle.loadData(loadType);
+    //  加载完成了，状态无值，清理效果
+    if (type == undefined) {
+        updownHandleRef.value.clear();
+        return;
+    }
+    //  其他情况，基于状态做响应
+    switch (type) {
+        //  刷新系列
+        case "init": return updownHandleRef.value.show("refresh", "数据加载中...");
+        case "refresh": return updownHandleRef.value.show("refresh", "刷新中...");
+        case "search": return updownHandleRef.value.show("refresh", "搜索中...");
+        //  加载系列
+        case "more": return updownHandleRef.value.show("more");
+        //  其他情况，提示警告，避免出现意料之外的情况
+        default:
+            console.warn("ElasticTable: not support loadType: ", type);
+            break;
+    }
 }
 
 // *****************************************   👉  组件渲染    *****************************************
-//  1、数据初始化、变化监听
-//  2、生命周期响应
 onMounted(async () => {
     await nextTick();
     emits("ready", handle);
-    options.refresh == true
-        ? updownHandleRef.value.refresh("数据加载中...")
-        : handle.loadData("init");
+    watcher(loadTypeRef, onLoadTypeChange);
+    handle.loadData("init");
 });
 
 </script>
