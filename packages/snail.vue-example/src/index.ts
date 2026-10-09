@@ -14,20 +14,20 @@ script.register(
 import { link } from "snail.view";
 
 //  -------------------------------------------------- 初始化Vue app实例   ------------------------------------------------------------
-import vue, { createApp, getCurrentScope, onScopeDispose, ref } from "vue"
-import lessUrl from "./styles/index.less";
-import App from "./components/app.vue";
 import { getType, onMountScope } from "snail.core";
+import { createApp, getCurrentScope, onScopeDispose, ref } from "vue";
+import App from "./components/app.vue";
+import lessUrl from "./styles/index.less";
 /**
  * 挂载Scope时，若在Vue的setup中，则自动销毁
  */
 onMountScope(scope => {
     const type = getType(scope);
     console.log(`%c${type}:`, "color:green", "scope mounted");
-    scope.global != true && getCurrentScope() && onScopeDispose(() => {
+    scope.onDestroy(() => {
         console.log(`%c${type}:`, "color:blue", "scope auto destroyed");
-        scope.destroy();
     });
+    scope.global != true && getCurrentScope() && onScopeDispose(scope.destroy);
 });
 /**
  * 初始化方法

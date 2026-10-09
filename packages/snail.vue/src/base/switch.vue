@@ -5,11 +5,11 @@
     4、【后续】支持指定 开启、关闭 状态的文字、颜色
 -->
 <template>
-    <div class="snail-switch" :class="[switchModel ? 'on' : 'off', readonly ? 'readonly' : '']"
+    <div class="snail-switch" :class="[valueRef ? 'on' : 'off', readonly ? 'readonly' : '']"
         v-bind:class="type || 'switch'" @click="onSwitchChange">
         <!-- 单选复选展示效果 -->
         <template v-if="type == 'checkbox' || type == 'radio'">
-            <Icon v-show="switchModel" :type="'success'" :color="'white'" :size="16" />
+            <Icon v-show="valueRef" :type="'success'" :color="'white'" :size="16" />
         </template>
         <!-- 默认渲染效果 -->
         <template v-else>
@@ -21,16 +21,18 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick } from "vue";
-import { SwitchEvents, SwitchOptions } from "./models/switch-model";
+import { shallowRef, ShallowRef } from "vue";
 import Icon from "./icon.vue";
+import { SwitchEvents, SwitchOptions } from "./models/switch-model";
+import { syncValue } from "./utils/base-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const props = defineProps<SwitchOptions>();
 const emits = defineEmits<SwitchEvents>();
 /**     开关值：开启还是关闭 */
-const switchModel = defineModel<boolean>({ default: false });
+// const switchModel = defineModel<boolean>({ default: false });
+const valueRef: ShallowRef<boolean> = shallowRef(props.value == true);
 //  2、可选配置选项
 defineOptions({ name: "Switch", inheritAttrs: true, });
 
@@ -39,13 +41,16 @@ defineOptions({ name: "Switch", inheritAttrs: true, });
  * 触发开关切换
  */
 function onSwitchChange() {
-    if (props.readonly == true) {
-        return;
+    if (props.readonly != true) {
+        valueRef.value = !valueRef.value;
+        emits("change", valueRef.value);
     }
-    //  更新绑定值，延迟change事件；外部同时使用v-model和change事件时，valueModel.value修改不会立马生效
-    switchModel.value = !switchModel.value;
-    nextTick(() => emits("change", switchModel.value));
 }
+
+// *****************************************   👉  组件渲染    *****************************************
+//  1、数据初始化、变化监听
+syncValue<boolean>(valueRef, () => props.value, value => value == true);
+//  2、生命周期响应
 </script>
 
 <!-- 默认效果渲染 -->

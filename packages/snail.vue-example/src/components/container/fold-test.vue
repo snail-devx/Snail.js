@@ -2,14 +2,20 @@
 <template>
     <Fold :title="'测试Fold'" style="margin:10px" :header="{ class: ['dddd'] }">
         <template #>
-            <div style="height:200px;background: red;" />
+            <div style="height:200px;background: gray;" />
+        </template>
+    </Fold>
+
+    <Fold :title="'测试Fold'" :status="'fold'" style="margin:10px" :header="{ class: ['dddd'] }">
+        <template #>
+            <div style="height:200px;background: gray;" />
         </template>
     </Fold>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components } from "../../libraries/snail_vue"
+import { onActivated, onDeactivated } from "vue";
+import { components } from "../../libraries/snail_vue";
 const { Fold } = components;
 
 // *****************************************   👉  组件定义    *****************************************

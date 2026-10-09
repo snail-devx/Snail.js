@@ -41,6 +41,7 @@ import Textarea from "./base/textarea.vue";
 export * from "./base/components/tree-base";
 export * from "./base/reactive";
 export * from "./base/utils/app-util";
+export * from "./base/utils/base-util";
 export * from "./base/utils/icon-util";
 
 // *****************************************   👉  container 相关导出    ****************************************

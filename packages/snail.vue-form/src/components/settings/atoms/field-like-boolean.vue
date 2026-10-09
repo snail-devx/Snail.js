@@ -6,16 +6,16 @@
     <div class="setting-item">
         <div class="item-title" :class="{ question: isStringNotEmpty(help) }" :title="help" v-text="title" />
         <div class="item-detail right">
-            <Switch :readonly="readonly" v-model="valueRef" @change="value => emits('change', value)" />
+            <Switch :readonly="readonly" :value="valueRef" @change="vl => (valueRef = vl, emits('change', vl))" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { isStringNotEmpty } from "snail.core";
+import { ChangeEvents, components } from "snail.vue";
 import { ref, ShallowRef, } from "vue";
 import { FieldPropertySettingOptions } from "../../../models/field-setting";
-import { ChangeEvents, components } from "snail.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

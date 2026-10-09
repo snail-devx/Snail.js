@@ -1,7 +1,7 @@
 <!-- 搜索组件-->
 <template>
     <div class="snail-search" :class="readonly ? 'readonly' : ''">
-        <input type="search" :placeholder="placeholder" :readonly="readonly" v-model.trim="textModel"
+        <input type="search" :placeholder="placeholder" :readonly="readonly" v-model.trim="valueRef"
             @keyup="onSearch($event)" />
         <div>
             <Icon class="search-button" custom button color="#707070" @click="onSearch(undefined)">
@@ -13,15 +13,18 @@
 </template>
 
 <script setup lang="ts">
-import { SearchEvents, SearchOptions } from "./models/search-model";
+import { correctString } from "snail.core";
+import { shallowRef, ShallowRef } from "vue";
 import Icon from "./icon.vue";
+import { SearchEvents, SearchOptions } from "./models/search-model";
+import { syncValue } from "./utils/base-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data 
 const props = defineProps<SearchOptions>();
 const emits = defineEmits<SearchEvents>();
 /**     搜索文本 */
-const textModel = defineModel<string>({ default: "" });
+const valueRef: ShallowRef<string> = shallowRef(props.value);
 //      三方组件
 //  2、可选配置选项
 defineOptions({ name: "Search", inheritAttrs: true, });
@@ -37,10 +40,14 @@ function onSearch(evt: KeyboardEvent) {
     }
     //  enter 回车健，或者自动完成时，触发搜索逻辑：后期做一些验证，将旧值存储起来，没变化时不做触发
     if (evt == undefined || evt.code == "Enter" || props.autoComplete == true) {
-        emits("search", textModel.value)
+        emits("search", valueRef.value)
     }
 }
 
+// *****************************************   👉  组件渲染    *****************************************
+//  1、数据初始化、变化监听
+syncValue<string>(valueRef, () => props.value, value => correctString(value, undefined, true));
+//  2、生命周期响应
 </script>
 
 <style lang="less">

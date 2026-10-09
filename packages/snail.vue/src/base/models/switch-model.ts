@@ -1,9 +1,9 @@
-import { ReadonlyOptions } from "./base-model";
+import { ReadonlyOptions, ValueOptions } from "./base-model";
 
 /**
  * 开关组件 配置选项
  */
-export type SwitchOptions = ReadonlyOptions & {
+export type SwitchOptions = ReadonlyOptions & ValueOptions<boolean> & {
     /**
      * 类型，决定开启/关闭状态的渲染效果
      * - switch     开关类型，默认效果

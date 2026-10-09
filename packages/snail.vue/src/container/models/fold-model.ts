@@ -1,4 +1,4 @@
-import { CSSDescriptor, CSSClassOptions } from "snail.view";
+import { CSSClassOptions } from "snail.view";
 import { DisabledOptions, TitleOptions } from "../../base/models/base-model";
 
 /**
@@ -23,6 +23,11 @@ export type FoldOptions = DisabledOptions & TitleOptions & {
      * - 如指定特定的css样式
      */
     body?: CSSClassOptions;
+
+    /**
+     * 初始状态
+     */
+    status?: FoldStatus;
 }
 
 /**

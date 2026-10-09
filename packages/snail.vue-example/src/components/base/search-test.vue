@@ -1,18 +1,19 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <Search v-model="text" @search="console.log" />
+    <button @click="textRef = String(Date.now())">更新搜索值</button>
+    <Search :value="textRef" @search="text => (textRef = text, console.log(textRef))" />
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated, useModel } from "vue";
+import { onActivated, onDeactivated, shallowRef } from "vue";
 
-import { components } from "../../libraries/snail_vue"
+import { components } from "../../libraries/snail_vue";
 const { Search } = components;
 
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const text = shallowRef<string>();
+const textRef = shallowRef<string>(String(Date.now()));
 //  2、可选配置选项
 defineOptions({ name: "SearchTest", inheritAttrs: true, });
 

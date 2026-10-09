@@ -1,9 +1,9 @@
-import { PlaceholderOptions, ReadonlyOptions } from "./base-model";
+import { PlaceholderOptions, ReadonlyOptions, ValueOptions } from "./base-model";
 
 /**
  * 搜索组件配置选项
  */
-export type SearchOptions = ReadonlyOptions & PlaceholderOptions & {
+export type SearchOptions = ReadonlyOptions & ValueOptions<string> & PlaceholderOptions & {
     /**
      * 启用【自动完成】
      * - true 时，只要文本变化了，就触发 search 事件
