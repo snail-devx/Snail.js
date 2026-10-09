@@ -13,7 +13,8 @@
 <template>
     <Table class="snail-data-table" :class="{ 'select-mode': selectModeRef && selectModeRef != 'none' }"
         :columns="columns" :index="options.index" :border="options.border" :header="header" :main="main"
-        :footer="footer" :loading="context.loadingRef.value" :bar-size="options.barSize">
+        :footer="footer" :loading="context.loadingRef.value" :bar-size="options.barSize"
+        @bottom="options.more && handle.loadData('more')">
         <!-- 表头 -->
         <template #header>
             <tr>
