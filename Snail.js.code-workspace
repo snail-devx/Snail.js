@@ -43,6 +43,7 @@
 		"svn.ignoreMissingSvnWarning": true,
 		"liveServer.settings.root": "./packages/snail.vue-example/dist",
 		"liveServer.settings.port": 40000,
+		"liveServer.settings.NoBrowser": true,
 	},
 	"extensions": {
 		"recommendations": [
