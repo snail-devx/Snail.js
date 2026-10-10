@@ -20,4 +20,15 @@ export type ButtonOptions = TitleOptions & {
      *  - link   ：链接式按钮：蓝色字体颜色，无边框
      */
     type?: "primary" | "default" | "link";
+
+    /**
+     * 按钮宽度
+     * - 覆盖size的默认配置
+     */
+    width?: string;
+    /**
+     * 按钮高度
+     * - 覆盖size的默认配置
+     */
+    height?: string;
 }

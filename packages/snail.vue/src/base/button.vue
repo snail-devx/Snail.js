@@ -1,6 +1,6 @@
 <!-- 按钮组件：做一些常见按钮样式的封装 -->
 <template>
-    <div class="snail-button" :class="[size || 'normal', type || 'default']" :title="title"
+    <div class="snail-button" :class="[size || 'normal', type || 'default']" :title="title" :style="{ width, height }"
         @click="evt => emits('click', evt)">
         <slot>按钮</slot>
     </div>
