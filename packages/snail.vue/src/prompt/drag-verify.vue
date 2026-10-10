@@ -15,11 +15,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, useTemplateRef } from "vue";
-import { DragVerifyOptions, DragVerifyInfo } from "./models/drag-verify-model";
-import Icon from "../base/icon.vue";
-import { getTwoArrowIconDraw } from "./utils/prompt-util";
 import { useObserver } from "snail.view";
+import { onMounted, ref, useTemplateRef } from "vue";
+import Icon from "../base/icon.vue";
+import { DragVerifyInfo, DragVerifyOptions } from "./models/drag-verify-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -33,8 +32,6 @@ const isTouch = 'ontouchstart' in window;
 const dragHandleDom = useTemplateRef("dragHandle");
 /** 拖拽信息 */
 const dragInfoRef = ref<DragVerifyInfo>({ status: "none", startX: 0, endX: 0, distance: 0 });
-/** 双箭头图标绘制路径 */
-const towArrowIcon: string = getTwoArrowIconDraw();
 //  2、可选配置选项
 defineOptions({ name: "DragVerify", inheritAttrs: true, });
 
