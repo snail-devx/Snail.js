@@ -6,6 +6,7 @@
  */
 import { hasOwnProperty, isArray, isArrayNotEmpty, IScope, isObject, isStringNotEmpty, mountScope, mustArray, mustString } from "snail.core";
 import { AllStyle, CSS, CSSDescriptor, ICSSManager, IStyleManager, StyleClassItem } from "../models/css-model";
+import { getLinkDefaultContainer } from "../utils/link-util";
 
 /**
  * 使用【CSS管理器】
@@ -100,8 +101,6 @@ function useCSS(): ICSSManager {
  */
 export const css: ICSSManager = useCSS();
 
-
-
 /**
  * 使用style标签管理器
  * - 实现临时style样式管理：基于传入的类样式，自动构建，并加上特定的class前缀，实现作用域隔离
@@ -111,7 +110,7 @@ export function useStyle(): IStyleManager & IScope {
     /** style标签元素 */
     const style: HTMLStyleElement = document.createElement("style");
     /** 分配的根类样式 */
-    const namespace: string = `namespace_${++styleTagIndex}`
+    const namespace: string = `userspace_${++styleTagIndex}`
 
     //#region ************************************* 接口方法：IStyleManager具体实现 *************************************
     /**
@@ -120,7 +119,7 @@ export function useStyle(): IStyleManager & IScope {
      * @param classes 类样式数组，name为类样式名称，options为样式配置（key为css样式，value为样式值；如width
      */
     function build(classes: StyleClassItem[]) {
-        style.parentElement || document.head.appendChild(style);
+        style.parentNode || (getLinkDefaultContainer().appendChild(style));
         if (isArrayNotEmpty(classes) == true) {
             style.innerText = classes.map((item, index) => {
                 //  构建当前class的类样式，注意key的大写问题
@@ -160,11 +159,12 @@ export function useStyle(): IStyleManager & IScope {
 
     //  初始化
     {
+        style.setAttribute("data-remark", "snail-style");
         const manager = mountScope<IStyleManager>({
             namespace,
             build
         }, { type: "IStyleManager" })
-        manager.onDestroy(() => style.parentElement && style.parentElement.removeChild(style));
+        manager.onDestroy(() => style.parentNode && style.parentNode.removeChild(style));
         return Object.freeze(manager);
     }
 }
