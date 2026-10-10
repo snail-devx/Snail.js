@@ -1,0 +1,5 @@
+{
+    "liveServer.settings.NoBrowser": true,
+    "liveServer.settings.port": 40000,
+    "liveServer.settings.root": "./packages/snail.vue-example/dist"
+}
