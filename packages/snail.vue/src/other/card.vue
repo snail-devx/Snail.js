@@ -8,7 +8,7 @@
         <!-- 标题区域:标题，做默认实现 -->
         <div class="header-area">
             <slot name="header">
-                <span class="title" :title="title" v-text="title" />
+                <span class="title ellipsis" :title="title" v-text="title" />
             </slot>
         </div>
         <!-- 详细信息信息项，每个信息项支持自定义插槽 -->
