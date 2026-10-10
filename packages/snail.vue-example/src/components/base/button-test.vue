@@ -19,12 +19,17 @@
         <Button type="link" size="normal">normal</Button>
         <Button type="link" size="small">normal</Button>
         <hr />
+        <h2>width height</h2>
+        <Button type="primary" width="100px">max</Button>
+        <Button type="primary" width="20rem" height="30px">middle</Button>
+        <Button type="primary" :width="'20rem'">normal</Button>
+        <Button type="primary" :height="'10%'">normal</Button>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
-import { components } from "../../libraries/snail_vue"
+import { onActivated, onDeactivated } from "vue";
+import { components } from "../../libraries/snail_vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
