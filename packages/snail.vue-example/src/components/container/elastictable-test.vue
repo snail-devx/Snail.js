@@ -24,9 +24,6 @@
             <button @click="handle && handle.toggleRowSelect(1)">切换选中：索引1</button>
             <button @click="handle && handle.stopSelectMode()">停止选择模式</button>
         </div>
-        <div style="display: flex;gap: 10px;align-items: center; flex-wrap: wrap;">
-            <button @click="handle && onTimeout(scope => scope.destroy(), 1000, handle.showLoading())">loading</button>
-        </div>
     </div>
     <div style="background-color: gray;display: flex;gap: 20px;flex-direction: column;">
         <Env :mode="'mobile'">

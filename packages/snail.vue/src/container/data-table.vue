@@ -13,8 +13,7 @@
 <template>
     <Table class="snail-data-table" :class="{ 'select-mode': selectModeRef && selectModeRef != 'none' }"
         :columns="columns" :index="options.index" :border="options.border" :header="header" :main="main"
-        :footer="footer" :loading="context.loadingRef.value" :bar-size="options.barSize"
-        @bottom="options.more && handle.loadData('more')">
+        :footer="footer" :bar-size="options.barSize" @bottom="options.more && handle.loadData('more')">
         <!-- 表头 -->
         <template #header>
             <tr>
@@ -38,13 +37,14 @@
         <!-- 数据行 -->
         <template #main>
             <!-- 无数据提醒 -->
-            <tr class="empty-message" v-if="rowsRef.length == 0">
+            <tr v-if="dataLoadedRef && rowsRef.length == 0" class="empty-message">
                 <td :colspan="columns.length + (index == true ? 1 : 0)">
                     <Empty :message="emptyMessage" />
                 </td>
             </tr>
             <!-- 真实数据行：main插槽；启用拖拽调整行顺序时，不允许和其他容器拖出、拖出-->
-            <Sort :group="{ name: dragId, pull: false, put: false }" :changer="rowsRef.length" :draggable="'.tbody-row'"
+            <Sort v-if="dataLoadedRef && rowsRef.length" :group="{ name: dragId, pull: false, put: false }"
+                :changer="rowsRef.length" :draggable="'.tbody-row'"
                 :disabled="main ? (selectModeRef != 'none' || main.draggable != true) : true"
                 :handle="main ? main.dragHandle : undefined" @update="handle.moveRow">
                 <Motion :multiple="true" :effect="motion" :duration="options.motion ? undefined : 0">
@@ -101,8 +101,8 @@
 </template>
 
 <script setup lang="ts">
-import { correctString, newId, useKey } from 'snail.core';
-import { computed, nextTick, onMounted } from 'vue';
+import { correctString, newId, useKey, wait } from 'snail.core';
+import { computed, nextTick, onMounted, shallowRef, ShallowRef } from 'vue';
 import Icon from '../base/icon.vue';
 import Empty from '../prompt/empty.vue';
 import { useDataTable } from './components/table-context';
@@ -124,6 +124,8 @@ const emptyMessage = computed(() => correctString(props.emptyMessage, '暂无数
 const { index, columns, header, main, footer } = options;
 const { handle, rowsRef, forceRowIdRef, selectModeRef, isSelectable, isSelected, toggleSelect } = context;
 //  3、界面交互属性变量
+/**      数据加载过了，数据加载过了才做一些效果展示，如无数据提醒*/
+const dataLoadedRef: ShallowRef<boolean> = shallowRef(false);
 /**     拖拽组件分类的Id值，避免界面有多个Table组件时，相互拖入 */
 const dragId: string = newId();
 
@@ -135,7 +137,8 @@ const dragId: string = newId();
 onMounted(async () => {
     await nextTick();
     emits("ready", handle);
-    handle.loadData("init");
+    await wait(handle.loadData("init"));
+    dataLoadedRef.value = true;
 });
 </script>
 

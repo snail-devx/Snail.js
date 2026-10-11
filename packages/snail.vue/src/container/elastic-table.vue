@@ -10,67 +10,62 @@
     <Elastic class="snail-elastic-table" bar elastic="y" :distance="150"
         :class="[namespace, selectModeRef && selectModeRef != 'none' ? 'select-mode' : '']"
         @ready="h => elasticHandleRef = h">
+        <!-- 主内容视图区域：实际内容 -->
         <template #default>
-            <Empty v-if="rowsRef.length == 0" :message="emptyMessage" />
-            <template v-else>
-                <Motion :multiple="true" :effect="options.motion" :duration="options.motion ? undefined : 0">
-                    <div v-for="(row, rowIndex) in rowsRef" :key="row.id" class="data-row"
-                        :class="{ 'force-row': forceRowIdRef == row.id }" :id="context.buildRowDomId(row)">
-                        <!-- 选择模式预留 -->
-                        <div class="row-select" v-show="selectModeRef != 'none'"
-                            :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
-                            @click="toggleSelect(row)">
-                            <Icon :type="'success'" :color="'white'" :size="14" />
-                        </div>
-                        <!-- 实际内容区域：默认插槽逻辑。区分行插槽还是列插槽 -->
-                        <div class="row-body" @click="selectModeRef == 'none' && emits('click', row, undefined)">
-                            <template v-if="$slots.row">
-                                <slot name="row" :="{ columns, row, rowIndex }">
-                                    无[row]插槽，无法渲染数据行
-                                </slot>
-                            </template>
-                            <template v-else>
-                                <div v-for="(column, columnIndex) in columns" :key="getKey(column)"
-                                    class="column-item ellipsis" :class="column.type" :style="{ width: column.width }"
-                                    :data-role="column.role">
-                                    <slot name="column" v-if="$slots.column"
-                                        :="{ row, rowIndex, column, columnIndex }" />
-                                    <slot name="default" v-else-if="$slots.default"
-                                        :="{ row, rowIndex, column, columnIndex }" />
-                                    <template v-else>
-                                        无[column]/[default]插槽，{{ column.name }} 无法渲染
-                                    </template>
-                                </div>
-                            </template>
-                        </div>
-                        <!-- 尾部区域：使用插槽渲染 -->
-                        <div class="row-footer" v-if="$slots.footer">
-                            <slot name="footer" :="{ row, rowIndex }" />
-                        </div>
+            <Empty v-if="dataLoadedRef && rowsRef.length == 0" :message="emptyMessage" />
+            <Motion v-if="dataLoadedRef && rowsRef.length" :multiple="true" :effect="options.motion"
+                :duration="options.motion ? undefined : 0">
+                <div v-for="(row, rowIndex) in rowsRef" :key="row.id" class="data-row"
+                    :class="{ 'force-row': forceRowIdRef == row.id }" :id="context.buildRowDomId(row)">
+                    <!-- 选择模式预留 -->
+                    <div class="row-select" v-show="selectModeRef != 'none'"
+                        :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
+                        @click="toggleSelect(row)">
+                        <Icon :type="'success'" :color="'white'" :size="14" />
                     </div>
-                </Motion>
-                <!-- 没有更多数据了：这个需要再琢磨一下，需要在没有数据后的下一次加载更多触发时才显示出来 -->
-                <!-- <div class="no-more-data" v-if="noMoreDataRef && options.loadMore == true">没有更多数据了...</div> -->
-            </template>
+                    <!-- 实际内容区域：默认插槽逻辑。区分行插槽还是列插槽 -->
+                    <div class="row-body" @click="selectModeRef == 'none' && emits('click', row, undefined)">
+                        <template v-if="$slots.row">
+                            <slot name="row" :="{ columns, row, rowIndex }">
+                                无[row]插槽，无法渲染数据行
+                            </slot>
+                        </template>
+                        <template v-else>
+                            <div v-for="(column, columnIndex) in columns" :key="getKey(column)"
+                                class="column-item ellipsis" :class="column.type" :data-role="column.role">
+                                <slot name="column" v-if="$slots.column" :="{ row, rowIndex, column, columnIndex }" />
+                                <slot name="default" v-else-if="$slots.default"
+                                    :="{ row, rowIndex, column, columnIndex }" />
+                                <template v-else>
+                                    无[column]/[default]插槽，{{ column.name }} 无法渲染
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                    <!-- 尾部区域：使用插槽渲染 -->
+                    <div class="row-footer" v-if="$slots.footer">
+                        <slot name="footer" :="{ row, rowIndex }" />
+                    </div>
+                </div>
+            </Motion>
+            <!-- 没有更多数据了：这个需要再琢磨一下，需要在没有数据后的下一次加载更多触发时才显示出来 -->
+            <!-- <div class="no-more-data" v-if="noMoreDataRef && options.loadMore == true">没有更多数据了...</div> -->
         </template>
         <template #plugin="handle">
             <!-- 这个需要琢磨一下，需要在没有数据后的下一次触发后，再禁用，并配合【没有更多数据了】的提示 -->
             <ElasticUpdown :="handle" :up="noMoreDataRef != true && options.more == true" :down="options.refresh"
                 @ready="handle => updownHandleRef = handle" @refresh="onDownRefresh" @more="onUpMore" />
-            <!-- Loading提示能力 -->
-            <Loading :show="loadTypeRef == undefined && loadingRef" />
         </template>
     </Elastic>
 </template>
 
 <script setup lang="ts">
-import { correctString, IScope, useKey, wait } from 'snail.core';
-import { useStyle } from 'snail.view';
+import { correctString, IScope, isStringNotEmpty, useKey, wait } from 'snail.core';
+import { StyleClassItem, useStyle } from 'snail.view';
 import { computed, nextTick, onMounted, shallowRef, ShallowRef } from 'vue';
 import Icon from '../base/icon.vue';
 import { useReactive } from '../base/reactive.js';
 import Empty from '../prompt/empty.vue';
-import Loading from '../prompt/loading.vue';
 import ElasticUpdown from './components/elastic-updown.vue';
 import { useDataTable } from './components/table-context.js';
 import Elastic from './elastic.vue';
@@ -90,8 +85,10 @@ const { watcher } = useReactive();
 const { namespace, build } = useStyle();
 //  2、参数解构，如覆盖props中属性
 const emptyMessage = computed(() => correctString(props.emptyMessage, '暂无数据', true));
-const { loadTypeRef, loadingRef, handle, rowsRef, forceRowIdRef, selectModeRef, isSelectable, isSelected, toggleSelect, noMoreDataRef } = context;
+const { loadTypeRef, handle, rowsRef, forceRowIdRef, selectModeRef, isSelectable, isSelected, toggleSelect, noMoreDataRef } = context;
 //  3、组件交互变量、常量
+/**      数据加载过了，数据加载过了才做一些效果展示，如无数据提醒*/
+const dataLoadedRef: ShallowRef<boolean> = shallowRef(false);
 /**     Elastic组件操作句柄 */
 const elasticHandleRef: ShallowRef<ElasticHandle> = shallowRef();
 /**     下拉刷新、上拉加载的操作句柄 */
@@ -110,6 +107,24 @@ async function forceRow(row: DataTableRow<any>) {
     const el = document.getElementById(domId);
     elasticHandleRef.value && elasticHandleRef.value.scrollIntoView(el);
 }
+
+/**
+ * 构建自定义样式
+ */
+function buildCustomStyle() {
+    /** 先仅构建列样式；后期支持其他的 */
+    const styles: StyleClassItem[] = [];
+    //  列的宽度配置有值时才构建，无值时使用默认的 100% 宽度
+    options.columns && options.columns.length && options.columns.forEach((col, index) => {
+        isStringNotEmpty(col.width) && styles.push({
+            mode: "child",
+            rule: `div.main-area>div.data-row>div.row-body>div.column-item:nth-child(${index + 1})`,
+            style: { width: col.width }
+        });
+    });
+    styles.length && build(styles);
+}
+
 
 /**
  * 触发下拉刷新时
@@ -140,36 +155,38 @@ async function onUpMore(scope: IScope) {
  * @param type 
  */
 function onLoadTypeChange(type: DataTableLoadType) {
-    //  如果是 updown 组件自身触发导致的改变，不进行响应
-    if (preLoadScope && preLoadScope.destroyed == false) {
-        return;
-    }
     //  加载完成了，状态无值，清理效果
     if (type == undefined) {
         updownHandleRef.value.clear();
         return;
     }
-    //  其他情况，基于状态做响应
-    switch (type) {
-        //  刷新系列
-        case "init": return updownHandleRef.value.show("refresh", "数据加载中...");
-        case "refresh": return updownHandleRef.value.show("refresh", "刷新中...");
-        case "search": return updownHandleRef.value.show("refresh", "搜索中...");
-        //  加载系列
-        case "more": return updownHandleRef.value.show("more");
-        //  其他情况，提示警告，避免出现意料之外的情况
-        default:
-            console.warn("ElasticTable: not support loadType: ", type);
-            break;
+    //  如果是 updown 组件自身触发导致的改变，不进行响应
+    if (preLoadScope == undefined || preLoadScope.destroyed == true) {
+        switch (type) {
+            //  刷新系列
+            case "init": return updownHandleRef.value.show("refresh", "数据加载中...");
+            case "refresh": return updownHandleRef.value.show("refresh", "刷新中...");
+            case "search": return updownHandleRef.value.show("refresh", "搜索中...");
+            //  加载系列
+            case "more": return updownHandleRef.value.show("more");
+            //  其他情况，提示警告，避免出现意料之外的情况
+            default:
+                console.warn("ElasticTable: not support loadType: ", type);
+                break;
+        }
     }
 }
 
 // *****************************************   👉  组件渲染    *****************************************
+//  1、数据初始化、变化监听
+//  2、生命周期响应
 onMounted(async () => {
+    buildCustomStyle();
     await nextTick();
     emits("ready", handle);
     watcher(loadTypeRef, onLoadTypeChange);
-    handle.loadData("init");
+    await wait(handle.loadData("init"));
+    dataLoadedRef.value = true;
 });
 
 </script>

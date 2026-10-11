@@ -1,4 +1,3 @@
-import { IScope } from "snail.core";
 import { HeightStyle, ScrollBaseOptions } from "snail.view";
 import { Ref, ShallowRef } from "vue";
 import { ReadyEvents } from "../../base/models/base-event";
@@ -29,14 +28,6 @@ export type TableOptions<T> = {
      * - simple     简单模式，不显示行下划线和阴影效果，纯净的表格渲染
      */
     readonly display?: "default" | "simple";
-
-    /**
-     * loading提示是否显示
-     * - true 显示loading提示；否则不显示
-     * - 外部可根据需要响应式改变此值
-     */
-    loading?: boolean;
-
     /**
      * 是否启用【索引序号列】
      * - 为true时，计算宽度会排除序号列的60px宽度
@@ -236,11 +227,6 @@ export type DataTableHandle<T> = {
      * @returns 异步任务，外部可感知加载进度
      */
     loadData(type: DataTableLoadType): Promise<void>;
-    /**
-     * 显示 加载中 提示
-     * @returns 作用域,作用域销毁时,取消 加载中 提示
-     */
-    showLoading(): IScope;
 
     /**
      * 获取行
@@ -580,10 +566,6 @@ export interface IDataTableContext {
      * - 加载中时有值，加载完成后为undefined
      */
     readonly loadTypeRef: ShallowRef<DataTableLoadType>;
-    /**
-     * 是否正在加载处理中的标记
-     */
-    readonly loadingRef: ShallowRef<boolean>;
     /**
      * 是否没有更多数据了
      */

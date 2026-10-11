@@ -1,4 +1,4 @@
-import { correctNumber, isArray, isArrayNotEmpty, IScope, isFunction, isNumberNotNaN, isString, mountScope, moveFromArray, mustFunction, mustObject, mustString, newId, throwError, throwIfTrue, throwIfUndefined, useScope } from "snail.core";
+import { correctNumber, isArray, isArrayNotEmpty, IScope, isFunction, isNumberNotNaN, isString, mountScope, moveFromArray, mustFunction, mustObject, mustString, newId, throwError, throwIfTrue, throwIfUndefined } from "snail.core";
 import { scrollIntoView } from "snail.view";
 import { Ref, ref, shallowRef, ShallowRef } from "vue";
 import { AppOptions } from "../../exporter";
@@ -15,8 +15,6 @@ import { DataTableBaseOptions, DataTableContextUseExt, DataTableEvents, DataTabl
 export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readonly<DataTableBaseOptions<any>>, emits: EmitterType<DataTableEvents>, ext?: DataTableContextUseExt): IDataTableContext & IScope {
     /**     数据加载类型 */
     const loadTypeRef: ShallowRef<DataTableLoadType> = shallowRef();
-    /**     是否正在加载处理中的标记*/
-    const loadingRef: ShallowRef<boolean> = shallowRef(false);
     //  数据行维护
     /**     表数据行 */
     const rowsRef: Ref<DataTableRow<any>[]> = ref([]);
@@ -63,9 +61,7 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
                 return;
             }
 
-            //  准备加载数据，维护好 loadingRef 效果
             loadTypeRef.value = type;
-            loadingRef.value = true;
             try {
                 const rows = await options.load(type);
                 noMoreDataRef.value = isArray(rows) == false || rows.length < options.page;
@@ -98,18 +94,7 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
             }
             finally {
                 loadTypeRef.value = undefined;
-                loadingRef.value = false;
             }
-        },
-        /**
-         * 显示 加载中 提示
-         * @returns 作用域,作用域销毁时,取消 加载中 提示
-         */
-        showLoading(): IScope {
-            loadingRef.value = true;
-            const scope = useScope();
-            scope.onDestroy(() => loadingRef.value = false);
-            return scope;
         },
 
         /**
@@ -443,7 +428,7 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
     //  管理器初始化构建
     {
         const manager = mountScope<IDataTableContext>({
-            handle, loadTypeRef, loadingRef, noMoreDataRef,
+            handle, loadTypeRef, noMoreDataRef,
             rowsRef, forceRowIdRef, buildRowDomId,
             //  选择数据行相关
             selectModeRef, isSelectable, isSelected, toggleSelect,

@@ -51,8 +51,6 @@
                 </slot>
             </tfoot>
         </table>
-        <!-- loading提示效果 -->
-        <Loading :show="loading" />
         <!-- 做一个列宽度辅助元素：将列表中配置的固定值放到这里自动计算出来实际宽度，用于辅助【buildTableColStyle】方法计算列宽度样式-->
         <div v-if="hasColumnsRef" class="column-assist" ref="column-assist">
             <span v-for="col in columns" :style="{ width: col.width }" />
@@ -65,7 +63,6 @@ import { correctString, isArrayNotEmpty, isStringNotEmpty } from 'snail.core';
 import { AllStyle, StyleClassItem, useObserver, useStyle } from 'snail.view';
 import { computed, onMounted, useTemplateRef } from 'vue';
 import Empty from '../prompt/empty.vue';
-import Loading from '../prompt/loading.vue';
 import { TableEvents, TableOptions, TableRowOptions } from './models/table-model';
 import Scroll from './scroll.vue';
 
@@ -282,13 +279,6 @@ onMounted(() => { //  事件监听处理
                 overflow-y: visible;
             }
         }
-    }
-
-    // 使用粘性定位，避免出现滚动条时，loading效果显示异常，遮不全
-    >div.snail-loading {
-        position: sticky;
-        width: 100%;
-        height: 100%;
     }
 
     //  宽度辅助元素：不显示出来，给高度0。加绝对优先级处理，防止外部做通用化标签处理影响
