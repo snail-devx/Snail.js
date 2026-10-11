@@ -16,16 +16,18 @@
                 </div>
             </template>
         </template>
+        <Loading :show="loading == true" />
     </div>
 </template>
 
 <script setup lang="ts">
+import { isArray, isStringNotEmpty } from "snail.core";
+import { css, CSSClassOptions, HeightStyle, WidthStyle, } from "snail.view";
 import { computed } from "vue";
+import Loading from "../prompt/loading.vue";
+import { SlotsType } from "./models/component-model";
 import { LayoutAreaItem, LayoutOptions } from "./models/layout-model";
 import Scroll from "./scroll.vue";
-import { css, CSSClassOptions, HeightStyle, WidthStyle, } from "snail.view";
-import { SlotsType } from "./models/component-model";
-import { isArray, isStringNotEmpty } from "snail.core";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -118,6 +120,7 @@ function buildHeightStyle(style: HeightStyle) {
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-layout {
+    position: relative;
     display: flex;
     flex-wrap: nowrap;
     overflow: hidden;

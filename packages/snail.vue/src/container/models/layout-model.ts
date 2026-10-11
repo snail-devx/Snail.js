@@ -3,8 +3,8 @@
  */
 
 import { CSSClassOptions, HeightStyle, WidthStyle } from "snail.view";
-import { ScrollEvents, ScrollOptions } from "./scroll-model";
 import { EventsType } from "./component-model";
+import { ScrollEvents, ScrollOptions } from "./scroll-model";
 
 /**
  * 布局组件 配置选项
@@ -50,6 +50,13 @@ export type LayoutOptions = {
      * - 配置滚动条和高度；高度不配置时，默认 `fit-content`
      */
     bottom?: LayoutAraeOptions<HeightStyle>;
+
+    /**
+     * 显示loading效果
+     * - 用于做一些耗时、异步操作时，显示loading提示
+     * - 辅助代码，避免在布局组件内部出现滚动条后，loading效果异常
+     */
+    loading?: boolean;
 }
 /**
  * 布局组件子区域 配置选项
