@@ -6,9 +6,15 @@
     <Env :mode="'desktop'">
         桌面模式，默认：
         <button @click="loadingRef = !loadingRef">切换loading</button><br />
-        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef">
+        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :desktop="{
+            main: {
+                scroll: { scroll: 'y' }
+            }
+        }" :loading="loadingRef">
             <template #desktop>
-                destktop区域
+                <div style="height: 300px;">
+                    destktop区域
+                </div>
             </template>
         </Page>
         <br />
@@ -45,7 +51,7 @@
         <br />
         移动端模式，配置头部和底部：
         <Page style="width: 100%;height: 200px;border: 1px solid gray;" :mobile="{
-            main: { class: 'scroll-y' },
+            main: { scroll: { scroll: 'y', barSize: 'mini' } },
             footer: {
                 disabled: false,
                 buttons: [
@@ -55,7 +61,9 @@
             }
         }" :loading="loadingRef">
             <template #mobile>
-                mobile区域
+                <div style="height: 300px;">
+                    mobile区域
+                </div>
             </template>
         </Page>
         <br />

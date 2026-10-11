@@ -1,10 +1,10 @@
-import { CSSClassOptions } from "snail.view";
 import { AppOptions } from "../../base/models/app-model";
 import { CloseEvents } from "../../base/models/base-event";
 import { DisabledOptions } from "../../base/models/base-model";
 import { ButtonOptions } from "../../base/models/button-model";
 import { HeaderOptions } from "../../base/models/header-model";
-import { FlexOptions } from "./flex-model";
+import { EventsType } from "./component-model";
+import { ScrollEvents, ScrollOptions } from "./scroll-model";
 
 /**
  * 页面组件配置选项
@@ -15,19 +15,20 @@ export type PageOptions = {
      * - 用于做一些耗时、异步操作时，显示loading提示
      */
     loading?: boolean;
+
     /**
      * desktop 桌面客户端模式下的页面配置
      * - header 头部区域，有配置不禁用才显示
-     * - main   内容区域，flex布局，无配置则不滚动，自动撑开内容页面
+     * - main   内容区域，自动撑开，可配置是否要滚动条
      * - footer 底部区域，有配置不禁用才显示
      */
-    desktop?: PageAreaOptions;
+    readonly desktop?: PageAreaOptions;
     /**
      * mobile 移动端模式下的页面配置
-     * - main   内容区域，flex布局，无配置则不滚动，自动撑开内容页面
+     * - main   内容区域，自动撑开，可配置是否要滚动条
      * - footer 底部区域，有配置不禁用才显示
      */
-    mobile?: Omit<PageAreaOptions, "header">;
+    readonly mobile?: Omit<PageAreaOptions, "header">;
 }
 /**
  * 页面组件渲染区域 配置选项
@@ -36,16 +37,28 @@ export type PageAreaOptions = {
     /**
      * 头部区域，有配置不禁用才显示
      */
-    header?: HeaderOptions & DisabledOptions;
+    readonly header?: HeaderOptions & DisabledOptions;
     /**
      * 内容区域，无配置则不滚动，自动撑开内容页面
-     * - 使用`Flex`组件渲染
      */
-    main?: FlexOptions & CSSClassOptions;
+    readonly main?: PageMainOptions;
     /**
      * 底部区域，有配置不禁用才显示
      */
-    footer?: PageFooterOptions
+    readonly footer?: PageFooterOptions
+}
+/**
+ * 页面主内容区域配置选项
+ * - 约束是否滚动
+ */
+export type PageMainOptions = {
+    /**
+     * 滚动视图配置
+     * - 视图属性：滚动条大小、显示时机
+     * - 滚动事件：滚动条显隐、滚动到顶部、底部、、、
+     * - 不传入则当前区域`overflow:hidden`溢出隐藏
+     */
+    scroll?: ScrollOptions & EventsType<ScrollEvents>;
 }
 /**
  * 页面底部配置选项

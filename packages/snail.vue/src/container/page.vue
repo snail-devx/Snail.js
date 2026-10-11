@@ -14,11 +14,11 @@
             <!-- 头部渲染：配置了，且没禁用时显示 -->
             <Header class="header-area" v-if="header && header.disabled != true" :="header" @close="emits('close')" />
             <!-- 主内容区域渲染。渲染顺序：端自有插槽 > 默认插槽 > 不支持提示 -->
-            <Flex class="main-area" :="main">
+            <Scroll class="main-area" :="main.scroll" :scroll="(main.scroll || {}).scroll || 'none'">
                 <slot v-if="$slots[mode]" :name="mode" :="slotHandle" />
                 <slot v-else-if="$slots.default" :="slotHandle" />
                 <Empty v-else :message="`未实现[${mode}]端渲染`" />
-            </Flex>
+            </Scroll>
             <!-- 底部区域：配置了，且没禁用时显示-->
             <Flex class="footer-area" :class="{ divider: footer && footer.divider == true }"
                 v-if="footer && footer.disabled != true" :cross="'center'"
@@ -35,7 +35,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { isFunction, isStringNotEmpty } from 'snail.core';
+import { isFunction } from 'snail.core';
 import Button from '../base/button.vue';
 import Header from '../base/header.vue';
 import { useApp } from '../base/utils/app-util';
@@ -43,6 +43,7 @@ import Empty from '../prompt/empty.vue';
 import Loading from '../prompt/loading.vue';
 import Flex from './flex.vue';
 import { PageEvents, PageFooterButton, PageOptions, PageSlotHandle } from './models/page-model';
+import Scroll from './scroll.vue';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -71,11 +72,6 @@ function onFooterButtonClick(button: PageFooterButton) {
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
-//      对main区域的配置做默认值处理
-{
-    isStringNotEmpty(main.direction) || (main.direction = "column");
-    main.class || (main.class = ["scroll-y", `${mode == "mobile" ? "mini" : "small"}-scrollbar`]);
-}
 //  2、生命周期响应
 </script>
 
@@ -96,8 +92,8 @@ function onFooterButtonClick(button: PageFooterButton) {
 
     >div.footer-area {
         position: relative;
+        overflow: hidden;
         flex-shrink: 0;
-        width: 100%;
         background-color: white;
 
         &.divider {
@@ -119,6 +115,7 @@ function onFooterButtonClick(button: PageFooterButton) {
             // 弹窗打开时，左右外边距，实现和Header、Footer对齐
             >div.main-area {
                 margin: 0 40px;
+                width: calc(100% - 80px);
             }
         }
 
@@ -137,8 +134,7 @@ function onFooterButtonClick(button: PageFooterButton) {
 
         //  移动端 底部区域特定样式
         >.footer-area {
-            margin-top: 8px;
-            height: 55px;
+            height: 56px;
             padding: 0 12px;
             box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
 
