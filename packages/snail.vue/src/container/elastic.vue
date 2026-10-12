@@ -88,6 +88,7 @@ onMounted(() => {
     //  主内容区域
     >div.main-area {
         position: relative;
+        background-color: #f7f8f9;
         min-width: 100%;
         height: fit-content;
         z-index: 1;

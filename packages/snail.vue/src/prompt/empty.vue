@@ -35,18 +35,15 @@ defineOptions({ name: "Empty", inheritAttrs: true, });
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-empty {
-    // width:100%；height:100%
-    .wh-fill();
+    width: 100%;
+    min-height: 250px;
     // flex 布局：display: flex，align-items、justify-content 都为center
     .flex-center();
     flex-direction: column;
 
-    &.mobile {
-        min-height: 250px;
-    }
-
-    &:not(.mobile) {
-        min-height: 150px;
+    //  桌面客户端，默认70%高度
+    &.desktop {
+        height: 70%;
     }
 
     >img {
