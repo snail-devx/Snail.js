@@ -41,11 +41,6 @@ defineOptions({ name: "Empty", inheritAttrs: true, });
     .flex-center();
     flex-direction: column;
 
-    //  桌面客户端，默认70%高度
-    &.desktop {
-        height: 70%;
-    }
-
     >img {
         height: 60px;
         width: 60px;
