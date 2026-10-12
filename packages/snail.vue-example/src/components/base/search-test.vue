@@ -1,14 +1,28 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <button @click="textRef = String(Date.now())">更新搜索值</button>
-    <Search :value="textRef" @search="text => (textRef = text, console.log(textRef))" />
+    <div style="padding: 10px;width: 100%;background-color: #f7f8f9;height: 100%;">
+        <button @click="textRef = String(Date.now())">更新搜索值</button>
+        <Env :mode="'desktop'">
+            <Search style="margin-top: 10px;" :value="textRef" :placeholder="'搜索'"
+                @search="text => (textRef = text, console.log(textRef))" />
+            <Search style="margin-top: 10px;" :value="textRef" :placeholder="'搜索'" :auto-complete="true"
+                @search="text => (textRef = text, console.log(textRef))" />
+        </Env>
+        <!-- 移动端 -->
+        <Env :mode="'mobile'">
+            <Search style="margin-top: 10px;" :value="textRef" :placeholder="'搜索'"
+                @search="text => (textRef = text, console.log(textRef))" />
+            <Search style="margin-top: 10px;" :value="textRef" :placeholder="'搜索'" :auto-complete="true"
+                @search="text => (textRef = text, console.log(textRef))" />
+        </Env>
+    </div>
 </template>
 
 <script setup lang="ts">
 import { onActivated, onDeactivated, shallowRef } from "vue";
 
 import { components } from "../../libraries/snail_vue";
-const { Search } = components;
+const { Search, Env } = components;
 
 
 // *****************************************   👉  组件定义    *****************************************
