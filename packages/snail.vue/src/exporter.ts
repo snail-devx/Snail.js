@@ -84,11 +84,13 @@ export * from "./container/utils/motion-util";
 export * from "./other/models/action-model";
 export * from "./other/models/card-model";
 export * from "./other/models/field-panel-model";
+export * from "./other/models/nav-bar-model";
 //  组件导出：赋值给 components
 import Action from "./other/action.vue";
 import Card from "./other/card.vue";
 import FieldPanel from "./other/field-panel.vue";
 import FlashNumber from "./other/flash-number.vue";
+import NavBar from "./other/nav-bar.vue";
 
 // *****************************************   👉  picker 相关导出    ****************************************
 //  类型导出
@@ -127,7 +129,7 @@ export const components = {
     Dynamic, Elastic, ElasticBar, ElasticUpdown, Flex, Fold, Motion, Layout, Page, Scroll, Sort, Tree, Wrapper,
     Table, ElasticTable, DataTable,
     //  other   下的组件
-    Action, Card, FieldPanel, FlashNumber,
+    Action, Card, FieldPanel, FlashNumber, NavBar,
     //  picker    下的组件
     DateTimePicker, ScrollPicker,
     //  prompt 下的组件
