@@ -56,7 +56,7 @@ export type PageMainOptions = {
      * 滚动视图配置
      * - 视图属性：滚动条大小、显示时机
      * - 滚动事件：滚动条显隐、滚动到顶部、底部、、、
-     * - 不传入则当前区域`overflow:hidden`溢出隐藏
+     * - 不传入，则走默认值（滚动时机：y轴滚动；滚动条大小：桌面端small，移动端mini）
      */
     scroll?: ScrollOptions & EventsType<ScrollEvents>;
 }

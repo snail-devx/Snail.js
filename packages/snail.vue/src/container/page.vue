@@ -14,7 +14,7 @@
             <!-- 头部渲染：配置了，且没禁用时显示 -->
             <Header class="header-area" v-if="header && header.disabled != true" :="header" @close="emits('close')" />
             <!-- 主内容区域渲染。渲染顺序：端自有插槽 > 默认插槽 > 不支持提示 -->
-            <Scroll class="main-area" :="main.scroll" :scroll="(main.scroll || {}).scroll || 'none'">
+            <Scroll class="main-area" :="main.scroll || { scroll: 'y', barSize: mode == 'mobile' ? 'mini' : 'small' }">
                 <slot v-if="$slots[mode]" :name="mode" :="slotHandle" />
                 <slot v-else-if="$slots.default" :="slotHandle" />
                 <Empty v-else :message="`未实现[${mode}]端渲染`" />
@@ -111,12 +111,6 @@ function onFooterButtonClick(button: PageFooterButton) {
             height: fit-content;
             min-height: 60%;
             max-height: 90%;
-
-            // 弹窗打开时，左右外边距，实现和Header、Footer对齐
-            >div.main-area {
-                margin: 0 40px;
-                width: calc(100% - 80px);
-            }
         }
 
         //  桌面端 底部区域特定样式
@@ -134,9 +128,11 @@ function onFooterButtonClick(button: PageFooterButton) {
 
         //  移动端 底部区域特定样式
         >.footer-area {
+            position: relative;
             height: 56px;
             padding: 0 12px;
             box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+            z-index: 1;
 
             // 按钮 均分宽度
             >div.snail-button {
