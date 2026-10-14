@@ -369,25 +369,26 @@
 
 //  -- 内边距 padding
 
-//  -- 其他样式
+//  -- ::before ::after 伪类 ：实现边框线和填充效果；不占用元素自身空间；需结合 .absolute .relative .fixed 等定位属性使用，否则伪类会超出容器
 .snail-app {
 
-    // absolute 定位的水平方向上下边框线；不占元素自身空间，利用 ::before ::after 伪元素实现
-    & {
+    // before after 伪类固定样式，z-index 避免被遮罩
+    ::after,
+    ::before {
+        position: absolute;
+        z-index: 1;
+    }
 
-        .before-line,
-        .after-line {
-            position: relative;
-        }
+    // 顶部和底部的水平横线：利用: :before::after 伪元素实现
+    & {
 
         .before-line::before,
         .after-line::after {
-            position: absolute;
             background-color: #e5e5e5;
             content: " ";
+            left: 0;
             width: 100%;
             height: 1px;
-            left: 0;
         }
 
         .before-line::before {
@@ -399,22 +400,16 @@
         }
     }
 
-    // absolute 定位的垂直方向左右边框线；不占元素自身空间，利用 ::before ::after 伪元素实现
+    // 左侧和右侧的垂直竖线：利用: :before::after 伪元素实现
     & {
-
-        .before-vline,
-        .after-vline {
-            position: relative;
-        }
 
         .before-vline::before,
         .after-vline::after {
-            position: absolute;
             background-color: #e5e5e5;
             content: " ";
+            top: 0;
             width: 1px;
             height: 100%;
-            top: 0;
         }
 
         .before-vline::before {
@@ -426,4 +421,12 @@
         }
     }
 
+    //  absolute 定位的遮罩层，使用 ::after 伪元素实现
+    .after-full::after {
+        content: " ";
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    }
 }
