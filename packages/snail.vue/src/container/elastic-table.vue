@@ -7,9 +7,8 @@
         2、其他列按照配置宽度渲染
 -->
 <template>
-    <Elastic class="snail-elastic-table" bar elastic="y" :distance="150"
-        :class="[namespace, selectModeRef && selectModeRef != 'none' ? 'select-mode' : '']"
-        @ready="h => elasticHandleRef = h">
+    <Elastic class="snail-elastic-table" :class="{ 'select-mode': selectModeRef && selectModeRef != 'none' }"
+        v-bind:class="namespace" bar elastic="y" @ready="h => elasticHandleRef = h">
         <!-- 主内容视图区域：实际内容 -->
         <template #default>
             <Empty v-if="dataLoadedRef && rowsRef.length == 0" :message="emptyMessage" />
