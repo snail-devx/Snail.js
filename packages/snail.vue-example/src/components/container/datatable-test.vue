@@ -2,44 +2,43 @@
 <template>
     <div style="display: flex;gap: 10px; flex-direction: column;">
         <div style="display: flex;gap: 10px;align-items: center; flex-wrap: wrap;">
-            <button @click="handle && handle.addRow(0, String(Date.now()), Date.now())">添加行：首行</button>
-            <button @click="handle && handle.addRow(3, String(Date.now()), Date.now())">添加行：索引3</button>
-            <button @click="handle && handle.addRow(undefined, String(Date.now()), Date.now())">添加行：末尾</button>
-            <button @click="handle && handle.refreshRow(0, String(Date.now()))">刷新行：首行</button>
-            <button @click="handle && handle.refreshRow(3, String(Date.now()))">刷新行：索引3</button>
+            <button @click="handleRef && handleRef.addRow(0, String(Date.now()), Date.now())">添加行：首行</button>
+            <button @click="handleRef && handleRef.addRow(3, String(Date.now()), Date.now())">添加行：索引3</button>
+            <button @click="handleRef && handleRef.addRow(undefined, String(Date.now()), Date.now())">添加行：末尾</button>
+            <button @click="handleRef && handleRef.refreshRow(0, String(Date.now()))">刷新行：首行</button>
+            <button @click="handleRef && handleRef.refreshRow(3, String(Date.now()))">刷新行：索引3</button>
         </div>
         <div style="display: flex;gap: 10px;align-items: center; flex-wrap: wrap;">
-            <button @click="handle && handle.forceRow(0)">聚焦行：首行</button>
-            <button @click="handle && handle.forceRow(3)">聚焦行：索引3</button>
-            <button @click="handle && handle.forceRow('14')">聚焦行：主键14</button>
-            <button @click="handle && handle.deleteRow(0)">删除行：首行</button>
-            <button @click="handle && handle.deleteRow(3)">删除行：索引3</button>
-            <button @click="handle && handle.deleteRow('14')">删除行：主键14</button>
+            <button @click="handleRef && handleRef.forceRow(0)">聚焦行：首行</button>
+            <button @click="handleRef && handleRef.forceRow(3)">聚焦行：索引3</button>
+            <button @click="handleRef && handleRef.forceRow('14')">聚焦行：主键14</button>
+            <button @click="handleRef && handleRef.deleteRow(0)">删除行：首行</button>
+            <button @click="handleRef && handleRef.deleteRow(3)">删除行：索引3</button>
+            <button @click="handleRef && handleRef.deleteRow('14')">删除行：主键14</button>
         </div>
         <div style="display: flex;gap: 10px;align-items: center; flex-wrap: wrap;">
-            <button @click="handle && handle.startSelectMode('single', 'delete')">开启选择模式：单选</button>
-            <button @click="handle && handle.startSelectMode('multiple', 'delete')">开启选择模式：多选</button>
-            <button @click="handle && console.log(handle.getSelectResult())">获取选择结果</button>
-            <button @click="handle && handle.toggleRowSelect()">切换全选</button>
-            <button @click="handle && handle.toggleRowSelect(1)">切换选中：索引1</button>
-            <button @click="handle && handle.stopSelectMode()">停止选择模式</button>
+            <button @click="handleRef && handleRef.startSelectMode('single', 'delete')">开启选择模式：单选</button>
+            <button @click="handleRef && handleRef.startSelectMode('multiple', 'delete')">开启选择模式：多选</button>
+            <button @click="handleRef && console.log(handleRef.getSelectResult())">获取选择结果</button>
+            <button @click="handleRef && handleRef.toggleRowSelect()">切换全选</button>
+            <button @click="handleRef && handleRef.toggleRowSelect(1)">切换选中：索引1</button>
+            <button @click="handleRef && handleRef.stopSelectMode()">停止选择模式</button>
         </div>
+        <div>数据长度：{{ xxRef.length }}</div>
     </div>
     <Env :mode="'desktop'">
         <DataTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns"
-            :main="{ draggable: true }" :footer="{}" @ready="han => handle = han" @click="console.log"
-            @move="console.log" @select="console.log">
+            :main="{ draggable: true }" :footer="{}" @click="console.log" @move="console.log" @select="console.log">
         </DataTable>
         <DataTable style="width: 100%;height: 250px;" index :load="loadData" :columns="columns" :motion="MOTION.scale"
-            :main="{ draggable: true }" @ready="han => handle = han" @click="console.log" @move="console.log"
-            @select="console.log">
+            :main="{ draggable: true }" @click="console.log" @move="console.log" @select="console.log">
             <template #="{ rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>" :key="String(columnIndex)">
                 {{ rowIndex }}--{{ columnIndex }}：：主键{{ row.id }}：：数据：{{ row.data }}
             </template>
         </DataTable>
 
         <DataTable style="width: 100%;height: 250px;margin-top: 20px;" index :load="loadData" :columns="columns"
-            :motion="MOTION.scale" :main="{ draggable: true }" @ready="han => handle = han" @click="console.log"
+            :motion="MOTION.scale" :main="{ draggable: true }" @ready="han => handleRef = han" @click="console.log"
             @move="console.log" @select="console.log">
             <template #main="{ rowIndex, columnIndex, row }: DataTableColumnSlotProps<any, any>"
                 :key="String(columnIndex)">
@@ -51,6 +50,7 @@
 
 <script setup lang="ts">
 import { delay, useTimer } from 'snail.core';
+import { computed, shallowRef, ShallowRef } from 'vue';
 import { components, DataTableColumnOptions, DataTableColumnSlotProps, DataTableHandle, DataTableLoadType, DataTableRow, MOTION } from '../../libraries/snail_vue';
 
 
@@ -69,7 +69,19 @@ const columns: DataTableColumnOptions<any>[] = [
     // { name: "创建时间4", width: "24%" },
     { name: "操作列", type: "operate" },
 ];
-let handle: DataTableHandle<any> = undefined;
+const handleRef: ShallowRef<DataTableHandle<any>> = shallowRef();
+
+const xxRef = computed(() => {
+    console.log("---------------------------------------------------", handleRef.value);
+    // return handleRef.value?.copyRows() || [];
+    return handleRef.value?.getRows() || [];
+    // const rows: DataTableRow<any>[] = [];
+    // if (handleRef.value) {
+    //     handleRef.value.eachRow(row => rows.push(row));
+    // }
+    // return rows;
+});
+
 
 // *****************************************   👉  方法+事件    ****************************************
 async function loadData(type: DataTableLoadType): Promise<DataTableRow<any>[]> {

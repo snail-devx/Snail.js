@@ -1,4 +1,4 @@
-import { correctNumber, isArray, isArrayNotEmpty, IScope, isFunction, isNumberNotNaN, isString, mountScope, moveFromArray, mustFunction, mustObject, mustString, newId, throwError, throwIfTrue, throwIfUndefined } from "snail.core";
+import { correctFunction, correctNumber, isArray, isArrayNotEmpty, IScope, isFunction, isNumberNotNaN, isString, mountScope, moveFromArray, mustFunction, mustObject, mustString, newId, throwError, throwIfTrue, throwIfUndefined } from "snail.core";
 import { scrollIntoView } from "snail.view";
 import { Ref, ref, shallowRef, ShallowRef } from "vue";
 import { AppOptions } from "../../exporter";
@@ -98,6 +98,33 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
         },
 
         /**
+         * 遍历数据行
+         * @param earch 遍历函数，传入参数（row和rowIndex）；返回值为false时终止遍历
+         */
+        eachRow(earch?: (row: DataTableRow<any>, rowIndex: number) => false | any): void {
+            mustFunction(earch, "earch");
+            for (let index = 0; index < rowsRef.value.length; index++) {
+                const row = rowsRef.value[index];
+                if (earch(row, index) === false) {
+                    break;
+                }
+            }
+        },
+        /**
+         * 获取符合条件的所有数据行索引
+         * @param predicate 断言函数，返回true时，表示符合条件；若为undefined，则返回所有数据行
+         * @returns 符合条件的数据行详情数组；不存在则返回undefined
+         */
+        getRows(predicate?: (row: DataTableRow<any>) => boolean): DataTableRowDetail<any>[] {
+            predicate = correctFunction(predicate, undefined);
+            const rows: DataTableRowDetail<any>[] = [];
+            rowsRef.value.forEach((row, index) => {
+                (predicate == undefined || predicate(row) == true)
+                    && rows.push(Object.freeze({ index, ...row }))
+            });
+            return rows;
+        },
+        /**
          * 获取行
          * @param position 数据行位置
          * @returns 数据行详情,包含行索引位置和行对象；不存在则返回undefined
@@ -119,19 +146,6 @@ export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readon
                 index != undefined && (row = rowsRef.value[index]);
             }
             return row ? Object.freeze({ index, ...row }) : undefined;
-        },
-        /**
-         * 获取符合条件的所有数据行索引
-         * @param predicate 断言函数，返回true时，表示符合条件
-         * @returns 符合条件的数据行详情数组；不存在则返回undefined
-         */
-        getRows(predicate: (row: DataTableRow<any>) => boolean): DataTableRowDetail<any>[] {
-            mustFunction(predicate, "predicate");
-            const rows: DataTableRowDetail<any>[] = [];
-            rowsRef.value.forEach((row, index) => {
-                predicate(row) && rows.push(Object.freeze({ index, ...row }))
-            });
-            return rows;
         },
         /**
          * 聚焦数据行

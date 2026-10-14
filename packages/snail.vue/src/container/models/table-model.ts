@@ -229,17 +229,22 @@ export type DataTableHandle<T> = {
     loadData(type: DataTableLoadType): Promise<void>;
 
     /**
+     * 遍历数据行
+     * @param earch 遍历函数，传入参数（row和rowIndex）；返回值为false时终止遍历
+     */
+    eachRow(earch?: (row: DataTableRow<T>, rowIndex: number) => false | any): void;
+    /**
+     * 获取符合条件的所有数据行索引
+     * @param predicate 断言函数，返回true时，表示符合条件；若为undefined，则返回所有数据行
+     * @returns 符合条件的数据行详情数组；不存在则返回undefined
+     */
+    getRows(predicate?: (row: DataTableRow<T>) => boolean): DataTableRowDetail<T>[];
+    /**
      * 获取行
      * @param position 数据行位置
      * @returns 数据行详情,包含行索引位置和行对象；不存在则返回undefined
      */
     getRow(position: DataTableRowPosition<T>): DataTableRowDetail<T> | undefined;
-    /**
-     * 获取符合条件的所有数据行索引
-     * @param predicate 断言函数，返回true时，表示符合条件
-     * @returns 符合条件的数据行详情数组；不存在则返回undefined
-     */
-    getRows(predicate: (row: DataTableRow<T>) => boolean): DataTableRowDetail<T>[];
     /**
      * 聚焦数据行
      * - 将行显示到可视区域
