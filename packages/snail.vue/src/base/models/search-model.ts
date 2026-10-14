@@ -10,6 +10,18 @@ export type SearchOptions = ReadonlyOptions & ValueOptions<string> & Placeholder
      * - false 时，只有点击【搜索】按钮，才触发 search 事件
      */
     autoComplete?: boolean;
+
+    /**
+     * 是否自动获得焦点
+     * - 为true时，组件加载完成后，文本输入框自动获得焦点
+     */
+    autoFocus?: boolean;
+
+    /**
+     * 禁用【清空】功能
+     * - 为 true 时，不出 删除 按钮，不能清空已输入的搜索文本
+     */
+    clearDisabled?: boolean;
 }
 /**
  * 搜索组件事件

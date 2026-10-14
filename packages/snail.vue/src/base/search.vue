@@ -7,8 +7,8 @@
                 <input type="search" ref="input-dom" :placeholder="placeholder" :readonly="readonly"
                     v-model.trim="valueRef" @focus="focusRef = true" @keyup="onKeyUp($event)" @blur="onInputBlur()" />
             </form>
-            <Icon v-if="readonly != true" button :type="'plus'" :rotate="45" :size="16" :color="'white'"
-                :background="'#c5c9db'" :radius="'16px'" @click="onClear()" />
+            <Icon v-if="readonly != true && clearDisabled != true" button :type="'plus'" :rotate="45" :size="16"
+                :color="'white'" :background="'#c5c9db'" :radius="'16px'" @click="onClear()" />
         </div>
         <!-- 操作按钮区域 -->
         <div class="operate-area" v-if="readonly != true" @click="mode == 'mobile' ? inputDom.focus() : onSubmit()">
@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { correctString, isStringNotEmpty } from "snail.core";
-import { shallowRef, ShallowRef, useTemplateRef } from "vue";
+import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import { useApp } from "../base/utils/app-util";
 import Icon from "./icon.vue";
 import { SearchEvents, SearchOptions } from "./models/search-model";
@@ -90,6 +90,7 @@ function onKeyUp(evt: KeyboardEvent) {
 //  1、数据初始化、变化监听
 syncValue<string>(valueRef, () => props.value, value => correctString(value, undefined, true));
 //  2、生命周期响应
+props.readonly != true && props.autoFocus == true && onMounted(() => inputDom.value.focus());
 </script>
 
 <style lang="less">
@@ -164,6 +165,7 @@ syncValue<string>(valueRef, () => props.value, value => correctString(value, und
     }
 
     >div.operate-area {
+        width: 34px;
         border: 1px solid #DDDFED;
         border-left: none;
     }
