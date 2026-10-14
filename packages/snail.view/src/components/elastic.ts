@@ -92,7 +92,7 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
         translateX != undefined && (position.x = translateX);
         translateY != undefined && (position.y = translateY);
         target.style.transform = `translate(${position.x}px,${position.y}px)`;
-        target.style.transition = animation == true ? "transform 0.2s ease-out" : "";
+        target.style.transition = animation == true ? "transform 0.4s ease-out" : "";
 
         curPosition = Object.freeze(position);
     }
@@ -151,8 +151,11 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
                 else {
                     const minValue = rootSize - targetSize;
                     if (minValue > tmpValue) {
-                        const offset = Math.min(minValue - tmpValue, options.distance);
-                        tmpValue = minValue - Math.pow(offset, options.factor);
+                        // const offset = Math.min(minValue - tmpValue, options.distance);
+                        // tmpValue = minValue - Math.pow(offset, options.factor);
+                        //  上面的旧代码有逻辑问题，导致是基于 distance 做了pow取值，导致右侧、底部的弹性效果太明显
+                        tmpValue = Math.pow(minValue - tmpValue, options.factor);
+                        tmpValue = minValue - Math.min(tmpValue, options.distance);
                     }
                 }
             }
@@ -269,7 +272,7 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
                 //  计算惯性滚动位置：看结束时间和上次move的时间戳，避免上时间停留时计算。鼠标快速点击时，不会进入move,preTouch为undefined,此时不用计算惯性
                 if (preTouch != undefined && Date.now() - preTouch.timestamp < 10) {
                     needInertia = true;
-                    const inertia = calScrollPosition(curPosition, { x: preTouch.vx * 100, y: preTouch.vy * 100 });
+                    const inertia = calScrollPosition(curPosition, { x: preTouch.vx * 400, y: preTouch.vy * 400 });
                     updateTranslate(true, inertia.x, inertia.y);
                     runFn("inertia", curPosition, detail);
                 }
@@ -278,7 +281,7 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
                 setTimeout(() => {
                     updateTranslate(true, end.x, end.y);
                     runFn("end", curPosition, detail);
-                }, needInertia ? 200 : 0);
+                }, needInertia ? 400 : 0);
                 //  结束后，对数据做重置
                 startPosition = undefined;
                 preTouch = undefined;
@@ -298,7 +301,7 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
         {
             options = isObject(options) ? { ...options } : Object.create(null);
             options.elastic = correctString(options.elastic, "both", true) as any;
-            options.distance = Math.abs(correctNumber(options.distance, 100));
+            options.distance = Math.abs(correctNumber(options.distance, 200));
             options.factor = isNumberInRange(options.factor, 0.1, 1) ? options.factor : 0.8;
         }
         {

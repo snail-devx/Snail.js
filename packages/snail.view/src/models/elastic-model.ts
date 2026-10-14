@@ -50,7 +50,7 @@ export type ElasticBaseOptions = {
     /**
      * 弹性效果距离
      * - 到顶、到底后，还能滚动多长距离
-     * - 默认100
+     * - 默认200
      */
     distance?: number;
 
