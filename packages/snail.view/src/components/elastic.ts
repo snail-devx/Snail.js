@@ -42,13 +42,17 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
         ({ x, y } = calcEndPosition(x, y, curPosition));
         updateTranslate(true, x, y);
     }
-    // /**
-    //  * 停靠配置停启用
-    //  * @param enabled 是否启用；true时启用，false为停用
-    //  */
-    // function dock(enabled: boolean): void {
-    //     dockDisabled = enabled == true ? false : true;
-    // }
+    /**
+     * 将子元素滚动到视图内
+     * @param el 
+     */
+    function scrollIntoView(el: HTMLElement): void {
+        if (target.contains(el) == true) {
+            const rootRect = target.getBoundingClientRect();
+            const elRect = el.getBoundingClientRect();
+            scrollTo(rootRect.left - elRect.left, rootRect.top - elRect.top);
+        }
+    }
     /**
      * 重置dock配置
      * - 用于在下拉刷新和上拉加载时，进行二次控制
@@ -308,7 +312,7 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
     //  构建管理器，并触摸事件监听
     {
         const manager = Object.freeze(mountScope<IElasticManager>(
-            { scrollTo, dock, refresh, },
+            { scrollTo, scrollIntoView, dock, refresh, },
             { type: "IElasticManager" }
         ));
         //  监听触摸事件，并自动销毁

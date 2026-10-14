@@ -62,15 +62,7 @@ onMounted(() => {
 
     readyRef.value = true;
     //  准备完毕，通知父组件
-    emits("ready", Object.freeze<ElasticHandle>({
-        scrollIntoView(el) {
-            if (mainAreaDom.value.contains(el) == true) {
-                const rootRect = mainAreaDom.value.getBoundingClientRect();
-                const elRect = el.getBoundingClientRect();
-                em.scrollTo(rootRect.left - elRect.left, rootRect.top - elRect.top);
-            }
-        },
-    }));
+    emits("ready", em);
 });
 </script>
 
@@ -89,10 +81,12 @@ onMounted(() => {
     >div.main-area {
         position: relative;
         background-color: #f7f8f9;
-        min-width: 100%;
-        height: fit-content;
         z-index: 1;
         user-select: none;
+        //  width 指定fit-content时，宽度无法撑开，设置为max-content才能撑开
+        min-width: 100%;
+        width: max-content;
+        height: fit-content;
     }
 }
 </style>

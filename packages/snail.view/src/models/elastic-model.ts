@@ -17,6 +17,11 @@ export interface IElasticManager {
      */
     scrollTo(x: number | undefined, y: number | undefined): void;
     /**
+     * 将子元素滚动到视图内
+     * @param el 
+     */
+    scrollIntoView(el: HTMLElement): void;
+    /**
      * 重置dock配置
      * - 用于在下拉刷新和上拉加载时，进行二次控制
      * @param options 新的dock配置，不传入则取消dock控制

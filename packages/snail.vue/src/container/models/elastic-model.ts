@@ -17,13 +17,7 @@ export type ElasticOptions = ElasticBaseOptions & {
 /**
  * 弹性组件操作句柄
  */
-export type ElasticHandle = {
-    /**
-     * 将子元素滚动到视图内
-     * @param el 
-     */
-    scrollIntoView(el: HTMLElement): void;
-}
+export type ElasticHandle = IElasticManager;
 
 /**
  * 弹性组件的插槽句柄
