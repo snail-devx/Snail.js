@@ -6,7 +6,7 @@
 <template>
     <div class="snail-elastic">
         <!-- 主内容区域 -->
-        <div class="main-area" ref="main-area">
+        <div class="main-area" ref="main-area" :style="mainStyle">
             <slot />
         </div>
         <!-- 插件挂载区域 -->
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { ElasticDetail, useElastic } from "snail.view";
+import { css, ElasticDetail, useElastic } from "snail.view";
 import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import { ReadyEvents } from "../base/models/base-event";
 import ElasticBar from "./components/elastic-bar.vue";
@@ -34,6 +34,8 @@ const emits = defineEmits<ReadyEvents<ElasticHandle>>();
 const mainAreaDom = useTemplateRef("main-area");
 const { elastic, bar } = props;
 //  2、组件交互变量、常量
+/**     main区域的自定义样式，一进来就构建好，不做响应式 */
+const mainStyle = css.buildStyle(props.main);
 /**     是否准备好了，准备二区号了，进行插件插槽渲染 */
 const readyRef: ShallowRef<boolean> = shallowRef(false);
 /**     插槽句柄：初始化中赋值并锁定 */
@@ -83,10 +85,6 @@ onMounted(() => {
         background-color: #f7f8f9;
         z-index: 1;
         user-select: none;
-        //  width 指定fit-content时，宽度无法撑开，设置为max-content才能撑开
-        min-width: 100%;
-        width: max-content;
-        height: fit-content;
     }
 }
 </style>

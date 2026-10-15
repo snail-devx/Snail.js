@@ -1,6 +1,6 @@
 
 import { IScope } from "snail.core";
-import { ElasticBaseOptions, ElasticDetail, IElasticManager } from "snail.view";
+import { ElasticBaseOptions, ElasticDetail, HeightStyle, IElasticManager, WidthStyle } from "snail.view";
 import { ReadyEvents } from "../../base/models/base-event";
 
 /**
@@ -12,6 +12,13 @@ export type ElasticOptions = ElasticBaseOptions & {
      * 弹性视图滚动时是否显示滚动条
      */
     bar: boolean;
+
+    /**
+     * 主内容区域配置
+     * - 可指定高度、宽度样式
+     * - 如在进行面包屑导航时，需要显式指定 width：max-content ，否则main宽度最大只能是100%
+     */
+    main?: HeightStyle & WidthStyle;
 }
 
 /**
