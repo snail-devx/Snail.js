@@ -119,6 +119,8 @@ export * from "./prompt/models/loading-model";
 import DragVerify from "./prompt/drag-verify.vue";
 import Empty from "./prompt/empty.vue";
 import Loading from "./prompt/loading.vue";
+import Spinner from "./prompt/spinner.vue";
+
 //  方法导出
 
 // *****************************************   👉  组件合并导出    ****************************************
@@ -133,5 +135,5 @@ export const components = {
     //  picker    下的组件
     DateTimePicker, ScrollPicker,
     //  prompt 下的组件
-    DragVerify, Empty, Loading
+    DragVerify, Empty, Loading, Spinner
 };
