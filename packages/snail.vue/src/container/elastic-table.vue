@@ -196,6 +196,9 @@ onMounted(async () => {
 
 .snail-elastic-table {
     >.main-area {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
         display: flex;
         flex-direction: column;
 
