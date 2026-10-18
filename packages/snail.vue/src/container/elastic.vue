@@ -82,6 +82,7 @@ onMounted(() => {
     //  主内容区域
     >div.main-area {
         position: relative;
+        display: flow-root;
         background-color: #f7f8f9;
         z-index: 1;
         user-select: none;
