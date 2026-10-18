@@ -65,7 +65,7 @@
             <Button :type="'link'" :size="'small'" v-text="'确定'" :class="{ 'disabled': isValidDateRef != true }"
                 @click="onConfirm" />
             <!-- 时间选择器组件区域：position 放到此区域绝对定位；放到main区域，会受到样式影响，没仔细查 -->
-            <TimeDesktopPicker v-if="showTimePicker == true" class="time-picker" :format="timeFormat"
+            <TimeDesktopPopup v-if="showTimePicker == true" class="time-picker" :format="timeFormat"
                 :min-time="props.minTime" :max-time="props.maxTime" :value="formatTimeValue(dateRef, timeFormat)"
                 :toolbar="toolbar" @clear="onConfirmTime('')" @confirm="onConfirmTime" />
         </template>
@@ -82,7 +82,7 @@ import { FollowExtend, FollowHandle } from '../../popup/models/follow-model';
 import { DateDesktopPopupOptions, DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, DateTimePickerEvents, DateTimePickerToolbarOptions } from '../models/datetime-model';
 import { PickerExtend } from '../models/picker-model';
 import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initStepByFormat } from '../utils/datetime-util';
-import TimeDesktopPicker from './time-desktop-picker.vue';
+import TimeDesktopPopup from './time-desktop-popup.vue';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

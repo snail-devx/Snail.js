@@ -2,10 +2,10 @@ import { correctNumber, IAsyncScope, IScope, mountScope, ScopeOptions, throwIfFa
 import { Component } from "vue";
 import { useApp } from "../base/utils/app-util";
 import { FollowPositionOptions, usePopup } from "../popup/manager";
-import ActionPicker from "./components/action-picker.vue";
-import DateDesktopPicker from "./components/date-desktop-picker.vue";
-import DatetimeMobilePicker from "./components/datetime-mobile-picker.vue";
-import TimeDesktopPicker from "./components/time-desktop-picker.vue";
+import ActionPopup from "./components/action-popup.vue";
+import DatetimeMobilePopup from "./components/datetime-mobile-popup.vue";
+import DateDesktopPopup from "./components/popup.vue";
+import TimeDesktopPopup from "./components/time-desktop-popup.vue";
 import { ActionPickerOptions } from "./models/action-model";
 import { DateTimePickerBaseOptions, TimeDesktopPopupOptions } from "./models/datetime-model";
 import { IPickerManager, PickerExtend, PickerPopupOptions } from "./models/picker-model";
@@ -39,7 +39,7 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
         options.toolbar = { ...options.toolbar }
         // 桌面客户端：看看是选时间，还是选日期做一下分发
         if (mode != "mobile") {
-            const { timeFormat, dateFormat } = correctFormat(options ? options.format : undefined);
+            const { timeFormat } = correctFormat(options ? options.format : undefined);
             //  选择时间
             let props: any = timeFormat != undefined
                 ? {
@@ -50,14 +50,14 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
                     toolbar: options.toolbar,
                 } as TimeDesktopPopupOptions
                 : options;
-            return showPicker(target, timeFormat ? TimeDesktopPicker : DateDesktopPicker, props, {
+            return showPicker(target, timeFormat ? TimeDesktopPopup : DateDesktopPopup, props, {
                 ...popupOptions,
                 type: "follow",
             });
         }
         //  移动端
         else {
-            return showPicker(target, DatetimeMobilePicker, options, {
+            return showPicker(target, DatetimeMobilePopup, options, {
                 dialog: {
                     closeOnEscape: true,
                     closeOnMask: true
@@ -106,7 +106,7 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
                 ...popupOptions,
                 type: "follow"
             };
-        return showPicker(target, ActionPicker, options, popup);
+        return showPicker(target, ActionPopup, options, popup);
     }
     //#endregion
 
