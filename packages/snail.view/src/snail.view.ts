@@ -13,3 +13,8 @@ export * from "./components/elastic";
 export * from "./components/link";
 export * from "./components/observer";
 export * from "./components/scroll";
+
+
+// 导出常量、工具方法
+export { HEIGHT, WIDTH } from "./utils/css-util";
+
