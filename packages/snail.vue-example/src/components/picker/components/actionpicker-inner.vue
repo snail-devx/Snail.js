@@ -12,15 +12,16 @@ const picker = usePicker();
 //  2、组件交互变量、常量
 
 // *****************************************   👉  方法+事件    ****************************************
-function showAction(evt: Event, mode: AppOptions['mode']) {
-    picker.showAction(evt.target as HTMLElement, {
+async function showAction(evt: Event, mode: AppOptions['mode']) {
+    const code = await picker.showAction(evt.target as HTMLElement, {
         title: "动作选择",
         actions: [
             { code: "code1", name: "动作1", },
             { code: "code2", name: "动作2", },
-            { code: "code3", name: "动作3", },
+            { code: "code3", name: "动作3", click: () => console.log("code3被点击了") },
         ],
     });
+    console.log("选择的动作编码：", code);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
