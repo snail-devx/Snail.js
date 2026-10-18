@@ -61,6 +61,7 @@ export * from "./container/models/tree-model";
 export * from "./container/models/wrapper-model";
 //  组件导出：赋值给 components
 import ElasticBar from "./container/components/elastic-bar.vue";
+import ElasticPadding from "./container/components/elastic-padding.vue";
 import ElasticUpdown from "./container/components/elastic-updown.vue";
 import DataTable from "./container/data-table.vue";
 import Dynamic from "./container/dynamic.vue";
@@ -129,7 +130,7 @@ export const components = {
     //  base下的组件
     Button, Choose, Env, Footer, Header, Icon, Input, Number, Search, Select, Switch, Textarea,
     //  container 下的组件
-    Dynamic, Elastic, ElasticBar, ElasticUpdown, Flex, Field, Fold, Motion, Layout, Page, Scroll, Sort, Tree, Wrapper,
+    Dynamic, Elastic, ElasticBar, ElasticPadding, ElasticUpdown, Flex, Field, Fold, Motion, Layout, Page, Scroll, Sort, Tree, Wrapper,
     Table, ElasticTable, DataTable,
     //  other   下的组件
     Action, Card, FlashNumber, NavBar,

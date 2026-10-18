@@ -48,6 +48,30 @@ export type ElasticSlotHandle = {
 
 
 /**
+ * Elastic组件【内边距】插件配置选项
+ * - 填充尺寸将遮盖住`main-area`区域
+ */
+export type ElasticPaddingOptions = {
+    /**
+     * 左侧内边距宽度
+     */
+    left?: string;
+    /**
+     * 右侧内边距宽度
+     */
+    right?: string;
+
+    /**
+     * 顶部内边距高度
+     */
+    top?: string;
+    /**
+     * 底部内边距高度
+     */
+    bottom?: string;
+}
+
+/**
  * 弹性组件【上拉加载、下拉刷新】组件配置选项
  */
 export type ElasticUpdownOptions = {

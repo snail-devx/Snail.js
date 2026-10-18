@@ -56,6 +56,19 @@
                 </div>
             </Elastic>
         </section>
+        <section style="flex: none;width: 300px;  height: 400px;border: 1px solid red; ">
+            <Elastic class="wh-fill" :bar="true" :elastic="'both'">
+                <template #default>
+                    <div style="height: 400px;width: 110%;background-color: gray;">
+                        <h3>测试Elastic的Padding插件</h3>
+                    </div>
+                </template>
+                <template #plugin>
+                    <ElasticPadding left="20px" top="20px" right="30px" bottom="40px" />
+                </template>
+
+            </Elastic>
+        </section>
     </div>
 </template>
 
@@ -67,7 +80,7 @@ import ElasticTestBody from "./components/elastic-test-body.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const { Elastic, ElasticUpdown } = components;
+const { Elastic, ElasticUpdown, ElasticPadding } = components;
 //  2、组件交互变量、常量
 
 
