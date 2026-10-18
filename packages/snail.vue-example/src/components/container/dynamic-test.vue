@@ -10,21 +10,25 @@
     </div>
 </template>
 <script setup lang="ts">
-import { Component, shallowRef } from "vue"
-import { components } from "../../libraries/snail_vue"
+import { Component, defineComponent, shallowRef } from "vue";
+import { components } from "../../libraries/snail_vue";
 const { Dynamic, Loading } = components;
 
 const showLoading = true;
 const dynamicName = shallowRef<string | undefined>("DialogContent");
 const dynamicComponent = shallowRef<Component | undefined>(Loading);
 const dynamicUrl = shallowRef<string | undefined>("/components/dynamic-test.js#default");
+
 setTimeout(() => {
     dynamicName.value = undefined;
 }, 1000);
 setTimeout(() => {
-    dynamicComponent.value = undefined;
+    dynamicComponent.value = defineComponent({
+        template: "<div>defineComponent的自定义组件</div>"
+    });
 }, 2000);
 setTimeout(() => {
+    dynamicComponent.value = undefined;
     dynamicUrl.value = "/components/container/dynamic-url-test.js#comp";
 }, 3000);
 //  组件内部错误，不会处理
