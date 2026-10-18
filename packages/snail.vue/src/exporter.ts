@@ -115,12 +115,13 @@ export * from "./popup/manager";
 export * from "./prompt/models/drag-verify-model";
 export * from "./prompt/models/empty-model";
 export * from "./prompt/models/loading-model";
+export * from "./prompt/models/progress-model";
 //  组件导出：赋值给 components
 import DragVerify from "./prompt/drag-verify.vue";
 import Empty from "./prompt/empty.vue";
 import Loading from "./prompt/loading.vue";
+import Progress from "./prompt/progress.vue";
 import Spinner from "./prompt/spinner.vue";
-
 //  方法导出
 
 // *****************************************   👉  组件合并导出    ****************************************
@@ -135,5 +136,5 @@ export const components = {
     //  picker    下的组件
     DateTimePicker, ScrollPicker,
     //  prompt 下的组件
-    DragVerify, Empty, Loading, Spinner
+    DragVerify, Empty, Loading, Progress, Spinner
 };

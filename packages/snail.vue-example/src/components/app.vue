@@ -51,6 +51,7 @@ import PopupTest from "./popup/popup-test.vue";
 import DragVerifyTest from "./prompt/drag-verify-test.vue";
 import EmptyTest from "./prompt/empty-test.vue";
 import LoadingTest from "./prompt/loading-test.vue";
+import ProgressTest from "./prompt/progress-test.vue";
 //  👉 其他组件
 import ActionTest from "./other/action-test.vue";
 import CardTest from "./other/card-test.vue";
@@ -58,7 +59,6 @@ import FlashNumberTest from "./other/flash-number-test.vue";
 //  👉 其他组件
 import UseScrollTest from "./view/use-scroll.vue";
 import UseStyleTest from "./view/use-style.vue";
-
 //#endregion
 
 // *****************************************   👉  组件定义    *****************************************
@@ -144,6 +144,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "DragVerify 滑块验证", data: DragVerifyTest, clickable: true, searchable: true, },
                 { text: "Empty 空状态", data: EmptyTest, clickable: true, searchable: true, },
                 { text: "Loading 加载状态", data: LoadingTest, clickable: true, searchable: true, },
+                { text: "Progress 进度提示", data: ProgressTest, clickable: true, searchable: true, },
             ]
         },
         {
@@ -191,8 +192,10 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[1].children[3], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[4], undefined);
     //  picker 测试
-    onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
+    // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
+    //  prompt 测试
+    onTreeNodeClick(treeOptions.nodes[5].children[3], undefined);
     // other 测试
     // onTreeNodeClick(treeOptions.nodes[6].children[2], undefined);
     //  view 测试
