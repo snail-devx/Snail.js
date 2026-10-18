@@ -91,8 +91,8 @@ importers:
         specifier: '>=2.0.35'
         version: 2.0.35(typescript@5.9.3)
       snail.view:
-        specifier: '>=2.0.24'
-        version: 2.0.24(typescript@5.9.3)
+        specifier: '>=2.0.25'
+        version: 2.0.25(typescript@5.9.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -134,11 +134,11 @@ importers:
         specifier: '>=2.0.35'
         version: 2.0.35(typescript@5.9.3)
       snail.view:
-        specifier: '>=2.0.24'
-        version: 2.0.24(typescript@5.9.3)
+        specifier: '>=2.0.25'
+        version: 2.0.25(typescript@5.9.3)
       snail.vue:
-        specifier: '>=2.0.46'
-        version: 2.0.46(typescript@5.9.3)
+        specifier: '>=2.0.47'
+        version: 2.0.47(typescript@5.9.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -219,11 +219,11 @@ importers:
         specifier: '>=2.0.35'
         version: 2.0.35(typescript@5.9.3)
       snail.view:
-        specifier: '>=2.0.24'
-        version: 2.0.24(typescript@5.9.3)
+        specifier: '>=2.0.25'
+        version: 2.0.25(typescript@5.9.3)
       snail.vue:
-        specifier: '>=2.0.46'
-        version: 2.0.46(typescript@5.9.3)
+        specifier: '>=2.0.47'
+        version: 2.0.47(typescript@5.9.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -2378,11 +2378,11 @@ packages:
   snail.rollup@2.0.0:
     resolution: {integrity: sha512-T1LY21fzc5LZ+zIBVLTfcHgbNq16gJhtb/BWeW5dKJYe+WPAgNU7+1KLwdrBlNpEa5dJeeF0LnFT1+VMw0o5ag==}
 
-  snail.view@2.0.24:
-    resolution: {integrity: sha512-yQzEnlI8lufrIDH85MJIFZOVpxykbPieM2QdY9eD6DJtPNXIHBzX4yKxXzW3sn1S3KXJdm8L9FTbzWqcGF/InA==}
+  snail.view@2.0.25:
+    resolution: {integrity: sha512-XXteJ6H3EbmxEl+sWg7BJTNNU0dd9mwYk0IbiizrvM2PsgdRaJPEnGw1dXHoVzlVct622sOQmXvDz3f245htEA==}
 
-  snail.vue@2.0.46:
-    resolution: {integrity: sha512-W85kUQSo9Y8O2357W75FcFea6a1M2G51MarYtsan4pmhVd83fiFlzCadN17PQGj0s/thuzi/2rGmEWMTp0Kcog==}
+  snail.vue@2.0.47:
+    resolution: {integrity: sha512-t4TyVlRTux2tVEi2oJbbGKDmscn7tIQYHGPmrWwYEOSeMHT+c97GUPmjmRzOaNdOnOAQiwS2m8RGwBVyMSIGaw==}
 
   sortablejs@1.15.6:
     resolution: {integrity: sha512-aNfiuwMEpfBM/CN6LY0ibyhxPfPbyFeBTYJKCvzkJ2GkUpazIt3H+QIPAMHwqQ7tMKaHz1Qj+rJJCqljnf4p3A==}
@@ -4868,16 +4868,16 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  snail.view@2.0.24(typescript@5.9.3):
+  snail.view@2.0.25(typescript@5.9.3):
     dependencies:
       snail.core: 2.0.35(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
-  snail.vue@2.0.46(typescript@5.9.3):
+  snail.vue@2.0.47(typescript@5.9.3):
     dependencies:
       snail.core: 2.0.35(typescript@5.9.3)
-      snail.view: 2.0.24(typescript@5.9.3)
+      snail.view: 2.0.25(typescript@5.9.3)
       sortablejs: 1.15.6
       vue: 3.5.24(typescript@5.9.3)
     transitivePeerDependencies:
