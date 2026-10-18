@@ -7,7 +7,7 @@
         '--size': correctString(size, undefined, true),
         '--background': correctString(background, undefined, true),
         '--foreground': correctString(foreground, undefined, true),
-    }" :title="String(progress)">
+    }">
         <div />
     </div>
 </template>
