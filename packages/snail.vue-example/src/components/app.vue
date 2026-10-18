@@ -27,6 +27,7 @@ import DatatableTest from "./container/datatable-test.vue";
 import DynamicTest from "./container/dynamic-test.vue";
 import ElasticTest from "./container/elastic-test.vue";
 import ElasticTableTest from "./container/elastictable-test.vue";
+import FieldTest from "./container/field-test.vue";
 import FlexTest from "./container/flex-test.vue";
 import FoldTest from "./container/fold-test.vue";
 import LayoutTest from "./container/layout-test.vue";
@@ -52,7 +53,6 @@ import LoadingTest from "./prompt/loading-test.vue";
 //  👉 其他组件
 import ActionTest from "./other/action-test.vue";
 import CardTest from "./other/card-test.vue";
-import FieldPanelTest from "./other/field-panel-test.vue";
 import FlashNumberTest from "./other/flash-number-test.vue";
 //  👉 其他组件
 import UseScrollTest from "./view/use-scroll.vue";
@@ -103,6 +103,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Datatable 数据表", data: DatatableTest, clickable: true, searchable: true, },
                 { text: "Elastic 弹性组件", data: ElasticTest, clickable: true, searchable: true, },
                 { text: "ElasticTable 弹性表格", data: ElasticTableTest, clickable: true, searchable: true, },
+                { text: "Field 字段容器", data: FieldTest, clickable: true, searchable: true },
                 { text: "Flex 弹性布局", data: FlexTest, clickable: true, searchable: true, },
                 { text: "Fold 折叠组件", data: FoldTest, clickable: true, searchable: true, },
                 { text: "Layout 布局测试", data: LayoutTest, clickable: true, searchable: true, },
@@ -148,7 +149,6 @@ const treeOptions: TreeOptions<Component> = {
             children: [
                 { text: "Action 操作项", data: ActionTest, clickable: true, searchable: true },
                 { text: "Card 卡片", data: CardTest, clickable: true, searchable: true },
-                { text: "FieldPanel 字段区域", data: FieldPanelTest, clickable: true, searchable: true },
                 { text: "FlashNumber", data: FlashNumberTest, clickable: true, searchable: true }
             ],
         }, {
@@ -186,11 +186,12 @@ onMounted(() => {
     //  container 测试
     // onTreeNodeClick(treeOptions.nodes[1].children[9], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
-    onTreeNodeClick(treeOptions.nodes[1].children[3], undefined);
+    // onTreeNodeClick(treeOptions.nodes[1].children[3], undefined);
+    onTreeNodeClick(treeOptions.nodes[1].children[4], undefined);
     //  picker 测试
     // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
     // other 测试
-    // onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
+    // onTreeNodeClick(treeOptions.nodes[6].children[2], undefined);
     //  view 测试
     // onTreeNodeClick(treeOptions.nodes[7].children[0], undefined);
 });

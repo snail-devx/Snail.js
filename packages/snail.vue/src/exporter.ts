@@ -48,6 +48,7 @@ export * from "./base/utils/icon-util";
 //  类型导出
 export * from "./container/models/component-model";
 export * from "./container/models/elastic-model";
+export * from "./container/models/field-model";
 export * from "./container/models/flex-model";
 export * from "./container/models/fold-model";
 export * from "./container/models/layout-model";
@@ -65,6 +66,7 @@ import DataTable from "./container/data-table.vue";
 import Dynamic from "./container/dynamic.vue";
 import ElasticTable from "./container/elastic-table.vue";
 import Elastic from "./container/elastic.vue";
+import Field from "./container/field.vue";
 import Flex from "./container/flex.vue";
 import Fold from "./container/fold.vue";
 import Layout from "./container/layout.vue";
@@ -83,12 +85,10 @@ export * from "./container/utils/motion-util";
 //  类型导出
 export * from "./other/models/action-model";
 export * from "./other/models/card-model";
-export * from "./other/models/field-panel-model";
 export * from "./other/models/nav-bar-model";
 //  组件导出：赋值给 components
 import Action from "./other/action.vue";
 import Card from "./other/card.vue";
-import FieldPanel from "./other/field-panel.vue";
 import FlashNumber from "./other/flash-number.vue";
 import NavBar from "./other/nav-bar.vue";
 
@@ -128,10 +128,10 @@ export const components = {
     //  base下的组件
     Button, Choose, Env, Footer, Header, Icon, Input, Number, Search, Select, Switch, Textarea,
     //  container 下的组件
-    Dynamic, Elastic, ElasticBar, ElasticUpdown, Flex, Fold, Motion, Layout, Page, Scroll, Sort, Tree, Wrapper,
+    Dynamic, Elastic, ElasticBar, ElasticUpdown, Flex, Field, Fold, Motion, Layout, Page, Scroll, Sort, Tree, Wrapper,
     Table, ElasticTable, DataTable,
     //  other   下的组件
-    Action, Card, FieldPanel, FlashNumber, NavBar,
+    Action, Card, FlashNumber, NavBar,
     //  picker    下的组件
     DateTimePicker, ScrollPicker,
     //  prompt 下的组件
