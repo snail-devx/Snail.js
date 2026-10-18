@@ -44,8 +44,20 @@
                 <ElasticTestBody style="width: 100%;" />
                 <!-- 启用此插件 -->
                 <template #plugin="handle">
-                    <ElasticUpdown :="handle" up :down="true" @ready="onUpdownReady" @refresh="loadData('refresh')"
-                        @more="loadData('more')" />
+                    <ElasticUpdown :="handle" up :down="true" @ready="onUpdownReady"
+                        @refresh="scope => loadData('refresh', scope)" @more="scope => loadData('more', scope)" />
+                </template>
+            </Elastic>
+        </section>
+        <section style="flex: none;width: 300px;  height: 400px;border: 1px solid red; ">
+            <Elastic class="wh-fill" :elastic="'y'" :bar="true" :distance="400" :dock="{ top: 40, bottom: 40 }">
+                <div>
+                    <h3>测试y轴内容没撑过容器区域</h3>
+                </div>
+                <!-- 启用此插件 -->
+                <template #plugin="handle">
+                    <ElasticUpdown :="handle" up :down="true" @ready="onUpdownReady"
+                        @refresh="scope => loadData('refresh', scope)" @more="(scope) => loadData('more', scope)" />
                 </template>
             </Elastic>
         </section>
@@ -73,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { delay } from "snail.core";
+import { delay, IScope } from "snail.core";
 import { onMounted } from "vue";
 import { components, ElasticUpdownHandle } from "../../libraries/snail_vue";
 import ElasticTestBody from "./components/elastic-test-body.vue";
@@ -85,8 +97,9 @@ const { Elastic, ElasticUpdown, ElasticPadding } = components;
 
 
 // *****************************************   👉  方法+事件    ****************************************
-async function loadData(mode: "refresh" | "more"): Promise<any> {
+async function loadData(mode: "refresh" | "more", scope: IScope): Promise<any> {
     await delay(1000 * 1);
+    scope && scope.destroy();
 }
 
 /**

@@ -76,6 +76,12 @@ function onDetailChange(detail: ElasticDetail) {
         }
         //  上拉时：看看是否开启了上拉加载更多；判定处于释放状态时，【上拉加载更多】提示跟手往上移动
         else if (props.up == true && detail.touch.total.y < 0 && moreRef.value != "running") {
+            //  如果 内容区域 没超过 可视区域，则不进行上拉加载更多
+            if (target.getBoundingClientRect().height < target.parentElement.getBoundingClientRect().height) {
+                moreRef.value = undefined;
+                return;
+            }
+            //  计算更新初始状态和释放状态
             const minY: number = target.parentElement.clientHeight - target.clientHeight;
             if (detail.position.y - minY <= - 40) {
                 moreRef.value = "release";
@@ -100,6 +106,10 @@ function onDetailChange(detail: ElasticDetail) {
             moreRef.value = "running";
             setTimeout(onRefreshOrMore, 0, "more");
         }
+        //  结束后，若果没有进行刷新或加载更多，则重置状态
+        refreshRef.value != "running" && (refreshRef.value = undefined);
+        moreRef.value != "running" && (moreRef.value = undefined);
+
         moreBottomRef.value = 0;
     }
 }
