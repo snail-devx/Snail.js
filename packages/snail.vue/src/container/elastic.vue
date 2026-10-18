@@ -82,10 +82,13 @@ onMounted(() => {
     //  主内容区域
     >div.main-area {
         position: relative;
-        display: flow-root;
         background-color: #f7f8f9;
         z-index: 1;
         user-select: none;
+
+        //  在main-area区域使用display: flow-root建立BFC，解决“main-area计算高度时，内部margin没包含”的问题
+        //      设置默认值，会影响衍生的ElasticTable组件，所以这里不设置默认值
+        // display: flow-root; 
     }
 }
 </style>
