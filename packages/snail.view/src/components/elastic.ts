@@ -320,7 +320,7 @@ export function useElastic(target: HTMLElement, options: ElasticBaseOptions, fn?
         ));
         //  监听触摸事件，并自动销毁
         const observer = useObserver();
-        observer.onTouch(target.parentElement, {}, onTouching);
+        observer.onTouch(target.parentElement, { preventDefault: options.preventDefault }, onTouching);
         observer.onSize(target, refresh);
         manager.onDestroy(() => observer.destroy());
 

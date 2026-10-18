@@ -55,6 +55,8 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
         mustFunction(fn, "onTouch: fn");
         const animationFrame = useAnimationFrame<TouchDetail>("queue", fn);
         //  1、进行触摸事件处理的相关方法，变量
+        /**     是否阻止默认行为 */
+        const preventDefault = options ? options.preventDefault === true : false;
         /**     触摸启动目标，用于计算距离和速度 */
         let startTarget: TouchTarget = undefined;
         /**     上一次触摸目标 */
@@ -110,6 +112,7 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
             //  触摸相关事件监听
             ("ontouchstart" in window) && scope.add(onEvent(el, "touchstart", (evt: TouchEvent) => {
                 if (startType == undefined) {
+                    preventDefault && evt.preventDefault();
                     startType = "touch";
                     runFn("start", buildTargetByTouch(evt));
                 }

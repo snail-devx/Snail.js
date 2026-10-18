@@ -2,7 +2,7 @@
  * 弹性视图相关数据结构
  */
 
-import { ElementPosition, TouchDetail } from "./observer-model";
+import { ElementPosition, TouchDetail, TouchOptions } from "./observer-model";
 
 /**
  * 接口：弹性滚动管理器
@@ -38,7 +38,7 @@ export interface IElasticManager {
 /**
  * 弹性滚动基础配置选项
  */
-export type ElasticBaseOptions = {
+export type ElasticBaseOptions = TouchOptions & {
     /**
      * 弹性效果启动配置
      * - x 仅在x轴方向上启用弹簧效果

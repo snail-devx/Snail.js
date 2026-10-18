@@ -98,6 +98,12 @@ export type TouchOptions = {
     //  */
     // disableMouse: boolean;
 
+    /**
+     * 阻止默认事件
+     * - 为true时，触摸事件触发时，阻止默认事件；此时若在滚动容器中可阻止页面滚动
+     */
+    preventDefault?: boolean;
+
     //  后续支持鼠标 wheel 事件，进行单位滑动，然后翻译为 回调中的效果数据
 }
 /**
