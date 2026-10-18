@@ -1,8 +1,7 @@
 <!-- 对话框弹窗容器：支持外部传入动画，不转则使用默认的 -->
 <template>
     <div :class="['snail-dialog', options.rootClass, popupStatus.value, popupTransition.value]"
-        :style="{ 'z-index': zIndex }" @mousedown.self="evt => mousedownTarget = evt.target"
-        @click.self="onDialogRootClick">
+        :style="{ 'z-index': zIndex }" @mousedown.self="onDialogRootMouseDown" @click.self="onDialogRootClick">
         <template v-if="options.wrapper == undefined" :key="'no-wrapper'">
             <Dynamic class="dialog-body" :name="options.name" :component="options.component" :url="options.url"
                 :props="props" :="dialogExtend" :popup-status="popupStatus.value" v-model="model" />
@@ -18,13 +17,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, shallowRef, useTemplateRef } from "vue";
-import { DialogOptions, DialogHandle, DialogWrapperHandle } from "../models/dialog-model";
-import { PopupDescriptor } from "../models/popup-model";
-import Dynamic from "../../container/dynamic.vue";
+import { mustFunction, runAsync } from "snail.core";
 import { useObserver } from "snail.view";
+import { onMounted, shallowRef } from "vue";
+import Dynamic from "../../container/dynamic.vue";
 import Wrapper from "../../container/wrapper.vue";
-import { mustFunction, runAsync, wait } from "snail.core";
+import { DialogHandle, DialogOptions, DialogWrapperHandle } from "../models/dialog-model";
+import { PopupDescriptor } from "../models/popup-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -48,11 +47,19 @@ let mousedownTarget: EventTarget = undefined;
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
+ * 对话框根元素鼠标按下时
+ * @param evt 
+ */
+function onDialogRootMouseDown(evt: MouseEvent) {
+    //  之前直接在 template 中写的，但是vue插件报错，MouseEvent无 value 属性，所以迁移成独立方法做赋值
+    mousedownTarget = evt.target
+}
+/**
  * 鼠标点击时
  * @param evt 
  */
 function onDialogRootClick(evt: MouseEvent) {
-    //  必须是在自己触发的鼠标按下事件，否则不关闭；解决“在子元素按下鼠标，然后移动到容器元素上松开师表，此时click.self被触发了，导致弹窗关了”问题
+    //  必须是在自己触发的鼠标按下事件，否则不关闭；解决“在子元素按下鼠标，然后移动到容器元素上松开鼠标，此时click.self被触发了，导致弹窗关了”问题
     evt.target === mousedownTarget && options.closeOnMask && closePopup();
     mousedownTarget = undefined;
 }
