@@ -52,8 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, } from "vue";
-import { usePicker, DatePickerOptions, components } from "../../libraries/snail_vue";
+import { components, usePicker } from "../../libraries/snail_vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

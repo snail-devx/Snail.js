@@ -40,6 +40,7 @@ import TreeTest from "./container/tree-test.vue";
 import DesignerTest from "./form/designer-test.vue";
 import RendererTest from "./form/renderer-test.vue";
 //  👉 选择器组件
+import ActionpickerTest from "./picker/actionpicker-test.vue";
 import DateTimeTest from "./picker/datetime-test.vue";
 import ScrollpikcerTest from "./picker/scrollpikcer-test.vue";
 //  👉 弹窗组件
@@ -124,6 +125,7 @@ const treeOptions: TreeOptions<Component> = {
         {
             text: "选择器",
             children: [
+                { text: "动作选择器", data: ActionpickerTest, clickable: true, searchable: true },
                 { text: "滚动选择器", data: ScrollpikcerTest, clickable: true, searchable: true },
                 { text: "DateTime 选择器", data: DateTimeTest, clickable: true, searchable: true },
             ]
@@ -187,8 +189,9 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[1].children[9], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[3], undefined);
-    onTreeNodeClick(treeOptions.nodes[1].children[4], undefined);
+    // onTreeNodeClick(treeOptions.nodes[1].children[4], undefined);
     //  picker 测试
+    onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
     // other 测试
     // onTreeNodeClick(treeOptions.nodes[6].children[2], undefined);

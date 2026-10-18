@@ -2,9 +2,11 @@ import { correctNumber, IAsyncScope, IScope, mountScope, ScopeOptions, throwIfFa
 import { Component } from "vue";
 import { useApp } from "../base/utils/app-util";
 import { FollowPositionOptions, usePopup } from "../popup/manager";
+import ActionPicker from "./components/action-picker.vue";
 import DateDesktopPicker from "./components/date-desktop-picker.vue";
 import DatetimeMobilePicker from "./components/datetime-mobile-picker.vue";
 import TimeDesktopPicker from "./components/time-desktop-picker.vue";
+import { ActionPickerOptions } from "./models/action-model";
 import { DateTimePickerBaseOptions, TimeDesktopPopupOptions } from "./models/datetime-model";
 import { IPickerManager, PickerExtend, PickerPopupOptions } from "./models/picker-model";
 import { ScrollPickerOptions, ScrollPickerPopupOptions } from "./models/scroll-piker-model";
@@ -81,6 +83,31 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
         }
         return showPicker<string, ScrollPickerOptions>(undefined, ScrollPicker, options, popupOptions);
     }
+
+    /**
+     * 显示【动作】选择器
+     * - 适配桌面端和移动端，桌面端follow弹窗，移动端使用ActionSheet模式
+     * @param target 哪个元素触发，基于此元素计算位置；桌面端必须，基于此元素进行follow效果
+     * @param options 选择控件配置选项
+     * @param popupOptions 选择器弹窗的一些扩展配置
+     * @returns 异步任务，可销毁选择组件；选择动作后，返回动作的code值
+     */
+    function showAction(target: HTMLElement, options: ActionPickerOptions, popupOptions?: Pick<PickerPopupOptions, "follow" | "dialog">): IAsyncScope<string> {
+        const popup: PickerPopupOptions = mode == "mobile"
+            ? {
+                dialog: {
+                    closeOnEscape: true,
+                    closeOnMask: true,
+                },
+                ...popupOptions,
+                type: "dialog"
+            }
+            : {
+                ...popupOptions,
+                type: "follow"
+            };
+        return showPicker(target, ActionPicker, options, popup);
+    }
     //#endregion
 
     //#region *************************************实现接口：IPickerManager接口方法*************************************
@@ -136,7 +163,7 @@ export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManage
 
     //  初始化管理器并返回
     const manager = Object.freeze(mountScope<IPickerManager>(
-        { showDateTime, showScroll, },
+        { showDateTime, showScroll, showAction },
         { global, type: "IPickerManager" }
     ));
     manager.onDestroy(popup.destroy);

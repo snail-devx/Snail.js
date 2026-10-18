@@ -5,6 +5,7 @@
 import { IAsyncScope } from "snail.core";
 import { DialogOptions, FollowPositionOptions } from "../../popup/manager";
 import { IPopupManager } from "../../popup/models/manager-model";
+import { ActionPickerOptions } from "./action-model";
 import { DateTimePickerBaseOptions } from "./datetime-model";
 import { ScrollPickerOptions, ScrollPickerPopupOptions } from "./scroll-piker-model";
 
@@ -31,6 +32,16 @@ export interface IPickerManager {
      * @returns 异步任务，可销毁选择组件；可接受组件选择值
      */
     showScroll(options: ScrollPickerOptions & ScrollPickerPopupOptions): IAsyncScope<string>;
+
+    /**
+     * 显示【动作】选择器
+     * - 适配桌面端和移动端，桌面端follow弹窗，移动端使用ActionSheet模式
+     * @param target 哪个元素触发，基于此元素计算位置；桌面端必须，基于此元素进行follow效果
+     * @param options 选择控件配置选项
+     * @param popupOptions 选择器弹窗的一些扩展配置
+     * @returns 异步任务，可销毁选择组件；选择动作后，返回动作的code值
+     */
+    showAction(target: HTMLElement, options: ActionPickerOptions, popupOptions?: Pick<PickerPopupOptions, "follow" | "dialog">): IAsyncScope<string>;
 }
 /**
  * 选择器弹窗配置选项
