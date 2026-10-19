@@ -76,7 +76,7 @@
                     </div>
                 </template>
                 <template #plugin>
-                    <ElasticPadding left="20px" top="20px" right="30px" bottom="40px" />
+                    <ElasticPadding left="20px" top="20px" right="30px" bottom="40px" background="red" />
                 </template>
 
             </Elastic>

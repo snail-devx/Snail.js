@@ -53,6 +53,12 @@ export type ElasticSlotHandle = {
  */
 export type ElasticPaddingOptions = {
     /**
+     * 盖板背景色
+     * - 不设置则默认和Elastic组件背景色保持一致
+     */
+    background?: string;
+
+    /**
      * 左侧内边距宽度
      */
     left?: string;

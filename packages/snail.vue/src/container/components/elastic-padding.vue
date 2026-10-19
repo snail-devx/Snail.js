@@ -3,10 +3,10 @@
     2、模拟出padding的内边距效果，遮住main-area区域内容，此时main-area区域需要配合设置dock，否则会有靠近边框位置的内容显示不出来
   -->
 <template>
-    <div class="padding left" v-if="isStringNotEmpty(left)" :style="{ width: left }" />
-    <div class="padding right" v-if="isStringNotEmpty(right)" :style="{ width: right }" />
-    <div class="padding top" v-if="isStringNotEmpty(top)" :style="{ height: top }" />
-    <div class="padding bottom" v-if="isStringNotEmpty(bottom)" :style="{ height: bottom }" />
+    <div class="padding left" v-if="isStringNotEmpty(left)" :style="{ background, width: left }" />
+    <div class="padding right" v-if="isStringNotEmpty(right)" :style="{ background, width: right }" />
+    <div class="padding top" v-if="isStringNotEmpty(top)" :style="{ background, height: top }" />
+    <div class="padding bottom" v-if="isStringNotEmpty(bottom)" :style="{ background, height: bottom }" />
 </template>
 
 <script setup lang="ts">
@@ -17,9 +17,7 @@ import { ElasticPaddingOptions } from '../models/elastic-model';
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 defineProps<ElasticPaddingOptions>()
-
 //  2、组件交互变量、常量
-
 
 // *****************************************   👉  方法+事件    ****************************************
 
