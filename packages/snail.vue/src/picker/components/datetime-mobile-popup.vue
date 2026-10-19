@@ -85,7 +85,7 @@ const secondItemsRef: ShallowRef<ScrollPickItem[]> = shallowRef();
 function onConfirmSelect() {
     // 验证选择的日期时间是否有效
     if (dateFormat != undefined && validateDate(dateFormat, dateRef.value, minDate, maxDate) != true) {
-        toast("warn", "请选择有效的日期", { closeDisabled: true });
+        toast("请选择有效的日期", { type: "warn", closeDisabled: true });
         return;
     }
     //  验证时间部分：日期格式中也可能包含时间部分
@@ -93,7 +93,7 @@ function onConfirmSelect() {
         ? "HH:mm"
         : (dateFormat == "yyyy-MM-dd HH:mm:ss" ? "HH:mm:ss" : timeFormat);
     if (tf != undefined && isValidTime(tf, dateRef.value, minTime, maxTime) != true) {
-        toast("warn", "请选择有效的时间", { closeDisabled: true });
+        toast("请选择有效的时间", { type: "warn", closeDisabled: true });
         return;
     }
     //  构建选中结果文本值
