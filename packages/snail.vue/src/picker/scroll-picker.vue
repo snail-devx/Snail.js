@@ -81,7 +81,7 @@ function onConfirmSelect() {
     const code = correctString(valueRef.value, undefined, false);
     const item = props.items.find(item => item.code == code);
     if (item == undefined) {
-        toast("请选择一个选项", { type: "warn" });
+        toast && toast("请选择一个选项", { type: "warn" });
         return;
     }
     props.closePopup(code);
