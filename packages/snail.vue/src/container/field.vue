@@ -77,6 +77,11 @@ const { mode } = useApp();
     }
 
     >.field-body {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        align-content: start;
+
         >input {
             width: 100%;
             height: 32px;
@@ -94,8 +99,15 @@ const { mode } = useApp();
         //  div和span的默认样式，确保和标题在同一水平线上
         >div,
         >span {
+            color: #2e3033;
             width: 100%;
             line-height: 20px;
+        }
+
+        //通用样式：整个一行项，填充满，居中对齐
+        >.row-item {
+            height: 32px;
+            line-height: 32px;
         }
     }
 
@@ -168,7 +180,9 @@ const { mode } = useApp();
 
         >input,
         >textarea {
-            padding-left: 6px;
+            padding-left: 0;
+            padding-right: 0;
+            border-radius: 0;
             border: none !important;
             background: transparent !important;
 
