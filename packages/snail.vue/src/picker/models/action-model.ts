@@ -33,6 +33,7 @@ export type ActionPickerItem = {
 
     /**
      * 点击动作时的回调
+     * - 外部需确保执行不报错，否则影响弹窗关闭
      */
     click?: () => void;
 

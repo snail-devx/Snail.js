@@ -41,7 +41,8 @@ const { mode } = useApp();
  * 点击动作项
  */
 function onActionItemClick(action: ActionPickerItem) {
-    isFunction(action.click) && setTimeout(action.click, 0);
+    //  click方法不能在setTimeout中执行，如涉及拍照的原生api时，会出问题
+    isFunction(action.click) && action.click();
     closePopup(action.code);
 }
 
@@ -110,9 +111,7 @@ function onActionItemClick(action: ActionPickerItem) {
     >div {
         position: relative;
         padding: 0 16px;
-        height: 44px;
         text-align: center;
-        line-height: 44px;
 
         &:not(.no-border) {
             border-bottom: 1px solid #E2E2E3
@@ -120,17 +119,22 @@ function onActionItemClick(action: ActionPickerItem) {
     }
 
     >div.action-title {
+        height: 44px;
+        line-height: 44px;
         color: #A2A4A6;
     }
 
 
     >div.action-item {
+        height: 50px;
+        line-height: 50px;
         font-size: 16px;
         color: black;
     }
 
     >div.action-cancel {
-        height: 50px;
+        height: 56px;
+        line-height: 50px;
         padding-top: 6px;
         font-size: 16px;
         color: black;

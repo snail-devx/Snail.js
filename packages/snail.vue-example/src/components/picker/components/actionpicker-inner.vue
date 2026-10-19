@@ -19,6 +19,7 @@ async function showAction(evt: Event, mode: AppOptions['mode']) {
             { code: "code1", name: "动作1", },
             { code: "code2", name: "动作2", },
             { code: "code3", name: "动作3", click: () => console.log("code3被点击了") },
+            { code: "code4", name: "动作4", click: () => console.log("code4被点击了") },
         ],
     });
     console.log("选择的动作编码：", code);
