@@ -1,14 +1,10 @@
 import { IAsyncScope, IScope } from "snail.core";
-import { ComponentOptions } from "../../container/models/component-model";
-import { AllStyle } from "snail.view";
-import { DialogOptions } from "./dialog-model";
-import { PopupOptions } from "./popup-model";
-import { Component } from "vue";
-import { ConfirmOptions } from "./confirm-model";
-import { IconType } from "../../base/models/icon-model";
-import { ToastOptions } from "./toast-model";
-import { FollowOptions } from "./follow-model";
 import { ComponentBindOptions } from "../../container/models/component-model";
+import { ConfirmOptions } from "./confirm-model";
+import { DialogOptions } from "./dialog-model";
+import { FollowOptions } from "./follow-model";
+import { PopupOptions } from "./popup-model";
+import { ToastOptions } from "./toast-model";
 
 /**
  * 弹窗管理器
@@ -52,10 +48,9 @@ export interface IPopupManager {
     confirm(title: string, message: string, options?: Omit<ConfirmOptions, "title" | "message">): IAsyncScope<boolean>;
     /**
      * Toast 提示框
-     * @param type 提示类型：成功、失败、、、
      * @param message 提示消息
      * @param options 提示框配置选项
      * @returns 弹窗打开结果，外部可手动关闭弹窗
      */
-    toast(type: IconType, message: string, options?: Omit<ToastOptions, "type" | "message">): IScope;
+    toast(message: string, options?: Omit<ToastOptions, "message">): IScope;
 }

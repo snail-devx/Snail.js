@@ -3,27 +3,33 @@
     2、不直接对外提供，外部使用toast方法使用
 -->
 <template>
-    <div class="snail-toast" :class="[popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
+    <div class="snail-toast" :class="[mode, popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
         @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
-        <Icon class="close-icon" v-if="props.closeDisabled != true" type="close" button :size="20" :color="'#707070'"
-            :hover-color="'red'" @click="closePopup();" />
-        <div class="icon" v-if="props.type">
-            <Icon :type="props.type" :color="'#707070'" :size="20" />
-        </div>
+        <!-- 桌面端 特有：关闭按钮，和消息图标 -->
+        <template v-if="mode == 'desktop'">
+            <Icon class="close-icon" v-if="props.closeDisabled != true" type="close" button :size="20"
+                :color="'#707070'" :hover-color="'red'" @click="closePopup();" />
+            <div class="icon" v-if="isStringNotEmpty(props.type)">
+                <Icon :type="props.type" :color="'#707070'" :size="20" />
+            </div>
+        </template>
+        <!-- 消息详情 -->
         <div class="message" v-html="props.message" />
     </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
-import { ToastOptions } from "../models/toast-model";
-import Icon from "../../base/icon.vue"
+import { IScope, isStringNotEmpty, useTimer } from "snail.core";
+import { onMounted } from "vue";
+import Icon from "../../base/icon.vue";
+import { useApp } from "../../base/utils/app-util";
 import { PopupDescriptor, PopupHandle, PopupOptions } from "../manager";
-import { IScope, useTimer } from "snail.core";
+import { ToastOptions } from "../models/toast-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const { options, extOptions, zIndex, popupStatus, popupTransition } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
 const { onTimeout } = useTimer();
+const { mode } = useApp();
 const props: ToastOptions = options.props;
 const { closePopup } = extOptions;
 /** 显示时长，默认1500ms */
@@ -55,18 +61,29 @@ onMounted(() => onMouseEvent(true));
 
 .snail-toast {
     position: fixed;
-    min-width: 200px;
-    max-width: 400px;
-    max-height: 200px;
-    border-radius: 10px;
-    padding: 20px 35px 20px 15px;
-    //  内容展示
-    display: flex;
     overflow: hidden;
+    // flex 布局，垂直水平居中
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    // 颜色背景
     color: white;
     background: rgba(0, 0, 0, 0.7);
-    //  通过left、rigth进行居中展示：left:50% top:50%; transform: translate(-50%, -50%)
-    .left-top-center();
+}
+
+//  桌面端效果
+.snail-toast.desktop {
+    min-width: 200px;
+    width: max-content;
+    max-width: 400px;
+    max-height: 200px;
+    padding: 20px 35px 20px 15px;
+    border-radius: 10px;
+    //  底部居中对齐
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 
     >svg.close-icon {
         position: absolute;
@@ -97,6 +114,28 @@ onMounted(() => onMouseEvent(true));
         overflow: hidden;
         line-height: 24px;
         word-break: break-all;
+    }
+}
+
+//  移动端适配
+.snail-toast.mobile {
+    max-width: 90%;
+    height: 40px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    //  底部水平居中对齐
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+
+    >div.message {
+        flex: 1;
+        height: 32px;
+        line-height: 32px;
+        // 显示单行，且溢出省略号
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 </style>

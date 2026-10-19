@@ -196,7 +196,8 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
 
     //  popup 测试
-    onTreeNodeClick(treeOptions.nodes[4].children[0], undefined);
+    // onTreeNodeClick(treeOptions.nodes[4].children[0], undefined);
+    onTreeNodeClick(treeOptions.nodes[4].children[2], undefined);
 
 
     //  prompt 测试

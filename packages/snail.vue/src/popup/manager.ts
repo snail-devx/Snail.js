@@ -12,7 +12,6 @@ import { checkDialog, monitorDialog } from "./utils/dialog-util";
 import { checkFollow } from "./utils/follow-util";
 import { checkPopup, destroyPopup, openPopup } from "./utils/popup-util";
 //  弹窗相关数据结构
-import { IconType } from "../base/models/icon-model";
 import { ConfirmOptions } from "./models/confirm-model";
 import { DialogHandle, DialogOptions } from "./models/dialog-model";
 import { FollowExtend, FollowHandle, FollowOptions } from "./models/follow-model";
@@ -148,17 +147,15 @@ export function usePopup(options?: Pick<ScopeOptions, "global">): IPopupManager 
     }
     /**
      * Toast 提示框
-     * @param type 提示类型：成功、失败、、、
      * @param message 提示消息
      * @returns 弹窗异步作用域，外部可手动关闭弹窗
      */
-    function toast(type: IconType, message: string, options?: Omit<ToastOptions, "type" | "message">): IScope {
+    function toast(message: string, options?: Omit<ToastOptions, "message">): IScope {
         /* 中转到popup实现，但使用ToastContainer作为弹窗容器；模拟 url 值，仅为通过验证 */
         return popupInCustomContainer(ToastContainer, {
             url: "#ToastContainer",
             props: {
                 ...(options || Object.create(null)),
-                type,
                 message
             }
         });
