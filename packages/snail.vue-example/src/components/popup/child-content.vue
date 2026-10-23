@@ -10,11 +10,11 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, shallowRef } from "vue";
-import { RunResult, useTimer } from "snail.core";
+import { useTimer } from "snail.core";
+import { shallowRef } from "vue";
 import { components, DialogHandle, DialogWrapperHandle, FollowHandle, PopupHandle, usePopup } from "../../libraries/snail_vue";
-const { } = components;
 import DialogContentTest from "./child-content.vue";
+const { } = components;
 
 // 👉 组件定义
 //  1、props、data
@@ -35,7 +35,7 @@ defineOptions({ name: "DialogContentTest", inheritAttrs: true, });
 // 👉 方法+事件
 function open() {
     popup.dialog<any, Record<string, any>, boolean>({
-        // transition: "scale",
+        motion: "scale",
         component: DialogContentTest,
         props: {
             xxx: 111,

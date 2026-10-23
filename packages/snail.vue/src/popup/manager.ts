@@ -158,8 +158,8 @@ export function usePopup(options?: Pick<ScopeOptions, "global">): IPopupManager 
                 ...(options || Object.create(null)),
                 message
             },
-            transition: page.mode == 'mobile' ? "toast" : undefined,
-            transitionDuration: 200,
+            motion: page.mode == 'mobile' ? "toast" : undefined,
+            motionDuration: 200,
         });
     }
     //#endregion

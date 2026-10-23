@@ -4,6 +4,7 @@
  */
 import { ShallowRef } from "vue";
 import { ComponentBindOptions, ComponentOptions } from "../../container/models/component-model";
+import { MotionEffectOptions } from "../../container/models/motion-model";
 
 /**
  * 弹窗配置选项
@@ -13,18 +14,20 @@ import { ComponentBindOptions, ComponentOptions } from "../../container/models/c
  */
 export type PopupOptions<Props = void, Model = void> = ComponentOptions & ComponentBindOptions<Props, Model> & {
     /**
-     * 弹窗动画名
-     * - 不传则默认“fade”
-     * - 动画规则：打开弹窗时，为 [transition]-in ；关闭弹窗时，为[transition]-out
-     * - - 传入 "scale"，则打开弹窗为 "scale-in"；关闭弹窗时为 "scale-out"
+     * 弹窗动画效果
+     * - 为Object时，显式指定 `enter`和`leave`样式，此时应使用`animation`实现动画样式
+     * - - 可访问`MOTION`使用内置动画效果
+     * - 为string时，自动拼接 in 和 out 作为弹窗打开、关闭时的动画效果类样式
+     * - - 打开弹窗时，为 [motion]-in ；关闭弹窗时，为 [motion]-out
+     * - - 如传入 "scale"，则打开弹窗为 "scale-in"；关闭弹窗时为 "scale-out"
      */
-    transition?: string;
+    motion?: MotionEffectOptions | string;
     /**
-     * 动画持续时间
-     * - 配合 transition 使用；单位ms，默认500ms
-     * - 外部传入自定义动画时，传入动画持续时间，否则可能导致关闭时动画失效
+     * 弹窗动画效果持续时间
+     * - 配合 motion 使用；单位ms，默认200ms
+     * - 外部传入自定义动画时，传入动画持续时间，否则可能导致效果异常
      */
-    transitionDuration?: number;
+    motionDuration?: number;
 
     /**
      * 自定义class
@@ -114,8 +117,8 @@ export type PopupDescriptor<Options extends PopupOptions, ExtOptions> = PopupSta
 
     /**
      * 弹窗动画名
-     * - 约束打开、关闭动画；基于 PopupOptions.transition 构建出来的
+     * - 约束打开、关闭动画；基于 PopupOptions.motion 构建出来的
      * - 具体使用方，将此值绑定的根元素上
      */
-    popupTransition: ShallowRef<string>;
+    motion: ShallowRef<string>;
 }

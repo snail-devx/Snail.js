@@ -63,7 +63,7 @@ export type PickerPopupOptions = {
      * 弹窗配置
      * - 模态弹窗时生效，如移动端弹出日期滚动选择器时
      */
-    dialog?: Pick<DialogOptions, "closeOnEscape" | "closeOnMask" | "rootClass">;
+    dialog?: Pick<DialogOptions, "motion" | "motionDuration" | "closeOnEscape" | "closeOnMask" | "rootClass">;
 
 };
 

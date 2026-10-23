@@ -3,23 +3,23 @@
     2、需要构建一层div，用于包裹，否则内部元素查找会特别麻烦
  -->
 <template>
-    <Dynamic class="snail-follow initial" :class="[popupStatus.value, popupTransition.value]"
-        :style="{ 'z-index': zIndex }" :name="options.name" :component="options.component" :url="options.url"
-        :props="props" :="followExt" v-model="model" />
+    <Dynamic class="snail-follow initial" :class="[popupStatus.value, motion.value]" :style="{ 'z-index': zIndex }"
+        :name="options.name" :component="options.component" :url="options.url" :props="props" :="followExt"
+        v-model="model" />
 </template>
 
 <script setup lang="ts">
-import { shallowRef, onMounted, nextTick, getCurrentInstance, ShallowRef } from "vue";
+import { useTimer } from "snail.core";
+import { css, ElementSize, HeightStyle, IObserver, OverflowStyle, PositionStyle, useObserver, WidthStyle } from "snail.view";
+import { getCurrentInstance, nextTick, onMounted, shallowRef, ShallowRef } from "vue";
 import Dynamic from "../../container/dynamic.vue";
 import { FollowElectResult, FollowExtend, FollowHandle, FollowOptions, FollowStrategy } from "../models/follow-model";
-import { calcFollowX, calcFollowY } from "../utils/follow-util";
-import { ElementSize, IObserver, useObserver, WidthStyle, HeightStyle, PositionStyle, css, OverflowStyle, TransitionStyle } from "snail.view";
-import { useTimer } from "snail.core";
 import { PopupDescriptor } from "../models/popup-model";
+import { calcFollowX, calcFollowY } from "../utils/follow-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { options, extOptions, popupStatus, zIndex, popupTransition } = defineProps<PopupDescriptor<FollowOptions, FollowHandle<any> & FollowExtend>>();
+const { options, extOptions, popupStatus, zIndex, motion } = defineProps<PopupDescriptor<FollowOptions, FollowHandle<any> & FollowExtend>>();
 const { props, model = shallowRef(undefined) } = options;
 const { closePopup } = extOptions;
 const { onClient, onSize, onEvent, onMutation } = useObserver() as IObserver;

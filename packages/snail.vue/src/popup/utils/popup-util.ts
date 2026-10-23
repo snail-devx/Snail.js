@@ -3,10 +3,11 @@
  * - 为了简化Manager中代码，不对外独立使用
  */
 
-import { FlatPromise, isObject, isStringNotEmpty, mustObject, throwIfFalse } from "snail.core";
+import { correctString, FlatPromise, isObject, isStringNotEmpty, mustObject, throwIfFalse } from "snail.core";
 import { App, Component, shallowRef } from "vue";
 import { AppOptions } from "../../base/models/app-model";
 import { newApp } from "../../base/utils/app-util";
+import { MotionEffectOptions } from "../../container/models/motion-model";
 import { PopupDescriptor, PopupOptions } from "../models/popup-model";
 
 /** 默认的Z-index值 */
@@ -51,7 +52,7 @@ export function openPopup<Options extends PopupOptions, ExtOptions extends Recor
         options: options,
         extOptions: extOptions,
         zIndex: options.zIndex || DEFAULT_ZINDEX,
-        popupTransition: shallowRef<string>(`${options.transition || "fade"}-in`),
+        motion: shallowRef<string>(correctPopupMotion("open", options.motion)),
     });
     {
         // const app = createApp(container, descriptor);
@@ -68,7 +69,7 @@ export function openPopup<Options extends PopupOptions, ExtOptions extends Recor
  * @param task 弹窗任务，在外部通过destroy销毁时，同步任务状态用
  */
 export function destroyPopup<T>(descriptor: PopupDescriptor<PopupOptions, any>, task: FlatPromise<T>) {
-    const { popupId, popupStatus, options, popupTransition } = descriptor;
+    const { popupId, popupStatus, options, motion } = descriptor;
     //  任务保底：若状态不是“close”，则是外部执行 scope.destroy() 强制销毁；维护弹窗状态
     if (popupStatus.value != "closed") {
         console.warn("force close after scope.destroy called.");
@@ -76,8 +77,8 @@ export function destroyPopup<T>(descriptor: PopupDescriptor<PopupOptions, any>, 
         task.resolve(undefined);
     }
     //  强制将动画值设置为【关闭】，先设置为null，再设置为新的动画名，避免 in和out都是同一个动画名时，动画不执行的问题
-    popupTransition.value = undefined;
-    setTimeout(() => popupTransition.value = `${options.transition || "fade"}-out`, 0);
+    motion.value = undefined;
+    setTimeout(() => motion.value = correctPopupMotion("close", options.motion), 0);
     //  销毁app实例：销毁时做一下延迟，实现销毁动画
     const app = POPUPMAPS.get(popupId);
     if (app != undefined) {
@@ -86,7 +87,7 @@ export function destroyPopup<T>(descriptor: PopupDescriptor<PopupOptions, any>, 
         setTimeout(() => {
             app._container.remove();
             app.unmount();
-        }, options.transitionDuration > 0 ? options.transitionDuration : 500);
+        }, options.motionDuration > 0 ? options.motionDuration : 200);
     }
 }
 
@@ -116,4 +117,24 @@ function getPopupAppElement(popupId: string): HTMLElement {
     appEle.id = popupId;
     appEle.classList.add("snail-app", "popup-app");
     return rootEl.appendChild(appEle);
+}
+
+/**
+ * 校正弹窗动画类样式
+ * @param type 打开弹窗，还是关闭弹窗
+ * @param motion 动画配置
+ * @returns 动画类样式名
+ */
+function correctPopupMotion(type: "open" | "close", motion?: PopupOptions["motion"]): string {
+    let motionName: string = undefined;
+    if (isObject(motion) == true) {
+        motionName = type == "close"
+            ? (motion as MotionEffectOptions).in
+            : (motion as MotionEffectOptions).out;
+    }
+    else if (isStringNotEmpty(motion) == true) {
+        motionName = `${motion}-${type == 'close' ? 'out' : 'in'}`
+    }
+
+    return correctString(motionName, `fade-${type == 'close' ? 'out' : 'in'}`, true);
 }

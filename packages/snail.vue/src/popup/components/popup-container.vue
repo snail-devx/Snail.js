@@ -4,7 +4,7 @@
     3、每个弹窗容器就是一个app实例，实现互不干扰
 -->
 <template>
-    <Dynamic class="snail-popup" :class="[popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
+    <Dynamic class="snail-popup" :class="[popupStatus.value, motion.value]" :style="{ 'z-index': zIndex }"
         :name="options.name" :component="options.component" :url="options.url" :props="props" :="extOptions"
         :popup-status="popupStatus.value" v-model="model" />
 </template>
@@ -16,7 +16,7 @@ import { PopupDescriptor, PopupHandle, PopupOptions } from "../models/popup-mode
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { options, zIndex, extOptions, popupStatus, popupTransition } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
+const { options, zIndex, extOptions, popupStatus, motion } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
 const { props, model = shallowRef(undefined) } = options;
 //  2、可选配置选项
 defineOptions({ name: "PopupContainer", inheritAttrs: true, });

@@ -1,7 +1,7 @@
 <!-- 对话框弹窗容器：支持外部传入动画，不转则使用默认的 -->
 <template>
-    <div :class="['snail-dialog', options.rootClass, popupStatus.value, popupTransition.value]"
-        :style="{ 'z-index': zIndex }" @mousedown.self="onDialogRootMouseDown" @click.self="onDialogRootClick">
+    <div :class="['snail-dialog', options.rootClass, popupStatus.value, motion.value]" :style="{ 'z-index': zIndex }"
+        @mousedown.self="onDialogRootMouseDown" @click.self="onDialogRootClick">
         <template v-if="options.wrapper == undefined" :key="'no-wrapper'">
             <Dynamic class="dialog-body" :name="options.name" :component="options.component" :url="options.url"
                 :props="props" :="dialogExtend" :popup-status="popupStatus.value" v-model="model" />
@@ -28,7 +28,7 @@ import { PopupDescriptor } from "../models/popup-model";
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 defineOptions({ name: "DialogContainer", inheritAttrs: true, });
-const { options, extOptions, popupStatus, zIndex, popupTransition } = defineProps<PopupDescriptor<DialogOptions, DialogHandle<any>>>();
+const { options, extOptions, popupStatus, zIndex, motion } = defineProps<PopupDescriptor<DialogOptions, DialogHandle<any>>>();
 const { props, model = shallowRef(undefined) } = options;
 const { closePopup, onBeforeClose } = extOptions;
 /** 监听器 */
@@ -119,7 +119,7 @@ onMounted(() => {
         .wh-fill();
         //  透明度动画，在非激活时，透明度0不显示
         opacity: 1;
-        transition: opacity 0.4s ease-in-out;
+        transition: opacity 0.2s ease-in-out;
     }
 
     //  弹窗展示组件：给个背景色，避免透明

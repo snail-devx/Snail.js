@@ -38,8 +38,8 @@ function buildMotionClass(): TransitionProps {
     if (durationRef.value > 0) {
         if (isString(props.effect) == false) {
             const effect = props.effect as MotionEffectOptions || MOTION.fade;
-            effectClass.enterActiveClass = effect.enter;
-            effectClass.leaveActiveClass = effect.leave;
+            effectClass.enterActiveClass = effect.in;
+            effectClass.leaveActiveClass = effect.out;
         }
         else if ((props.effect as string).length > 0) {
             effectClass.enterActiveClass = `${props.effect} enter-active`;

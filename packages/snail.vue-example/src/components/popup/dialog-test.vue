@@ -8,9 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef, onActivated, onDeactivated, } from "vue";
-import { usePopup, useReactive } from "../../libraries/snail_vue"
-import DialogContent from "./child-content.vue"
+import { onActivated, onDeactivated, shallowRef, } from "vue";
+import { MOTION, usePopup } from "../../libraries/snail_vue";
+import DialogContent from "./child-content.vue";
 
 // 👉 组件定义
 //  1、props、data
@@ -34,7 +34,7 @@ function onOpenClick(startWrapper) {
             content: { scroll: "none", class: "ffffffffffff-content" },
             footer: { class: "fffffffffffff-footer" }
         } : undefined,
-        // transition: "scale",
+        motion: MOTION.bottom,
         props: {
             //  接收自定义事件
             onCustomEvent(data: number) {

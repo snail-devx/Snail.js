@@ -40,12 +40,14 @@ export type MotionOptions = {
 export type MotionEffectOptions = {
     /**
      * 入场进入时的动画效果
-     * - 用于初始化入场动画；最终映射成 Transition 组件的 `enter-active-class` 属性
+     * - 用于初始化入场动画；
+     * - 如 `Motion.vue`组件最终映射成 Transition 组件的 `enter-active-class` 属性
      */
-    enter?: string;
+    in?: string;
     /**
      * 退场离开时的动画效果
-     * - 用于初始化退场动画；最终映射成 Transition 组件的 `leave-active-class` 属性
+     * - 用于初始化退场动画；
+     * - 如 `Motion.vue`组件最终映射成 Transition 组件的 `leave-active-class` 属性
      */
-    leave?: string;
+    out?: string;
 }

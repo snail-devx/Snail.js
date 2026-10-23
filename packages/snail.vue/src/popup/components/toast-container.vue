@@ -3,7 +3,7 @@
     2、不直接对外提供，外部使用toast方法使用
 -->
 <template>
-    <div class="snail-toast" :class="[mode, popupStatus.value, popupTransition.value]" :style="{ 'z-index': zIndex }"
+    <div class="snail-toast" :class="[mode, popupStatus.value, motion.value]" :style="{ 'z-index': zIndex }"
         @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
         <!-- 桌面端 特有：关闭按钮，和消息图标 -->
         <template v-if="mode == 'desktop'">
@@ -27,13 +27,13 @@ import { ToastOptions } from "../models/toast-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { options, extOptions, zIndex, popupStatus, popupTransition } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
+const { options, extOptions, zIndex, popupStatus, motion } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
 const { onTimeout } = useTimer();
 const { mode } = useApp();
 const props: ToastOptions = options.props;
 const { closePopup } = extOptions;
-/** 显示时长，默认1500ms */
-const duration = props.duration > 0 ? props.duration : 1500;
+/** 显示时长，默认2000ms */
+const duration = props.duration > 0 ? props.duration : 2000;
 /** 自动销毁时的定时器 */
 var destroyTimer: IScope;
 //  2、可选配置选项
