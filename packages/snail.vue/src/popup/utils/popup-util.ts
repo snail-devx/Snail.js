@@ -75,8 +75,9 @@ export function destroyPopup<T>(descriptor: PopupDescriptor<PopupOptions, any>, 
         popupStatus.value = "closed";
         task.resolve(undefined);
     }
-    //  强制将动画值设置为【关闭】
-    popupTransition.value = `${options.transition || "fade"}-out`;
+    //  强制将动画值设置为【关闭】，先设置为null，再设置为新的动画名，避免 in和out都是同一个动画名时，动画不执行的问题
+    popupTransition.value = undefined;
+    setTimeout(() => popupTransition.value = `${options.transition || "fade"}-out`, 0);
     //  销毁app实例：销毁时做一下延迟，实现销毁动画
     const app = POPUPMAPS.get(popupId);
     if (app != undefined) {

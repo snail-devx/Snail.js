@@ -125,8 +125,8 @@ onMounted(() => onMouseEvent(true));
     border-radius: 6px;
     //  底部水平居中对齐
     left: 50%;
-    bottom: 20px;
-    transform: translateX(-50%);
+    bottom: -40px;
+    transform: translate(-50%, -60px);
 
     >div.message {
         flex: 1;
@@ -136,6 +136,29 @@ onMounted(() => onMouseEvent(true));
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    // 动画效果
+    & {
+        @keyframes snail-toast-mobile {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 0);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -60px);
+            }
+        }
+
+        &.toast-in {
+            animation: snail-toast-mobile 0.2s ease-in-out;
+        }
+
+        &.toast-out {
+            animation: snail-toast-mobile 0.2s ease-in-out reverse;
+        }
     }
 }
 </style>

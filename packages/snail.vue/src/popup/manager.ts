@@ -157,7 +157,9 @@ export function usePopup(options?: Pick<ScopeOptions, "global">): IPopupManager 
             props: {
                 ...(options || Object.create(null)),
                 message
-            }
+            },
+            transition: page.mode == 'mobile' ? "toast" : undefined,
+            transitionDuration: 200,
         });
     }
     //#endregion
