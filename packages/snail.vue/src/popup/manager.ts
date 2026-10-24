@@ -19,7 +19,8 @@ import { IPopupManager } from "./models/manager-model";
 import { PopupHandle, PopupOptions } from "./models/popup-model";
 import { ToastOptions } from "./models/toast-model";
 //  用到的弹窗容器组件
-import { useApp } from "../base/utils/app-util";
+import { AppOptions } from "../base/models/app-model";
+import { correctAppOptions, useApp } from "../base/utils/app-util";
 import ConfirmContainer from "./components/confirm-container.vue";
 import DialogContainer from "./components/dialog-container.vue";
 import FollowContainer from "./components/follow-container.vue";
@@ -36,14 +37,13 @@ export * from "./models/toast-model";
 
 /**
  * 使用【弹窗管理器】
- * - 内部会调用 {@link useApp} 方法构建应用程序配置，并在打开弹窗时自动继承下去
- * @param options 配置选项；可配置应用程序配置
+ * @param options 配置选项；可配置{@link AppOptions.mode}属性，不配置则使用 {@link useApp} 获取
  * @returns 全新的【弹窗管理器】实例+作用域对象
  */
-export function usePopup(options?: Pick<ScopeOptions, "global">): IPopupManager & IScope {
-    const global = options ? options.global : false;
-    /** 弹窗页面配置选项 */
-    const page = useApp();
+export function usePopup(options?: Pick<ScopeOptions, "global"> & Pick<AppOptions, "mode">): IPopupManager & IScope {
+    const global = options ? options.global == true : false;
+    /** 弹窗页面的应用模式 */
+    const page = options && options.mode ? correctAppOptions({ mode: options.mode }) : useApp();
     /** 作用域组：管理动画效果子作用域 */
     const scopes: IScopes = useScopes({ global });
 

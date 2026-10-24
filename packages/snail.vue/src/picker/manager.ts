@@ -1,6 +1,7 @@
 import { correctNumber, IAsyncScope, IScope, mountScope, ScopeOptions, throwIfFalse } from "snail.core";
 import { Component } from "vue";
-import { useApp } from "../base/utils/app-util";
+import { AppOptions } from "../base/models/app-model";
+import { correctAppOptions, useApp } from "../base/utils/app-util";
 import { FollowPositionOptions, usePopup } from "../popup/manager";
 import ActionPopup from "./components/action-popup.vue";
 import DateDesktopPopup from "./components/date-desktop-popup.vue";
@@ -15,15 +16,14 @@ import { correctFormat } from "./utils/datetime-util";
 
 /**
  * 使用选择器
- * @param options 配置选项
+ * @param options 配置选项；可配置{@link AppOptions.mode}属性，不配置则使用 {@link useApp} 获取
  * @returns 选择器实例+作用域对象
  */
-export function usePicker(options?: Pick<ScopeOptions, "global">): IPickerManager & IScope {
+export function usePicker(options?: Pick<ScopeOptions, "global"> & Pick<AppOptions, "mode">): IPickerManager & IScope {
     const global = options ? options.global : false;
-    /** 弹窗管理器 */
-    const popup = usePopup({ global });
-    /** 应用配置：PC、还是移动端 */
-    const { mode } = useApp();
+    const { mode } = options && options.mode ? correctAppOptions({ mode: options.mode }) : useApp();
+    /** 弹窗管理器：显式指定 应用环境信息 */
+    const popup = usePopup({ global, mode });
 
     //#region *************************************实现接口：IPickerManager接口方法*************************************
     /**
