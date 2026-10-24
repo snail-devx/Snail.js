@@ -63,6 +63,7 @@ import { correctString, IScope, isStringNotEmpty, useKey, wait } from 'snail.cor
 import { StyleClassItem, useStyle } from 'snail.view';
 import { computed, nextTick, onMounted, shallowRef, ShallowRef } from 'vue';
 import Icon from '../base/icon.vue';
+import Motion from '../base/motion.vue';
 import { useReactive } from '../base/reactive.js';
 import Empty from '../prompt/empty.vue';
 import ElasticUpdown from './components/elastic-updown.vue';
@@ -70,7 +71,6 @@ import { useDataTable } from './components/table-context.js';
 import Elastic from './elastic.vue';
 import { ElasticHandle, ElasticUpdownHandle } from './models/elastic-model';
 import { DataTableContextUseExt, DataTableEvents, DataTableLoadType, DataTableRow, ElasticTableOptions } from './models/table-model';
-import Motion from './motion.vue';
 import { correctElasticTableOptions } from './utils/table-util.js';
 
 // *****************************************   👉  组件定义    *****************************************

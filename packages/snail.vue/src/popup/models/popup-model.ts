@@ -3,8 +3,9 @@
  *  1、在弹窗、模态弹窗、跟随弹窗的效果下复用
  */
 import { ShallowRef } from "vue";
+import { MotionEffectOptions } from "../../base/models/motion-model";
+import { MOTION } from "../../base/utils/motion-util";
 import { ComponentBindOptions, ComponentOptions } from "../../container/models/component-model";
-import { MotionEffectOptions } from "../../container/models/motion-model";
 
 /**
  * 弹窗配置选项
@@ -16,10 +17,11 @@ export type PopupOptions<Props = void, Model = void> = ComponentOptions & Compon
     /**
      * 弹窗动画效果
      * - 为Object时，显式指定 `enter`和`leave`样式，此时应使用`animation`实现动画样式
-     * - - 可访问`MOTION`使用内置动画效果
+     * - - 可访问 {@link MOTION}使用内置动画效果
      * - 为string时，自动拼接 in 和 out 作为弹窗打开、关闭时的动画效果类样式
      * - - 打开弹窗时，为 [motion]-in ；关闭弹窗时，为 [motion]-out
      * - - 如传入 "scale"，则打开弹窗为 "scale-in"；关闭弹窗时为 "scale-out"
+     * - 默认值为 "fade"
      */
     motion?: MotionEffectOptions | string;
     /**

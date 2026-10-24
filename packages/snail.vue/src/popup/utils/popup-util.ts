@@ -6,8 +6,8 @@
 import { correctString, FlatPromise, isObject, isStringNotEmpty, mustObject, throwIfFalse } from "snail.core";
 import { App, Component, shallowRef } from "vue";
 import { AppOptions } from "../../base/models/app-model";
+import { MotionEffectOptions } from "../../base/models/motion-model";
 import { newApp } from "../../base/utils/app-util";
-import { MotionEffectOptions } from "../../container/models/motion-model";
 import { PopupDescriptor, PopupOptions } from "../models/popup-model";
 
 /** 默认的Z-index值 */

@@ -18,6 +18,7 @@ import ChooseTest from "./base/choose-test.vue";
 import HeaderFooterTest from "./base/header-footer-test.vue";
 import IconTest from "./base/icon-test.vue";
 import InputTest from "./base/input-test.vue";
+import MotionTest from "./base/motion-test.vue";
 import SearchTest from "./base/search-test.vue";
 import SelectTest from "./base/select-test.vue";
 import SwitchTest from "./base/switch-test.vue";
@@ -31,7 +32,6 @@ import FieldTest from "./container/field-test.vue";
 import FlexTest from "./container/flex-test.vue";
 import FoldTest from "./container/fold-test.vue";
 import LayoutTest from "./container/layout-test.vue";
-import MotionTest from "./container/motion-test.vue";
 import PageTest from "./container/page-test.vue";
 import ScrollTest from "./container/scroll-test.vue";
 import TableTest from "./container/table-test.vue";
@@ -91,6 +91,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, searchable: true, },
                 { text: "Icon 图标组件", data: IconTest, clickable: true, searchable: true, },
                 { text: "Input 输入框组件", data: InputTest, clickable: true, searchable: true, },
+                { text: "Motion 动画组件", data: MotionTest, clickable: true, searchable: true, },
                 { text: "Search 搜索组件", data: SearchTest, clickable: true, searchable: true, },
                 { text: "Select 选项菜单组件", data: SelectTest, clickable: true, searchable: true, },
                 { text: "Switch 开关组件", data: SwitchTest, clickable: true, searchable: true, },
@@ -108,7 +109,6 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Flex 弹性布局", data: FlexTest, clickable: true, searchable: true, },
                 { text: "Fold 折叠组件", data: FoldTest, clickable: true, searchable: true, },
                 { text: "Layout 布局测试", data: LayoutTest, clickable: true, searchable: true, },
-                { text: "Motion 动画组件", data: MotionTest, clickable: true, searchable: true, },
                 { text: "Page 页面组件", data: PageTest, clickable: true, searchable: true, },
                 { text: "Scroll 滚动组件", data: ScrollTest, clickable: true, searchable: true, },
                 { text: "Table 表格组件", data: TableTest, clickable: true, searchable: true, },

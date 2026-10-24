@@ -1,3 +1,5 @@
+import { MOTION } from "../utils/motion-util";
+
 /**
  * 动画组件配置选项
  * - 实现组件入/退场的动画效果
@@ -13,7 +15,7 @@ export type MotionOptions = {
     /**
      * 动画效果
      * - 为Object时，显式指定 `enter`和`leave`样式，此时应使用`animation`实现动画样式
-     * - - 可访问`MOTION`使用内置动画效果
+     * - - 可访问 {@link MOTION}使用内置动画效果
      * - 为string时，为动画的根样式，实现动画效果时：
      * - - 入场动画：`${effect}.enter-active` `${effect}.enter-from` `${effect}.enter-to` 
      * - - 退场动画：`${effect}.leave-active` `${effect}.leave-from` `${effect}.leave-to` 

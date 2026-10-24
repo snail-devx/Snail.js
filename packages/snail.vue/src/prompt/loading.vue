@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import Motion from '../container/motion.vue';
-import { MOTION } from '../container/utils/motion-util';
+import Motion from '../base/motion.vue';
+import { MOTION } from '../base/utils/motion-util';
 import { LoadingOptions } from './models/loading-model';
 
 

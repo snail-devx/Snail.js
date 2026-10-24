@@ -1,7 +1,8 @@
 import { HeightStyle, ScrollBaseOptions } from "snail.view";
 import { Ref, ShallowRef } from "vue";
 import { ReadyEvents } from "../../base/models/base-event";
-import { MotionOptions } from "./motion-model";
+import { MotionOptions } from "../../base/models/motion-model";
+import { MOTION } from "../../base/utils/motion-util";
 import { ScrollEvents } from "./scroll-model";
 
 /**
@@ -193,6 +194,7 @@ export type DataTableBaseOptions<T> = {
     /**
      * 动效配置
      * - 在添加、删除等操作数据行时起作用
+     * - 可访问 {@link MOTION}使用内置动画效果
      * - 默认无动画
      */
     motion?: MotionOptions["effect"];
