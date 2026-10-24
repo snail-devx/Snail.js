@@ -10,10 +10,11 @@
 <script setup lang="ts">
 import { provide } from "vue";
 import { AppOptions } from "./models/app-model";
-import { correctAppOptions, INJECTKEY_AppOptions } from "./utils/app-util";
+import { correctAppOptions, INJECTKEY_AppOptions, useApp } from "./utils/app-util";
 
 // *****************************************   👉  组件定义    *****************************************
 defineOptions({ inheritAttrs: false });
-const { mode } = defineProps<AppOptions>();
-provide(INJECTKEY_AppOptions, correctAppOptions({ mode }));
+const { mode } = defineProps<Pick<AppOptions, "mode">>();
+//  注入配置，除了 mode 属性，其他的继承当前环境的配置
+provide(INJECTKEY_AppOptions, correctAppOptions({ ...useApp, mode }));
 </script>

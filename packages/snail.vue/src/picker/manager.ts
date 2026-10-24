@@ -19,11 +19,12 @@ import { correctFormat } from "./utils/datetime-util";
  * @param options 配置选项；可配置{@link AppOptions.mode}属性，不配置则使用 {@link useApp} 获取
  * @returns 选择器实例+作用域对象
  */
-export function usePicker(options?: Pick<ScopeOptions, "global"> & Pick<AppOptions, "mode">): IPickerManager & IScope {
+export function usePicker(options?: Pick<ScopeOptions, "global"> & AppOptions): IPickerManager & IScope {
     const global = options ? options.global : false;
-    const { mode } = options && options.mode ? correctAppOptions({ mode: options.mode }) : useApp();
     /** 弹窗管理器：显式指定 应用环境信息 */
-    const popup = usePopup({ global, mode });
+    const popup = usePopup(options);
+    /** 弹窗页面应用的配置：默认继承当前环境，可使用options覆盖 */
+    const { mode } = correctAppOptions({ ...useApp(), ...options });
 
     //#region *************************************实现接口：IPickerManager接口方法*************************************
     /**

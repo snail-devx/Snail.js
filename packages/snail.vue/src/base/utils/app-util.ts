@@ -2,7 +2,7 @@
  * Vue App助手类，做一些app实例的辅助性工作
  */
 
-import { IScope, mustFunction, removeFromArray, useScope } from "snail.core";
+import { IScope, mustFunction, removeFromArray, script, useScope } from "snail.core";
 import { App, Component, createApp, inject, InjectionKey, provide } from "vue";
 import { AppOptions, AppType } from "../models/app-model";
 
@@ -16,12 +16,14 @@ const appCreatedFns: Array<(app: App, type?: AppType) => void> = [];
 export const INJECTKEY_AppOptions = Symbol() as InjectionKey<Readonly<Required<AppOptions>>>;
 /**
  * 校正应用配置选项
+ * - 对{@link AppOptions}进行校验，确保配置项有效
  * @param options app配置选项
  * @returns 校正后的配置选项；传入无效则构建默认值
  */
 export function correctAppOptions(options?: AppOptions): Readonly<Required<AppOptions>> {
     const page: Required<AppOptions> = Object.create(null);
     page.mode = options && options.mode == "mobile" ? "mobile" : "desktop";
+    page.script = options && options.script ? options.script : script;
     return Object.freeze(page);
 }
 /**

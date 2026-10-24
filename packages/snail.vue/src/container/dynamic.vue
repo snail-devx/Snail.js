@@ -12,10 +12,11 @@
 </template>
 
 <script setup lang="ts">
+import { delay, isObject, isStringNotEmpty } from "snail.core";
 import { Component, defineComponent, onErrorCaptured, ref, shallowRef } from "vue";
-import { delay, isObject, isStringNotEmpty, script, } from "snail.core";
-import Loading from "../prompt/loading.vue"
 import { useReactive } from "../base/reactive";
+import { useApp } from "../base/utils/app-util.js";
+import Loading from "../prompt/loading.vue";
 import { DynamicOptions } from "./models/dynamic-model";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -23,6 +24,7 @@ import { DynamicOptions } from "./models/dynamic-model";
 defineOptions({ name: "Dynamic", inheritAttrs: false, });
 const { name, component, url, props = {} } = defineProps<DynamicOptions<Record<string, any>>>();
 const { watcher } = useReactive();
+const { script } = useApp();
 //  2、组件交互变量、常量
 /**      动态加载组件的ref实例引用 */
 const componentRef = ref(null);

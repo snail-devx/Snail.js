@@ -1,4 +1,4 @@
-import { IScope, isFunction, isScope, mustObject, mustString, script, throwError, throwIfFalse, useScope, wait } from "snail.core";
+import { IScope, isFunction, isScope, mustObject, mustString, throwError, throwIfFalse, useScope, wait } from "snail.core";
 import { AppOptions } from "../../base/models/app-model";
 import { correctAppOptions, newApp, useApp } from "../../base/utils/app-util";
 import Dynamic from "../dynamic.vue";
@@ -57,8 +57,8 @@ export async function mountByUrl<T>(options: AppOptions, target: HTMLElement, mo
         scope.destroy();
         return scope;
     }
-    //  组件挂载
-    const { success, data } = await wait(script.load(mountUrl));
+    //  组件挂载：使用校正过后的script加载url，实现外部脚本隔离需求
+    const { success, data } = await wait(options.script.load(mountUrl));
     if (success != true || data == undefined) {
         alert("组件加载失败：" + mountUrl);
         scope.destroy();

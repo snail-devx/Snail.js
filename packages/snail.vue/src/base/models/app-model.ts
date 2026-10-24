@@ -1,6 +1,7 @@
 /**
  * Vue应用程序实例相关
  */
+import { IScriptManager, script } from "snail.core";
 import { createApp, provide } from "vue";
 
 /** App类型 
@@ -21,5 +22,13 @@ export type AppOptions = {
      * - - desktop 【默认值】面端页面应用，适合pc、笔记本等大屏幕渲染
      * - - mobile 移动端页面应用，适合小屏幕，如h5页面，嵌入app中的页面
      */
-    mode?: "desktop" | "mobile"
+    mode: "desktop" | "mobile";
+
+    /**
+     * 脚本管理器
+     * - 用于后后代组件中管理脚本，如加载、卸载等
+     * - 实现脚本管理隔离，避免所有脚本都堆到全局{@link script}中
+     * - 若不指定，则默认使用全局{@link script}
+     */
+    script?: IScriptManager;
 }
