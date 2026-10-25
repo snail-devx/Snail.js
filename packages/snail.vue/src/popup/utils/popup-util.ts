@@ -3,7 +3,7 @@
  * - 为了简化Manager中代码，不对外独立使用
  */
 
-import { correctString, FlatPromise, isObject, isStringNotEmpty, mustObject, throwIfFalse } from "snail.core";
+import { FlatPromise, isObject, isStringNotEmpty, mustObject, throwIfFalse } from "snail.core";
 import { App, Component, shallowRef } from "vue";
 import { AppOptions } from "../../base/models/app-model";
 import { MotionEffectOptions } from "../../base/models/motion-model";
@@ -129,12 +129,16 @@ function correctPopupMotion(type: "open" | "close", motion?: PopupOptions["motio
     let motionName: string = undefined;
     if (isObject(motion) == true) {
         motionName = type == "close"
-            ? (motion as MotionEffectOptions).in
-            : (motion as MotionEffectOptions).out;
+            ? (motion as MotionEffectOptions).out
+            : (motion as MotionEffectOptions).in;
     }
     else if (isStringNotEmpty(motion) == true) {
-        motionName = `${motion}-${type == 'close' ? 'out' : 'in'}`
+        motionName = type == "close" ? "out" : "in";
+        motionName = `${motion}-${motionName}`
     }
-
-    return correctString(motionName, `fade-${type == 'close' ? 'out' : 'in'}`, true);
+    if (isStringNotEmpty(motionName) == false) {
+        motionName = type == "close" ? "out" : "in";
+        motionName = `fade-${motionName}`;
+    }
+    return motionName;
 }
