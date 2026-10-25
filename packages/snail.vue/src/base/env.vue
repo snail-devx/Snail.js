@@ -16,5 +16,5 @@ import { correctAppOptions, INJECTKEY_AppOptions, useApp } from "./utils/app-uti
 defineOptions({ inheritAttrs: false });
 const { mode } = defineProps<Pick<AppOptions, "mode">>();
 //  注入配置，除了 mode 属性，其他的继承当前环境的配置
-provide(INJECTKEY_AppOptions, correctAppOptions({ ...useApp, mode }));
+provide(INJECTKEY_AppOptions, correctAppOptions({ ...useApp(), mode }));
 </script>
