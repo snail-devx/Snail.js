@@ -35,11 +35,11 @@
 </template>
 
 <script setup lang="ts">
-import { newId, throwIfTrue } from "snail.core";
+import { throwIfTrue } from "snail.core";
 import { useAnimation } from "snail.view";
-import { shallowRef, computed, useTemplateRef, ShallowRef, onMounted, nextTick, onActivated } from "vue";
-import { TreeNodeEvents, TreeNodeModel, TreeNodeOptions, TreeNodeSlotOptions } from "../models/tree-model";
+import { ShallowRef, computed, nextTick, onActivated, onMounted, shallowRef, useTemplateRef } from "vue";
 import Icon from "../../base/icon.vue";
+import { TreeNodeEvents, TreeNodeModel, TreeNodeOptions, TreeNodeSlotOptions } from "../models/tree-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -204,45 +204,47 @@ onActivated(() => {
 
 // *****************************************   👉  特殊样式适配    *****************************************
 //  缩进层级样式适配：最多支持10级缩进
-@levelIndent: 24px;
+.snail-tree-node {
+    @levelIndent: 24px;
 
-.snail-tree-node.level-1>.indent {
-    padding-left: 4px;
-}
+    &.level-1>.indent {
+        padding-left: 4px;
+    }
 
-.snail-tree-node.level-2>.indent {
-    padding-left: 1*@levelIndent;
-}
+    &.level-2>.indent {
+        padding-left: 1*@levelIndent;
+    }
 
-.snail-tree-node.level-3>.indent {
-    padding-left: 2*@levelIndent;
-}
+    &.level-3>.indent {
+        padding-left: 2*@levelIndent;
+    }
 
-.snail-tree-node.level-4>.indent {
-    padding-left: 3*@levelIndent;
-}
+    &.level-4>.indent {
+        padding-left: 3*@levelIndent;
+    }
 
-.snail-tree-node.level-5>.indent {
-    padding-left: 4*@levelIndent;
-}
+    &.level-5>.indent {
+        padding-left: 4*@levelIndent;
+    }
 
-.snail-tree-node.level-6>.indent {
-    padding-left: 5*@levelIndent;
-}
+    &.level-6>.indent {
+        padding-left: 5*@levelIndent;
+    }
 
-.snail-tree-node.level-7>.indent {
-    padding-left: 6*@levelIndent;
-}
+    &.level-7>.indent {
+        padding-left: 6*@levelIndent;
+    }
 
-.snail-tree-node.level-8>.indent {
-    padding-left: 7*@levelIndent;
-}
+    &.level-8>.indent {
+        padding-left: 7*@levelIndent;
+    }
 
-.snail-tree-node.level-9>.indent {
-    padding-left: 8*@levelIndent;
-}
+    &.level-9>.indent {
+        padding-left: 8*@levelIndent;
+    }
 
-.snail-tree-node.level-10>.indent {
-    padding-left: 9*@levelIndent;
+    &.level-10>.indent {
+        padding-left: 9*@levelIndent;
+    }
 }
 </style>
