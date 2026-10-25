@@ -29,23 +29,23 @@ setTimeout(() => {
 }, 2000);
 setTimeout(() => {
     dynamicComponent.value = undefined;
-    dynamicUrl.value = "/components/container/dynamic-url-test.js#comp";
+    dynamicUrl.value = "/components/base/dynamic-url-test.js#comp";
 }, 3000);
 //  组件内部错误，不会处理
 setTimeout(() => {
-    dynamicUrl.value = "/components/container/dynamic-url-test.js#error";
+    dynamicUrl.value = "/components/base/dynamic-url-test.js#error";
 }, 4000);
 setTimeout(() => {
-    dynamicUrl.value = "/components/container/dynamic-url-test.js#errorSetup";
+    dynamicUrl.value = "/components/base/dynamic-url-test.js#errorSetup";
 }, 6000);
 setTimeout(() => {
-    dynamicUrl.value = "/components/container/dynamic-url-test.js#errorMounted";
+    dynamicUrl.value = "/components/base/dynamic-url-test.js#errorMounted";
 }, 8000);
 //  url地址错误
 setTimeout(() => {
     dynamicUrl.value = "sxxxx";
 }, 10000);
 setTimeout(() => {
-    dynamicUrl.value = "/components/container/dynamic-url-test.js#default";
+    dynamicUrl.value = "/components/base/dynamic-url-test.js#default";
 }, 12000);
 </script>

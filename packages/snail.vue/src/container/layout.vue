@@ -24,8 +24,8 @@
 import { isArray, isStringNotEmpty } from "snail.core";
 import { css, CSSClassOptions, HeightStyle, WidthStyle, } from "snail.view";
 import { computed } from "vue";
+import { SlotsType } from "../base/models/component-model";
 import Loading from "../prompt/loading.vue";
-import { SlotsType } from "./models/component-model";
 import { LayoutAreaItem, LayoutOptions } from "./models/layout-model";
 import Scroll from "./scroll.vue";
 

@@ -1,8 +1,8 @@
 import { correctFunction, correctNumber, isArray, isArrayNotEmpty, IScope, isFunction, isNumberNotNaN, isString, mountScope, moveFromArray, mustFunction, mustObject, mustString, newId, throwError, throwIfTrue, throwIfUndefined } from "snail.core";
 import { scrollIntoView } from "snail.view";
 import { Ref, ref, shallowRef, ShallowRef } from "vue";
+import { EmitterType } from "../../base/models/component-model";
 import { AppOptions } from "../../exporter";
-import { EmitterType } from "../models/component-model";
 import { DataTableBaseOptions, DataTableContextUseExt, DataTableEvents, DataTableHandle, DataTableLoadType, DataTableRow, DataTableRowDetail, DataTableRowPosition, DataTableSelectMode, DataTableSelectResult, DataTableSortStatus, IDataTableContext } from "../models/table-model";
 
 /**

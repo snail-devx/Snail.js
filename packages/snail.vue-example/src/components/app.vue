@@ -15,6 +15,7 @@ import { components, TreeNodeModel, TreeOptions, useReactive } from "../librarie
 import BaseTest from "./base/base-test.vue";
 import ButtonTest from "./base/button-test.vue";
 import ChooseTest from "./base/choose-test.vue";
+import DynamicTest from "./base/dynamic-test.vue";
 import HeaderFooterTest from "./base/header-footer-test.vue";
 import IconTest from "./base/icon-test.vue";
 import InputTest from "./base/input-test.vue";
@@ -25,7 +26,6 @@ import SwitchTest from "./base/switch-test.vue";
 import TextareaTest from "./base/textarea-test.vue";
 //  👉 容器组件
 import DatatableTest from "./container/datatable-test.vue";
-import DynamicTest from "./container/dynamic-test.vue";
 import ElasticTest from "./container/elastic-test.vue";
 import ElasticTableTest from "./container/elastictable-test.vue";
 import FieldTest from "./container/field-test.vue";
@@ -88,6 +88,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "基础测试组件", data: BaseTest, clickable: true, searchable: true, },
                 { text: "Button 按钮组件", data: ButtonTest, clickable: true, searchable: true, },
                 { text: "Choose 选择组件", data: ChooseTest, clickable: true, searchable: true, },
+                { text: "Dynamic 动态组件", data: DynamicTest, clickable: true, searchable: true, },
                 { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, searchable: true, },
                 { text: "Icon 图标组件", data: IconTest, clickable: true, searchable: true, },
                 { text: "Input 输入框组件", data: InputTest, clickable: true, searchable: true, },
@@ -101,7 +102,6 @@ const treeOptions: TreeOptions<Component> = {
         {
             text: "容器组件",
             children: [
-                { text: "Dynamic 动态组件", data: DynamicTest, clickable: true, searchable: true, },
                 { text: "Datatable 数据表", data: DatatableTest, clickable: true, searchable: true, },
                 { text: "Elastic 弹性组件", data: ElasticTest, clickable: true, searchable: true, },
                 { text: "ElasticTable 弹性表格", data: ElasticTableTest, clickable: true, searchable: true, },

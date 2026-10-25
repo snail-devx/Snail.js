@@ -13,6 +13,7 @@ export * from "./base/models/base-event";
 export * from "./base/models/base-model";
 export * from "./base/models/button-model";
 export * from "./base/models/choose-model";
+export * from "./base/models/component-model";
 export * from "./base/models/footer-model";
 export * from "./base/models/header-model";
 export * from "./base/models/icon-model";
@@ -28,6 +29,7 @@ export * from "./base/models/tree-base";
 //  组件导出
 import Button from "./base/button.vue";
 import Choose from "./base/choose.vue";
+import Dynamic from "./base/dynamic.vue";
 import Env from "./base/env.vue";
 import Footer from "./base/footer.vue";
 import Header from "./base/header.vue";
@@ -44,12 +46,12 @@ export * from "./base/components/tree-base";
 export * from "./base/reactive";
 export * from "./base/utils/app-util";
 export * from "./base/utils/base-util";
+export * from "./base/utils/component-util";
 export * from "./base/utils/icon-util";
 export * from "./base/utils/motion-util";
 
 // *****************************************   👉  container 相关导出    ****************************************
 //  类型导出
-export * from "./container/models/component-model";
 export * from "./container/models/elastic-model";
 export * from "./container/models/field-model";
 export * from "./container/models/flex-model";
@@ -66,7 +68,6 @@ import ElasticBar from "./container/components/elastic-bar.vue";
 import ElasticPadding from "./container/components/elastic-padding.vue";
 import ElasticUpdown from "./container/components/elastic-updown.vue";
 import DataTable from "./container/data-table.vue";
-import Dynamic from "./container/dynamic.vue";
 import ElasticTable from "./container/elastic-table.vue";
 import Elastic from "./container/elastic.vue";
 import Field from "./container/field.vue";
@@ -80,7 +81,6 @@ import Table from "./container/table.vue";
 import Tree from "./container/tree.vue";
 import Wrapper from "./container/wrapper.vue";
 //  方法导出
-export * from "./container/utils/component-util";
 
 // *****************************************   👉  other 相关导出    ****************************************
 //  类型导出
@@ -128,9 +128,9 @@ import Spinner from "./prompt/spinner.vue";
 // *****************************************   👉  组件合并导出    ****************************************
 export const components = {
     //  base下的组件
-    Button, Choose, Env, Footer, Header, Icon, Input, Motion, Number, Search, Select, Switch, Textarea,
+    Button, Choose, Dynamic, Env, Footer, Header, Icon, Input, Motion, Number, Search, Select, Switch, Textarea,
     //  container 下的组件
-    Dynamic, Elastic, ElasticBar, ElasticPadding, ElasticUpdown, Flex, Field, Fold, Layout, Page, Scroll, Sort, Tree, Wrapper,
+    Elastic, ElasticBar, ElasticPadding, ElasticUpdown, Flex, Field, Fold, Layout, Page, Scroll, Sort, Tree, Wrapper,
     Table, ElasticTable, DataTable,
     //  other   下的组件
     Action, Card, FlashNumber, NavBar,

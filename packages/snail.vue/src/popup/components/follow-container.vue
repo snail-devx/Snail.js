@@ -12,7 +12,7 @@
 import { useTimer } from "snail.core";
 import { css, ElementSize, HeightStyle, IObserver, OverflowStyle, PositionStyle, useObserver, WidthStyle } from "snail.view";
 import { getCurrentInstance, nextTick, onMounted, shallowRef, ShallowRef } from "vue";
-import Dynamic from "../../container/dynamic.vue";
+import Dynamic from "../../base/dynamic.vue";
 import { FollowElectResult, FollowExtend, FollowHandle, FollowOptions, FollowStrategy } from "../models/follow-model";
 import { PopupDescriptor } from "../models/popup-model";
 import { calcFollowX, calcFollowY } from "../utils/follow-util";

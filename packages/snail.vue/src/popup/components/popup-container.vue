@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { shallowRef } from "vue";
-import Dynamic from "../../container/dynamic.vue";
+import Dynamic from "../../base/dynamic.vue";
 import { PopupDescriptor, PopupHandle, PopupOptions } from "../models/popup-model";
 
 // *****************************************   👉  组件定义    *****************************************

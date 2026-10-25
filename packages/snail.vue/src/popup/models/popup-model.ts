@@ -3,9 +3,9 @@
  *  1、在弹窗、模态弹窗、跟随弹窗的效果下复用
  */
 import { ShallowRef } from "vue";
+import { ComponentBindOptions, ComponentOptions } from "../../base/models/component-model";
 import { MotionEffectOptions } from "../../base/models/motion-model";
 import { MOTION } from "../../base/utils/motion-util";
-import { ComponentBindOptions, ComponentOptions } from "../../container/models/component-model";
 
 /**
  * 弹窗配置选项

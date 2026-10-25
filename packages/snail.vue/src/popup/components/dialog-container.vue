@@ -20,7 +20,7 @@
 import { mustFunction, runAsync } from "snail.core";
 import { useObserver } from "snail.view";
 import { onMounted, shallowRef } from "vue";
-import Dynamic from "../../container/dynamic.vue";
+import Dynamic from "../../base/dynamic.vue";
 import Wrapper from "../../container/wrapper.vue";
 import { DialogHandle, DialogOptions, DialogWrapperHandle } from "../models/dialog-model";
 import { PopupDescriptor } from "../models/popup-model";

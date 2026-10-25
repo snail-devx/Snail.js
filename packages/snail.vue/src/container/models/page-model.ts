@@ -2,8 +2,8 @@ import { AppOptions } from "../../base/models/app-model";
 import { CloseEvents } from "../../base/models/base-event";
 import { DisabledOptions } from "../../base/models/base-model";
 import { ButtonOptions } from "../../base/models/button-model";
+import { EventsType } from "../../base/models/component-model";
 import { HeaderOptions } from "../../base/models/header-model";
-import { EventsType } from "./component-model";
 import { ScrollEvents, ScrollOptions } from "./scroll-model";
 
 /**

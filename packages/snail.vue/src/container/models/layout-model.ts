@@ -3,7 +3,7 @@
  */
 
 import { CSSClassOptions, HeightStyle, WidthStyle } from "snail.view";
-import { EventsType } from "./component-model";
+import { EventsType } from "../../base/models/component-model";
 import { ScrollEvents, ScrollOptions } from "./scroll-model";
 
 /**

@@ -30,7 +30,7 @@ import { useSelectContext } from "./components/select-context";
 import Icon from "./icon.vue";
 import { ISelectContext, SelectEvents, SelectItem, SelectOptions, SelectPopupEvents, SelectPopupOptions, SelectSlotOptions } from "./models/select-model";
 import { } from "../base/reactive";
-import { EventsType } from "../container/models/component-model";
+import { EventsType } from "../base/models/component-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data

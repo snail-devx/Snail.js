@@ -1,4 +1,4 @@
-import { ComponentBindOptions, ComponentOptions } from "./component-model";
+import { ComponentBindOptions, ComponentOptions } from "../../base/models/component-model";
 
 /**
  * 动态加载组件 组件配置选项

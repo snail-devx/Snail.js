@@ -1,18 +1,15 @@
-import { dirname, relative, resolve } from "path"
-import { fileURLToPath } from "url";
-import minimist from "minimist";
-import { Builder, buildDist, buildNetPath, forceExt } from "snail.rollup"
 import nodeResolve from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
-import json from "@rollup/plugin-json";
 import terser from "@rollup/plugin-terser";
+import { dirname, resolve } from "path";
+import { Builder, buildDist, buildNetPath, forceExt } from "snail.rollup";
 import assetPlugin from "snail.rollup-asset";
 import htmlPlugin from "snail.rollup-html";
-import injectPlugin, { removeDynamicModule, registerDynamicModule } from "snail.rollup-inject";
+import injectPlugin, { registerDynamicModule, removeDynamicModule } from "snail.rollup-inject";
 import scriptPlugin from "snail.rollup-script";
 import stylePlugin, { MODULE_INJECT_LINK, STYLE_EXTEND_PATHS } from "snail.rollup-style";
 import urlPlugin, { URL_HANDLES } from "snail.rollup-url";
-import vuePlugin from "snail.rollup-vue"
+import vuePlugin from "snail.rollup-vue";
+import { fileURLToPath } from "url";
 
 /** 不使用如下方式获取dirName，会在末尾存在 "/"；但resolve等不会存在 "/"；会导致断言出问题
  * const __dirname = fileURLToPath(new URL('.', import.meta.url)); 
@@ -151,7 +148,7 @@ const components = builder.build([
         }
     },
     {
-        src: "components/container/dynamic-url-test.ts",
+        src: "components/base/dynamic-url-test.ts",
         isCommonLib: false,
         format: "amd",
     }
