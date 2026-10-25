@@ -105,10 +105,10 @@ import { correctString, newId, useKey, wait } from 'snail.core';
 import { computed, nextTick, onMounted, shallowRef, ShallowRef } from 'vue';
 import Icon from '../base/icon.vue';
 import Motion from '../base/motion.vue';
+import Sort from '../base/sort.vue';
 import Empty from '../prompt/empty.vue';
 import { useDataTable } from './components/table-context';
 import { DataTableEvents, DataTableOptions } from './models/table-model';
-import Sort from './sort.vue';
 import Table from './table.vue';
 import { correctDataTableOptions } from './utils/table-util';
 

@@ -15,11 +15,13 @@ export * from "./base/models/component-model";
 export * from "./base/models/icon-model";
 export * from "./base/models/motion-model";
 export * from "./base/models/reactive-model";
+export * from "./base/models/sort-model";
 //  组件导出
 import Dynamic from "./base/dynamic.vue";
 import Env from "./base/env.vue";
 import Icon from "./base/icon.vue";
 import Motion from "./base/motion.vue";
+import Sort from "./base/sort.vue";
 //  方法导出
 export * from "./base/reactive";
 export * from "./base/utils/app-util";
@@ -37,7 +39,6 @@ export * from "./container/models/fold-model";
 export * from "./container/models/layout-model";
 export * from "./container/models/page-model";
 export * from "./container/models/scroll-model";
-export * from "./container/models/sort-model";
 export * from "./container/models/table-model";
 export * from "./container/models/wrapper-model";
 //  组件导出：赋值给 components
@@ -55,7 +56,6 @@ import Fold from "./container/fold.vue";
 import Layout from "./container/layout.vue";
 import Page from "./container/page.vue";
 import Scroll from "./container/scroll.vue";
-import Sort from "./container/sort.vue";
 import Table from "./container/table.vue";
 import Wrapper from "./container/wrapper.vue";
 //  方法导出
@@ -133,9 +133,9 @@ import Spinner from "./prompt/spinner.vue";
 // *****************************************   👉  组件合并导出    ****************************************
 export const components = {
     //  base下的组件
-    Dynamic, Env, Icon, Motion,
+    Dynamic, Env, Icon, Motion, Sort,
     //  container 下的组件
-    Flex, Field, Fold, Layout, Page, Scroll, Sort, Wrapper,
+    Flex, Field, Fold, Layout, Page, Scroll, Wrapper,
     Elastic, ElasticTable, Table, DataTable,
     //      components下的辅助组件
     ElasticBar, ElasticPadding, ElasticUpdown, Footer, Header,
