@@ -13,17 +13,9 @@ import { components, TreeNodeModel, TreeOptions, useReactive } from "../librarie
 //#region *******************************   👉  组件定义    *****************************************
 //  👉 基础组件：
 import BaseTest from "./base/base-test.vue";
-import ButtonTest from "./base/button-test.vue";
-import ChooseTest from "./base/choose-test.vue";
 import DynamicTest from "./base/dynamic-test.vue";
-import HeaderFooterTest from "./base/header-footer-test.vue";
 import IconTest from "./base/icon-test.vue";
-import InputTest from "./base/input-test.vue";
 import MotionTest from "./base/motion-test.vue";
-import SearchTest from "./base/search-test.vue";
-import SelectTest from "./base/select-test.vue";
-import SwitchTest from "./base/switch-test.vue";
-import TextareaTest from "./base/textarea-test.vue";
 //  👉 容器组件
 import DatatableTest from "./container/datatable-test.vue";
 import ElasticTest from "./container/elastic-test.vue";
@@ -31,11 +23,20 @@ import ElasticTableTest from "./container/elastictable-test.vue";
 import FieldTest from "./container/field-test.vue";
 import FlexTest from "./container/flex-test.vue";
 import FoldTest from "./container/fold-test.vue";
+import HeaderFooterTest from "./container/header-footer-test.vue";
 import LayoutTest from "./container/layout-test.vue";
 import PageTest from "./container/page-test.vue";
 import ScrollTest from "./container/scroll-test.vue";
 import TableTest from "./container/table-test.vue";
-import TreeTest from "./container/tree-test.vue";
+//  👉 控件组件
+import ButtonTest from "./control/button-test.vue";
+import ChooseTest from "./control/choose-test.vue";
+import InputTest from "./control/input-test.vue";
+import SearchTest from "./control/search-test.vue";
+import SelectTest from "./control/select-test.vue";
+import SwitchTest from "./control/switch-test.vue";
+import TextareaTest from "./control/textarea-test.vue";
+import TreeTest from "./control/tree-test.vue";
 //  👉 表单组件
 import DesignerTest from "./form/designer-test.vue";
 import RendererTest from "./form/renderer-test.vue";
@@ -79,6 +80,7 @@ const treeOptions: TreeOptions<Component> = {
     },
     nodeOptions: {
         // foldDisabled: true,
+        expandLevel: 1,
     },
     nodes: [
         {
@@ -86,17 +88,9 @@ const treeOptions: TreeOptions<Component> = {
             fixed: true,
             children: [
                 { text: "基础测试组件", data: BaseTest, clickable: true, searchable: true, },
-                { text: "Button 按钮组件", data: ButtonTest, clickable: true, searchable: true, },
-                { text: "Choose 选择组件", data: ChooseTest, clickable: true, searchable: true, },
                 { text: "Dynamic 动态组件", data: DynamicTest, clickable: true, searchable: true, },
-                { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, searchable: true, },
                 { text: "Icon 图标组件", data: IconTest, clickable: true, searchable: true, },
-                { text: "Input 输入框组件", data: InputTest, clickable: true, searchable: true, },
                 { text: "Motion 动画组件", data: MotionTest, clickable: true, searchable: true, },
-                { text: "Search 搜索组件", data: SearchTest, clickable: true, searchable: true, },
-                { text: "Select 选项菜单组件", data: SelectTest, clickable: true, searchable: true, },
-                { text: "Switch 开关组件", data: SwitchTest, clickable: true, searchable: true, },
-                { text: "Textarea 多行文本框", data: TextareaTest, clickable: true, searchable: true }
             ],
         },
         {
@@ -108,10 +102,23 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Field 字段容器", data: FieldTest, clickable: true, searchable: true },
                 { text: "Flex 弹性布局", data: FlexTest, clickable: true, searchable: true, },
                 { text: "Fold 折叠组件", data: FoldTest, clickable: true, searchable: true, },
+                { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, searchable: true, },
                 { text: "Layout 布局测试", data: LayoutTest, clickable: true, searchable: true, },
                 { text: "Page 页面组件", data: PageTest, clickable: true, searchable: true, },
                 { text: "Scroll 滚动组件", data: ScrollTest, clickable: true, searchable: true, },
                 { text: "Table 表格组件", data: TableTest, clickable: true, searchable: true, },
+            ]
+        },
+        {
+            text: "控件组件",
+            children: [
+                { text: "Button 按钮组件", data: ButtonTest, clickable: true, searchable: true, },
+                { text: "Choose 选择组件", data: ChooseTest, clickable: true, searchable: true, },
+                { text: "Input 输入框组件", data: InputTest, clickable: true, searchable: true, },
+                { text: "Search 搜索组件", data: SearchTest, clickable: true, searchable: true, },
+                { text: "Select 选项菜单组件", data: SelectTest, clickable: true, searchable: true, },
+                { text: "Switch 开关组件", data: SwitchTest, clickable: true, searchable: true, },
+                { text: "Textarea 多行文本框", data: TextareaTest, clickable: true, searchable: true },
                 { text: "Tree 树组件", data: TreeTest, clickable: true, searchable: true, },
             ]
         },
