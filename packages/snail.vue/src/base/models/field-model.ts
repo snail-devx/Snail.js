@@ -1,4 +1,4 @@
-import { TitleOptions } from "../../base/models/base-model";
+import { TitleOptions } from "./base-model";
 
 /**
  * 字段组件配置选项

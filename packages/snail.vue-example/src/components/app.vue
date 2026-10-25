@@ -14,13 +14,13 @@ import { components, TreeNodeModel, TreeOptions, useReactive } from "../librarie
 //  👉 基础组件：
 import BaseTest from "./base/base-test.vue";
 import DynamicTest from "./base/dynamic-test.vue";
+import FieldTest from "./base/field-test.vue";
 import IconTest from "./base/icon-test.vue";
 import MotionTest from "./base/motion-test.vue";
 //  👉 容器组件
 import DatatableTest from "./container/datatable-test.vue";
 import ElasticTest from "./container/elastic-test.vue";
 import ElasticTableTest from "./container/elastictable-test.vue";
-import FieldTest from "./container/field-test.vue";
 import FlexTest from "./container/flex-test.vue";
 import FoldTest from "./container/fold-test.vue";
 import HeaderFooterTest from "./container/header-footer-test.vue";
@@ -89,6 +89,7 @@ const treeOptions: TreeOptions<Component> = {
             children: [
                 { text: "基础测试组件", data: BaseTest, clickable: true, searchable: true, },
                 { text: "Dynamic 动态组件", data: DynamicTest, clickable: true, searchable: true, },
+                { text: "Field 字段容器", data: FieldTest, clickable: true, searchable: true },
                 { text: "Icon 图标组件", data: IconTest, clickable: true, searchable: true, },
                 { text: "Motion 动画组件", data: MotionTest, clickable: true, searchable: true, },
             ],
@@ -99,7 +100,6 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Datatable 数据表", data: DatatableTest, clickable: true, searchable: true, },
                 { text: "Elastic 弹性组件", data: ElasticTest, clickable: true, searchable: true, },
                 { text: "ElasticTable 弹性表格", data: ElasticTableTest, clickable: true, searchable: true, },
-                { text: "Field 字段容器", data: FieldTest, clickable: true, searchable: true },
                 { text: "Flex 弹性布局", data: FlexTest, clickable: true, searchable: true, },
                 { text: "Fold 折叠组件", data: FoldTest, clickable: true, searchable: true, },
                 { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, searchable: true, },

@@ -12,6 +12,7 @@ export * from "./base/models/app-model";
 export * from "./base/models/base-event";
 export * from "./base/models/base-model";
 export * from "./base/models/component-model";
+export * from "./base/models/field-model";
 export * from "./base/models/icon-model";
 export * from "./base/models/motion-model";
 export * from "./base/models/reactive-model";
@@ -19,6 +20,7 @@ export * from "./base/models/sort-model";
 //  组件导出
 import Dynamic from "./base/dynamic.vue";
 import Env from "./base/env.vue";
+import Field from "./base/field.vue";
 import Icon from "./base/icon.vue";
 import Motion from "./base/motion.vue";
 import Sort from "./base/sort.vue";
@@ -33,7 +35,6 @@ export * from "./base/utils/motion-util";
 // *****************************************   👉  container 相关导出    ****************************************
 //  类型导出
 export * from "./container/models/elastic-model";
-export * from "./container/models/field-model";
 export * from "./container/models/flex-model";
 export * from "./container/models/fold-model";
 export * from "./container/models/layout-model";
@@ -50,7 +51,6 @@ import Header from "./container/components/header.vue";
 import DataTable from "./container/data-table.vue";
 import ElasticTable from "./container/elastic-table.vue";
 import Elastic from "./container/elastic.vue";
-import Field from "./container/field.vue";
 import Flex from "./container/flex.vue";
 import Fold from "./container/fold.vue";
 import Layout from "./container/layout.vue";
@@ -133,9 +133,9 @@ import Spinner from "./prompt/spinner.vue";
 // *****************************************   👉  组件合并导出    ****************************************
 export const components = {
     //  base下的组件
-    Dynamic, Env, Icon, Motion, Sort,
+    Dynamic, Env, Field, Icon, Motion, Sort,
     //  container 下的组件
-    Flex, Field, Fold, Layout, Page, Scroll, Wrapper,
+    Flex, Fold, Layout, Page, Scroll, Wrapper,
     Elastic, ElasticTable, Table, DataTable,
     //      components下的辅助组件
     ElasticBar, ElasticPadding, ElasticUpdown, Footer, Header,
