@@ -2,6 +2,17 @@ import { correctFunction, IScope, useScope } from "snail.core";
 import { ShallowRef, watch, WatchSource } from "vue";
 
 /**
+ * 将value转成指定类型返回
+ * - 辅助方法，解决ts类型断言问题；内部不做任何操作，直接返回 `value as T`
+ * - 如vue中 value为联合类型时，需要使用此方法转成指定类型，否则vue无法识别正确类型
+ * @param value 
+ * @returns 
+ */
+export function as<T>(value: any): T {
+    return value as T;
+}
+
+/**
  * 监听同步value属性值
  * - 使用场景：组件提供value属性，外部改变后，实时同步给组件
  * - 使用方式：在setup方法中调用即可，组件销毁时自动取消监听
