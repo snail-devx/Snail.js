@@ -2,8 +2,8 @@
  * 数值控件的数据结构
  */
 
-import { ChangeEvents } from "./base-event";
-import { PlaceholderOptions, ReadonlyOptions } from "./base-model";
+import { ChangeEvents } from "../../base/models/base-event";
+import { PlaceholderOptions, ReadonlyOptions } from "../../base/models/base-model";
 
 /**
  * 数值组件的基础配置选项

@@ -12,11 +12,11 @@
 </template>
 
 <script setup lang="ts">
-import { ConfirmOptions } from "../models/confirm-model"
+import Footer from "../../container/components/footer.vue";
+import Header from "../../container/components/header.vue";
+import { ConfirmOptions } from "../models/confirm-model";
 import { DialogHandle } from "../models/dialog-model";
 import { PopupStatusOptions } from "../models/popup-model";
-import Header from "../../base/header.vue";
-import Footer from "../../base/footer.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data

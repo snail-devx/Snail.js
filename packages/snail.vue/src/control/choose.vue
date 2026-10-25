@@ -21,11 +21,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ComputedRef, nextTick } from "vue";
-import { newId, isArray, useKey } from "snail.core";
+import { isArray, useKey } from "snail.core";
 import { css } from "snail.view";
-import { ChooseOptions, ChooseEvents, ChooseItem } from "./models/choose-model";
-import Icon from "./icon.vue";
+import { computed, ComputedRef, nextTick } from "vue";
+import Icon from "../base/icon.vue";
+import { ChooseEvents, ChooseItem, ChooseOptions } from "./models/choose-model";
 
 // *****************************************   👉  私有类型    *****************************************
 /**

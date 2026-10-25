@@ -1,4 +1,4 @@
-import { PlaceholderOptions, ReadonlyOptions, ValueOptions } from "./base-model";
+import { PlaceholderOptions, ReadonlyOptions } from "../../base/models/base-model";
 
 /**
  * 多行文本框组件配置选项

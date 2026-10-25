@@ -3,9 +3,9 @@
  */
 
 import { IScope, mountScope } from "snail.core";
+import { ShallowRef } from "vue";
 import { ISelectContext, SelectItem } from "../models/select-model";
 import { useTreeContext } from "./tree-base";
-import { ShallowRef } from "vue";
 
 /**
  * 使用【选项菜单】上下文

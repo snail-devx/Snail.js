@@ -25,12 +25,12 @@
 <script setup lang="ts">
 import { hasAny, IAsyncScope, isArrayNotEmpty, IScope, removeFromArray, useTimer } from "snail.core";
 import { computed, nextTick, ShallowRef, shallowRef, useTemplateRef } from "vue";
+import Icon from "../base/icon.vue";
+import { EventsType } from "../base/models/component-model";
+import { } from "../base/reactive";
 import { usePopup } from "../popup/manager";
 import { useSelectContext } from "./components/select-context";
-import Icon from "./icon.vue";
 import { ISelectContext, SelectEvents, SelectItem, SelectOptions, SelectPopupEvents, SelectPopupOptions, SelectSlotOptions } from "./models/select-model";
-import { } from "../base/reactive";
-import { EventsType } from "../base/models/component-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -186,8 +186,8 @@ function onSelectItemClick(path: SelectItem<any>[]) {
 </script>
 
 <script lang="ts">
+import { onAppCreated } from "../base/utils/app-util";
 import SelectPopup from "./components/select-popup.vue";
-import { onAppCreated } from "./utils/app-util";
 //  非组件实例逻辑：将【选项弹窗】注册为【弹窗】app实例的全局组件，方便树形复用
 onAppCreated((app, type) => {
     type == "popup" && app.component("SelectPopup", SelectPopup);

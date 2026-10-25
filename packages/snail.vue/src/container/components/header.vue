@@ -16,8 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import { HeaderOptions, HeaderEvents } from "./models/header-model";
-import Icon from "./icon.vue";
+import Icon from "../../base/icon.vue";
+import { HeaderEvents, HeaderOptions } from "../models/page-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data、event

@@ -11,38 +11,16 @@
 export * from "./base/models/app-model";
 export * from "./base/models/base-event";
 export * from "./base/models/base-model";
-export * from "./base/models/button-model";
-export * from "./base/models/choose-model";
 export * from "./base/models/component-model";
-export * from "./base/models/footer-model";
-export * from "./base/models/header-model";
 export * from "./base/models/icon-model";
-export * from "./base/models/input-model";
 export * from "./base/models/motion-model";
-export * from "./base/models/number-model";
 export * from "./base/models/reactive-model";
-export * from "./base/models/search-model";
-export * from "./base/models/select-model";
-export * from "./base/models/switch-model";
-export * from "./base/models/textarea-model";
-export * from "./base/models/tree-base";
 //  组件导出
-import Button from "./base/button.vue";
-import Choose from "./base/choose.vue";
 import Dynamic from "./base/dynamic.vue";
 import Env from "./base/env.vue";
-import Footer from "./base/footer.vue";
-import Header from "./base/header.vue";
 import Icon from "./base/icon.vue";
-import Input from "./base/input.vue";
 import Motion from "./base/motion.vue";
-import Number from "./base/number.vue";
-import Search from "./base/search.vue";
-import Select from "./base/select.vue";
-import Switch from "./base/switch.vue";
-import Textarea from "./base/textarea.vue";
 //  方法导出
-export * from "./base/components/tree-base";
 export * from "./base/reactive";
 export * from "./base/utils/app-util";
 export * from "./base/utils/base-util";
@@ -61,12 +39,13 @@ export * from "./container/models/page-model";
 export * from "./container/models/scroll-model";
 export * from "./container/models/sort-model";
 export * from "./container/models/table-model";
-export * from "./container/models/tree-model";
 export * from "./container/models/wrapper-model";
 //  组件导出：赋值给 components
 import ElasticBar from "./container/components/elastic-bar.vue";
 import ElasticPadding from "./container/components/elastic-padding.vue";
 import ElasticUpdown from "./container/components/elastic-updown.vue";
+import Footer from "./container/components/footer.vue";
+import Header from "./container/components/header.vue";
 import DataTable from "./container/data-table.vue";
 import ElasticTable from "./container/elastic-table.vue";
 import Elastic from "./container/elastic.vue";
@@ -78,9 +57,35 @@ import Page from "./container/page.vue";
 import Scroll from "./container/scroll.vue";
 import Sort from "./container/sort.vue";
 import Table from "./container/table.vue";
-import Tree from "./container/tree.vue";
 import Wrapper from "./container/wrapper.vue";
 //  方法导出
+
+
+// *****************************************   👉  control 相关导出    ****************************************
+//  类型导出
+export * from "./control/models/button-model";
+export * from "./control/models/choose-model";
+export * from "./control/models/input-model";
+export * from "./control/models/number-model";
+export * from "./control/models/search-model";
+export * from "./control/models/select-model";
+export * from "./control/models/switch-model";
+export * from "./control/models/textarea-model";
+export * from "./control/models/tree-base";
+export * from "./control/models/tree-model";
+//  组件导出：赋值给 components
+import Button from "./control/button.vue";
+import Choose from "./control/choose.vue";
+import Input from "./control/input.vue";
+import Number from "./control/number.vue";
+import Search from "./control/search.vue";
+import Select from "./control/select.vue";
+import Switch from "./control/switch.vue";
+import Textarea from "./control/textarea.vue";
+import Tree from "./control/tree.vue";
+//  方法导出
+export * from "./control/components/tree-base";
+
 
 // *****************************************   👉  other 相关导出    ****************************************
 //  类型导出
@@ -128,10 +133,14 @@ import Spinner from "./prompt/spinner.vue";
 // *****************************************   👉  组件合并导出    ****************************************
 export const components = {
     //  base下的组件
-    Button, Choose, Dynamic, Env, Footer, Header, Icon, Input, Motion, Number, Search, Select, Switch, Textarea,
+    Dynamic, Env, Icon, Motion,
     //  container 下的组件
-    Elastic, ElasticBar, ElasticPadding, ElasticUpdown, Flex, Field, Fold, Layout, Page, Scroll, Sort, Tree, Wrapper,
-    Table, ElasticTable, DataTable,
+    Flex, Field, Fold, Layout, Page, Scroll, Sort, Wrapper,
+    Elastic, ElasticTable, Table, DataTable,
+    //      components下的辅助组件
+    ElasticBar, ElasticPadding, ElasticUpdown, Footer, Header,
+    //  control 下的组件
+    Button, Choose, Input, Number, Search, Select, Switch, Textarea, Tree,
     //  other   下的组件
     Action, Card, FlashNumber, NavBar,
     //  picker    下的组件

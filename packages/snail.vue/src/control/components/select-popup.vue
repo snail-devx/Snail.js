@@ -25,13 +25,13 @@
 </template>
 
 <script setup lang="ts">
-import { IAsyncScope, isArrayNotEmpty, IScope, isStringNotEmpty, newId, useTimer } from "snail.core";
-import { shallowRef, computed, ShallowRef, ComputedRef, nextTick, } from "vue";
+import { IAsyncScope, isArrayNotEmpty, IScope, isStringNotEmpty, useTimer } from "snail.core";
+import { computed, shallowRef, ShallowRef } from "vue";
+import { useReactive } from "../../base/reactive";
 import { usePopup } from "../../popup/manager";
-import { useReactive } from "../reactive";
 //  依赖的其他vue组件
-import Search from "../search.vue";
 import Empty from "../../prompt/empty.vue";
+import Search from "../search.vue";
 import SelectNode from "./select-node.vue";
 //  使用到的数据类型
 import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
@@ -298,5 +298,5 @@ watcher(popupStatus, newValue => newValue == "closed" && childFollowScope && chi
 }
 
 //  有分组时
-.snail-select-popup.has-group {}
+// .snail-select-popup.has-group {}
 </style>

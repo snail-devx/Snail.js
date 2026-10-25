@@ -16,10 +16,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, } from "vue";
+import Footer from "./components/footer.vue";
+import Header from "./components/header.vue";
 import { WrapperEvents, WrapperOptions } from "./models/wrapper-model";
-import Header from "../base/header.vue";
-import Footer from "../base/footer.vue";
 import Scroll from "./scroll.vue";
 
 // *****************************************   👉  组件定义    *****************************************

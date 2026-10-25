@@ -6,27 +6,25 @@
 <template>
     <div class="snail-tree">
         <Search v-if="search" :="search" @search="onSearch" />
-        <Scroll :scroll="'y'">
+        <div class="tree-nodes small-scrollbar">
             <TreeNode v-for="node in nodes || []" :key="context.getKey(node)" :node="node" :parent="undefined"
                 :level="1" :options="nodeOptions" :context="context" @click="onTreeNodeClick">
                 <template #="slotProps: TreeNodeSlotOptions<any>">
                     <slot :="slotProps" />
                 </template>
             </TreeNode>
-        </Scroll>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { newId } from "snail.core";
 import { TreeEvents, TreeNodeModel, TreeNodeSlotOptions, TreeOptions } from "./models/tree-model";
 //  三方组件
-import Scroll from "./scroll.vue";
-import Search from "../base/search.vue";
-import TreeNode from "./components/tree-node.vue";
-import { ITreeBaseContext } from "../base/models/tree-base";
-import { useTreeContext } from "../base/components/tree-base";
 import { shallowRef, ShallowRef } from "vue";
+import Search from "../control/search.vue";
+import { useTreeContext } from "./components/tree-base";
+import TreeNode from "./components/tree-node.vue";
+import { ITreeBaseContext } from "./models/tree-base";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
@@ -77,7 +75,8 @@ function onTreeNodeClick(node: TreeNodeModel<any>, parents?: TreeNodeModel<any>[
         margin: 12px 12px 12px 12px;
     }
 
-    .snail-scroll {
+    >.tree-nodes {
+        overflow: hidden auto;
         flex: 1;
     }
 }

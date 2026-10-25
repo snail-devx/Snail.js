@@ -3,8 +3,8 @@
  *  1、组件基础上下文 默认实现
  */
 import { hasAny, IScope, isStringNotEmpty, mountScope, newId } from "snail.core";
-import { ITreeBaseContext, TreeNodeExtend, TreeSearchResult, TreeNode } from "../models/tree-base";
 import { ShallowRef, shallowRef } from "vue";
+import { ITreeBaseContext, TreeNode, TreeNodeExtend, TreeSearchResult } from "../models/tree-base";
 
 /**
  * 使用【树上下文】

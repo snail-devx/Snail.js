@@ -36,11 +36,11 @@
 </template>
 <script setup lang="ts">
 import { isFunction } from 'snail.core';
-import Button from '../base/button.vue';
-import Header from '../base/header.vue';
 import { useApp } from '../base/utils/app-util';
+import Button from '../control/button.vue';
 import Empty from '../prompt/empty.vue';
 import Loading from '../prompt/loading.vue';
+import Header from './components/header.vue';
 import Flex from './flex.vue';
 import { PageEvents, PageFooterButton, PageOptions, PageSlotHandle } from './models/page-model';
 import Scroll from './scroll.vue';

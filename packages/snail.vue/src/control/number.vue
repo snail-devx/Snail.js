@@ -45,10 +45,10 @@
 <script setup lang="ts">
 import { isStringNotEmpty } from "snail.core";
 import { nextTick, ShallowRef, shallowRef, useTemplateRef, } from "vue";
-import { NumberEvents, NumberFormatResult, NumberOptions } from "./models/number-model";
-import { useReactive } from "./reactive";
+import Icon from "../base/icon.vue";
+import { useReactive } from "../base/reactive";
 import { useFormatter } from "./components/number-formatter";
-import Icon from "./icon.vue";
+import { NumberEvents, NumberFormatResult, NumberOptions } from "./models/number-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

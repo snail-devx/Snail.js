@@ -1,9 +1,9 @@
-import { ShallowRef } from "vue";
-import { PlaceholderOptions, ReadonlyOptions, ValueOptions } from "./base-model";
 import { IScope } from "snail.core";
 import { HeightStyle } from "snail.view";
+import { ShallowRef } from "vue";
+import { PlaceholderOptions, ReadonlyOptions, ValueOptions } from "../../base/models/base-model";
+import { ITreeBaseContext, TreeNode, TreeNodeExtend } from "../models/tree-base";
 import { SearchOptions } from "./search-model";
-import { ITreeBaseContext, TreeNode, TreeNodeExtend } from "./tree-base";
 
 /**
  * 选项菜单 基础配置选项

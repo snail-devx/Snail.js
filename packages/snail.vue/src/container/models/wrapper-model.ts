@@ -1,8 +1,7 @@
-import { DisabledOptions } from "../../base/models/base-model";
-import { HeaderOptions } from "../../base/models/header-model";
-import { FooterEvents, FooterOptions } from "../../base/models/footer-model";
-import { ScrollOptions } from "./scroll-model";
 import { CSSClassOptions } from "snail.view";
+import { DisabledOptions } from "../../base/models/base-model";
+import { FooterEvents, FooterOptions, HeaderOptions } from "../../container/models/page-model";
+import { ScrollOptions } from "./scroll-model";
 
 /**
  * 包裹组件 相关实体

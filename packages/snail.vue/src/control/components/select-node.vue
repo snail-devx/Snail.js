@@ -19,8 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import Icon from "../icon.vue";
 import { computed, useTemplateRef } from "vue";
+import Icon from "../../base/icon.vue";
 import { SelectItem, SelectNodeEvents, SelectNodeOptions } from "../models/select-model";
 
 // *****************************************   👉  组件定义    *****************************************
