@@ -15,8 +15,9 @@ import { link } from "snail.view";
 
 //  -------------------------------------------------- 初始化Vue app实例   ------------------------------------------------------------
 import { getType, onMountScope } from "snail.core";
-import { createApp, getCurrentScope, onScopeDispose, ref } from "vue";
+import { getCurrentScope, onScopeDispose, ref } from "vue";
 import App from "./components/app.vue";
+import { newApp } from "./libraries/snail_vue";
 import lessUrl from "./styles/index.less";
 /**
  * 挂载Scope时，若在Vue的setup中，则自动销毁
@@ -35,6 +36,6 @@ onMountScope(scope => {
 export function initFunc() {
     link.register(lessUrl);
     const testNumber = ref(123);
-    const app = createApp(App, { testNumber });
+    const app = newApp("normal", { mode: "desktop" }, App, { testNumber });
     app.mount("#app");
 }
