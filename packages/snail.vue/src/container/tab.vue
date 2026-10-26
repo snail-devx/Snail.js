@@ -189,6 +189,8 @@ onMounted(async () => {
                 display: flex;
 
                 >.tab-item {
+                    flex: none;
+
                     >span {
                         max-width: 100px;
                     }
