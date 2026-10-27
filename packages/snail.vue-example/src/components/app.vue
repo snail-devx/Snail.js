@@ -27,8 +27,8 @@ import HeaderFooterTest from "./container/header-footer-test.vue";
 import LayoutTest from "./container/layout-test.vue";
 import PageTest from "./container/page-test.vue";
 import ScrollTest from "./container/scroll-test.vue";
-import TabTest from "./container/tab-test.vue";
 import TableTest from "./container/table-test.vue";
+import TabsTest from "./container/tabs-test.vue";
 //  👉 控件组件
 import ButtonTest from "./control/button-test.vue";
 import ChooseTest from "./control/choose-test.vue";
@@ -107,9 +107,9 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Layout 布局测试", data: LayoutTest, clickable: true, searchable: true, },
                 { text: "Page 页面组件", data: PageTest, clickable: true, searchable: true, },
                 { text: "Scroll 滚动组件", data: ScrollTest, clickable: true, searchable: true, },
-
-                { text: "Tab 标签页组件", data: TabTest, clickable: true, searchable: true, },
                 { text: "Table 表格组件", data: TableTest, clickable: true, searchable: true, },
+
+                { text: "Tabs 标签页组件", data: TabsTest, clickable: true, searchable: true, },
             ]
         },
         {
@@ -197,7 +197,7 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
 
     //  container 测试
-    onTreeNodeClick(treeOptions.nodes[1].children[9], undefined);
+    onTreeNodeClick(treeOptions.nodes[1].children[10], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[3], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[4], undefined);

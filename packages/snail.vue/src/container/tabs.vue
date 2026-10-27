@@ -4,13 +4,14 @@
     3、标签项内容，支持动态组件、或者插槽，切换标签页时，支持切换前钩子
  -->
 <template>
-    <div class="snail-tab" :class="correctString(position, 'top', true)">
+    <div class="snail-tab" :class="[correctString(position, 'top', true)]"
+        :style="{ '--tab-width': tabWidth, '--tab-height': tabHeight }">
         <Loading :show="loading" />
         <!-- 头部导航区域：显示标签项，点击时激活显示内容 -->
-        <div class="tab-header" v-if="isArrayNotEmpty(tabs) && hideHeader != true">
+        <div class="tab-header" v-if="isArrayNotEmpty(tabs) && headerDisabled != true">
             <!-- 标签项 -->
-            <div class="tab-items small-scrollbar">
-                <div class="tab-item" v-for="tab in tabs" :key="tab.code" :class="{ 'actived': selectedItemRef == tab }"
+            <div class="tab-items small-scrollbar" :class="[correctString(align, 'left', true)]">
+                <div class="tab-item" v-for="tab in tabs" :key="tab.id" :class="{ 'actived': selectedItemRef == tab }"
                     :title="tab.name" @click="onTabItemClick(tab)">
                     <span class="ellipsis" v-text="tab.name" />
                 </div>
@@ -44,36 +45,71 @@ import { ComponentOptions } from '../base/models/component-model.js';
 import { as } from '../base/utils/base-util';
 import Empty from '../prompt/empty.vue';
 import Loading from '../prompt/loading.vue';
-import { TabEvents, TabHandle, TabItemOptions, TabOptions } from './models/tab-model';
+import { TabsEvents, TabsHandle, TabsItemOptions, TabsOptions } from './models/tabs-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<TabOptions>();
-const emits = defineEmits<TabEvents>();
+const props = defineProps<TabsOptions>();
+const emits = defineEmits<TabsEvents>();
 const { getKey } = useKey();
 //  2、组件交互变量、常量
 /**     选中的标签项 */
-const selectedItemRef: ShallowRef<TabItemOptions> = shallowRef(undefined);
+const selectedItemRef: ShallowRef<TabsItemOptions> = shallowRef(undefined);
+
+// *****************************************   👉  句柄+接口    ****************************************
+/**     标签页操作句柄 */
+const handle: TabsHandle = Object.freeze<TabsHandle>({
+    active(position: string | number) {
+        if (props.tabs && props.tabs.length > 0) {
+            const tab = isString(position) ? props.tabs.find(t => t.id == position) : props.tabs[position];
+            return tab != undefined ? onTabItemClick(tab) : Promise.resolve(false);
+        }
+        return Promise.resolve(false);
+    },
+    next() {
+        if (props.tabs && props.tabs.length > 0) {
+            let tab: TabsItemOptions = selectedItemRef.value == undefined ? props.tabs[0] : undefined;
+            if (tab == undefined) {
+                const index = props.tabs.indexOf(selectedItemRef.value);
+                index != -1 && index < props.tabs.length - 1 && (tab = props.tabs[index + 1]);
+            }
+            return tab != undefined ? onTabItemClick(tab) : Promise.resolve(false);
+        }
+        return Promise.resolve(false);
+    },
+    prev() {
+        if (props.tabs && props.tabs.length > 0) {
+            let tab: TabsItemOptions = selectedItemRef.value == undefined ? props.tabs[0] : undefined;
+            if (tab == undefined) {
+                const index = props.tabs.indexOf(selectedItemRef.value);
+                index > 0 && (tab = props.tabs[index - 1]);
+            }
+            return tab != undefined ? onTabItemClick(tab) : Promise.resolve(false);
+        }
+        return Promise.resolve(false);
+    }
+});
 
 // *****************************************   👉  方法+事件    ****************************************
-/**     标签页操作句柄 */
-const handle: TabHandle = Object.freeze<TabHandle>({});
-
 /**
  * 页签项点击时
  * @param tab 
+ * @returns 是否切换成功
  */
-function onTabItemClick(tab: TabItemOptions) {
+function onTabItemClick(tab: TabsItemOptions): Promise<boolean> {
     if (selectedItemRef.value != tab) {
         //  初次不用执行钩子函数
         if (selectedItemRef.value == undefined) {
             selectedItemRef.value = tab;
+            return Promise.resolve(true);
         }
         //  执行钩子函数，然后再切换，根据返回值决定是否切换
         else {
             selectedItemRef.value = tab;
+            return Promise.resolve(true);
         }
     }
+    return Promise.resolve(false);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
@@ -105,10 +141,22 @@ onMounted(async () => {
         overflow: hidden;
 
         >.tab-items {
+            display: flex;
             flex: 1;
             position: relative;
 
+            & {
+                &.center {
+                    justify-content: center;
+                }
+
+                &.end {
+                    justify-content: flex-end;
+                }
+            }
+
             >.tab-item {
+                flex: none;
                 position: relative;
                 cursor: pointer;
                 padding: 0 20px;
@@ -137,15 +185,19 @@ onMounted(async () => {
 
     &.left,
     &.right {
+        //  变量定义
+        --tab-width: 200px;
+        --tab-height: 40px;
 
         >.tab-header {
-            width: 240px;
+            width: var(--tab-width);
 
             >.tab-items {
+                flex-direction: column;
                 overflow: hidden auto;
 
                 >.tab-item {
-                    height: 40px;
+                    height: var(--tab-height);
 
                     &:hover {
                         background-color: #EFF9FF;
@@ -179,21 +231,19 @@ onMounted(async () => {
 
     &.top,
     &.bottom {
-        flex-direction: column;
+        flex-direction: column; //  变量定义
+        --tab-width: 100px;
+        --tab-height: 44px;
 
         >.tab-header {
-            height: 44px;
+            height: var(--tab-height);
 
             >.tab-items {
                 overflow: hidden;
-                display: flex;
 
                 >.tab-item {
-                    flex: none;
-
-                    >span {
-                        max-width: 100px;
-                    }
+                    justify-content: center;
+                    width: var(--tab-width);
 
                     &.actived,
                     &:hover {
@@ -226,7 +276,6 @@ onMounted(async () => {
             }
         }
     }
-
 
     //  底部显示
     &.bottom {
