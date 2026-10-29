@@ -8,17 +8,17 @@
         :style="{ '--tab-width': tabWidth, '--tab-height': tabHeight }">
         <Loading :show="loading" />
         <!-- 头部导航区域：显示标签项，点击时激活显示内容 -->
-        <div class="tab-header" v-if="isArrayNotEmpty(tabs) && headerDisabled != true">
+        <div class="tab-header" v-if="isArrayNotEmpty(tabs) && hideHeader != true">
             <!-- 标签项 -->
-            <div class="tab-items small-scrollbar" :class="[correctString(align, 'left', true)]">
+            <div class="tab-items small-scrollbar" :class="[correctString(align, 'left', true)]" ref="tab-items">
                 <div class="tab-item" v-for="tab in tabs" :key="tab.id" :class="{ 'actived': selectedItemRef == tab }"
-                    :title="tab.name" @click="onTabItemClick(tab)">
+                    :title="tab.name" :id="tab.id" @click="onTabItemClick(tab)">
                     <span class="ellipsis" v-text="tab.name" />
                 </div>
             </div>
             <!-- 更多按钮：溢出时才出 -->
             <Icon class="more-items" button custom :size="20" :hover-color="'#279bf1'"
-                v-if="position != 'left' && position != 'right'">
+                v-if="overflowStatusRef && overflowStatusRef.overflowX == true" @click="onShowMoreTabs">
                 <path
                     d="M150.54803811 177.65693516h677.72242858v90.36299049H150.54803811zM150.54803811 426.15515905h677.72242858v90.36299049H150.54803811zM150.54803811 674.65338292h677.72242858v90.36299043H150.54803811z" />
             </Icon>
@@ -26,9 +26,10 @@
         <!-- 标签内容区域：渲染激活的标签项，支持插槽和动态组件两种方式 -->
         <div class="tab-content small-scrollbar" v-if="selectedItemRef">
             <Dynamic v-if="isObject(selectedItemRef.content)" :key="getKey(selectedItemRef)"
-                :="as<ComponentOptions>(selectedItemRef.content)" :props="selectedItemRef.props" />
+                :="as<ComponentOptions>(selectedItemRef.content)" :props="selectedItemRef.props"
+                v-bind="buildTabItemHandle(selectedItemRef)" />
             <slot v-else-if="isString(selectedItemRef.content)" :key="getKey(selectedItemRef) + 'slot'"
-                :name="selectedItemRef.content" :="selectedItemRef.props">
+                :name="selectedItemRef.content" :="selectedItemRef.props" v-bind="buildTabItemHandle(selectedItemRef)">
                 <Empty :message="`无[${selectedItemRef.content}]插槽，无法渲染标签页`" />
             </slot>
             <Empty v-else :message="`[${selectedItemRef.name}]标签页未指定 content；无法渲染`" />
@@ -37,24 +38,37 @@
 </template>
 
 <script setup lang="ts">
-import { correctString, isArrayNotEmpty, isObject, isString, useKey } from 'snail.core';
-import { nextTick, onMounted, shallowRef, ShallowRef } from 'vue';
+import { correctString, isArrayNotEmpty, IScope, isObject, isString, isStringNotEmpty, useHook, useKey } from 'snail.core';
+import { ElementOverflowStatus, scrollIntoView, useObserver } from 'snail.view';
+import { nextTick, onMounted, onUnmounted, shallowRef, ShallowRef, useTemplateRef } from 'vue';
 import Dynamic from '../base/dynamic.vue';
 import Icon from '../base/icon.vue';
-import { ComponentOptions } from '../base/models/component-model.js';
+import { ComponentOptions } from '../base/models/component-model';
+import { useReactive } from '../base/reactive';
 import { as } from '../base/utils/base-util';
+import { usePicker } from '../picker/manager';
 import Empty from '../prompt/empty.vue';
 import Loading from '../prompt/loading.vue';
-import { TabsEvents, TabsHandle, TabsItemOptions, TabsOptions } from './models/tabs-model';
+import { TabsEvents, TabsHandle, TabsItemHandle, TabsItemOptions, TabsOptions } from './models/tabs-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<TabsOptions>();
 const emits = defineEmits<TabsEvents>();
 const { getKey } = useKey();
+const { showAction } = usePicker();
+const { onOverflow } = useObserver();
+const { watcher } = useReactive();
+const { register, runHookAsync } = useHook<string>();
+/**     标签选项卡容器Dom，计算溢出使用 */
+const tabItemsDom = useTemplateRef('tab-items');
 //  2、组件交互变量、常量
 /**     选中的标签项 */
 const selectedItemRef: ShallowRef<TabsItemOptions> = shallowRef(undefined);
+/**     标签选项卡容器Dom的溢出状态*/
+const overflowStatusRef: ShallowRef<ElementOverflowStatus> = shallowRef();
+/**     标签选项卡容器Dom的溢出状态监听作用域 */
+let overflowScope: IScope = undefined;
 
 // *****************************************   👉  句柄+接口    ****************************************
 /**     标签页操作句柄 */
@@ -92,24 +106,70 @@ const handle: TabsHandle = Object.freeze<TabsHandle>({
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
+ * 监控标签页容器Dom的溢出状态
+ */
+function monitTabItemsOverFlow() {
+    //  无需溢出监听
+    if (props.hideHeader == true || props.position == "left" || props.position == "right") {
+        overflowStatusRef.value = undefined;
+        overflowScope && overflowScope.destroy();
+        overflowScope = undefined;
+        return;
+    }
+    //  需要溢出监听：但要避免重复监听
+    if (overflowScope == undefined || overflowScope.destroyed == true) {
+        overflowScope = onOverflow(tabItemsDom.value, now => overflowStatusRef.value = now);
+    }
+}
+/**
+ * 构建标签项的操作句柄
+ * @param tab 
+ */
+function buildTabItemHandle(tab: TabsItemOptions): TabsItemHandle {
+    return {
+        beforeLeave(fn) {
+            return register(tab.id, fn);
+        },
+    }
+}
+
+/**
  * 页签项点击时
  * @param tab 
  * @returns 是否切换成功
  */
-function onTabItemClick(tab: TabsItemOptions): Promise<boolean> {
+async function onTabItemClick(tab: TabsItemOptions): Promise<boolean> {
     if (selectedItemRef.value != tab) {
-        //  初次不用执行钩子函数
-        if (selectedItemRef.value == undefined) {
-            selectedItemRef.value = tab;
-            return Promise.resolve(true);
+        emits("click", tab.id);
+        //  初次不用执行钩子函数；否则执行钩子函数，然后根据返回值决定是否切换
+        let canSelect = selectedItemRef.value == undefined ? true : undefined;
+        if (canSelect == undefined) {
+            const rt = await runHookAsync(selectedItemRef.value.id, { mode: "one", order: "desc" });
+            canSelect = rt.success == true && rt.data !== false;
         }
-        //  执行钩子函数，然后再切换，根据返回值决定是否切换
-        else {
+        if (canSelect == true) {
+            const oldTabId = selectedItemRef.value ? selectedItemRef.value.id : undefined;
             selectedItemRef.value = tab;
-            return Promise.resolve(true);
+            scrollIntoView(tab.id);
+            emits("active", tab.id);
+            emits("change", tab.id, oldTabId);
+            return true;
         }
     }
-    return Promise.resolve(false);
+    return false;
+}
+/**
+ * 显示更多的标签页
+ */
+async function onShowMoreTabs(evt: Event) {
+    const code = await showAction(evt.target as HTMLElement, {
+        title: "标签页",
+        actions: props.tabs.map(t => ({ code: t.id, name: t.name })),
+    });
+    //  若切换了选中页签，则同步激活，并确保显示到视图窗口中
+    if (isStringNotEmpty(code) && (selectedItemRef.value == undefined || selectedItemRef.value.id != code)) {
+        handle.active(code);
+    }
 }
 
 // *****************************************   👉  组件渲染    *****************************************
@@ -122,7 +182,12 @@ onMounted(async () => {
         await nextTick();
         selectedItemRef.value == undefined && onTabItemClick(props.tabs[0]);
     }
+    //  监听值改变，进行溢出状态计算
+    watcher(() => props.position, monitTabItemsOverFlow);
+    watcher(() => props.hideHeader, monitTabItemsOverFlow);
+    setTimeout(monitTabItemsOverFlow, 0);
 });
+onUnmounted(() => overflowScope && overflowScope.destroy());
 </script>
 
 <style lang="less">
@@ -169,6 +234,7 @@ onMounted(async () => {
         // 更多tabs导航按钮
         >.more-items {
             flex: none;
+            margin-left: 10px;
             justify-self: flex-end;
         }
     }

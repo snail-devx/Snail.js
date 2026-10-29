@@ -18,7 +18,7 @@
             center
             <Switch :type="'radio'" :value="alignRef == 'end'" @change="vl => vl && (alignRef = 'end')" />
             end
-            <b style="margin-left: 100px;">header-disabled：</b>
+            <b style="margin-left: 100px;">hide-header：</b>
             <Switch :type="'radio'" :value="headerRef" @change="vl => headerRef = vl" />
         </div>
         <div style=" display: flex;gap: 10px; align-items: center;">
@@ -37,7 +37,7 @@
 
         <Tabs style="flex: 1;margin-top: 20px;border-top: 1px solid gray;" :position="positionRef" :tabs="tabs"
             :loading="loadingRef" :align="alignRef" :tab-width="widthRef" :tab-height="heightRef"
-            :header-disabled="headerRef" @ready="h => handleRef = h">
+            :hide-header="headerRef" @ready="h => handleRef = h">
             <template #>
                 默认
             </template>
@@ -51,6 +51,7 @@
 <script setup lang="ts">
 import { onMounted, shallowRef, ShallowRef } from 'vue';
 import { components, TabsHandle, TabsItemOptions, TabsOptions } from '../../libraries/snail_vue';
+import TabItem from './components/tab-item.vue';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -67,7 +68,7 @@ const tabs: TabsItemOptions[] = [
     { id: "Tab1", name: "页签1", content: "tab1" },
     { id: "Tab2", name: "页签2", content: "default" },
     { id: "Tab3", name: "页签3", content: undefined },
-    { id: "Tab4", name: "页签4", content: undefined },
+    { id: "Tab4", name: "页签4", content: { component: TabItem } },
 ];
 
 

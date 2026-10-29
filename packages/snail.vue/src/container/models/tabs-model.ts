@@ -1,3 +1,4 @@
+import { HookFunctionReturn, IScope } from "snail.core";
 import Dynamic from "../../base/dynamic.vue";
 import { ReadyEvents } from "../../base/models/base-event";
 import { ComponentOptions } from "../../base/models/component-model";
@@ -7,18 +8,18 @@ import { ComponentOptions } from "../../base/models/component-model";
  */
 export type TabsOptions = {
     /**
-     * 标签选项卡的位置
-     * - left: 选项卡在左侧，内容显示在右侧
-     * - right: 选项卡在右侧，内容显示在左侧
-     * - top: 【默认值】选项卡在顶部，内容显示在下方
-     * - bottom: 选项卡在底部，内容显示在上方
+     * 标签栏位置
+     * - top: 【默认值】标签在顶部，内容在下方
+     * - bottom: 标签在底部，内容在上方
+     * - left: 标签在左侧，内容在右侧
+     * - right: 标签在右侧，内容在左侧
      */
-    position: "left" | "right" | "top" | "bottom";
+    position?: "top" | "bottom" | "left" | "right";
     /**
-     * 标签选项卡在头部的对齐方式
-     * - start: 【默认值】靠左对齐
-     * - center: 居中对齐
-     * - end: 靠右对齐
+     * 标签栏中标签对齐方式（标签总宽不足时生效）
+     * - start: 【默认值】靠左/靠上
+     * - center: 居中
+     * - end: 靠右/靠下
      */
     align?: "start" | "center" | "end";
     /**
@@ -44,11 +45,10 @@ export type TabsOptions = {
      */
     loading?: boolean;
     /**
-     * 头部是否禁用
-     * - 组件头部显示标签选项和一些操作按钮
-     * - true时，不显示标签头部，外部通过 handle 控制激活哪个标签显示
+     * 是否隐藏标签头部
+     * - true 时不显示标签栏，外部通过 handle 控制切换
      */
-    headerDisabled?: boolean;
+    hideHeader?: boolean;
 }
 /**
  * Tab 组件事件
@@ -58,15 +58,14 @@ export type TabsEvents = ReadyEvents<TabsHandle> & {
      * 点击标签页时
      * - 点击后触发，但是会否激活标签页，由组件内部控制
      * @param id 激活的标签页id
-     * @param index 激活的标签页索引
      */
-    click: [id: string, index: number];
+    click: [id: string];
     /**
      * 激活标签页时
      * @param id 激活的标签页id
      * @param index 激活的标签页索引
      */
-    active: [id: string, index: number];
+    active: [id: string];
     /**
      * 标签页切换时
      * @param id 激活的标签页id
@@ -125,4 +124,18 @@ export type TabsItemOptions = {
      * - 通过 v-bind 绑定给组件/插槽
      */
     props?: Record<string, any>;
+}
+
+/**
+ * Tab 标签页组件标签项的操作句柄
+ * - 挂载给标签项的内容组件、插槽中的一些方法、属性
+ */
+export type TabsItemHandle = {
+    /**
+     * 监听：离开激标签页之前
+     * - 要切换到其他标签页时，会触发该钩子函数
+     * @param fn 钩子函数，若返回false或者异步false，则不会切换到其他页签
+     * @returns 作用域，可以根据需要销毁，则注销钩子函数
+     */
+    beforeLeave(fn: () => HookFunctionReturn): IScope;
 }
