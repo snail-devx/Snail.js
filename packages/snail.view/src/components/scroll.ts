@@ -180,7 +180,6 @@ export function useScroll(target: HTMLElement, options: ScrollBaseOptions, fn?: 
             });
         }
         //  滚动视图信息初始化
-        refresh();
         refresh("initial");
 
         return manager;
