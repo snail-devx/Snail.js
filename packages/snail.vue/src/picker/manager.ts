@@ -2,6 +2,7 @@ import { correctNumber, IAsyncScope, IScope, mountScope, ScopeOptions, throwIfFa
 import { Component } from "vue";
 import { AppOptions } from "../base/models/app-model";
 import { correctAppOptions, useApp } from "../base/utils/app-util";
+import { MOTION } from "../base/utils/motion-util";
 import { FollowPositionOptions, usePopup } from "../popup/manager";
 import ActionPopup from "./components/action-popup.vue";
 import DateDesktopPopup from "./components/date-desktop-popup.vue";
@@ -60,8 +61,9 @@ export function usePicker(options?: Pick<ScopeOptions, "global"> & AppOptions): 
         else {
             return showPicker(target, DatetimeMobilePopup, options, {
                 dialog: {
+                    motion: MOTION.bottom,
                     closeOnEscape: true,
-                    closeOnMask: true
+                    closeOnMask: true,
                 },
                 ...popupOptions,
                 type: "dialog",
@@ -78,8 +80,9 @@ export function usePicker(options?: Pick<ScopeOptions, "global"> & AppOptions): 
         const popupOptions: PickerPopupOptions = {
             type: "dialog",
             dialog: {
+                motion: MOTION.bottom,
                 closeOnEscape: true,
-                closeOnMask: true
+                closeOnMask: true,
             }
         }
         return showPicker<string, ScrollPickerOptions>(undefined, ScrollPicker, options, popupOptions);
@@ -97,6 +100,7 @@ export function usePicker(options?: Pick<ScopeOptions, "global"> & AppOptions): 
         const popup: PickerPopupOptions = mode == "mobile"
             ? {
                 dialog: {
+                    motion: MOTION.bottom,
                     closeOnEscape: true,
                     closeOnMask: true,
                 },

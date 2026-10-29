@@ -1,14 +1,14 @@
 <!-- 对话框弹窗容器：支持外部传入动画，不转则使用默认的 -->
 <template>
-    <div :class="['snail-dialog', options.rootClass, popupStatus.value, motion.value]" :style="{ 'z-index': zIndex }"
+    <div :class="['snail-dialog', options.rootClass, popupStatus.value]" :style="{ 'z-index': zIndex }"
         @mousedown.self="onDialogRootMouseDown" @click.self="onDialogRootClick">
         <template v-if="options.wrapper == undefined" :key="'no-wrapper'">
-            <Dynamic class="dialog-body" :name="options.name" :component="options.component" :url="options.url"
-                :props="props" :="dialogExtend" :popup-status="popupStatus.value" v-model="model" />
+            <Dynamic class="dialog-body" :class="motion.value" :name="options.name" :component="options.component"
+                :url="options.url" :props="props" :="dialogExtend" :popup-status="popupStatus.value" v-model="model" />
         </template>
         <!-- 启用Wrapper模式时，强制注入【onBuildData】 -->
-        <Wrapper v-else class="dialog-body dialog-builtin" :in-popup="true" :="options.wrapper" @cancel="closePopup()"
-            @confirm="onWrapperConfirm">
+        <Wrapper v-else class="dialog-body dialog-builtin" :class="motion.value" :in-popup="true" :="options.wrapper"
+            @cancel="closePopup()" @confirm="onWrapperConfirm">
             <Dynamic :name="options.name" :component="options.component" :url="options.url" :props="props"
                 :="dialogExtend" :popup-status="popupStatus.value" v-model="model"
                 :on-build-data="registerBuildDataFunc" />
@@ -119,7 +119,7 @@ onMounted(() => {
         .wh-fill();
         //  透明度动画，在非激活时，透明度0不显示
         opacity: 1;
-        transition: opacity 0.2s ease-in-out;
+        transition: opacity 0.2s linear;
     }
 
     //  弹窗展示组件：给个背景色，避免透明
