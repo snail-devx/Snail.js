@@ -14,6 +14,8 @@ import { PopupDescriptor, PopupOptions } from "../models/popup-model";
 const DEFAULT_ZINDEX: number = 2000;
 /** 弹窗字典：key为弹窗id，value为构建的app实例 */
 const POPUPMAPS: Map<string, App<Element>> = new Map();
+/** 弹窗的z-index值队列 */
+const QUEUE_ZINDEX: number[] = [];
 
 /**
  * 检测弹窗配置选项
@@ -51,7 +53,7 @@ export function openPopup<Options extends PopupOptions, ExtOptions extends Recor
         popupStatus: shallowRef("open"),
         options: options,
         extOptions: extOptions,
-        zIndex: options.zIndex || DEFAULT_ZINDEX,
+        zIndex: correctZIndex(options.zIndex),
         motion: shallowRef<string>(correctPopupMotion("open", options.motion)),
     });
     {
@@ -89,6 +91,8 @@ export function destroyPopup<T>(descriptor: PopupDescriptor<PopupOptions, any>, 
             app.unmount();
         }, options.motionDuration > 0 ? options.motionDuration : 200);
     }
+    //  整理完之后，清理ZIndex值
+    QUEUE_ZINDEX.splice(POPUPMAPS.size);
 }
 
 /**
@@ -141,4 +145,17 @@ function correctPopupMotion(type: "open" | "close", motion?: PopupOptions["motio
         motionName = `fade-${motionName}`;
     }
     return motionName;
+}
+/**
+ * 校正弹窗的z-index值
+ * @param zIndex 
+ * @returns 新的z-index值，确保新弹窗在最前面
+ */
+function correctZIndex(zIndex: number): number {
+    let tmpZIndex = zIndex > DEFAULT_ZINDEX ? zIndex : DEFAULT_ZINDEX;
+    if (QUEUE_ZINDEX.length > 0) {
+        tmpZIndex = Math.max(QUEUE_ZINDEX[QUEUE_ZINDEX.length - 1], tmpZIndex)
+    }
+    QUEUE_ZINDEX.push(tmpZIndex);
+    return tmpZIndex;
 }

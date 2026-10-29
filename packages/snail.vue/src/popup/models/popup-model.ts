@@ -46,6 +46,7 @@ export type PopupOptions<Props = void, Model = void> = ComponentOptions & Compon
 
     /**
      * 弹窗的z-index值
+     * - 涉及到多层弹窗时，指定的z-index值若低于前面弹窗，会自动校正
      * - 无特殊情况，建议不指定，内部会自动生成，确保弹窗正确性
      */
     zIndex?: number;
