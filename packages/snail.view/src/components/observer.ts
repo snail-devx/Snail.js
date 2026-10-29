@@ -5,7 +5,7 @@
  *  1、不提供全局【观察者】对象；这个涉到不少子scope的销毁，在全局挂着始终不好
  */
 import { checkScope, correctNumber, IScope, IScopes, mountScope, mustFunction, mustString, run, ScopeOptions, throwIfFalse, useScopes } from "snail.core";
-import { ElementSize, IObserver, TouchDetail, TouchDistance, TouchOptions, TouchStatus, TouchTarget } from "../models/observer-model";
+import { ElementOverflowStatus, ElementSize, IObserver, TouchDetail, TouchDistance, TouchOptions, TouchStatus, TouchTarget } from "../models/observer-model";
 import { useAnimationFrame } from "./animation";
 
 /**
@@ -188,6 +188,41 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
             timer && clearInterval(timer);
         });
     }
+    /**
+     * 监听元素的溢出状态
+     * @param el 监听元素
+     * @param fn 变化时的回调方法，回调时传入当前状态和上次状态（初始时，上次状态为undefined）
+     * @returns 作用域，可销毁监听
+     */
+    function onOverflow(el: Element, fn: (now: ElementOverflowStatus, pre?: ElementOverflowStatus) => void): IScope {
+        checkScope(manager, "onSize: observer destroyed.");
+        throwIfFalse(el instanceof Element, "onSize: el must be an Element.");
+        mustFunction(fn, "onOverflow: fn");
+        const scope = scopes.get();
+
+        //  使用定时器监听，ResizeObserver监听也不是特别好，涉及到 元素指定了overflow: hidden时，ResizeObserver无法监听到变化
+        let preStatus: ElementOverflowStatus = undefined;
+        const tmpFunc = () => {
+            // +1 防 sub-pixel 抖动 
+            const now: ElementOverflowStatus = Object.freeze<ElementOverflowStatus>({
+                overflowX: el.scrollWidth > el.clientWidth + 1,
+                overflowY: el.scrollHeight > el.clientHeight + 1
+            });
+            //  有变化时，进行回调通知：如果preStatus为undefined，表示是第一次计算，始终回调
+            if (preStatus == undefined || preStatus.overflowX != now.overflowX || preStatus.overflowY != now.overflowY) {
+                try {
+                    run(fn, now, preStatus);
+                }
+                finally {
+                    preStatus = now;
+                }
+            }
+        };
+        //  启动监听，并在下一帧的时候进行第一次初始化计算
+        const timer = setInterval(tmpFunc, 100);
+        requestAnimationFrame(tmpFunc);
+        return scope.onDestroy(() => clearInterval(timer));
+    }
 
     /**
      * 监听元素客户端位置、大小变化
@@ -295,7 +330,7 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
     //  构建管理器实例，挂载scope作用域
     const manager = mountScope<IObserver>(
         {
-            onEvent, onTouch, onSize,
+            onEvent, onTouch, onSize, onOverflow,
             onClient, onMutation
         },
         { global, type: "IObserver" }

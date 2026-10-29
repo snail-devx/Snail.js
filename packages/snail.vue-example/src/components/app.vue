@@ -59,6 +59,7 @@ import ActionTest from "./other/action-test.vue";
 import CardTest from "./other/card-test.vue";
 import FlashNumberTest from "./other/flash-number-test.vue";
 //  👉 其他组件
+import UseObserverTest from "./view/use-observer.vue";
 import UseScrollTest from "./view/use-scroll.vue";
 import UseStyleTest from "./view/use-style.vue";
 //#endregion
@@ -167,6 +168,7 @@ const treeOptions: TreeOptions<Component> = {
         }, {
             text: "Snail.View",
             children: [
+                { text: "useObserver 测试", data: UseObserverTest, clickable: true, searchable: true },
                 { text: "UseScroll 测试", data: UseScrollTest, clickable: true, searchable: true },
                 { text: "useStyle 测试", data: UseStyleTest, clickable: true, searchable: true }
             ]

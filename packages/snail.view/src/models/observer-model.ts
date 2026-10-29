@@ -35,6 +35,13 @@ export interface IObserver {
      * @returns 作用域，可销毁监听
      */
     onSize(el: Element, fn: (size: Readonly<ElementSize>) => void): IScope;
+    /**
+     * 监听元素的溢出状态
+     * @param el 监听元素
+     * @param fn 变化时的回调方法，回调时传入当前状态和上次状态（初始时，上次状态为undefined）
+     * @returns 作用域，可销毁监听
+     */
+    onOverflow(el: Element, fn: (now: ElementOverflowStatus, pre?: ElementOverflowStatus) => void): IScope;
 
     /**
      * 监听元素客户端位置、大小变化
@@ -85,6 +92,19 @@ export type ElementPosition = {
      */
     y: number;
 }
+/**
+ * 元素溢出状态
+ */
+export type ElementOverflowStatus = {
+    /**
+     * x方向是否溢出
+     */
+    overflowX: boolean;
+    /**
+     * y方向是否溢出
+     */
+    overflowY: boolean;
+};
 
 
 /**

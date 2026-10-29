@@ -113,8 +113,8 @@ export function useScroll(target: HTMLElement, options: ScrollBaseOptions, fn?: 
             scrollLeft: target.scrollLeft,
             scrollTop: target.scrollTop,
             //  计算出来的滚动条状态
-            xbar: target.scrollWidth > target.clientWidth,
-            ybar: target.scrollHeight > target.clientHeight,
+            xbar: target.scrollWidth > target.clientWidth + 1,
+            ybar: target.scrollHeight > target.clientHeight + 1,
             left: isScrollLeft(target),
             right: isScrollRight(target),
             top: isScrollTop(target),
