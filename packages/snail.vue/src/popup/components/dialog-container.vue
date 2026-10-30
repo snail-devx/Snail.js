@@ -119,7 +119,6 @@ onMounted(() => {
         .wh-fill();
         //  透明度动画，在非激活时，透明度0不显示
         opacity: 1;
-        transition: opacity 0.2s linear;
     }
 
     //  弹窗展示组件：给个背景色，避免透明
@@ -146,14 +145,20 @@ onMounted(() => {
 
 
 // *****************************************   👉  特殊状态    *****************************************
-//  非激活状态时
-.snail-dialog.unactive {
-    &::before {
+.snail-dialog {
+
+    //  非激活、关闭状态时，遮罩层透明度0
+    &.unactive::before,
+    &.closed::before {
         opacity: 0;
     }
 
-    &>.dialog-body {
-        box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    // 非激活状态时，做一点阴影效果做区分
+    &.unactive {
+        >.dialog-body {
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+        }
     }
+
 }
 </style>
