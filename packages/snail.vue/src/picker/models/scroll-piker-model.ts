@@ -14,7 +14,7 @@ export type ScrollPickerOptions = {
     items: ScrollPickItem[];
     /**
      * 选中值
-     * - 选择项的`code`值
+     * - 选择项的`id`值
      */
     value?: string;
 
@@ -44,10 +44,10 @@ export type ScrollPickerPopupOptions = TitleOptions & {
  */
 export type ScrollPickItem = {
     /**
-     * 选项code
-     * - 保持唯一
+     * 选项id值
+     * - 确保唯一
      */
-    code: string;
+    id: string;
     /**
      * 选项名称
      */

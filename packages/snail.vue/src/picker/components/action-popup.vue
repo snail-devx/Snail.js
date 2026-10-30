@@ -7,9 +7,10 @@
         <template v-if="mode == 'mobile' && isStringNotEmpty(title)">
             <div class="action-title ellipsis" v-text="title" />
         </template>
-        <template v-for="(action, index) in actions" :key="action.code">
+        <template v-for="(action, index) in actions" :key="action.id">
             <div class="action-item ellipsis" :class="{
-                'no-border': mode == 'mobile' && (index == actions.length - 1)
+                'no-border': mode == 'mobile' && (index == actions.length - 1),
+                'selected': action.id == value,
             }" :style="{
                 '--color': correctString(action.color, undefined, true),
                 '--hover-color': correctString(action.hoverColor, undefined, true)
@@ -28,7 +29,6 @@ import { DialogHandle, FollowExtend } from '../../popup/manager';
 import { ActionPickerItem, ActionPickerOptions } from '../models/action-model';
 import { PickerExtend } from '../models/picker-model';
 
-
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const { closePopup } = defineProps<ActionPickerOptions & DialogHandle<string> & FollowExtend & PickerExtend>();
@@ -43,7 +43,7 @@ const { mode } = useApp();
 function onActionItemClick(action: ActionPickerItem) {
     //  click方法不能在setTimeout中执行，如涉及拍照的原生api时，会出问题
     isFunction(action.click) && action.click();
-    closePopup(action.code);
+    closePopup(action.id);
 }
 
 // *****************************************   👉  组件渲染    *****************************************
@@ -65,8 +65,8 @@ function onActionItemClick(action: ActionPickerItem) {
 
     //  颜色配置
     & {
-        --color: "#2E3033";
-        --hover-color: "#2E3033";
+        --color: #2E3033;
+        --hover-color: #2E3033;
 
         >div.action-item {
             color: var(--color);
@@ -76,6 +76,8 @@ function onActionItemClick(action: ActionPickerItem) {
                 color: var(--hover-color);
                 background-color: #F8F9FA;
             }
+
+
         }
     }
 }
@@ -148,6 +150,15 @@ function onActionItemClick(action: ActionPickerItem) {
             height: 6px;
             background-color: #E2E2E3;
             opacity: .4;
+        }
+    }
+}
+
+// 选中状态时的样式，放到最后，否则移动端会被覆盖
+.snail-action-picker {
+    >div.action-item {
+        &.selected {
+            color: #279bf1;
         }
     }
 }

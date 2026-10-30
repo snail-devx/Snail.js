@@ -1,6 +1,6 @@
 import { DisabledOptions, ValueOptions } from "../../base/models/base-model";
 import { IconOptions } from "../../base/models/icon-model";
-import { FollowPositionOptions, FollowStrategy } from "../../popup/models/follow-model";
+import { FollowPositionOptions } from "../../popup/models/follow-model";
 
 /**
  * 可操作项组件 的配置选项
@@ -59,10 +59,10 @@ export type ActionItemsOptions = {
  */
 export type ActionItem = {
     /**
-     * 操作项编码
+     * 操作项id值
      * - 确保唯一
      */
-    code: string;
+    id: string;
     /**
      * 操作项名称
      * - 确保唯一

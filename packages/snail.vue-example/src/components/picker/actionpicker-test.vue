@@ -20,9 +20,9 @@ import ActionpickerInner from './components/actionpicker-inner.vue';
 const { Env } = components;
 //  2、组件交互变量、常量
 const actions: ActionPickerItem[] = [
-    { code: "code1", name: "动作1", },
-    { code: "code2", name: "动作2", },
-    { code: "code3", name: "动作3", },
+    { id: "code1", name: "动作1", },
+    { id: "code2", name: "动作2", },
+    { id: "code3", name: "动作3", },
 ];
 
 // *****************************************   👉  方法+事件    ****************************************

@@ -2,9 +2,9 @@
 <template>
     <div class="snail-action-items"
         :class="[correctString(mode, 'vertical', true), isStringNotEmpty(inPopup) ? 'in-popup' : '']">
-        <div class="action-item flex-cross-center" v-for="action in actions" :key="action.code"
+        <div class="action-item flex-cross-center" v-for="action in actions" :key="action.id"
             :style="{ '--color': correctString(action.color, null, true), '--hcolor': correctString(action.hoverColor, null, true) }"
-            @click="onActionItemClick(action.code)">
+            @click="onActionItemClick(action.id)">
             <Icon v-if="action.icon != undefined" :="action.icon" :custom="false" :size="20" />
             <span class="ellipsis" v-text="action.name" />
         </div>
@@ -13,9 +13,9 @@
 
 <script setup lang="ts">
 import { correctString, isStringNotEmpty } from "snail.core";
-import { ActionEvents, ActionItemsOptions } from "../models/action-model";
 import Icon from "../../base/icon.vue";
 import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
+import { ActionEvents, ActionItemsOptions } from "../models/action-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

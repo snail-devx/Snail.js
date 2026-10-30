@@ -370,7 +370,7 @@ export function buildYearScrollItems(year: number, min: DateValue, max: DateValu
     for (let index = -1000; index < 1000; index++) {
         const tmpYear: number = Math.max(0, year + index);
         items.push({
-            code: String(tmpYear),
+            id: String(tmpYear),
             name: String(tmpYear),
             disabled: validateYear(tmpYear, min, max) == false,
         });
@@ -387,7 +387,7 @@ export function buildMonthScrollItems(year: number, min: DateValue, max: DateVal
     const items: ScrollPickItem[] = [];
     for (let index = 1; index <= 12; index++) {
         items.push({
-            code: String(index),
+            id: String(index),
             name: String(index),
             disabled: validateMonth(year, index, min, max) == false,
         });
@@ -411,7 +411,7 @@ export function buildDayScrollItems(year: number, month: number, min: DateValue,
             break;
         }
         items.push({
-            code: String(index),
+            id: String(index),
             name: String(index),
             disabled: validateDay(year, month, index, min, max) == false,
         });
@@ -428,7 +428,7 @@ export function buildHourScrollItems(min: TimeValue, max: TimeValue): ScrollPick
     const items: ScrollPickItem[] = [];
     for (let index = 0; index < 24; index++) {
         items.push({
-            code: String(index),
+            id: String(index),
             name: String(index),
             disabled: validateHour(index, min, max) == false,
         });
@@ -446,7 +446,7 @@ export function buildMinuteScrollItems(hour: number, min: TimeValue, max: TimeVa
     const items: ScrollPickItem[] = [];
     for (let index = 0; index < 60; index++) {
         items.push({
-            code: String(index),
+            id: String(index),
             name: String(index),
             disabled: validateMinute(hour, index, min, max) == false,
         });
@@ -465,7 +465,7 @@ export function buildSecondScrollItems(hour: number, minute: number, min: TimeVa
     const items: ScrollPickItem[] = [];
     for (let index = 0; index < 60; index++) {
         items.push({
-            code: String(index),
+            id: String(index),
             name: String(index),
             disabled: validateSecond(hour, minute, index, min, max) == false,
         });

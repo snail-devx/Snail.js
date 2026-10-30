@@ -37,15 +37,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, } from "vue";
-import { ActionOptions, ActionSlotHandle, components, useReactive } from "../../libraries/snail_vue";
+import { ActionOptions, ActionSlotHandle, components } from "../../libraries/snail_vue";
 const { Action } = components;
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const actions: ActionOptions["actions"] = [
-    { "code": "add", "name": "添加" },
-    { "code": "delete", "name": "删除" },
+    { "id": "add", "name": "添加" },
+    { "id": "delete", "name": "删除" },
 ];
 
 //  2、组件交互变量、常量

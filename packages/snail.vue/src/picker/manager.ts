@@ -92,7 +92,7 @@ export function usePicker(options?: Pick<ScopeOptions, "global"> & AppEnv): IPic
      * @param target 哪个元素触发，基于此元素计算位置；桌面端必须，基于此元素进行follow效果
      * @param props 选择控件属性
      * @param options 选择器弹窗的一些扩展配置
-     * @returns 异步任务，可销毁选择组件；选择动作后，返回动作的code值
+     * @returns 异步任务，可销毁选择组件；选择动作后，返回动作项的id值
      */
     function showAction(target: HTMLElement, props: ActionPickerOptions, options?: Pick<PickerPopupOptions, "follow" | "dialog">): IAsyncScope<string> {
         const po: PickerPopupOptions = popup.mode == "mobile"

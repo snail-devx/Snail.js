@@ -27,15 +27,14 @@
 </template>
 
 <script setup lang="ts">
-import { IAsyncScope, isArrayNotEmpty } from 'snail.core';
+import { IAsyncScope, isArrayNotEmpty, isStringNotEmpty } from 'snail.core';
 import { useObserver } from 'snail.view';
 import { onMounted, shallowRef, ShallowRef, useTemplateRef } from 'vue';
-import { isStringNotEmpty } from 'snail.core';
-import { ActionEvents, ActionItemsOptions, ActionOptions, ActionSlotHandle } from './models/action-model';
 import Icon from '../base/icon.vue';
+import { usePicker } from '../picker/manager';
 import { usePopup } from '../popup/manager';
 import ActionItems from './components/action-items.vue';
-import { usePicker } from '../picker/manager';
+import { ActionEvents, ActionItemsOptions, ActionOptions, ActionSlotHandle } from './models/action-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -64,7 +63,7 @@ const slotHandle: ActionSlotHandle = Object.freeze<ActionSlotHandle>({
  */
 function buildDefaultText() {
     if (isArrayNotEmpty(props.actions) == true) {
-        const item = props.actions.find(item => item.code == valueRef.value) || props.actions[0];
+        const item = props.actions.find(item => item.id == valueRef.value) || props.actions[0];
         return item.name;
     }
     return undefined;

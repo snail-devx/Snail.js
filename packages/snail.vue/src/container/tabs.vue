@@ -164,7 +164,8 @@ async function onTabItemClick(tab: TabsItemOptions): Promise<boolean> {
 async function onShowMoreTabs(evt: Event) {
     const code = await showAction(evt.target as HTMLElement, {
         title: "标签页",
-        actions: props.tabs.map(t => ({ code: t.id, name: t.name })),
+        actions: props.tabs.map(t => ({ id: t.id, name: t.name })),
+        value: selectedItemRef.value ? selectedItemRef.value.id : undefined,
     });
     //  若切换了选中页签，则同步激活，并确保显示到视图窗口中
     if (isStringNotEmpty(code) && (selectedItemRef.value == undefined || selectedItemRef.value.id != code)) {

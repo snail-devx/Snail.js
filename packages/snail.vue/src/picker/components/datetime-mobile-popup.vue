@@ -146,8 +146,8 @@ function onDaySelect(code: string) {
     //  需要验证天数是否有效：无效则重新赋值，找不到当前天时取最后一天；如2月28,day不能是30日
     {
         let day: number = Number(code);
-        const dayItem = dayItemsRef.value.find(item => item.code == code);
-        dayItem || (day = Number(getFromArray(dayItemsRef.value, -1).code));
+        const dayItem = dayItemsRef.value.find(item => item.id == code);
+        dayItem || (day = Number(getFromArray(dayItemsRef.value, -1).id));
 
         day != dateRef.value.day && (dateRef.value.day = day);
     }
