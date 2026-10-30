@@ -42,7 +42,6 @@ export * from "./container/models/page-model";
 export * from "./container/models/scroll-model";
 export * from "./container/models/table-model";
 export * from "./container/models/tabs-model";
-export * from "./container/models/wrapper-model";
 //  组件导出：赋值给 components
 import ElasticBar from "./container/components/elastic-bar.vue";
 import ElasticPadding from "./container/components/elastic-padding.vue";
@@ -59,7 +58,6 @@ import Page from "./container/page.vue";
 import Scroll from "./container/scroll.vue";
 import Table from "./container/table.vue";
 import Tabs from "./container/tabs.vue";
-import Wrapper from "./container/wrapper.vue";
 //  方法导出
 
 
@@ -137,7 +135,7 @@ export const components = {
     //  base下的组件
     Dynamic, Env, Field, Icon, Motion, Sort,
     //  container 下的组件
-    Flex, Fold, Layout, Page, Scroll, Wrapper, Tabs,
+    Flex, Fold, Layout, Page, Scroll, Tabs,
     Elastic, ElasticTable, Table, DataTable,
     //      components下的辅助组件
     ElasticBar, ElasticPadding, ElasticUpdown, Footer, Header,

@@ -2,27 +2,16 @@
 <template>
     <div :class="['snail-dialog', options.rootClass, popupStatus.value]" :style="{ 'z-index': zIndex }"
         @mousedown.self="onDialogRootMouseDown" @click.self="onDialogRootClick">
-        <template v-if="options.wrapper == undefined" :key="'no-wrapper'">
-            <Dynamic class="dialog-body" :class="motion.value" :name="options.name" :component="options.component"
-                :url="options.url" :props="props" :="dialogExtend" :popup-status="popupStatus.value" v-model="model" />
-        </template>
-        <!-- 启用Wrapper模式时，强制注入【onBuildData】 -->
-        <Wrapper v-else class="dialog-body dialog-builtin" :class="motion.value" :in-popup="true" :="options.wrapper"
-            @cancel="closePopup()" @confirm="onWrapperConfirm">
-            <Dynamic :name="options.name" :component="options.component" :url="options.url" :props="props"
-                :="dialogExtend" :popup-status="popupStatus.value" v-model="model"
-                :on-build-data="registerBuildDataFunc" />
-        </Wrapper>
+        <Dynamic class="dialog-body" :class="motion.value" :name="options.name" :component="options.component"
+            :url="options.url" :props="props" :="dialogExtend" :popup-status="popupStatus.value" v-model="model" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { mustFunction, runAsync } from "snail.core";
 import { useObserver } from "snail.view";
 import { onMounted, shallowRef } from "vue";
 import Dynamic from "../../base/dynamic.vue";
-import Wrapper from "../../container/wrapper.vue";
-import { DialogHandle, DialogOptions, DialogWrapperHandle } from "../models/dialog-model";
+import { DialogHandle, DialogOptions } from "../models/dialog-model";
 import { PopupDescriptor } from "../models/popup-model";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -62,29 +51,6 @@ function onDialogRootClick(evt: MouseEvent) {
     //  必须是在自己触发的鼠标按下事件，否则不关闭；解决“在子元素按下鼠标，然后移动到容器元素上松开鼠标，此时click.self被触发了，导致弹窗关了”问题
     evt.target === mousedownTarget && options.closeOnMask && closePopup();
     mousedownTarget = undefined;
-}
-
-/**
- * 注册【构建数据】方法
- * - 使用变量，方便复用类型
- * @param fn 
- */
-const registerBuildDataFunc: DialogWrapperHandle<any>["onBuildData"] = fn => {
-    mustFunction(fn, "fn");
-    fn_onBuildData = fn;
-};
-/**
- * 包裹器【确认】按钮点击时
- */
-async function onWrapperConfirm() {
-    if (fn_onBuildData != undefined) {
-        const rt = await runAsync(fn_onBuildData);
-        console.log("onBuildData result：", rt);
-        rt.success !== false && closePopup(rt.data);
-    }
-    else {
-        closePopup();
-    }
 }
 
 // *****************************************   👉  组件渲染    *****************************************
@@ -128,21 +94,8 @@ onMounted(() => {
         border-radius: 4px;
         //  私有添加阴影，增强显示效果
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-
-        // Dialog 内置的Wrapper组件：默认不指定高度和宽度，由内容组件自己决定
-        &.snail-wrapper.dialog-builtin {
-            min-width: auto;
-            width: fit-content;
-            min-height: auto;
-            height: fit-content;
-
-            >.wrapper-body {
-                padding: 0 40px;
-            }
-        }
     }
 }
-
 
 // *****************************************   👉  特殊状态    *****************************************
 .snail-dialog {
