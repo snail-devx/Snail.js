@@ -1,6 +1,6 @@
 import { IScope } from "snail.core";
-import { Component, PropType, Ref, ShallowRef } from "vue";
-import { AppOptions } from "../../base/models/app-model";
+import { Component, Ref, ShallowRef } from "vue";
+import { AppEnv } from "../../base/models/app-model";
 
 /**
  * 组件配置选项
@@ -82,8 +82,8 @@ export type ComponentBindOptions<Props = void, Model = void> = {
 
 /**
  * 组件挂载函数
- * @param options 组件配置选项
+ * @param env 应用环境信息
  * @param root 组件挂载根节点
  * @param props 组件属性
  */
-export type CommentMountFunction<T> = (options: AppOptions, root: HTMLElement, props: PropsType<T>) => IScope | Promise<IScope>;
+export type CommentMountFunction<T> = (env: AppEnv, root: HTMLElement, props: PropsType<T>) => IScope | Promise<IScope>;

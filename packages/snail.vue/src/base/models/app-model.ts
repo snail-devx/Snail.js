@@ -11,13 +11,13 @@ import { createApp, provide } from "vue";
 export type AppType = "normal" | "popup";
 
 /**
- * Vue 应用实例配置选项
+ * Vue 应用环境信息
  * - 用于在 {@link createApp} 后,执行{@link provide}方法注入，方便后代组件直取
  */
-export type AppOptions = {
+export type AppEnv = {
     /**
      * 应用模式
-     * - 用于告知后代组件运行环境，方便后代组件实现多端交互适配
+     * - 当前处于哪种模式，方便组件进行多端适配
      * - 有效取值：
      * - - desktop 【默认值】面端页面应用，适合pc、笔记本等大屏幕渲染
      * - - mobile 移动端页面应用，适合小屏幕，如h5页面，嵌入app中的页面

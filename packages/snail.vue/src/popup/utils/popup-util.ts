@@ -5,7 +5,7 @@
 
 import { FlatPromise, isObject, isStringNotEmpty, mustObject, throwIfFalse } from "snail.core";
 import { App, Component, shallowRef } from "vue";
-import { AppOptions } from "../../base/models/app-model";
+import { AppEnv } from "../../base/models/app-model";
 import { MotionEffectOptions } from "../../base/models/motion-model";
 import { newApp } from "../../base/utils/app-util";
 import { PopupDescriptor, PopupOptions } from "../models/popup-model";
@@ -39,14 +39,13 @@ export function checkPopup(options: PopupOptions): string | undefined {
 /**
  * 打开弹窗
  * - 弹窗页面将作为独立app存在
- * @param page  弹窗页面配置选项
+ * @param env 应用环境信息；注入到新的app实例中，后代组件可{@link useApp}取到
  * @param container 弹窗容器组件；作为createApp的根组件；如DialogContainer、PopupContainer、、、
  * @param options 弹窗配置选项
  * @param extOptions 弹窗扩展配置选项
- * @param page 页面配置参数，注入到新的app实例中，后台组件可{@link usePageMode}取到
  * @returns 弹窗描述器对象
  */
-export function openPopup<Options extends PopupOptions, ExtOptions extends Record<string, any>>(page: AppOptions, container: Component, options: Options, extOptions: ExtOptions)
+export function openPopup<Options extends PopupOptions, ExtOptions extends Record<string, any>>(env: AppEnv, container: Component, options: Options, extOptions: ExtOptions)
     : Readonly<PopupDescriptor<Options, ExtOptions>> {
     const descriptor = Object.freeze<PopupDescriptor<Options, ExtOptions>>({
         popupId: `popup-${getPopupId()}`,
@@ -59,7 +58,7 @@ export function openPopup<Options extends PopupOptions, ExtOptions extends Recor
     {
         // const app = createApp(container, descriptor);
         // triggerAppCreated(app, "popup");
-        const app = newApp("popup", page, container, descriptor);
+        const app = newApp("popup", env, container, descriptor);
         app.mount(getPopupAppElement(descriptor.popupId));
         POPUPMAPS.set(descriptor.popupId, app);
     }

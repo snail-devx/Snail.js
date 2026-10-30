@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import { AppOptions, usePicker } from '../../../libraries/snail_vue';
+import { AppEnv, usePicker } from '../../../libraries/snail_vue';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -12,7 +12,7 @@ const picker = usePicker();
 //  2、组件交互变量、常量
 
 // *****************************************   👉  方法+事件    ****************************************
-async function showAction(evt: Event, mode: AppOptions['mode']) {
+async function showAction(evt: Event, mode: AppEnv['mode']) {
     const code = await picker.showAction(evt.target as HTMLElement, {
         title: "动作选择",
         actions: [

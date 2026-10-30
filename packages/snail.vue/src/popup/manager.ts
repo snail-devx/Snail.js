@@ -8,8 +8,8 @@
  */
 import { defer, IAsyncScope, IScope, IScopes, isStringNotEmpty, mountScope, ScopeOptions, useAsyncScope, useHook, useScopes } from "snail.core";
 import { Component } from "vue";
-import { AppOptions } from "../base/models/app-model";
-import { correctAppOptions, useApp } from "../base/utils/app-util";
+import { AppEnv } from "../base/models/app-model";
+import { correctAppEnv, useApp } from "../base/utils/app-util";
 import { checkDialog, monitorDialog } from "./utils/dialog-util";
 import { checkFollow } from "./utils/follow-util";
 import { checkPopup, destroyPopup, openPopup } from "./utils/popup-util";
@@ -37,13 +37,13 @@ export * from "./models/toast-model";
 
 /**
  * 使用【弹窗管理器】
- * @param options 配置选项；可配置{@link AppOptions.mode}属性，不配置则使用 {@link useApp} 获取
+ * @param options 配置选项；可配置{@link AppEnv}，不配置则使用 {@link useApp} 获取
  * @returns 全新的【弹窗管理器】实例+作用域对象
  */
-export function usePopup(options?: Pick<ScopeOptions, "global"> & AppOptions): IPopupManager & IScope {
+export function usePopup(options?: Pick<ScopeOptions, "global"> & AppEnv): IPopupManager & IScope {
     const global = options ? options.global == true : false;
-    /** 弹窗页面应用的配置：默认继承当前环境，可使用options覆盖 */
-    const app = correctAppOptions({ ...useApp(), ...options });
+    /** 弹窗页面应用环境信息：默认继承当前环境，可使用options覆盖 */
+    const env = correctAppEnv({ ...useApp(), ...options });
     /** 作用域组：管理动画效果子作用域 */
     const scopes: IScopes = useScopes({ global });
 
@@ -97,7 +97,7 @@ export function usePopup(options?: Pick<ScopeOptions, "global"> & AppOptions): I
                 },
                 onBeforeClose: fn => hook.register("onBeforeClose", fn),
             });
-            const descriptor = openPopup<any, DialogHandle<T>>(app, DialogContainer, options, extOptions);
+            const descriptor = openPopup<any, DialogHandle<T>>(env, DialogContainer, options, extOptions);
             scope = useAsyncScope<T>(deferred.promise);
             monitorDialog(descriptor, scope, deferred);
         }
@@ -158,7 +158,7 @@ export function usePopup(options?: Pick<ScopeOptions, "global"> & AppOptions): I
                 ...(options || Object.create(null)),
                 message
             },
-            motion: app.mode == 'mobile' ? "toast" : undefined,
+            motion: env.mode == 'mobile' ? "toast" : undefined,
             motionDuration: 200,
         });
     }
@@ -217,7 +217,7 @@ export function usePopup(options?: Pick<ScopeOptions, "global"> & AppOptions): I
             },
             ...extOptions
         });
-        const descriptor = openPopup(app, container || PopupContainer, options, extOptions);
+        const descriptor = openPopup(env, container || PopupContainer, options, extOptions);
         const scope = useAsyncScope<T>(deferred.promise);
         scope.onDestroy(() => destroyPopup(descriptor, deferred));
         return scope;
@@ -227,6 +227,8 @@ export function usePopup(options?: Pick<ScopeOptions, "global"> & AppOptions): I
     //  构建管理器实例，挂载scope作用域
     const manager = mountScope<IPopupManager>(
         {
+            mode: env.mode,
+
             popup, dialog, follow,
             confirm, toast
         },

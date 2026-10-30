@@ -1,8 +1,8 @@
 import { correctFunction, correctNumber, isArray, isArrayNotEmpty, IScope, isFunction, isNumberNotNaN, isString, mountScope, moveFromArray, mustFunction, mustObject, mustString, newId, throwError, throwIfTrue, throwIfUndefined } from "snail.core";
 import { scrollIntoView } from "snail.view";
 import { Ref, ref, shallowRef, ShallowRef } from "vue";
+import { AppEnv } from "../../base/models/app-model";
 import { EmitterType } from "../../base/models/component-model";
-import { AppOptions } from "../../exporter";
 import { DataTableBaseOptions, DataTableContextUseExt, DataTableEvents, DataTableHandle, DataTableLoadType, DataTableRow, DataTableRowDetail, DataTableRowPosition, DataTableSelectMode, DataTableSelectResult, DataTableSortStatus, IDataTableContext } from "../models/table-model";
 
 /**
@@ -12,7 +12,7 @@ import { DataTableBaseOptions, DataTableContextUseExt, DataTableEvents, DataTabl
  * @param emits 
  * @param ext 扩展配置
  */
-export function useDataTable(mode: Required<AppOptions["mode"]>, options: Readonly<DataTableBaseOptions<any>>, emits: EmitterType<DataTableEvents>, ext?: DataTableContextUseExt): IDataTableContext & IScope {
+export function useDataTable(mode: Required<AppEnv["mode"]>, options: Readonly<DataTableBaseOptions<any>>, emits: EmitterType<DataTableEvents>, ext?: DataTableContextUseExt): IDataTableContext & IScope {
     /**     数据加载类型 */
     const loadTypeRef: ShallowRef<DataTableLoadType> = shallowRef();
     //  数据行维护

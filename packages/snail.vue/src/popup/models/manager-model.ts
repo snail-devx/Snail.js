@@ -1,4 +1,5 @@
 import { IAsyncScope, IScope } from "snail.core";
+import { AppEnv } from "../../base/models/app-model";
 import { ComponentBindOptions } from "../../base/models/component-model";
 import { ConfirmOptions } from "./confirm-model";
 import { DialogOptions } from "./dialog-model";
@@ -10,6 +11,12 @@ import { ToastOptions } from "./toast-model";
  * 弹窗管理器
  */
 export interface IPopupManager {
+    /**
+     * 应用模式
+     * - 当前处于哪种模式，方便组件进行多端适配
+     */
+    readonly mode: AppEnv["mode"],
+
     /**
      * 弹出
      * - 弹窗位置位置、大小、动画效果等由组件自己完成

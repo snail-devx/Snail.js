@@ -1,4 +1,4 @@
-import { AppOptions } from "../../base/models/app-model";
+import { AppEnv } from "../../base/models/app-model";
 import { CloseEvents } from "../../base/models/base-event";
 import { ConfirmAreaOptions, DisabledOptions, TitleOptions } from "../../base/models/base-model";
 import { EventsType } from "../../base/models/component-model";
@@ -169,7 +169,7 @@ export type PageFooterButton = {
 /**
  * 页面组件 插槽句柄
  */
-export type PageSlotHandle = Required<Pick<AppOptions, "mode">>;
+export type PageSlotHandle = Required<Pick<AppEnv, "mode">>;
 
 /**
  * 页面组件事件
