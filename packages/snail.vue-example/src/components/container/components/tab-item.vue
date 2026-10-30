@@ -9,7 +9,7 @@ import { TabsItemHandle } from '../../../libraries/snail_vue';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const { beforeLeave } = defineProps<TabsItemHandle>();
+const { onBeforeLeave } = defineProps<TabsItemHandle>();
 //  2、组件交互变量、常量
 
 
@@ -18,7 +18,7 @@ const { beforeLeave } = defineProps<TabsItemHandle>();
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
-beforeLeave(() => {
+onBeforeLeave(() => {
     if (Date.now() % 2 == 0) {
         return false;
     }

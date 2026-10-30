@@ -144,5 +144,5 @@ export type TabsItemHandle = {
      * @param fn 钩子函数，若返回false或者异步false，则不会切换到其他页签
      * @returns 作用域，可以根据需要销毁，则注销钩子函数
      */
-    beforeLeave(fn: () => HookFunctionReturn): IScope;
+    onBeforeLeave(fn: () => HookFunctionReturn): IScope;
 }

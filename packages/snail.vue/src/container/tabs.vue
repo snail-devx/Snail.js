@@ -127,9 +127,7 @@ function monitTabItemsOverFlow() {
  */
 function buildTabItemHandle(tab: TabsItemOptions): TabsItemHandle {
     return {
-        beforeLeave(fn) {
-            return register(tab.id, fn);
-        },
+        onBeforeLeave: fn => register(tab.id, fn),
     }
 }
 
