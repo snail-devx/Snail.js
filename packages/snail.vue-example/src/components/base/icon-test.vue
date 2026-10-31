@@ -1,65 +1,40 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <article>
-        <section>
-            <Icon :type="'arrow'" />
-        </section>
-        <section>
-            <Icon :type="'close'" />
-        </section>
-        <section>
-            <Icon :type="'datepicker'" />
-        </section>
-        <section>
-            <Icon :type="'download'" />
-        </section>
-        <section>
-            <Icon :type="'edit'" />
-        </section>
-        <section>
-            <Icon :type="'pause'" />
-        </section>
-        <section>
-            <Icon :type="'error'" />
-        </section>
-        <section>
-            <Icon :type="'grip'" />
-        </section>
-        <section>
-            <Icon :type="'plus'" />
-        </section>
-        <section>
-            <Icon :type="'print'" />
-        </section>
-        <section>
-            <Icon :type="'subtract'" />
-        </section>
-        <section>
-            <Icon :type="'success'" />
-        </section>
-        <section>
-            <Icon :type="'trash'" />
-        </section>
-        <section>
-            <Icon :type="'warn'" />
-        </section>
-        <section>
-            <Icon :type="'more'" />
-        </section>
-
-        <section>
-            <Icon :type="'warn'" :opacity="0.3" />
-            <Icon :type="'warn'" :opacity="-1" />
-            <Icon :type="'warn'" :opacity="0.1" />
-        </section>
-        <section>
-            <Icon :type="'warn'" :border="'1px solid red'" :background="'blue'" :radius="'50%'" @click="console.log" />
-        </section>
-    </article>
+    <h3>状态类：</h3>
+    <Icon :type="'success'" />
+    <Icon :type="'error'" />
+    <Icon :type="'warn'" />
+    <h3>操作类：</h3>
+    <Icon :type="'close'" />
+    <Icon :type="'trash'" />
+    <Icon :type="'download'" />
+    <Icon :type="'print'" />
+    <Icon :type="'edit'" />
+    <Icon :type="'pause'" />
+    <h3>指向类：</h3>
+    <Icon :type="'arrow'" />
+    <Icon :type="'datepicker'" />
+    <Icon :type="'timepicker'" />
+    <h3>其他类：</h3>
+    <Icon :type="'plus'" />
+    <Icon :type="'subtract'" />
+    <Icon :type="'more'" />
+    <Icon :type="'stats'" />
+    <Icon :type="'grip'" />
+    <Icon :type="'circle-loading'" />
+    <h3>rotate</h3>
+    <Icon :type="'arrow'" :rotate="45" />
+    <Icon :type="'arrow'" :rotate="90" />
+    <h3>opacity</h3>
+    <Icon :type="'warn'" :opacity="0.3" />
+    <Icon :type="'warn'" :opacity="-1" />
+    <Icon :type="'warn'" :opacity="0.1" />
+    <h3>border、background、radius</h3>
+    <Icon :type="'warn'" :border="'1px solid red'" :background="'blue'" :radius="'50%'" @click="console.log" />
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { onActivated, onDeactivated } from "vue";
 import { components } from "../../libraries/snail_vue";
 
 // *****************************************   👉  组件定义    *****************************************
