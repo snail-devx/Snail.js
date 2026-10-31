@@ -1,7 +1,9 @@
 import { HookFunctionReturn, IScope } from "snail.core";
+import { Component } from "vue";
 import Dynamic from "../../base/dynamic.vue";
 import { ReadyEvents } from "../../base/models/base-event";
 import { ComponentOptions } from "../../base/models/component-model";
+import { IconType } from "../../base/models/icon-model";
 
 /**
  * Tab 标签页组件配置选项
@@ -111,12 +113,12 @@ export type TabsItemOptions = {
      */
     name: string;
 
-    // /**
-    //  * 图标
-    //  * - 支持 vue组件和内置支持图标
-    //  * - vue 组件时，传入自定义图标的渲染组件，svg为根节点，否则 color 和 hoverColor 不生效
-    //  */
-    // icon?: Component | IconType;
+    /**
+     * 图标
+     * - 支持 vue组件和内置支持图标
+     * - vue 组件时，传入自定义图标的渲染组件，svg为根节点
+     */
+    icon?: Component | IconType;
 
     // 后期支持标签图标
 

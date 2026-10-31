@@ -65,7 +65,7 @@ const widthRef: ShallowRef<string> = shallowRef();
 const heightRef: ShallowRef<string> = shallowRef();
 const headerRef: ShallowRef<boolean> = shallowRef();
 const tabs: TabsItemOptions[] = [
-    { id: "Tab1", name: "页签1", content: "tab1" },
+    { id: "Tab1", name: "页签1", content: "tab1", icon: "download" },
     { id: "Tab2", name: "页签2", content: "default" },
     { id: "Tab3", name: "页签3", content: undefined },
     { id: "Tab4", name: "页签4", content: { component: TabItem } },

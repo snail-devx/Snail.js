@@ -13,6 +13,10 @@
             <div class="tab-items small-scrollbar" :class="[correctString(align, 'left', true)]" ref="tab-items">
                 <div class="tab-item" v-for="tab in tabs" :key="tab.id" :class="{ 'actived': selectedItemRef == tab }"
                     :title="tab.name" :id="tab.id" @click="onTabItemClick(tab)">
+                    <template v-if="tab.icon">
+                        <Icon class="tab-icon" v-if="isString(tab.icon)" :type="as<IconType>(tab.icon)" />
+                        <component class="tab-icon" v-else :is="tab.content" />
+                    </template>
                     <span class="ellipsis" v-text="tab.name" />
                 </div>
             </div>
@@ -44,6 +48,7 @@ import { nextTick, onMounted, onUnmounted, shallowRef, ShallowRef, useTemplateRe
 import Dynamic from '../base/dynamic.vue';
 import Icon from '../base/icon.vue';
 import { ComponentOptions } from '../base/models/component-model';
+import { IconType } from '../base/models/icon-model';
 import { useReactive } from '../base/reactive';
 import { as } from '../base/utils/base-util';
 import { usePicker } from '../picker/manager';
@@ -223,10 +228,19 @@ onUnmounted(() => overflowScope && overflowScope.destroy());
                 flex: none;
                 position: relative;
                 cursor: pointer;
-                padding: 0 20px;
+                padding: 0 10px;
+                gap: 4px;
                 color: #646464;
                 display: flex;
                 align-items: center;
+
+                // 标签项图标
+                >svg.tab-icon {
+                    flex: none;
+                    fill: currentColor;
+                    width: 14px;
+                    height: 14px;
+                }
             }
         }
 
@@ -266,6 +280,7 @@ onUnmounted(() => overflowScope && overflowScope.destroy());
 
                     &:hover {
                         background-color: #EFF9FF;
+                        color: var(--actived-color);
                     }
 
                     &.actived {
