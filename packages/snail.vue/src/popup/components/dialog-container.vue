@@ -29,8 +29,6 @@ const dialogExtend = Object.freeze<DialogHandle<any>>({
     closePopup: closePopup,
     onBeforeClose: onBeforeClose
 });
-/** onBuildData 句柄方法 */
-let fn_onBuildData: () => any | Promise<any> = undefined;
 /** 鼠标按下时的目标元素：*/
 let mousedownTarget: EventTarget = undefined;
 
