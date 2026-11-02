@@ -6,7 +6,7 @@
     5、搜索框需要搜索时，对外发送事件，由【../select.vue】完成搜索处理，并更新选项数据
 -->
 <template>
-    <div class="snail-select-popup" :class="classRef" :style="popupStyle" @mouseenter="onEnterPopup"
+    <div class="snail-select-popup small-scrollbar" :class="classRef" :style="popupStyle" @mouseenter="onEnterPopup"
         @mouseleave="onLeavePopup">
         <template v-if="classRef['child-popup'] && classRef['placeholder']">
             暂无选项
@@ -77,7 +77,7 @@ const showClearButtonRef = computed(() => needClearButton && props.showClear && 
     : true)
 );
 //  4、可选配置选项
-defineOptions({ name: "Select2Popup", inheritAttrs: true, });
+defineOptions({ name: "SelectPopup", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -177,7 +177,7 @@ async function onEnterSelectNode(target: HTMLDivElement, node: SelectItem<any>, 
     if (node.type == "group" && parent) {
         childFollowTargetDom = target;
         childFollowScope = follow(childFollowTargetDom, {
-            name: "SelectPopup",
+            name: "Snail-SelectPopup",
             spaceClient: 10,
             followY: "ratio",
             //  x轴方向上的跟随策略：根据当前弹窗的x轴跟随策略，自动做优化，尽量避免3+级弹窗会覆盖主以前的弹窗

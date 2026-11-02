@@ -132,7 +132,7 @@ async function onClick() {
     //  打开弹窗：跟随宽度，并在合适时机关闭掉
     context.doSearch(undefined);
     followScope = follow<any, SelectPopupOptions<any> & EventsType<SelectPopupEvents<any>>>(rootDom.value, {
-        name: "SelectPopup",
+        name: "Snail-SelectPopup",
         followWidth: true,
         followX: "start",
         spaceClient: 10,
@@ -189,8 +189,8 @@ function onSelectItemClick(path: SelectItem<any>[]) {
 import { onAppCreated } from "../base/utils/app-util";
 import SelectPopup from "./components/select-popup.vue";
 //  非组件实例逻辑：将【选项弹窗】注册为【弹窗】app实例的全局组件，方便树形复用
-onAppCreated((app, type) => {
-    type == "popup" && app.component("SelectPopup", SelectPopup);
+onAppCreated((app, env, type) => {
+    type == "popup" && app.component("Snail-SelectPopup", SelectPopup);
 });
 </script>
 

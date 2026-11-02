@@ -7,7 +7,7 @@ import { App, Component, createApp, inject, InjectionKey, provide } from "vue";
 import { AppEnv, AppType } from "../models/app-model";
 
 /** 应用创建后的通知方法集合 */
-const appCreatedFns: Array<(app: App, type: AppType, env: Readonly<Required<AppEnv>>) => void> = [];
+const appCreatedFns: Array<(app: App, env: Readonly<Required<AppEnv>>, type: AppType) => void> = [];
 
 /**
  * 注入Key：应用环境信息
@@ -55,7 +55,7 @@ export function newApp<T extends Record<string, any>>(type: AppType, env: AppEnv
     const app = createApp(component, props);
     env = correctAppEnv(env);
     app.provide(INJECTKEY_AppEnv, correctAppEnv(env));
-    triggerAppCreated(app, type, env as any);
+    triggerAppCreated(app, env as any, type,);
     return app;
 }
 
@@ -64,7 +64,7 @@ export function newApp<T extends Record<string, any>>(type: AppType, env: AppEnv
  * @param fn 回调通知
  * @returns 通知句柄，可销毁回调通知，一般在外部销毁时执行
  */
-export function onAppCreated(fn: (app: App, type: AppType, env: Readonly<Required<AppEnv>>) => void): IScope {
+export function onAppCreated(fn: (app: App, env: Readonly<Required<AppEnv>>, type: AppType) => void): IScope {
     mustFunction(fn, "fn");
     appCreatedFns.push(fn);
     return useScope().onDestroy(() => removeFromArray(appCreatedFns, fn));
@@ -72,11 +72,11 @@ export function onAppCreated(fn: (app: App, type: AppType, env: Readonly<Require
 /**
  * 触发app创建后事件
  * @param app 创建的app实例
- * @param type app创建类型；满足区分特定app实例使用
  * @param env 应用环境信息
+ * @param type app创建类型；满足区分特定app实例使用
  * @returns app自身
  */
-function triggerAppCreated(app: App, type: AppType, env: Readonly<Required<AppEnv>>): App {
-    appCreatedFns.forEach(fn => fn(app, type, env));
+function triggerAppCreated(app: App, env: Readonly<Required<AppEnv>>, type: AppType): App {
+    appCreatedFns.forEach(fn => fn(app, env, type));
     return app;
 }
