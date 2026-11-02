@@ -3,9 +3,13 @@
  *  1、在弹窗、模态弹窗、跟随弹窗的效果下复用
  */
 
+import { CSSClassOptions, } from "snail.view";
 import { ShallowRef } from "vue";
+import { DisabledOptions } from "../../base/models/base-model";
 import { ComponentBindOptions, ComponentOptions } from "../../base/models/component-model";
 import { MotionEffectOptions } from "../../base/models/motion-model";
+import { FooterEvents, FooterOptions, HeaderOptions } from "../../container/models/page-model";
+import { ScrollOptions } from "../../container/models/scroll-model";
 
 /**
  * 弹窗配置选项
@@ -136,3 +140,33 @@ export type PopupAppDescriptor = {
      */
     destroy(): void;
 }
+
+/**
+ * 弹窗外壳 组件配置选项
+ */
+export type PopupShellOptions<Props = void, Model = void> = {
+    /**
+     * Header组件配置
+     * - 不传入，则不需要 Header组件
+     */
+    header?: Partial<HeaderOptions> & DisabledOptions & CSSClassOptions;
+    /**
+     * 内容组件配置
+     * - 滚动相关配置
+     * - 不传入则无需滚动
+     */
+    content: ComponentOptions & ComponentBindOptions<Props, Model> & ScrollOptions & CSSClassOptions;
+    /**
+     * Footer组件配置
+     * - 不传入，则不需要 Footer 组件
+     */
+    footer?: FooterOptions & DisabledOptions & CSSClassOptions;
+}
+
+/**
+ * 弹窗外壳 组件事件
+ * - 特殊事件说明：
+ * - - cancel：点击【取消】、【关闭】时触发
+ * - - confirm：点击【确定】时触发
+ */
+export type PopupShellEvents = FooterEvents;
