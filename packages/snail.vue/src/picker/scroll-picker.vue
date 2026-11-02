@@ -38,14 +38,13 @@ import { ElasticDetail, IElasticManager, useElastic, useObserver } from "snail.v
 import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import { useReactive } from "../base/reactive";
 import { usePopup } from "../popup/manager";
-import { DialogHandle } from "../popup/models/dialog-model";
-import { PopupStatusOptions } from "../popup/models/popup-model";
+import { PopupHandle } from "../popup/models/popup-model";
 import { PickerExtend } from "./models/picker-model";
 import { ScrollPickerEvents, ScrollPickerOptions, ScrollPickerPopupOptions } from "./models/scroll-piker-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<ScrollPickerOptions & ScrollPickerPopupOptions & Partial<DialogHandle<string> & PopupStatusOptions & PickerExtend>>();
+const props = defineProps<ScrollPickerOptions & ScrollPickerPopupOptions & Partial<PopupHandle<string> & PickerExtend>>();
 const emits = defineEmits<ScrollPickerEvents>();
 const { onSize } = useObserver();
 const { watcher } = useReactive();

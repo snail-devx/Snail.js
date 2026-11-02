@@ -3,7 +3,8 @@
  */
 
 import { IAsyncScope } from "snail.core";
-import { DialogOptions, FollowPositionOptions } from "../../popup/manager";
+import { DialogOptions } from "../../popup/models/dialog-model";
+import { FollowExtendOptions } from "../../popup/models/follow-model";
 import { IPopupManager } from "../../popup/models/manager-model";
 import { ActionPickerOptions } from "./action-model";
 import { DateTimePickerBaseOptions } from "./datetime-model";
@@ -58,13 +59,12 @@ export type PickerPopupOptions = {
      * 跟随效果
      * - 跟随弹窗时生效，如客户端弹出日期选择器跟随弹窗时
      */
-    follow?: FollowPositionOptions;
+    follow?: FollowExtendOptions;
     /**
      * 弹窗配置
      * - 模态弹窗时生效，如移动端弹出日期滚动选择器时
      */
     dialog?: Pick<DialogOptions, "motion" | "motionDuration" | "closeOnEscape" | "closeOnMask" | "rootClass">;
-
 };
 
 /**

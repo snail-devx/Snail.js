@@ -29,23 +29,21 @@ import { IAsyncScope, isArrayNotEmpty, IScope, isStringNotEmpty, useTimer } from
 import { computed, shallowRef, ShallowRef } from "vue";
 import { useReactive } from "../../base/reactive";
 import { usePopup } from "../../popup/manager";
-//  依赖的其他vue组件
+import { FollowHandle } from "../../popup/models/follow-model";
 import Empty from "../../prompt/empty.vue";
+import { SelectItem, SelectPopupEvents, SelectPopupExtend, SelectPopupOptions } from "../models/select-model";
 import Search from "../search.vue";
 import SelectNode from "./select-node.vue";
-//  使用到的数据类型
-import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
-import { SelectItem, SelectPopupEvents, SelectPopupExtend, SelectPopupOptions } from "../models/select-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const props = defineProps<SelectPopupOptions<any> & SelectPopupExtend & FollowHandle<SelectItem<any>[]> & FollowExtend>();
+const props = defineProps<SelectPopupOptions<any> & SelectPopupExtend & FollowHandle<SelectItem<any>[]>>();
+const { context, pinned, parentPinned, popupStatus } = props;
 const emits = defineEmits<SelectPopupEvents<any>>();
 const { follow } = usePopup();
 const { onTimeout } = useTimer();
 const { watcher } = useReactive();
 //      解构一些响应式变量，方便访问
-const { context, popupStatus, pinned, parentPinned } = props;
 /**     能够展示的【选择项】：需要【补丁】节点 */
 const itemsRef = computed(() => (props.items || []).filter(item => context.isShow(item, true)));
 /**     弹窗所需的类样式信息 */

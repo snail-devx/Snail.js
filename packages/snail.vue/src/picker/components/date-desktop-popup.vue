@@ -78,7 +78,7 @@ import { computed, ref, Ref, shallowRef, ShallowRef, useTemplateRef } from 'vue'
 import Icon from "../../base/icon.vue";
 import Layout from '../../container/layout.vue';
 import Button from "../../control/button.vue";
-import { FollowExtend, FollowHandle } from '../../popup/models/follow-model';
+import { FollowHandle } from '../../popup/models/follow-model';
 import { DateDesktopPopupOptions, DatePickerDayItem, DatePickerMonthItem, DatePickerYearItem, DateTimePickerEvents, DateTimePickerToolbarOptions } from '../models/datetime-model';
 import { PickerExtend } from '../models/picker-model';
 import { buildDayItems, buildMonthItems, buildYearItems, electDateValue, initStepByFormat } from '../utils/datetime-util';
@@ -86,7 +86,7 @@ import TimeDesktopPopup from './time-desktop-popup.vue';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<DateDesktopPopupOptions & PickerExtend & FollowExtend & FollowHandle<string>>();
+const props = defineProps<DateDesktopPopupOptions & PickerExtend & FollowHandle<string>>();
 const emits = defineEmits<DateTimePickerEvents>();
 const { inPopup, toolbar = Object.create(null) as DateTimePickerToolbarOptions } = props;
 //  2、整理传入属性值

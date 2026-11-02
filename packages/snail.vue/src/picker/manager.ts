@@ -3,7 +3,8 @@ import { Component } from "vue";
 import { AppEnv } from "../base/models/app-model";
 import { useApp } from "../base/utils/app-util";
 import { MOTION } from "../base/utils/motion-util";
-import { FollowPositionOptions, usePopup } from "../popup/manager";
+import { usePopup } from "../popup/manager";
+import { FollowExtendOptions } from "../popup/models/follow-model";
 import ActionPopup from "./components/action-popup.vue";
 import DateDesktopPopup from "./components/date-desktop-popup.vue";
 import DatetimeMobilePopup from "./components/datetime-mobile-popup.vue";
@@ -135,7 +136,7 @@ export function usePicker(options?: Pick<ScopeOptions, "global"> & AppEnv): IPic
         //  跟随弹窗：跟随效果给一些默认值
         else {
             throwIfFalse(target instanceof Element, "showPicker: target must be an Element");
-            const follow: FollowPositionOptions = (options ? options.follow : undefined) || Object.create(null);
+            const follow: FollowExtendOptions = (options ? options.follow : undefined) || Object.create(null);
             {
                 follow.followX = follow.followX || ["center", "start", "end", "before", "after"];
                 follow.spaceX = correctNumber(follow.spaceX, 2);

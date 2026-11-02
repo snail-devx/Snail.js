@@ -1,46 +1,44 @@
-<!-- 跟随弹窗 容器
-    1、不借助popup弹窗中转，直接自己处理即可；中转过去意义不大
-    2、需要构建一层div，用于包裹，否则内部元素查找会特别麻烦
- -->
+<!-- 组件介绍写到这里 -->
 <template>
-    <Dynamic class="snail-follow initial" :class="[popupStatus.value, motion.value]" :style="{ 'z-index': zIndex }"
-        :name="options.name" :component="options.component" :url="options.url" :props="props" :="followExt"
-        v-model="model" />
+    <Dynamic :class="['snail-follow', 'initial', context.popupStatus.value, context.motion.value]"
+        :style="{ 'z-index': context.zIndex }" :name="name" :component="component" :url="url" :props="props.props"
+        v-model="model" :="handle" />
 </template>
 
 <script setup lang="ts">
-import { useTimer } from "snail.core";
-import { css, ElementSize, HeightStyle, IObserver, OverflowStyle, PositionStyle, useObserver, WidthStyle } from "snail.view";
-import { getCurrentInstance, nextTick, onMounted, shallowRef, ShallowRef } from "vue";
-import Dynamic from "../../base/dynamic.vue";
-import { FollowElectResult, FollowExtend, FollowHandle, FollowOptions, FollowStrategy } from "../models/follow-model";
-import { PopupDescriptor } from "../models/popup-model";
-import { calcFollowX, calcFollowY } from "../utils/follow-util";
+import { useTimer } from 'snail.core';
+import { css, ElementSize, HeightStyle, OverflowStyle, PositionStyle, useObserver, WidthStyle } from 'snail.view';
+import { getCurrentInstance, nextTick, onMounted, readonly, shallowRef, ShallowRef } from 'vue';
+import Dynamic from '../../base/dynamic.vue';
+import { FollowElectResult, FollowExtendOptions, FollowHandle, FollowStrategy } from '../models/follow-model';
+import { PopupContainerOptions } from '../models/popup-model';
+import { calcFollowX, calcFollowY } from '../utils/follow-util';
 
 // *****************************************   👉  组件定义    *****************************************
-//  1、props、data
-const { options, extOptions, popupStatus, zIndex, motion } = defineProps<PopupDescriptor<FollowOptions, FollowHandle<any> & FollowExtend>>();
-const { props, model = shallowRef(undefined) } = options;
-const { closePopup } = extOptions;
-const { onClient, onSize, onEvent, onMutation } = useObserver() as IObserver;
+//  1、props、event、model、components
+const props = defineProps<PopupContainerOptions<any, any, any> & FollowExtendOptions & { target: HTMLElement }>();
+const { context, target, model = shallowRef(undefined) } = props;
+const { onClient, onSize, onEvent, onMutation } = useObserver();
 const { onTimeout } = useTimer();
-/** 跟随组件的扩展配置：冻结，传递给实际【内容组件】使用 */
-const followExt = Object.freeze<FollowExtend & FollowHandle<any>>({
-    target: extOptions.target,
-    popupStatus: popupStatus,
-    followX: shallowRef<FollowStrategy>(undefined),
-    followY: shallowRef<FollowStrategy>(undefined),
-    pinned: shallowRef<boolean>(false),
-
-    inPopup: "follow",
-    closePopup: closePopup,
-});
-/**  跟随组件根节点*/
+//  2、组件交互变量、常量
+/**     跟随组件根节点*/
 const rootDom: ShallowRef<HTMLElement> = shallowRef<HTMLElement>();
-/** Follow根元素上一次缓存尺寸*/
+/**     x轴方向的跟随策略：计算之后的最新策略值 */
+const followXRef: ShallowRef<FollowStrategy> = shallowRef(undefined);
+/**     y轴方向的跟随策略：计算之后的最新策略值 */
+const followYRef: ShallowRef<FollowStrategy> = shallowRef(undefined);
+/**     弹窗句柄，下放给业务组件使用 */
+const handle: FollowHandle<any> = Object.freeze<FollowHandle<any>>({
+    inPopup: context.inPopup,
+    popupStatus: context.popupStatus,
+    closePopup: context.closePopup,
+    //  跟随弹窗特有
+    pinned: shallowRef<boolean>(false),
+    followX: readonly(followXRef),
+    followY: readonly(followYRef),
+});
+/**     Follow根元素上一次缓存尺寸*/
 const preSize: ElementSize = { width: 0, height: 0 };
-//  2、可选配置选项.
-defineOptions({ name: "FollowContainer", inheritAttrs: true, });
 
 // *****************************************   👉  方法+事件    ****************************************
 /**
@@ -48,18 +46,18 @@ defineOptions({ name: "FollowContainer", inheritAttrs: true, });
  */
 function buildFollow() {
     //  若弹窗已经关闭了，则不用再计算了
-    if (popupStatus.value == "closed") {
+    if (context.popupStatus.value == "closed") {
         return;
     }
     //  跟随宽度、高度，则强制和target尺寸保持一致；若需要跟随高度、宽度，则overflow做一下
     // console.group("%cstart run buildFollow:", "color:red");
-    const targetRect: DOMRectReadOnly = extOptions.target.getBoundingClientRect();
+    const targetRect: DOMRectReadOnly = target.getBoundingClientRect();
     // console.log("-- target:", targetRect, extOptions.target);
     css.operate(rootDom.value, "add", {
         style: {
-            width: options.followWidth ? `${targetRect.width}px` : "",
-            height: options.followHeight ? `${targetRect.height}px` : "",
-            overflow: options.followWidth || options.followHeight ? "auto" : "",
+            width: props.followWidth ? `${targetRect.width}px` : "",
+            height: props.followHeight ? `${targetRect.height}px` : "",
+            overflow: props.followWidth || props.followHeight ? "auto" : "",
         }
     });
     //  计算选举跟随效果：基于target和内容组件尺寸，计算选举出合适位置；若操作了宽度、高度，则强制同步设置过去
@@ -68,22 +66,22 @@ function buildFollow() {
         const rootRect = rootDom.value.getBoundingClientRect();
         //  X轴方向跟随效果计算
         {
-            const xResult: FollowElectResult = calcFollowX(options, targetRect, rootRect.width);
+            const xResult: FollowElectResult = calcFollowX(props, targetRect, rootRect.width);
             // console.log("-- follow x:", xResult);
             followStyle.left = `${xResult.start}px`;
             xResult.size != undefined && (followStyle.width = `${xResult.size}px`);
-            followExt.followX.value = xResult.strategy;
+            followXRef.value = xResult.strategy;
         }
         //  X轴方向跟随效果计算
         {
-            const yResult: FollowElectResult = calcFollowY(options, targetRect, rootRect.height);
+            const yResult: FollowElectResult = calcFollowY(props, targetRect, rootRect.height);
             // console.log("-- follow y: ", yResult);
             followStyle.top = `${yResult.start}px`;
             yResult.size != undefined && (followStyle.height = `${yResult.size}px`);
-            followExt.followY.value = yResult.strategy;
+            followYRef.value = yResult.strategy;
         }
         //  溢出时的滚动条设置：若操作了高度和宽度，则需要overflow处理
-        const needOverflow: boolean = options.followWidth || options.followHeight
+        const needOverflow: boolean = props.followWidth || props.followHeight
             || followStyle.width != undefined || followStyle.height != undefined;
         followStyle.overflow = needOverflow ? "auto" : "";
     }
@@ -109,6 +107,8 @@ function onRootSize(size: Readonly<ElementSize>) {
 }
 
 // *****************************************   👉  组件渲染    *****************************************
+//  1、数据初始化、变化监听
+//  2、生命周期响应
 onMounted(() => {
     //  加载元素：计算跟随，然后监听变化，确保实时跟随效果；
     // loadingRef.value = true;
@@ -119,22 +119,22 @@ onMounted(() => {
             : instance.vnode.el.nextElementSibling;
         rootDom.value.classList.contains("snail-follow") || rootDom.value.classList.add("snail-follow");
         //  第一次触发时，为初始化计算，不做处理
-        onClient(extOptions.target, () => preSize.width != 0 && preSize.height != 0 && options.closeOnTarget
-            ? closePopup(undefined)
+        onClient(target, () => preSize.width != 0 && preSize.height != 0 && props.closeOnTarget
+            ? context.closePopup(undefined)
             : rootDom.value && buildFollow()
         );
         //  监听【跟随组件】大小变化；延迟启动（避免初始化时多次执行计算）
         onTimeout(onSize, 1000, rootDom.value, onRootSize);
         //  监听全局事件，进行rezie、esc和mask处理；延迟启动，开发时发现vue会在外部点击时，触发一下事件，事件冒泡到了window上
         onTimeout(function () {
-            onEvent(window, "resize", () => options.closeOnResize
-                ? closePopup(undefined)
+            onEvent(window, "resize", () => props.closeOnResize
+                ? context.closePopup(undefined)
                 : rootDom.value && buildFollow()
             );
-            onEvent(window, "keyup", (evet: KeyboardEvent) => options.closeOnEscape
+            onEvent(window, "keyup", (evet: KeyboardEvent) => props.closeOnEscape
                 && evet.key === "Escape"
-                && followExt.pinned.value != true
-                && closePopup(undefined)
+                && handle.pinned.value != true
+                && context.closePopup(undefined)
             );
             //  监听点击：确保比子元素先捕获点击事件，否则可能在子元素被vue重新渲染更新后，判断 contains 会出问题
             onEvent(window, "click", (event: MouseEvent) => {
@@ -144,16 +144,16 @@ onMounted(() => {
                  *  2、是跟随容器自身、内部点击时不自动关闭
                  *  3、是跟随的目标元素自身、内部点击时不自动关闭；这个暂时不做实现，外部不一定是click激活的
                  */
-                if (options.closeOnMask != true || followExt.pinned.value == true) {
+                if (props.closeOnMask != true || handle.pinned.value == true) {
                     return;
                 }
                 //  检测元素点击事件
                 const isClickInContainer = rootDom.value === event.target || rootDom.value.contains(event.target as HTMLElement);
-                const isClickInTarget = extOptions.target == event.target || extOptions.target.contains(event.target as HTMLElement);
-                if (isClickInContainer || (isClickInTarget && options.closeOnTarget != true)) {
+                const isClickInTarget = target == event.target || target.contains(event.target as HTMLElement);
+                if (isClickInContainer || (isClickInTarget && props.closeOnTarget != true)) {
                     return;
                 }
-                closePopup(undefined);
+                context.closePopup(undefined);
             });
             //  监听子元素变化：暂时不监听属性变化
             onMutation(rootDom.value, {
@@ -167,9 +167,6 @@ onMounted(() => {
 </script>
 
 <style lang="less">
-// 引入Mixins样式
-@import "snail.view/dist/styles/mixins.less";
-
 .snail-follow {
     background-color: white;
     position: fixed;

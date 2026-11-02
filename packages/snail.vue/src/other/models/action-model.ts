@@ -1,6 +1,6 @@
 import { DisabledOptions, ValueOptions } from "../../base/models/base-model";
 import { IconOptions } from "../../base/models/icon-model";
-import { FollowPositionOptions } from "../../popup/models/follow-model";
+import { FollowExtendOptions } from "../../popup/models/follow-model";
 
 /**
  * 可操作项组件 的配置选项
@@ -36,7 +36,7 @@ export type ActionOptions = DisabledOptions & ValueOptions<string> & {
      * 跟随弹窗配置
      * - mode 为 `follow`时生效
      */
-    follow?: Pick<FollowPositionOptions, "followX" | "followY" | "spaceX" | "spaceY">
+    follow?: Pick<FollowExtendOptions, "followX" | "followY" | "spaceX" | "spaceY">
 };
 /**
  * 操作项集合 组件渲染配置选项

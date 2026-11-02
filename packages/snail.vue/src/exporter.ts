@@ -106,12 +106,17 @@ export * from "./picker/models/scroll-piker-model";
 //  组件导出
 import DateTimePicker from "./picker/datetime-picker.vue";
 import ScrollPicker from "./picker/scroll-picker.vue";
-
 //  方法导出
 export * from "./picker/manager";
 
 // *****************************************   👉  popup 相关导出    ****************************************
-//  类型在【./popup/manager】中导出了
+//  类型导出
+export * from "./popup/models/confirm-model";
+export * from "./popup/models/dialog-model";
+export * from "./popup/models/follow-model";
+export * from "./popup/models/manager-model";
+export * from "./popup/models/popup-model";
+export * from "./popup/models/toast-model";
 //  组件导出：赋值给 components
 //  方法导出
 export * from "./popup/manager";

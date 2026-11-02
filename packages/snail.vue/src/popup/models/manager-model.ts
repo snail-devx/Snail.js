@@ -1,6 +1,5 @@
 import { IAsyncScope, IScope } from "snail.core";
 import { AppEnv } from "../../base/models/app-model";
-import { ComponentBindOptions } from "../../base/models/component-model";
 import { ConfirmOptions } from "./confirm-model";
 import { DialogOptions } from "./dialog-model";
 import { FollowOptions } from "./follow-model";

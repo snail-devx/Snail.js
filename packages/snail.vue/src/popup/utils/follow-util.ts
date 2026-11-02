@@ -1,8 +1,5 @@
-/**
- * 跟随弹窗 助手方法
- */
-import { isArrayNotEmpty, isNumberNotNaN, isStringNotEmpty } from "snail.core";
-import { FollowElectResult, FollowOptions, FollowStrategy } from "../models/follow-model";
+import { correctNumber, isArrayNotEmpty, isNumberNotNaN, isStringNotEmpty } from "snail.core";
+import { FollowElectResult, FollowExtendOptions, FollowOptions, FollowStrategy } from "../models/follow-model";
 
 /**
  * 检测弹窗配置选项
@@ -21,7 +18,7 @@ export function checkFollow(options: FollowOptions): string | undefined {
  * @param width 跟随组件的宽度
  * @returns 水平方向的跟随效果：left标记坐标位置，width标记组件新的宽度；undefined表示不设置，
  */
-export function calcFollowX(options: FollowOptions, target: DOMRectReadOnly, width: number): FollowElectResult {
+export function calcFollowX(options: FollowExtendOptions, target: DOMRectReadOnly, width: number): FollowElectResult {
     const space = isNumberNotNaN(options.spaceX) ? options.spaceX : 0;
     const spaceClient = isNumberNotNaN(options.spaceClient) ? options.spaceClient : 0;
     /* 若target已经显示不全了，则不再显示follow；部分情况下，展示不全也需要展示出来，这里先忽略掉；后期通过配置约束溢出时是否显示
@@ -41,9 +38,9 @@ export function calcFollowX(options: FollowOptions, target: DOMRectReadOnly, wid
  * @param height 跟随组件的高度
  * @returns 水平方向的跟随效果：top、bottom标记坐标位置，height标记组件新的高度；undefined表示不设置，
  */
-export function calcFollowY(options: FollowOptions, target: DOMRectReadOnly, height: number): FollowElectResult {
-    const space = isNumberNotNaN(options.spaceY) ? options.spaceY : 0;
-    const spaceClient = isNumberNotNaN(options.spaceClient) ? options.spaceClient : 0;
+export function calcFollowY(options: FollowExtendOptions, target: DOMRectReadOnly, height: number): FollowElectResult {
+    const space = correctNumber(options.spaceY, 0);
+    const spaceClient = correctNumber(options.spaceClient, 0);
     /* 若target已经显示不全了，则不再显示follow；部分情况下，展示不全也需要展示出来，这里先忽略掉；后期通过配置约束溢出时是否显示
     if ((target.top < spaceClient) || (target.bottom + spaceClient > window.innerHeight)) {
         return { strategy: undefined, start: -height };

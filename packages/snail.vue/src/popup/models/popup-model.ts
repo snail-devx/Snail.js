@@ -2,16 +2,17 @@
  * 公共通用数据结构：
  *  1、在弹窗、模态弹窗、跟随弹窗的效果下复用
  */
+
 import { ShallowRef } from "vue";
 import { ComponentBindOptions, ComponentOptions } from "../../base/models/component-model";
 import { MotionEffectOptions } from "../../base/models/motion-model";
-import { MOTION } from "../../base/utils/motion-util";
 
 /**
  * 弹窗配置选项
- * - 约束弹出组件信息
- * - 弹出组件时传递的参数信息
- * @see ComponentBindOptions 了解 Props、Model 泛型参数的含义
+ * - {@link ComponentOptions} 哪个组件要弹窗打开
+ * - {@link ComponentBindOptions} 组件弹窗打开时，传递的props和model 信息
+ * @typeparam Props 组件弹窗打开时传递的的props
+ * @typeparam Model 组件弹窗打开时传递的model
  */
 export type PopupOptions<Props = void, Model = void> = ComponentOptions & ComponentBindOptions<Props, Model> & {
     /**
@@ -32,28 +33,16 @@ export type PopupOptions<Props = void, Model = void> = ComponentOptions & Compon
     motionDuration?: number;
 
     /**
-     * 自定义class
-     * - 绑定到内容组件根元素上
-     * - 可以直接在props中指定，无需特殊设置
-    class?: string | string[];
-     */
-    /**
-     * 自定义style
-     * - 绑定到内容组件根元素上
-     * - 可以直接在props中指定，无需特殊设置
-    style?: AllStyle;
-     */
-
-    /**
      * 弹窗的z-index值
      * - 涉及到多层弹窗时，指定的z-index值若低于前面弹窗，会自动校正
      * - 无特殊情况，建议不指定，内部会自动生成，确保弹窗正确性
      */
     zIndex?: number;
 }
-
 /**
- * 弹出组件句柄
+ * 弹窗句柄
+ * - 下放给弹窗的具体业务组件使用
+ * @typeparam T 关闭弹窗时，传递的数据类型
  */
 export type PopupHandle<T> = {
     /**
@@ -62,66 +51,88 @@ export type PopupHandle<T> = {
      * - dialog ：  模态对话弹窗
      * - follow ：  跟随效果弹窗
      */
-    inPopup: Readonly<"popup" | "dialog" | "follow">;
+    readonly inPopup: "popup" | "dialog" | "follow";
+    /**
+     * 弹窗状态
+     * - 响应式只读副本，不可修改
+     */
+    readonly popupStatus: Readonly<ShallowRef<PopupStatus>>;
     /**
      * 关闭弹窗
      * @param data 关闭时传递数据
      */
     closePopup(data?: T): void;
-}
-
+};
 /**
- * 弹窗状态：响应式
+ * 弹窗状态
  * - open       打开
  * - active     激活，针对Dialog弹窗生效
  * - unactive   非激活，针对Dialog弹窗生效
  * - closed     关闭
  */
-export type PopupStatus = ShallowRef<"open" | "active" | "unactive" | "closed">;
-/**
- * 弹窗状态 配置选项
- */
-export type PopupStatusOptions = {
-    /**
-     * 弹窗状态：响应式
-     */
-    popupStatus: PopupStatus;
-}
+export type PopupStatus = "open" | "active" | "unactive" | "closed";
 
 /**
- * 弹窗对象描述器
- * - 给弹窗容器使用，传递过去作为props使用
+ * 弹窗容器组件配置选项
+ * - 方便容器组件中 defineProps 使用
+ * - 只有通用基础的属性选项，如模态弹窗和跟随弹窗的特性配置属性，不在此定义，容器自己 & 对应类型
+ * - {@link ComponentOptions} 哪个组件要弹窗打开
+ * - {@link ComponentBindOptions} 组件弹窗打开时，传递的props和model 信息
+ * @typeparam T 关闭弹窗时，传递的数据类型
+ * @typeparam Props 组件弹窗打开时传递的的props
+ * @typeparam Model 组件弹窗打开时传递的model
  */
-export type PopupDescriptor<Options extends PopupOptions, ExtOptions> = PopupStatusOptions & {
+export type PopupContainerOptions<T, Props = void, Model = void> = ComponentOptions & ComponentBindOptions<Props, Model> & {
+    /**
+     * 弹窗上下文
+    * - 传递给各个弹窗组件，感知弹窗状态、zindex等信息
+     */
+    context: PopupContext<T>;
+}
+/**
+ * 弹窗上下文
+ * - 传递给各个弹窗组件，感知弹窗状态、zindex等信息
+ * - 传递close方法，用于具体弹窗组件中，关闭弹窗
+ * @typeparam T 关闭弹窗时，传递的数据类型
+ */
+export type PopupContext<T = void> = PopupHandle<T> & {
     /**
      * 弹窗Id
      * - 自动分配，全局唯一
      */
-    popupId: string,
-
-    /**
-     * 弹窗配置选项
-     * - 由外部传递过来的业务数据配置信息
-     * - 约束具体弹窗的业务组件和业务组件所需props等数据
-     */
-    options: Options;
-
-    /**
-     * 弹窗扩展配置选项
-     * - 由 popup、follow等方法内部组件：如关闭弹窗方法、钩子函数等
-     * - 配合业务组件使用的一些配置数据
-     */
-    extOptions: ExtOptions;
-
+    readonly popupId: string,
     /**
      * 实际分配的zIndex值
      */
-    zIndex: number;
-
+    readonly zIndex: number;
     /**
      * 弹窗动画名
+     * - 响应式只读副本，不可修改
      * - 约束打开、关闭动画；基于 PopupOptions.motion 构建出来的
      * - 具体使用方，将此值绑定的根元素上
      */
-    motion: ShallowRef<string>;
+    readonly motion: Readonly<ShallowRef<string>>;
+}
+
+/**
+ * 弹窗应用描述器
+ * - 内部使用
+ */
+export type PopupAppDescriptor = {
+    // /**
+    //  * 弹窗app实例
+    //  */
+    // app: App<Element>;
+    /**
+     * 弹窗状态，响应式
+     */
+    statusRef: ShallowRef<PopupStatus>;
+    /**
+     * 弹窗动画效果类样式，响应式
+     */
+    motionRef: ShallowRef<string>;
+    /**
+     * 销毁弹窗应用
+     */
+    destroy(): void;
 }

@@ -6,34 +6,30 @@
  * 4、统一管理 弹出层z-index值等
  * 5、【后续支持】全局配置z-index起始值，容器组件、、、
  */
-import { defer, IAsyncScope, IScope, IScopes, isStringNotEmpty, mountScope, ScopeOptions, useAsyncScope, useHook, useScopes } from "snail.core";
+
+import { defer, FlatPromise, IAsyncScope, IScope, IScopes, isStringNotEmpty, mountScope, ScopeOptions, useAsyncScope, useScopes } from "snail.core";
 import { Component } from "vue";
 import { AppEnv } from "../base/models/app-model";
+import { ComponentBindOptions } from "../base/models/component-model";
 import { correctAppEnv, useApp } from "../base/utils/app-util";
+import { ConfirmOptions } from "./models/confirm-model";
+import { DialogOptions } from "./models/dialog-model";
+import { FollowOptions } from "./models/follow-model";
+import { IPopupManager } from "./models/manager-model";
+import { PopupContext, PopupHandle, PopupOptions } from "./models/popup-model";
+import { ToastOptions } from "./models/toast-model";
 import { checkDialog, monitorDialog } from "./utils/dialog-util";
 import { checkFollow } from "./utils/follow-util";
-import { checkPopup, destroyPopup, openPopup } from "./utils/popup-util";
-//  弹窗相关数据结构
-import { ConfirmOptions } from "./models/confirm-model";
-import { DialogHandle, DialogOptions } from "./models/dialog-model";
-import { FollowExtend, FollowHandle, FollowOptions } from "./models/follow-model";
-import { IPopupManager } from "./models/manager-model";
-import { PopupHandle, PopupOptions } from "./models/popup-model";
-import { ToastOptions } from "./models/toast-model";
-//  用到的弹窗容器组件
+import { checkPopup, destroyPopup, openPopup, updatePopupStatus } from "./utils/popup-util";
+//  弹窗容器组件
+import { MOTION } from "../base/utils/motion-util";
 import ConfirmContainer from "./components/confirm-container.vue";
 import DialogContainer from "./components/dialog-container.vue";
 import FollowContainer from "./components/follow-container.vue";
 import PopupContainer from "./components/popup-container.vue";
 import ToastContainer from "./components/toast-container.vue";
 
-/** 把自己的类型共享出去 */
-export * from "./models/confirm-model";
-export * from "./models/dialog-model";
-export * from "./models/follow-model";
-export * from "./models/manager-model";
-export * from "./models/popup-model";
-export * from "./models/toast-model";
+
 
 /**
  * 使用【弹窗管理器】
@@ -50,81 +46,57 @@ export function usePopup(options?: Pick<ScopeOptions, "global"> & AppEnv): IPopu
     //#region *************************************实现接口：IPopupManager接口方法*************************************
     /**
      * 弹出
+     * - 弹窗位置位置、大小、动画效果等由组件自己完成
+     * @see ComponentBindOptions 了解 Props、Model 泛型参数的含义
      * @param options 弹窗配置选项
-     * @returns 弹窗异步作用域，外部可手动关闭弹窗
+     * @returns 弹窗打开结果，外部可手动关闭弹窗
      */
     function popup<T, Props = void, Model = void>(options: PopupOptions<Props, Model>): IAsyncScope<T> {
         const scope = checkOptions<any, T>(options, checkPopup)
-            || popupInCustomContainer<T, any, any>(PopupContainer, options);
+            || popupInContainer<T, PopupOptions<Props, Model>>(PopupContainer, options).scope;
         return addScope2Scopes(scope);
     }
     /**
      * 对话框
      * - 支持指定模态和非模态对话框
      * - 默认垂直水平居中展示
+     * @see ComponentBindOptions 了解 Props、Model 泛型参数的含义
      * @param options 弹窗配置选项
-     * @returns 弹窗异步作用域，外部可手动关闭弹窗
+     * @returns 弹窗打开结果，外部可手动关闭弹窗
      */
     function dialog<T, Props = void, Model = void>(options: DialogOptions<Props, Model>): IAsyncScope<T> {
         var scope = checkOptions<any, T>(options, checkDialog);
         if (scope == undefined) {
-            const deferred = defer<T>();
-            /** 弹窗关闭的钩子函数：弹窗任务完成后，自动销毁 */
-            const hook = useHook<"onBeforeClose">();
-            deferred.promise.finally(hook.destroy);
-            /** 弹窗是否正在关闭中 */
-            var isClosing: boolean = false;
-            /** 弹窗扩展配置选项 */
-            const extOptions = Object.freeze<DialogHandle<T>>({
-                inPopup: "dialog",
-                async closePopup(data?: T) {
-                    if (hook.destroyed == true || isClosing == true) {
-                        return;
-                    }
-                    //  执行拦截器，返回false则取消关闭；执行时，将弹窗data数据同步传递下去
-                    {
-                        isClosing = true;
-                        const rt = await hook.runHookAsync("onBeforeClose", { mode: "one", order: "desc" }, data);
-                        isClosing = false;
-                        if (rt.success != true) {
-                            console.warn("run onBeforeClose failed", rt.reason, rt.ex);
-                            return;
-                        }
-                    }
-                    //  关闭弹窗，任务完成
-                    descriptor.popupStatus.value = "closed";
-                    deferred.resolve(data);
-                },
-                onBeforeClose: fn => hook.register("onBeforeClose", fn),
+            const rt = popupInContainer<T, DialogOptions<Props, Model>>(DialogContainer, options, {
+                inPopup: "dialog"
             });
-            const descriptor = openPopup<any, DialogHandle<T>>(env, DialogContainer, options, extOptions);
-            scope = useAsyncScope<T>(deferred.promise);
-            monitorDialog(descriptor, scope, deferred);
+            scope = rt.scope;
+            monitorDialog(rt.context.popupId, rt.scope, rt.task);
         }
         return addScope2Scopes(scope);
     }
     /**
-    * 跟随弹窗
-    * - 跟随指定的target对象，可跟随位置、大小
-    * @param target 跟随的目标元素
-    * @param options 跟随配置选项
-    * @returns 弹窗异步作用域，外部可手动关闭弹窗
-    */
-    function follow<T, Props = void, Model = void>(target: Element, options: FollowOptions<Props, Model>): IAsyncScope<T> {
+     * 跟随弹窗
+     * - 跟随指定的target对象，可跟随位置、大小
+     * @see ComponentBindOptions 了解 Props、Model 泛型参数的含义
+     * @param target 跟随的目标元素
+     * @param options 跟随配置选项
+     * @returns 弹窗异步作用域，外部可手动关闭弹窗
+     */
+    function follow<T, Props = void, Model = void>(target: HTMLElement, options: FollowOptions<Props, Model>): IAsyncScope<T> {
         var scope: IAsyncScope<T> = undefined;
         if (target instanceof Element == false) {
             const deferred = defer<T>();
             deferred.reject("follow: target must be an HTMLElement.");
             scope = useAsyncScope(deferred.promise);
         }
+        scope = scope || checkOptions<any, T>(options, checkFollow);
         //  打开弹窗：覆盖 inPopup 值，并将target传递下去
         if (scope == undefined) {
-            const extOptions: Pick<FollowHandle<T>, "inPopup"> & Pick<FollowExtend, "target"> = {
-                inPopup: "follow",
-                target: target,
-            };
-            scope = checkOptions<any, T>(options, checkFollow)
-                || popupInCustomContainer<T, any, any>(FollowContainer, options, extOptions);
+            scope = popupInContainer<T, FollowOptions<Props, Model> & { target: HTMLElement }>(FollowContainer,
+                { ...options, target },
+                { inPopup: "follow" }
+            ).scope;
         }
         return addScope2Scopes(scope);
     }
@@ -142,6 +114,7 @@ export function usePopup(options?: Pick<ScopeOptions, "global"> & AppEnv): IPopu
         return dialog({
             component: ConfirmContainer,
             closeOnEscape: true,
+            motion: MOTION.scale,
             props: { ...options, title, message }
         });
     }
@@ -152,7 +125,7 @@ export function usePopup(options?: Pick<ScopeOptions, "global"> & AppEnv): IPopu
      */
     function toast(message: string, options?: Omit<ToastOptions, "message">): IScope {
         /* 中转到popup实现，但使用ToastContainer作为弹窗容器；模拟 url 值，仅为通过验证 */
-        return popupInCustomContainer(ToastContainer, {
+        const { scope } = popupInContainer<void, PopupOptions<ToastOptions, void>>(ToastContainer, {
             url: "#ToastContainer",
             props: {
                 ...(options || Object.create(null)),
@@ -161,6 +134,7 @@ export function usePopup(options?: Pick<ScopeOptions, "global"> & AppEnv): IPopu
             motion: env.mode == 'mobile' ? "toast" : undefined,
             motionDuration: 200,
         });
+        return scope;
     }
     //#endregion
 
@@ -196,31 +170,26 @@ export function usePopup(options?: Pick<ScopeOptions, "global"> & AppEnv): IPopu
             : scopes.add(scope);
     }
     /**
-     * 在自定义容器中打开【弹出】组件
-     * - 内部自动构建 PopupHandle<T> 相关参数
-     * - 外部也可通过 extOptions 覆盖构建的PopupHandle<T> 相关参数
-     * @param container 自定义容器，无效则自动使用 PopupContainer
-     * @param options 弹窗配置选项
-     * @param extOptions 扩展的一些自定义参数
-     * @returns 弹窗异步作用域，外部可手动关闭弹窗
+     * 在指定容器中弹窗
+     * @param container 弹窗根容器，无效则自动使用 PopupContainer
+    * @param options 弹窗配置选项，将直接挂载到容器属性上
+     * @param extend 弹窗扩展，无则使用默认，容器通过`props.context`属性访问。可通过此参数自定义弹窗关闭方法等
+     * @returns 弹窗上下文和异步作用域
      */
-    function popupInCustomContainer<T, Options extends PopupOptions, ExtOptions extends Record<string, any>>(container: Component, options: Options, extOptions?: ExtOptions)
-        : IAsyncScope<T> {
-        const deferred = defer<T>();
-        extOptions = Object.freeze<PopupHandle<T> & ExtOptions>({
-            inPopup: "popup",
-            closePopup: data => {
+    function popupInContainer<T, Options extends PopupOptions<any, any>>(container: Component, options: Options, extend?: Partial<PopupHandle<T>>): { context: PopupContext<T>, scope: IAsyncScope<T>, task: FlatPromise<T> } {
+        const task = defer<T>();
+        const context = openPopup<T, Options>(env, container, options, {
+            inPopup: (extend ? extend.inPopup : undefined) || "popup",
+            closePopup: (extend ? extend.closePopup : undefined) || (data => {
                 if (scope.destroyed == false) {
-                    descriptor.popupStatus.value = "closed";
-                    deferred.resolve(data);
+                    updatePopupStatus(context.popupId, "closed");
+                    task.resolve(data);
                 }
-            },
-            ...extOptions
+            }),
         });
-        const descriptor = openPopup(env, container || PopupContainer, options, extOptions);
-        const scope = useAsyncScope<T>(deferred.promise);
-        scope.onDestroy(() => destroyPopup(descriptor, deferred));
-        return scope;
+        const scope = useAsyncScope<T>(task.promise);
+        scope.onDestroy(() => destroyPopup(context.popupId, task));
+        return { context, scope, task };
     }
     //#endregion
 
@@ -228,9 +197,8 @@ export function usePopup(options?: Pick<ScopeOptions, "global"> & AppEnv): IPopu
     const manager = mountScope<IPopupManager>(
         {
             mode: env.mode,
-
             popup, dialog, follow,
-            confirm, toast
+            confirm, toast,
         },
         { global: options ? options.global : false, type: "IPopupManager" }
     );

@@ -1,6 +1,6 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <div class="test-popup-child-content" style="background-color: rosybrown;">
+    <div class="test-popup-child-content" style="background-color: white;border: 1px solid red;">
         <button @click="open();">打开弹窗</button>
         <button @click="onClose">关闭</button>
         <button @click="trigger();">触发事件</button>
@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { useTimer } from "snail.core";
 import { shallowRef } from "vue";
-import { components, DialogHandle, FollowHandle, PopupHandle, usePopup } from "../../libraries/snail_vue";
+import { components, FollowHandle, usePopup } from "../../../libraries/snail_vue";
 import DialogContentTest from "./child-content.vue";
 const { } = components;
 
@@ -20,12 +20,9 @@ const { } = components;
 //  1、props、data
 const bvModel = defineModel<boolean>();
 const { onInterval } = useTimer();
-const {
-    inPopup, closePopup,
-    onBeforeClose,
-} = defineProps<DialogHandle<string> & PopupHandle<any> & FollowHandle<any>>()
+const { inPopup, closePopup, } = defineProps<FollowHandle<string>>()
 const emits = defineEmits<{
-    (e: "customEvent", data: number)
+    customEvent: [data: number]
 }>();
 const popup = usePopup();
 //  2、可选配置选项
@@ -57,9 +54,6 @@ function trigger() {
 
 // 👉 组件渲染
 //  1、数据初始化、变化监听；仅dialog对话框才有此方法
-onBeforeClose && onBeforeClose(() => {
-    return new Date().getSeconds() % 2 == 0 ? false : undefined;
-})
 onInterval(() => bvModel.value = !bvModel.value, 1000);
 //  2、生命周期响应
 </script>

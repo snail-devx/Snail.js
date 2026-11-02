@@ -6,5 +6,4 @@ import { ConfirmAreaOptions, MessageOptions, TitleOptions } from "../../base/mod
  * - message        确认提示信息；默认“请确认？”；支持html格式内容
  */
 export type ConfirmOptions = TitleOptions & MessageOptions & ConfirmAreaOptions & {
-
-}
+} 

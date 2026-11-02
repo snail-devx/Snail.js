@@ -15,13 +15,13 @@
 
 <script setup lang="ts">
 import { defineComponent, onActivated, onDeactivated } from "vue";
-import { components, IPopupManager, useApp, usePopup } from "../../libraries/snail_vue";
-import DialogChildContent from "./child-content.vue";
+import { components, useApp, usePopup } from "../../libraries/snail_vue";
+import DialogChildContent from "./components/child-content.vue";
 
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const popup: IPopupManager = usePopup();
+const popup = usePopup();
 const { Env } = components;
 //  2、可选配置选项
 defineOptions({ name: "PopupText", inheritAttrs: true, });

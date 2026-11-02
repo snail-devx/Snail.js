@@ -1,21 +1,18 @@
-/**
- * 跟随效果 弹窗
- */
-
 import { ShallowRef } from "vue";
-import { PopupHandle, PopupOptions, PopupStatusOptions } from "./popup-model";
+import { PopupHandle, PopupOptions } from "./popup-model";
 
 /**
  * 跟随弹窗 配置选项
  * - 传入的组件，根据配置跟随 target 位置和大小；
  * @see ComponentBindOptions 了解 Props、Model 泛型参数的含义
  */
-export type FollowOptions<Props = void, Model = void> = PopupOptions<Props, Model> & FollowPositionOptions;
+export type FollowOptions<Props = void, Model = void> = PopupOptions<Props, Model> & FollowExtendOptions;
 /**
- * 跟随位置 配置选项
+ * 跟随弹窗 扩展配置选项
+ * - 约束如何跟随 target 位置和大小
  * - 基于此计算出最终的跟随效果
  */
-export type FollowPositionOptions = {
+export type FollowExtendOptions = {
     /**
      * 启用【宽度】跟随
      * - 为true则和 target 宽度保持一致
@@ -105,54 +102,31 @@ export type FollowPositionOptions = {
  * - 详细值定义，参照 FollowOptions.followX 和 FollowOptions.followY
  */
 export type FollowStrategy = "start" | "center" | "end" | "before" | "after" | "ratio";
-
 /**
- * 跟随弹窗 句柄
- * - 用于在 弹窗组件 内部进行模式判断和关闭跟随弹窗
+ * 跟随弹窗句柄
+ * - 下放给弹窗的具体业务组件使用
  */
 export type FollowHandle<T> = PopupHandle<T> & {
-}
-/**
- * 跟随弹窗 扩展配置
- */
-export type FollowExtend = PopupStatusOptions & {
     /**
-     * 跟随的目标元素
+     * x轴的跟随策略
+     * - 响应式只读副本，不可修改
      */
-    target: Element;
-
+    followX: Readonly<ShallowRef<FollowStrategy>>,
     /**
-     * x轴方向的跟随策略：响应式
-     * - 基于外部传入的跟随策略，计算选举出来的最优策略值
+     * y轴的跟随策略
+     * - 响应式只读副本，不可修改
      */
-    followX: ShallowRef<FollowStrategy>;
-    /**
-     * y轴方向的跟随策略：响应式
-     * - 基于外部传入的跟随策略，计算选举出来的最优策略值
-     */
-    followY: ShallowRef<FollowStrategy>;
+    followY: Readonly<ShallowRef<FollowStrategy>>,
 
     /**
      * Follow弹窗是否【钉住】了
+     * - 响应式，可以通过修改此值，控制是否钉住
      * - 为true时，closeOnMask、closeOnEscape失效
      * - 满足 子弹窗 点击等操作时，不自动销毁父级弹窗
      */
     pinned: ShallowRef<boolean>;
-}
+};
 
-/**
- * 跟随策略 配置选项
- */
-export type FollowStrategyOptions = {
-    /**
-     * x轴的跟随策略
-     */
-    followX?: FollowStrategy,
-    /**
-     * x轴的跟随策略
-     */
-    followY?: FollowStrategy;
-}
 
 /**
  * 跟随选举结果

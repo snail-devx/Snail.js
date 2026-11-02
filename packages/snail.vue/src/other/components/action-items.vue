@@ -14,14 +14,13 @@
 <script setup lang="ts">
 import { correctString, isStringNotEmpty } from "snail.core";
 import Icon from "../../base/icon.vue";
-import { FollowExtend, FollowHandle } from "../../popup/models/follow-model";
+import { FollowHandle } from "../../popup/models/follow-model";
 import { ActionEvents, ActionItemsOptions } from "../models/action-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const props = defineProps<ActionItemsOptions & Partial<FollowHandle<string> & FollowExtend>>();
+const props = defineProps<ActionItemsOptions & Partial<FollowHandle<string>>>();
 const emits = defineEmits<ActionEvents>();
-
 //  2、组件交互变量、常量
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -37,7 +36,6 @@ function onActionItemClick(code: string) {
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
-
 </script>
 
 <style lang="less">

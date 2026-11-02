@@ -3,12 +3,12 @@
     2、不直接对外提供，外部使用toast方法使用
 -->
 <template>
-    <div class="snail-toast" :class="[mode, popupStatus.value, motion.value]" :style="{ 'z-index': zIndex }"
-        @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
+    <div class="snail-toast" :class="[mode, context.popupStatus.value, context.motion.value]"
+        :style="{ 'z-index': context.zIndex }" @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
         <!-- 桌面端 特有：关闭按钮，和消息图标 -->
         <template v-if="mode == 'desktop'">
             <Icon class="close-icon" v-if="props.closeDisabled != true" type="close" button :size="20"
-                :color="'#707070'" :hover-color="'red'" @click="closePopup();" />
+                :color="'#707070'" :hover-color="'red'" @click="context.closePopup();" />
             <div class="icon" v-if="isStringNotEmpty(props.type)">
                 <Icon :type="props.type" :color="'#707070'" :size="20" />
             </div>
@@ -22,16 +22,14 @@ import { IScope, isStringNotEmpty, useTimer } from "snail.core";
 import { onMounted } from "vue";
 import Icon from "../../base/icon.vue";
 import { useApp } from "../../base/utils/app-util";
-import { PopupDescriptor, PopupHandle, PopupOptions } from "../manager";
+import { PopupContainerOptions } from "../models/popup-model";
 import { ToastOptions } from "../models/toast-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { options, extOptions, zIndex, popupStatus, motion } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
+const { props, context } = defineProps<PopupContainerOptions<any, any, any> & ToastOptions>();
 const { onTimeout } = useTimer();
 const { mode } = useApp();
-const props: ToastOptions = options.props;
-const { closePopup } = extOptions;
 /** 显示时长，默认2000ms */
 const duration = props.duration > 0 ? props.duration : 2000;
 /** 自动销毁时的定时器 */
@@ -47,7 +45,7 @@ defineOptions({ name: "ToastContainer", inheritAttrs: true });
  */
 function onMouseEvent(isLeave: boolean) {
     destroyTimer && destroyTimer.destroy();
-    destroyTimer = isLeave ? onTimeout(closePopup, duration) : undefined;
+    destroyTimer = isLeave ? onTimeout(context.closePopup, duration) : undefined;
 }
 
 // *****************************************   👉  组件渲染    *****************************************

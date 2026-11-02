@@ -1,7 +1,6 @@
 <!-- 模态弹窗测试组件 -->
 <template>
-    <button @click="onOpenClick(false)">打开弹窗</button>
-    <button @click="onOpenClick(true)">打开弹窗：Wrapper</button>
+    <button @click="onOpenClick">打开弹窗</button>
     <button @click="onConfirm">确认弹窗</button>
     <hr />
     vModelTest值双向绑定到弹窗中：{{ vModelTest }}
@@ -10,7 +9,7 @@
 <script setup lang="ts">
 import { onActivated, onDeactivated, shallowRef, } from "vue";
 import { MOTION, usePopup } from "../../libraries/snail_vue";
-import DialogContent from "./child-content.vue";
+import DialogContent from "./components/child-content.vue";
 
 // 👉 组件定义
 //  1、props、data
@@ -24,16 +23,11 @@ defineOptions({ name: "DialogTest", inheritAttrs: false, });
 /**
  * 打开弹窗
  */
-function onOpenClick(startWrapper) {
+function onOpenClick() {
     const dialog = popup.dialog<any, Record<string, any>, boolean>({
         component: DialogContent,
         closeOnEscape: true,
         closeOnMask: true,
-        wrapper: startWrapper ? {
-            header: { title: "弹窗", class: "fffffffffff-header" },
-            content: { scroll: "none", class: "ffffffffffff-content" },
-            footer: { class: "fffffffffffff-footer" }
-        } : undefined,
         motion: MOTION.bottom,
         props: {
             //  接收自定义事件

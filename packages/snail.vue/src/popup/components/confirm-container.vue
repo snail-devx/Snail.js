@@ -15,14 +15,11 @@
 import Footer from "../../container/components/footer.vue";
 import Header from "../../container/components/header.vue";
 import { ConfirmOptions } from "../models/confirm-model";
-import { DialogHandle } from "../models/dialog-model";
-import { PopupStatusOptions } from "../models/popup-model";
+import { PopupHandle } from "../models/popup-model.js";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-defineProps<ConfirmOptions & DialogHandle<boolean> & PopupStatusOptions>();
-//  2、可选配置选项
-defineOptions({ name: "ConfirmContainer", inheritAttrs: true, });
+defineProps<ConfirmOptions & PopupHandle<boolean>>();
 </script>
 
 <style lang="less">

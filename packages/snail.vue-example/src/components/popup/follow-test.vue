@@ -18,9 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch, onActivated, onDeactivated } from "vue";
+import { onActivated, onDeactivated } from "vue";
 import { FollowOptions, usePopup } from "../../libraries/snail_vue";
-import ChildContent from "./child-content.vue";
+import ChildContent from "./components/child-content.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data

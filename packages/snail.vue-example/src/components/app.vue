@@ -199,7 +199,7 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[6].children[1], undefined);
 
     //  container 测试
-    onTreeNodeClick(treeOptions.nodes[1].children[10], undefined);
+    // onTreeNodeClick(treeOptions.nodes[1].children[10], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[3], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[4], undefined);
@@ -208,16 +208,15 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
 
     //  popup 测试
-    // onTreeNodeClick(treeOptions.nodes[4].children[0], undefined);
-    // onTreeNodeClick(treeOptions.nodes[4].children[2], undefined);
-
+    onTreeNodeClick(treeOptions.nodes[5].children[2], undefined);
+    // onTreeNodeClick(treeOptions.nodes[5].children[0], undefined);
 
     //  prompt 测试
-    // onTreeNodeClick(treeOptions.nodes[5].children[3], undefined);
+    // onTreeNodeClick(treeOptions.nodes[6].children[3], undefined);
     // other 测试
-    // onTreeNodeClick(treeOptions.nodes[6].children[2], undefined);
+    // onTreeNodeClick(treeOptions.nodes[7].children[2], undefined);
     //  view 测试
-    // onTreeNodeClick(treeOptions.nodes[7].children[0], undefined);
+    // onTreeNodeClick(treeOptions.nodes[8].children[0], undefined);
 });
 </script>
 

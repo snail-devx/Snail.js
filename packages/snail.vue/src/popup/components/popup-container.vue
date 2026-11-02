@@ -1,36 +1,38 @@
-<!-- 弹窗容器对象 
-    1、负责加载弹窗展示的组件
-    2、负责处理弹窗的关闭逻辑
-    3、每个弹窗容器就是一个app实例，实现互不干扰
--->
+<!-- 弹窗容器组件 -->
 <template>
-    <Dynamic class="snail-popup" :class="[popupStatus.value, motion.value]" :style="{ 'z-index': zIndex }"
-        :name="options.name" :component="options.component" :url="options.url" :props="props" :="extOptions"
-        :popup-status="popupStatus.value" v-model="model" />
+    <Dynamic :class="['snail-popup', context.popupStatus.value, context.motion.value]"
+        :style="{ 'z-index': context.zIndex }" :name="name" :component="component" :url="url" :props="props.props"
+        v-model="model" :="handle" />
 </template>
 
 <script setup lang="ts">
 import { shallowRef } from "vue";
 import Dynamic from "../../base/dynamic.vue";
-import { PopupDescriptor, PopupHandle, PopupOptions } from "../models/popup-model";
+import { PopupContainerOptions, PopupHandle } from "../models/popup-model";
 
 // *****************************************   👉  组件定义    *****************************************
-//  1、props、data
-const { options, zIndex, extOptions, popupStatus, motion } = defineProps<PopupDescriptor<PopupOptions, PopupHandle<any>>>();
-const { props, model = shallowRef(undefined) } = options;
-//  2、可选配置选项
-defineOptions({ name: "PopupContainer", inheritAttrs: true, });
+//  1、props、event、model、components
+const props = defineProps<PopupContainerOptions<any, any, any>>();
+const { model = shallowRef(undefined) } = props;
+//  2、组件交互变量、常量
+/**     弹窗句柄，下放给业务组件使用 */
+const handle: PopupHandle<any> = Object.freeze<PopupHandle<any>>({
+    inPopup: props.context.inPopup,
+    popupStatus: props.context.popupStatus,
+    closePopup: props.context.closePopup,
+});
+
+// *****************************************   👉  方法+事件    ****************************************
 
 // *****************************************   👉  组件渲染    *****************************************
+//  1、数据初始化、变化监听
+//  2、生命周期响应 
 </script>
 
 <style lang="less">
-// 引入Mixins样式
-@import "snail.view/dist/styles/mixins.less";
-
 .snail-popup {
     position: fixed;
-    // x、y起始位置：left:0,top:0
-    .left-top-start();
+    left: 0;
+    top: 0;
 }
 </style>

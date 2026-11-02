@@ -25,13 +25,13 @@
 <script setup lang="ts">
 import { correctString, isFunction, isStringNotEmpty } from 'snail.core';
 import { useApp } from '../../base/utils/app-util';
-import { DialogHandle, FollowExtend } from '../../popup/manager';
+import { FollowHandle } from '../../popup/models/follow-model';
 import { ActionPickerItem, ActionPickerOptions } from '../models/action-model';
 import { PickerExtend } from '../models/picker-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const { closePopup } = defineProps<ActionPickerOptions & DialogHandle<string> & FollowExtend & PickerExtend>();
+const { closePopup } = defineProps<ActionPickerOptions & FollowHandle<string> & PickerExtend>();
 const { mode } = useApp();
 
 //  2、组件交互变量、常量
