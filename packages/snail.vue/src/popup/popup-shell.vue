@@ -81,12 +81,5 @@ onMounted(async () => {
     >:not(.snail-header):not(.snail-footer) {
         flex: 1;
     }
-
-    // 模态弹窗打开时，左右40px间距
-    &.dialog-body {
-        >:not(.snail-header):not(.snail-footer) {
-            margin: 0 40px;
-        }
-    }
 }
 </style>
