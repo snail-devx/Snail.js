@@ -3,13 +3,12 @@
  *  1、在弹窗、模态弹窗、跟随弹窗的效果下复用
  */
 
-import { CSSClassOptions, } from "snail.view";
+import { HeightStyle, WidthStyle } from "snail.view";
 import { ShallowRef } from "vue";
-import { DisabledOptions } from "../../base/models/base-model";
+import Dynamic from "../../base/dynamic.vue";
 import { ComponentBindOptions, ComponentOptions } from "../../base/models/component-model";
 import { MotionEffectOptions } from "../../base/models/motion-model";
-import { FooterEvents, FooterOptions, HeaderOptions } from "../../container/models/page-model";
-import { ScrollOptions } from "../../container/models/scroll-model";
+import { FooterOptions, HeaderOptions } from "../../container/models/page-model";
 
 /**
  * 弹窗配置选项
@@ -65,7 +64,7 @@ export type PopupHandle<T> = {
      * 关闭弹窗
      * @param data 关闭时传递数据
      */
-    closePopup(data?: T): void;
+    readonly closePopup: (data?: T) => void;
 };
 /**
  * 弹窗状态
@@ -143,30 +142,42 @@ export type PopupAppDescriptor = {
 
 /**
  * 弹窗外壳 组件配置选项
+ * - 各个地方不支持 disabled 配置，这个是弹窗，一锤子买卖，若不需要，直接不构建即可
  */
 export type PopupShellOptions<Props = void, Model = void> = {
+    /**
+     * 弹窗尺寸
+     * - 可指定固定值，最大、最小值，也可以指定百分比
+     * - 必须指定，否则会出现闪动情况；若不确定最后宽度，可给一个最小宽度、高度值
+     * - 原因：content 是异步加载，若不指定则一开始只会渲染header和footer，很小一部分，等 content 加载渲染完成后，弹窗尺寸会变大
+     */
+    size: WidthStyle & HeightStyle;
     /**
      * Header组件配置
      * - 不传入，则不需要 Header组件
      */
-    header?: Partial<HeaderOptions> & DisabledOptions & CSSClassOptions;
+    header?: HeaderOptions;
     /**
      * 内容组件配置
-     * - 滚动相关配置
-     * - 不传入则无需滚动
+     * - 直接通过 {@link Dynamic} 组件加载作为，不会在外层包裹一层div
      */
-    content: ComponentOptions & ComponentBindOptions<Props, Model> & ScrollOptions & CSSClassOptions;
+    main: ComponentOptions & ComponentBindOptions<Props, Model>;
     /**
      * Footer组件配置
      * - 不传入，则不需要 Footer 组件
      */
-    footer?: FooterOptions & DisabledOptions & CSSClassOptions;
+    footer?: FooterOptions;
 }
-
 /**
- * 弹窗外壳 组件事件
- * - 特殊事件说明：
- * - - cancel：点击【取消】、【关闭】时触发
- * - - confirm：点击【确定】时触发
+ * 弹窗外壳 组件钩子函数
+ * - 下放给业务组件使用
  */
-export type PopupShellEvents = FooterEvents;
+export type PopupShellHook<T> = {
+    /**
+     * 注册【构建数据】事件方法
+     * - 仅在Dialog为使用了wrapper模式时生效，用于在【确认】按钮点击时，构建实际内容组件中的数据
+     * - 仅支持注册一次，多次注册以最后一次的为准
+     * @param fn 取数据时执行的钩子函数，支持异步；若需要阻止弹窗关闭则`fn`方法直接报错即可
+     */
+    onBuildData(fn: () => T | Promise<T>): void;
+}
