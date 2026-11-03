@@ -6,7 +6,7 @@
     <div class="snail-confirm flex-column">
         <Header :use-to="'dialog'" :title="title || '提示'" @close="closePopup(false)" />
         <div class="confirm-body" v-html="message || '请确认？'" />
-        <Footer align="right" :cancel-name="cancelName" :cancel-disabled="cancelDisabled" :confirm-name="confirmName"
+        <Footer align="end" :cancel-name="cancelName" :cancel-disabled="cancelDisabled" :confirm-name="confirmName"
             :confirm-disabled="confirmDisabled" @cancel="closePopup(false)" @confirm="closePopup(true)" />
     </div>
 </template>

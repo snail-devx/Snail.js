@@ -1,6 +1,6 @@
 import { AppEnv } from "../../base/models/app-model";
 import { CloseEvents } from "../../base/models/base-event";
-import { ConfirmAreaOptions, DisabledOptions, TitleOptions } from "../../base/models/base-model";
+import { AlignOptions, ConfirmAreaOptions, DisabledOptions, TitleOptions } from "../../base/models/base-model";
 import { EventsType } from "../../base/models/component-model";
 import { ButtonOptions } from "../../control/models/button-model";
 import { ScrollEvents, ScrollOptions } from "./scroll-model";
@@ -8,13 +8,9 @@ import { ScrollEvents, ScrollOptions } from "./scroll-model";
 /**
  * 页面底部组件配置选项
  * - footer.vue 组件使用
+ * - 集成 {@link AlignOptions} align 属性；内部的按钮水平方向对齐方式：默认值 right 
  */
-export type FooterOptions = ConfirmAreaOptions & {
-    /**
-     * 内部的按钮等对齐方式：
-     * - 默认 right
-     */
-    align?: "left" | "center" | "right";
+export type FooterOptions = ConfirmAreaOptions & AlignOptions & {
     /**
      * 是否启用分割线
      * 启用后，则组件顶部设置边框 border-top: 1px solid #dddfed;
@@ -40,8 +36,9 @@ export type FooterEvents = {
  * 页面头部配置选项
  * - header.vue 组件使用
  * - title          将作为头部标题，无则不展示标题区域
+ * - algin          弹窗标题对齐方式：默认值 center
  */
-export type HeaderOptions = TitleOptions & {
+export type HeaderOptions = TitleOptions & AlignOptions & {
     /**
      * 使用到哪里
      * - page   ：页面头部：默认类型；标题、关闭按钮等对齐一行；
@@ -54,10 +51,6 @@ export type HeaderOptions = TitleOptions & {
      */
     divider?: boolean;
 
-    /** 弹窗标题对齐方式
-     * - 默认值：center
-     */
-    titleAlign?: "left" | "center" | "right";
     /** 禁用【关闭】按钮
      * - 默认值false 
      */
@@ -107,7 +100,7 @@ export type PageAreaOptions = {
      */
     readonly header?: HeaderOptions & DisabledOptions;
     /**
-     * 内容区域，无配置则不滚动，自动撑开内容页面
+     * 内容区域，默认自动撑开内容页面，y轴滚动
      */
     readonly main?: PageMainOptions;
     /**
@@ -130,13 +123,9 @@ export type PageMainOptions = {
 }
 /**
  * 页面底部配置选项
+ * - 集成 {@link AlignOptions} align 属性；内部的按钮水平方向对齐方式：默认值 center 
  */
-export type PageFooterOptions = {
-    /**
-    * 内部的按钮水平方向对齐方式：
-    * - 默认 center
-    */
-    align?: "start" | "center" | "end";
+export type PageFooterOptions = AlignOptions & {
     /**
      * 是否启用分割线
      * - 启用后，则组件顶部设置边框

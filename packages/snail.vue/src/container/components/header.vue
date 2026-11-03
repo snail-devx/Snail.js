@@ -6,7 +6,7 @@
 <template>
     <header class="snail-header" :class="useTo" v-bind:class="{ 'start-divider': divider }">
         <!-- 标题区域 -->
-        <div v-if="title != ''" v-text="title" class="header-title" :class="titleAlign" />
+        <div v-if="title != ''" v-text="title" class="header-title" :class="align || 'center'" />
         <!-- 插槽区域，自定义内容 -->
         <slot />
         <!-- 关闭按钮区域 -->
@@ -21,7 +21,7 @@ import { HeaderEvents, HeaderOptions } from "../models/page-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data、event
-const { useTo = 'page', divider, title = "", titleAlign = "center", closeDisabled = false } = defineProps<HeaderOptions>();
+const { useTo = 'page', title = "", closeDisabled } = defineProps<HeaderOptions>();
 const emits = defineEmits<HeaderEvents>();
 //  2、可选配置选项
 defineOptions({ name: "Header", inheritAttrs: true, });
@@ -52,7 +52,7 @@ defineOptions({ name: "Header", inheritAttrs: true, });
 // *****************************************   👉  特殊样式适配    *****************************************
 //  标题文本对齐方式
 .snail-header>.header-title {
-    &.left {
+    &.start {
         text-align: left;
     }
 
@@ -60,7 +60,7 @@ defineOptions({ name: "Header", inheritAttrs: true, });
         text-align: center;
     }
 
-    &.right {
+    &.end {
         text-align: right;
     }
 }

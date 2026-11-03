@@ -40,6 +40,20 @@ export type MessageOptions = {
 }
 
 /**
+ * 对齐方式 配置选项
+ */
+export type AlignOptions = {
+    /**
+     * 内部元素对齐方式
+     * - 默认值根据业务不同不一样
+     * - start : 开始位置对齐，如左对齐，顶部对齐
+     * - center : 居中对齐
+     * - end : 结束位置对齐，如右对齐，底部对齐
+     */
+    align?: "start" | "center" | "end";
+}
+
+/**
  * 只读 配置选项
  * - 抽取出来，方便外部服用
  */
