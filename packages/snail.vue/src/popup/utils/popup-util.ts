@@ -177,12 +177,10 @@ function correctPopupMotion(type: PopupType, status: PopupStatus, motion?: Popup
  */
 function correctZIndex(zIndex: number): number {
     const globalZIndex = DEFAULT.zIndex > 0 ? DEFAULT.zIndex : 2000;
-    let tmpZIndex = zIndex > globalZIndex ? zIndex : globalZIndex;
-    if (QUEUE_ZINDEX.length > 0) {
-        tmpZIndex = Math.max(QUEUE_ZINDEX[QUEUE_ZINDEX.length - 1], tmpZIndex)
-    }
-    QUEUE_ZINDEX.push(tmpZIndex);
-    return tmpZIndex;
+    zIndex > globalZIndex || (zIndex = globalZIndex);
+    QUEUE_ZINDEX.length && (zIndex = Math.max(QUEUE_ZINDEX[QUEUE_ZINDEX.length - 1], zIndex));
+    QUEUE_ZINDEX.push(zIndex);
+    return zIndex;
 }
 
 /**
