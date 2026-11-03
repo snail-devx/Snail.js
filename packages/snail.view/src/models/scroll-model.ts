@@ -39,20 +39,18 @@ export type ScrollBaseOptions = ScrollbarOptions & {
  */
 export type ScrollbarOptions = {
     /**
-     * 支持滚动的方向
-     * - 默认值：both
-     * - 可选配置如下：
-     * - - x ：支持水平方向滚动，内容超出时出横向滚动条
-     * - - y ：支持垂直方向滚动，内容超出时出纵向滚动条
-     * - - both ：支持水平和垂直方向滚动，内容超出时出横向纵向滚动条
-     * - - none ： 无滚动条
+     * 滚动条出现时机
+     * - both   【默认值】支持水平和垂直方向滚动，内容超出时出横向纵向滚动条
+     * - x      支持水平方向滚动，内容超出时出横向滚动条
+     * - y      支持垂直方向滚动，内容超出时出纵向滚动条
+     * - none   无滚动条
      */
-    scroll: "x" | "y" | "both" | "none";
+    bar: "x" | "y" | "both" | "none";
 
     /**
      * 滚动条尺寸
      * - normal ：常规，10px
-     * - small ：小尺寸，宽度 6px
+     * - small ：【默认值】小尺寸，宽度 6px
      * - mini ：迷你尺寸，宽度 4px
      * - none ：无，不显示滚动条，但仍然能够滚动
      */

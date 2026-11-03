@@ -32,10 +32,8 @@ export function scrollIntoView(target: HTMLElement | string, options?: ScrollInt
  * @returns 滚动管理器+作用域实例
  */
 export function useScroll(target: HTMLElement, options: ScrollBaseOptions, fn?: (detail: ScrollDetail) => void): IScrollManager & IScope {
-
     /** 滚动视图上一次状态 */
     let preStatus: ScrollStatus = undefined;
-
 
     //#region ************************************* 接口方法：IScrollManager 具体实现 *************************************
     /**
@@ -124,19 +122,19 @@ export function useScroll(target: HTMLElement, options: ScrollBaseOptions, fn?: 
         const classes: string[] = [];
         {
             //  映射滚动样式和滚动条大小
-            switch (options ? options.scroll : undefined) {
+            switch (options ? options.bar : undefined) {
                 case "x":
                 case "y":
                 case "none":
-                    classes.push(`scroll-${options.scroll}`);
+                    classes.push(`scroll-${options.bar}`);
                     break;
                 case "both":
                     classes.push("scroll-xy");
                     break;
             }
             const barSize: string = options
-                ? correctString(options.barSize, undefined, true)
-                : undefined;
+                ? correctString(options.barSize, "small", true)
+                : "small";
             barSize && classes.push(`${barSize}-scrollbar`);
             //  映射视图状态信息：如是否出现滚动条
             now.xbar == true && classes.push("x-bar");
