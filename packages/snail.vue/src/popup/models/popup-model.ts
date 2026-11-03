@@ -17,7 +17,12 @@ import { FooterOptions, HeaderOptions } from "../../container/models/page-model"
  * @typeparam Props 组件弹窗打开时传递的的props
  * @typeparam Model 组件弹窗打开时传递的model
  */
-export type PopupOptions<Props = void, Model = void> = ComponentOptions & ComponentBindOptions<Props, Model> & {
+export type PopupOptions<Props = void, Model = void> = ComponentOptions & ComponentBindOptions<Props, Model> & PopupExtendOptions;
+/**
+ * 弹窗扩展配置选项
+ * - 约束动画、层级等信息
+ */
+export type PopupExtendOptions = {
     /**
      * 弹窗动画效果
      * - 为Object时，显式指定 `enter`和`leave`样式，此时应使用`animation`实现动画样式
@@ -25,9 +30,11 @@ export type PopupOptions<Props = void, Model = void> = ComponentOptions & Compon
      * - 为string时，自动拼接 in 和 out 作为弹窗打开、关闭时的动画效果类样式
      * - - 打开弹窗时，为 [motion]-in ；关闭弹窗时，为 [motion]-out
      * - - 如传入 "scale"，则打开弹窗为 "scale-in"；关闭弹窗时为 "scale-out"
+     * - 为function时，根据弹窗类型和弹窗状态，返回对应的动画完整类样式，内部不会追加in/out
+     * - 不建议对`follow`弹窗使用缩放，转场类动画，可能导致跟随效果定位异常
      * - 默认值为 "fade"
      */
-    motion?: MotionEffectOptions | string;
+    motion?: MotionEffectOptions | string | ((popupType: PopupType, status: PopupStatus) => string);
     /**
      * 弹窗动画效果持续时间
      * - 配合 motion 使用；单位ms，默认200ms
@@ -42,6 +49,7 @@ export type PopupOptions<Props = void, Model = void> = ComponentOptions & Compon
      */
     zIndex?: number;
 }
+
 /**
  * 弹窗句柄
  * - 下放给弹窗的具体业务组件使用
@@ -50,11 +58,9 @@ export type PopupOptions<Props = void, Model = void> = ComponentOptions & Compon
 export type PopupHandle<T> = {
     /**
      * 组件是否在【弹出窗口】中
-     * - popup  ：  普通弹出弹窗
-     * - dialog ：  模态对话弹窗
-     * - follow ：  跟随效果弹窗
+     * - 有值时，表示具体的弹窗类型
      */
-    readonly inPopup: "popup" | "dialog" | "follow";
+    readonly inPopup: PopupType;
     /**
      * 弹窗状态
      * - 响应式只读副本，不可修改
@@ -66,6 +72,13 @@ export type PopupHandle<T> = {
      */
     readonly closePopup: (data?: T) => void;
 };
+/**
+ * 弹窗类型
+ * - popup  ：  普通弹出弹窗
+ * - dialog ：  模态对话弹窗
+ * - follow ：  跟随效果弹窗
+ */
+export type PopupType = "popup" | "dialog" | "follow";
 /**
  * 弹窗状态
  * - open       打开

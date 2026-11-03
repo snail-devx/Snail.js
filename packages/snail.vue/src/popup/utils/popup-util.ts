@@ -3,19 +3,32 @@
  * - 为了简化Manager中代码，不对外独立使用
  */
 
-import { FlatPromise, isObject, isStringNotEmpty, mustFunction, mustObject, throwIfFalse } from "snail.core";
+import { correctString, FlatPromise, isFunction, isObject, isStringNotEmpty, mustFunction, mustObject, throwIfFalse } from "snail.core";
 import { Component, readonly, shallowRef } from "vue";
 import { AppEnv } from "../../base/models/app-model";
 import { MotionEffectOptions } from "../../base/models/motion-model";
 import { newApp } from "../../base/utils/app-util";
-import { PopupAppDescriptor, PopupContext, PopupHandle, PopupOptions, PopupStatus } from "../models/popup-model";
+import { PopupAppDescriptor, PopupContext, PopupExtendOptions, PopupHandle, PopupOptions, PopupStatus, PopupType } from "../models/popup-model";
 
-/** 默认的Z-index值 */
-const DEFAULT_ZINDEX: number = 2000;
+/** 弹窗默认配置 */
+const DEFAULT: PopupExtendOptions = Object.create(null);
 /** 弹窗字典：key为弹窗id，value为构建的app实例 */
 const POPUPMAPS: Map<string, PopupAppDescriptor> = new Map();
 /** 弹窗的z-index值队列 */
 const QUEUE_ZINDEX: number[] = [];
+
+/**
+ * 配置弹窗默认配置
+ * - 注意：`z-index`尽量在站点启动时初始化，避免已使用弹窗后再配置，否则容器导致层级混乱
+ * @param options 配置选项
+ */
+export function configPopup(options: PopupExtendOptions) {
+    if (options != undefined) {
+        options.zIndex > 0 && (DEFAULT.zIndex = options.zIndex);
+        options.motion && (DEFAULT.motion = options.motion);
+        options.motionDuration > 0 && (DEFAULT.motionDuration = options.motionDuration)
+    }
+}
 
 /**
  * 检测弹窗配置选项
@@ -29,7 +42,6 @@ export function checkPopup(options: PopupOptions): string | undefined {
             isStringNotEmpty(options.name) || isObject(options.component) || isStringNotEmpty(options.url),
             "checkPopup: options.name/component/url cannot be invalid at same time."
         );
-        options.zIndex > 0 || (options.zIndex = DEFAULT_ZINDEX);
     }
     catch (ex: any) {
         return ex.message;
@@ -48,11 +60,15 @@ export function openPopup<T, Options extends PopupOptions<any, any>>(env: AppEnv
     mustObject(options, "openPopup: options");
     mustObject(extend, "openPopup: extend");
     mustFunction(extend.closePopup, "openPopup: extend.closePopup");
+    const popupType: PopupType = extend.inPopup || "popup";
+    const duration = [options.motionDuration, DEFAULT.motionDuration, 200].find(item => item > 0);
+    const motion = options.motion;
     const statusRef = shallowRef<PopupStatus>("open");
-    const motionRef = shallowRef<string>(correctPopupMotion("open", options.motion));
+    const motionRef = shallowRef<string>(correctPopupMotion(popupType, "open", options.motion));
+    debugger;
     //  构建上下文：状态和动画，使用只读副本对外共享
     const context: PopupContext<T> = {
-        inPopup: extend.inPopup || "popup",
+        inPopup: popupType,
         popupId: `popup-${getPopupId()}`,
         zIndex: correctZIndex(options.zIndex),
         popupStatus: readonly(statusRef),
@@ -62,9 +78,8 @@ export function openPopup<T, Options extends PopupOptions<any, any>>(env: AppEnv
     // 构建弹窗app实例，并做绑定
     {
         //  对options进行复制，并剔除掉[PopupOptions]一些属性，这些属性无需往下传递，或者需要加工后共享到context中
-        const { motion, motionDuration } = options;
         const props = { ...options, context };
-        ["motion", "motionDuration", "zIndex"].forEach(key => delete props[key])
+        ["motion", "motionDuration", "zIndex"].forEach(key => delete props[key]);
         //  构建app做绑定，并缓存app实例相关数据
         const app = newApp("popup", env, container, props);
         app.mount(getPopupAppElement(context.popupId));
@@ -75,13 +90,13 @@ export function openPopup<T, Options extends PopupOptions<any, any>>(env: AppEnv
                 //  强制将动画值设置为【关闭】，先设置为null，再设置为新的动画名，避免 in和out都是同一个动画名时，动画不执行的问题
                 statusRef.value = "closed";
                 motionRef.value = undefined;
-                setTimeout(() => motionRef.value = correctPopupMotion("close", motion), 0);
+                setTimeout(() => motionRef.value = correctPopupMotion(popupType, "closed", motion), 0);
                 POPUPMAPS.delete(context.popupId);
                 //  延迟销毁，实现销毁动画
                 setTimeout(() => {
                     app._container.remove();
                     app.unmount();
-                }, motionDuration > 0 ? motionDuration : 200);
+                }, duration);
             }
         }));
     }
@@ -115,7 +130,6 @@ export function updatePopupStatus(popupId: string, status: PopupStatus): void {
     descriptor && (descriptor.statusRef.value = status);
 }
 
-
 /**
  * 获取弹窗Id
  * - 自执行函数构建一个闭包，内部维护id值
@@ -126,24 +140,33 @@ const getPopupId: () => number = (function () {
 })();
 /**
  * 校正弹窗动画类样式
- * @param type 打开弹窗，还是关闭弹窗
+ * @param type 弹窗类型
+ * @param status 弹窗状态，关闭还是打开
  * @param motion 动画配置
  * @returns 动画类样式名
  */
-function correctPopupMotion(type: "open" | "close", motion?: PopupOptions["motion"]): string {
+function correctPopupMotion(type: PopupType, status: PopupStatus, motion?: PopupOptions["motion"]): string {
     let motionName: string = undefined;
-    if (isObject(motion) == true) {
-        motionName = type == "close"
-            ? (motion as MotionEffectOptions).out
-            : (motion as MotionEffectOptions).in;
-    }
-    else if (isStringNotEmpty(motion) == true) {
-        motionName = type == "close" ? "out" : "in";
-        motionName = `${motion}-${motionName}`
-    }
-    if (isStringNotEmpty(motionName) == false) {
-        motionName = type == "close" ? "out" : "in";
-        motionName = `fade-${motionName}`;
+    for (const item of [motion, DEFAULT.motion, "fade"]) {
+        if (item != undefined) {
+            if (isObject(item) == true) {
+                motionName = status == "closed"
+                    ? (item as MotionEffectOptions).out
+                    : (item as MotionEffectOptions).in;
+            }
+            else if (isStringNotEmpty(item) == true) {
+                motionName = status == "closed" ? "out" : "in";
+                motionName = `${item}-${motionName}`
+            }
+            else if (isFunction(item) == true) {
+                motionName = (item as (popupType: PopupType, status: PopupStatus) => string)(type, status);
+                motionName = correctString(motionName, undefined, true);
+            }
+
+            if (motionName != undefined) {
+                break;
+            }
+        }
     }
     return motionName;
 }
@@ -153,7 +176,8 @@ function correctPopupMotion(type: "open" | "close", motion?: PopupOptions["motio
  * @returns 新的z-index值，确保新弹窗在最前面
  */
 function correctZIndex(zIndex: number): number {
-    let tmpZIndex = zIndex > DEFAULT_ZINDEX ? zIndex : DEFAULT_ZINDEX;
+    const globalZIndex = DEFAULT.zIndex > 0 ? DEFAULT.zIndex : 2000;
+    let tmpZIndex = zIndex > globalZIndex ? zIndex : globalZIndex;
     if (QUEUE_ZINDEX.length > 0) {
         tmpZIndex = Math.max(QUEUE_ZINDEX[QUEUE_ZINDEX.length - 1], tmpZIndex)
     }

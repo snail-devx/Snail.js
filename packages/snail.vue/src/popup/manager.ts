@@ -29,8 +29,6 @@ import FollowContainer from "./components/follow-container.vue";
 import PopupContainer from "./components/popup-container.vue";
 import ToastContainer from "./components/toast-container.vue";
 
-
-
 /**
  * 使用【弹窗管理器】
  * @param options 配置选项；可配置{@link AppEnv}，不配置则使用 {@link useApp} 获取
@@ -131,7 +129,7 @@ export function usePopup(options?: Pick<ScopeOptions, "global"> & AppEnv): IPopu
                 ...(options || Object.create(null)),
                 message
             },
-            motion: env.mode == 'mobile' ? "toast" : undefined,
+            motion: env.mode == 'mobile' ? "toast" : MOTION.fade,
             motionDuration: 200,
         });
         return scope;

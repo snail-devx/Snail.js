@@ -59,7 +59,7 @@ import Scroll from "./container/scroll.vue";
 import Table from "./container/table.vue";
 import Tabs from "./container/tabs.vue";
 //  方法导出
-
+export { buildPageCommonFooter } from "./container/utils/page-util";
 
 // *****************************************   👉  control 相关导出    ****************************************
 //  类型导出
@@ -85,7 +85,6 @@ import Textarea from "./control/textarea.vue";
 import Tree from "./control/tree.vue";
 //  方法导出
 export * from "./control/components/tree-base";
-
 
 // *****************************************   👉  other 相关导出    ****************************************
 //  类型导出
@@ -118,8 +117,10 @@ export * from "./popup/models/manager-model";
 export * from "./popup/models/popup-model";
 export * from "./popup/models/toast-model";
 //  组件导出：赋值给 components
+import PopupShell from "./popup/popup-shell.vue";
 //  方法导出
 export * from "./popup/manager";
+export { configPopup } from "./popup/utils/popup-util";
 
 // *****************************************   👉  prompt 相关导出    ****************************************
 //  类型导出
@@ -150,6 +151,8 @@ export const components = {
     Action, Card, FlashNumber, NavBar,
     //  picker    下的组件
     DateTimePicker, ScrollPicker,
+    //  popup    下的组件
+    PopupShell,
     //  prompt 下的组件
     DragVerify, Empty, Loading, Progress, Spinner
 };
