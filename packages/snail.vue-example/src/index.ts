@@ -17,7 +17,7 @@ import { link } from "snail.view";
 import { getType, onMountScope } from "snail.core";
 import { getCurrentScope, onScopeDispose, ref } from "vue";
 import App from "./components/app.vue";
-import { newApp } from "./libraries/snail_vue";
+import { configPopup, MOTION, newApp } from "./libraries/snail_vue";
 import lessUrl from "./styles/index.less";
 /**
  * 挂载Scope时，若在Vue的setup中，则自动销毁
@@ -39,3 +39,14 @@ export function initFunc() {
     const app = newApp("normal", { mode: "desktop" }, App, { testNumber });
     app.mount("#app");
 }
+
+// 配置弹窗默认配置
+configPopup({
+    zIndex: 4000,
+    motionDuration: 300,
+    motion: (type, status) => {
+        if (type != "follow") {
+            return status == "closed" ? MOTION.scale.out : MOTION.scale.in;
+        }
+    },
+});

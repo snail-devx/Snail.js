@@ -65,7 +65,6 @@ export function openPopup<T, Options extends PopupOptions<any, any>>(env: AppEnv
     const motion = options.motion;
     const statusRef = shallowRef<PopupStatus>("open");
     const motionRef = shallowRef<string>(correctPopupMotion(popupType, "open", options.motion));
-    debugger;
     //  构建上下文：状态和动画，使用只读副本对外共享
     const context: PopupContext<T> = {
         inPopup: popupType,
