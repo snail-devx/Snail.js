@@ -10,7 +10,7 @@
 -->
 <template>
     <Scroll class="snail-table" :class="namespace, border ? 'start-border' : '', display == 'simple' ? 'simple' : ''"
-        :scroll="'both'" :bar-size="barSize || 'small'" @bottom="emits('bottom')">
+        :bar="'both'" :bar-size="barSize || 'small'" @bottom="emits('bottom')">
         <Empty v-if="hasColumnsRef != true" :message="'无columns配置，无法进行表格渲染'" />
         <!-- 主内容区域 -->
         <table v-if="hasColumnsRef" cellpadding="0" cellspacing="0" :class="index == true ? 'start-index' : ''">

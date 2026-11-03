@@ -11,7 +11,7 @@
         </Layout>
         <br />上中下布局：<br />
         <Layout :direction="'vertical'" style="width: 100%;height: 30%;"
-            :top="{ height: '40px', scroll: { scroll: 'y', barSize: 'mini' } }">
+            :top="{ height: '40px', scroll: { bar: 'y', barSize: 'mini' } }">
             <template #main>main</template>
             <template #top>
                 <div style="height: 100px;">top</div>
@@ -22,10 +22,10 @@
         </Layout>
         <br />上中下，再嵌套左中右布局：<br />
         <Layout :direction="'vertical'" style="width: 100%;height: 30%;margin-top: 10px;"
-            :top="{ height: '40px', maxHeight: '200px', scroll: { scroll: 'y' } }">
+            :top="{ height: '40px', maxHeight: '200px', scroll: { bar: 'y' } }">
             <template #main>
                 <Layout :direction="'horizontal'" style="height: 100%;"
-                    :top="{ height: '20px', maxHeight: '200px', scroll: { scroll: 'y' } }">
+                    :top="{ height: '20px', maxHeight: '200px', scroll: { bar: 'y' } }">
                     <template #main>main</template>
                     <template #top>top</template>
                     <template #bottom>bottom</template>
@@ -40,10 +40,10 @@
         </Layout>
         <br />左中右，再嵌套上中下布局：<br />
         <Layout :direction="'horizontal'" style="width: 100%;height: 30%;margin-top: 10px;"
-            :top="{ height: '40px', maxHeight: '200px', scroll: { scroll: 'y' } }">
+            :top="{ height: '40px', maxHeight: '200px', scroll: { bar: 'y' } }">
             <template #main>
                 <Layout :direction="'vertical'" style="height: 100%;"
-                    :top="{ height: '40px', maxHeight: '200px', scroll: { scroll: 'y' } }">
+                    :top="{ height: '40px', maxHeight: '200px', scroll: { bar: 'y' } }">
                     <template #main>main</template>
                     <template #top>top</template>
                     <template #bottom>bottom</template>
@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, shallowRef, } from "vue";
+import { onMounted } from "vue";
 import { components } from "../../libraries/snail_vue";
 
 // *****************************************   👉  组件定义    *****************************************

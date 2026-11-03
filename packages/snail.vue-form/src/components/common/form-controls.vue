@@ -4,7 +4,7 @@
         <!-- 搜索组件 -->
         <Search placeholder="请输入控件名称搜索" :auto-complete="true" @search="text => searchTextRef = text" />
         <!-- 控件列表：暂时不做分组，后期再考虑，符合搜索值的控件才显示出来 -->
-        <Scroll :scroll="'y'" class="control-list">
+        <Scroll :bar="'y'" class="control-list">
             <Empty v-if="hasControls != true" message="无可用控件" />
             <Sort v-else draggable=".control-item" changer="1" :disabled="global.readonly" :sortDisabled="true"
                 :group="{ name: global.key, pull: 'clone', put: false }" @remove="onControlItemRemove">
@@ -25,9 +25,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, shallowRef, ShallowRef } from "vue";
 import { isArrayNotEmpty, isStringNotEmpty } from "snail.core";
 import { components, SortEvent } from "snail.vue";
+import { computed, inject, shallowRef, ShallowRef } from "vue";
 import { } from "../../models/field-container";
 import { INJECTKEY_GlobalContext } from "./field-common";
 

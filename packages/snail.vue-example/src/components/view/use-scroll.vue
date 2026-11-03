@@ -26,7 +26,7 @@ const rootDom = useTemplateRef("root");
 //  2、生命周期响应
 onMounted(() => {
     const scroll = useScroll(rootDom.value, {
-        scroll: "both",
+        bar: "both",
         barSize: "small",
     });
 });

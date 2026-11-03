@@ -8,7 +8,7 @@
         <button @click="loadingRef = !loadingRef">切换loading</button><br />
         <Page style="width: 100%;height: 200px;border: 1px solid gray;" :desktop="{
             main: {
-                scroll: { scroll: 'y' }
+                scroll: { bar: 'y' }
             }
         }" :loading="loadingRef">
             <template #desktop>
@@ -51,7 +51,7 @@
         <br />
         移动端模式，配置头部和底部：
         <Page style="width: 100%;height: 200px;border: 1px solid gray;" :mobile="{
-            main: { scroll: { scroll: 'y', barSize: 'mini' } },
+            main: { scroll: { bar: 'y', barSize: 'mini' } },
             footer: {
                 disabled: false,
                 buttons: [
