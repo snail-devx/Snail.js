@@ -14,7 +14,7 @@
             <!-- 头部渲染：配置了，且没禁用时显示 -->
             <Header class="header-area" v-if="header && header.disabled != true" :="header" @close="emits('close')" />
             <!-- 主内容区域渲染。渲染顺序：端自有插槽 > 默认插槽 > 不支持提示 -->
-            <Scroll class="main-area" :="main.scroll || { scroll: 'y', barSize: mode == 'mobile' ? 'mini' : 'small' }">
+            <Scroll class="main-area" :="main.scroll || { bar: 'y', barSize: mode == 'mobile' ? 'mini' : 'small' }">
                 <slot v-if="$slots[mode]" :name="mode" :="slotHandle" />
                 <slot v-else-if="$slots.default" :="slotHandle" />
                 <Empty v-else :message="`未实现[${mode}]端渲染`" />
@@ -105,13 +105,7 @@ function onFooterButtonClick(button: PageFooterButton) {
     &.desktop {
 
         // 弹窗打开时
-        &.dialog-body {
-            width: 80%;
-            max-width: 1000px;
-            height: fit-content;
-            min-height: 60%;
-            max-height: 90%;
-        }
+        // &.dialog-body {}
 
         //  桌面端 底部区域特定样式
         >.footer-area {
