@@ -33,9 +33,10 @@ const handle: FollowHandle<any> = Object.freeze<FollowHandle<any>>({
     popupStatus: context.popupStatus,
     closePopup: context.closePopup,
     //  跟随弹窗特有
-    pinned: shallowRef<boolean>(false),
+    target,
     followX: readonly(followXRef),
     followY: readonly(followYRef),
+    pinned: shallowRef<boolean>(false),
 });
 /**     Follow根元素上一次缓存尺寸*/
 const preSize: ElementSize = { width: 0, height: 0 };

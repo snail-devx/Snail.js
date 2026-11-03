@@ -108,15 +108,19 @@ export type FollowStrategy = "start" | "center" | "end" | "before" | "after" | "
  */
 export type FollowHandle<T> = PopupHandle<T> & {
     /**
+     * 当前跟随的目标元素
+     */
+    readonly target: HTMLElement;
+    /**
      * x轴的跟随策略
      * - 响应式只读副本，不可修改
      */
-    followX: Readonly<ShallowRef<FollowStrategy>>,
+    readonly followX: Readonly<ShallowRef<FollowStrategy>>,
     /**
      * y轴的跟随策略
      * - 响应式只读副本，不可修改
      */
-    followY: Readonly<ShallowRef<FollowStrategy>>,
+    readonly followY: Readonly<ShallowRef<FollowStrategy>>,
 
     /**
      * Follow弹窗是否【钉住】了
@@ -124,7 +128,7 @@ export type FollowHandle<T> = PopupHandle<T> & {
      * - 为true时，closeOnMask、closeOnEscape失效
      * - 满足 子弹窗 点击等操作时，不自动销毁父级弹窗
      */
-    pinned: ShallowRef<boolean>;
+    readonly pinned: ShallowRef<boolean>;
 };
 
 
