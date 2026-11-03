@@ -17,6 +17,7 @@ const POPUPMAPS: Map<string, PopupAppDescriptor> = new Map();
 /** 弹窗的z-index值队列 */
 const QUEUE_ZINDEX: number[] = [];
 
+//#region ************************************* 全局共享方法 *************************************
 /**
  * 配置弹窗默认配置
  * - 注意：`z-index`尽量在站点启动时初始化，避免已使用弹窗后再配置，否则容器导致层级混乱
@@ -29,7 +30,9 @@ export function configPopup(options: PopupExtendOptions) {
         options.motionDuration > 0 && (DEFAULT.motionDuration = options.motionDuration)
     }
 }
+//#endregion
 
+//#region ************************************* 内部助手方法 *************************************
 /**
  * 检测弹窗配置选项
  * @param options 弹窗配置选项
@@ -128,7 +131,9 @@ export function updatePopupStatus(popupId: string, status: PopupStatus): void {
     const descriptor = POPUPMAPS.get(popupId);
     descriptor && (descriptor.statusRef.value = status);
 }
+//#endregion
 
+//#region ************************************* 私有方法 *************************************
 /**
  * 获取弹窗Id
  * - 自执行函数构建一个闭包，内部维护id值
@@ -202,3 +207,4 @@ function getPopupAppElement(popupId: string): HTMLElement {
     appEle.classList.add("snail-app", "popup-app");
     return rootEl.appendChild(appEle);
 }
+//#endregion

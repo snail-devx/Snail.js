@@ -1,5 +1,6 @@
 import { PageFooterOptions } from "../models/page-model";
 
+//#region ************************************* 全局共享方法 *************************************
 /**
  * 构建`Page`组件的通用Footer配置
  * - 包含【取消】、【确认】按钮
@@ -17,3 +18,4 @@ export function buildPageCommonFooter(cancelFn: () => void, confirmFn: () => voi
         ]
     };
 }
+//#endregion
