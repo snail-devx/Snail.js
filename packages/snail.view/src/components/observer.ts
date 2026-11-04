@@ -4,7 +4,7 @@
  * 注意事项：
  *  1、不提供全局【观察者】对象；这个涉到不少子scope的销毁，在全局挂着始终不好
  */
-import { checkScope, correctNumber, IScope, IScopes, mountScope, mustFunction, mustString, run, ScopeOptions, throwIfFalse, useScopes } from "snail.core";
+import { checkScope, correctNumber, IScope, IScopes, isNullish, mountScope, mustFunction, mustString, run, ScopeOptions, throwIfFalse, throwIfTrue, useScopes } from "snail.core";
 import { ElementOverflowStatus, ElementSize, IObserver, TouchDetail, TouchDistance, TouchOptions, TouchStatus, TouchTarget } from "../models/observer-model";
 import { useAnimationFrame } from "./animation";
 
@@ -31,9 +31,10 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
      * @param useCapture 是否使用捕获模式
      * @returns 作用域，可销毁监听
      */
-    function onEvent(target: Element | Window, name: string, fn: (...args: any[]) => void, useCapture?: boolean): IScope {
+    function onEvent(target: Element | Window | Document, name: string, fn: (...args: any[]) => void, useCapture?: boolean): IScope {
         checkScope(manager, "onEvent: observer destroyed.");
-        throwIfFalse(target instanceof Element || target === window, "onEvent: target must be an Element or Window");
+        throwIfTrue(isNullish(target), "onEvent: target is nullish");
+        mustFunction(target.addEventListener, "onEvent: target.addEventListener");
         mustString(name, "onEvent: name");
         mustFunction(fn, "onEvent: fn");
         target.addEventListener(name, fn, useCapture);
@@ -117,16 +118,16 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
                     runFn("start", buildTargetByTouch(evt));
                 }
             }));
-            ("ontouchmove" in window) && scope.add(onEvent(window, "touchmove", (evt: TouchEvent) => {
+            ("ontouchmove" in window) && scope.add(onEvent(document, "touchmove", (evt: TouchEvent) => {
                 startType == "touch" && runFn("move", buildTargetByTouch(evt));
             }));
-            ("ontouchend" in window) && scope.add(onEvent(window, "touchend", (evt: TouchEvent) => {
+            ("ontouchend" in window) && scope.add(onEvent(document, "touchend", (evt: TouchEvent) => {
                 if (startType == "touch") {
                     startType = undefined;
                     runFn("end", buildTargetByTouch(evt));
                 }
             }));
-            ("ontouchcancel" in window) && scope.add(onEvent(window, "touchcancel", (evt: TouchEvent) => {
+            ("ontouchcancel" in window) && scope.add(onEvent(document, "touchcancel", (evt: TouchEvent) => {
                 if (startType == "touch") {
                     startType = undefined;
                     runFn("cancel", buildTargetByTouch(evt));
@@ -139,10 +140,10 @@ export function useObserver(options?: Pick<ScopeOptions, "global">): IObserver &
                     runFn("start", buildTargetByMouse(evt));
                 }
             }));
-            ("onmousemove" in window) && scope.add(onEvent(window, "mousemove", (evt: MouseEvent) => {
+            ("onmousemove" in window) && scope.add(onEvent(document, "mousemove", (evt: MouseEvent) => {
                 startType == "mouse" && runFn("move", buildTargetByMouse(evt));
             }));
-            ("onmouseup" in window) && scope.add(onEvent(window, "mouseup", (evt: MouseEvent) => {
+            ("onmouseup" in window) && scope.add(onEvent(document, "mouseup", (evt: MouseEvent) => {
                 if (startType == "mouse") {
                     startType = undefined;
                     runFn("end", buildTargetByMouse(evt));

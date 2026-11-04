@@ -14,7 +14,7 @@ export interface IObserver {
      * @param useCapture 是否使用捕获模式
      * @returns 作用域，可销毁监听
      */
-    onEvent(target: Element | Window, name: string, fn: (...args: any[]) => void, useCapture?: boolean): IScope;
+    onEvent(target: Element | Window | Document, name: string, fn: (...args: any[]) => void, useCapture?: boolean): IScope;
 
     /**
      * 监听元素触摸事件
