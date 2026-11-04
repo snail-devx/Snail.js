@@ -6,12 +6,13 @@
 <template>
     <header class="snail-header" :class="useTo" v-bind:class="{ 'start-divider': divider }">
         <!-- 标题区域 -->
-        <div v-if="title != ''" v-text="title" class="header-title" :class="align || 'center'" />
+        <div v-if="title != ''" class="header-title" :class="align || 'center'" v-text="title" />
         <!-- 插槽区域，自定义内容 -->
         <slot />
         <!-- 关闭按钮区域 -->
-        <Icon class="close-icon" type="close" button :size="22" :color="useTo == 'page' ? '#2e3033' : '#464953'"
-            v-if="closeDisabled != true" @click="emits('close')" />
+        <Icon v-if="closeDisabled != true" class="close-icon" type="close" button :size="22"
+            :color="useTo == 'page' ? '#2e3033' : '#464953'" :hover-color="'#d91309'" :title="'关闭'"
+            @click="emits('close')" />
     </header>
 </template>
 
