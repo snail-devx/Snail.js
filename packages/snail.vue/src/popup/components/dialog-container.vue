@@ -52,12 +52,12 @@ function onDialogRootClick(evt: MouseEvent) {
 //  1、数据初始化、变化监听
 //  2、生命周期响应
 onMounted(() => {
-    onEvent(window, "keyup", (event: KeyboardEvent) => {
+    onEvent(document, "keyup", (event: KeyboardEvent) => {
         event.key === "Escape" && context.popupStatus.value == "active"
             && props.closeOnEscape && context.closePopup();
     });
     //  监听全局的click事件，重置 mousedownTarget 对象
-    onEvent(window, "click", () => mousedownTarget = undefined);
+    onEvent(document, "click", () => mousedownTarget = undefined);
 });
 
 </script>

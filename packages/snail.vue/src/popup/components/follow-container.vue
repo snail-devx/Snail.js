@@ -132,13 +132,12 @@ onMounted(() => {
                 ? context.closePopup(undefined)
                 : rootDom.value && buildFollow()
             );
-            onEvent(window, "keyup", (evet: KeyboardEvent) => props.closeOnEscape
-                && evet.key === "Escape"
-                && handle.pinned.value != true
+            onEvent(document, "keyup", (evet: KeyboardEvent) => props.closeOnEscape
+                && evet.key === "Escape" && handle.pinned.value != true
                 && context.closePopup(undefined)
             );
             //  监听点击：确保比子元素先捕获点击事件，否则可能在子元素被vue重新渲染更新后，判断 contains 会出问题
-            onEvent(window, "click", (event: MouseEvent) => {
+            onEvent(document, "click", (event: MouseEvent) => {
                 /**
                  * 自动关闭的例外情况：
                  *  1、未配置 点击遮罩关闭时；钉住时不自动关闭；

@@ -85,8 +85,8 @@ function onDragEnd() {
 
 // *****************************************   👉  组件渲染    *****************************************
 isTouch || onMounted(function () {
-    onEvent(window, "mousemove", onDragMove);
-    onEvent(window, "mouseup", onDragEnd);
+    onEvent(document, "mousemove", onDragMove);
+    onEvent(document, "mouseup", onDragEnd);
 });
 </script>
 
