@@ -4,7 +4,7 @@
     3、尾部区域：标题、值、操作；支持完全自定义插槽
 -->
 <template>
-    <div class="snail-card">
+    <div class="snail-card" @click="onCardClick">
         <!-- 标题区域:标题，做默认实现 -->
         <div class="header-area">
             <slot name="header">
@@ -43,17 +43,28 @@
 <script setup lang="ts">
 import { isFunction, useKey } from 'snail.core';
 import Icon from '../base/icon.vue';
+import { ClickEvents } from '../base/models/base-event';
 import { CardInfoItem, CardOptions } from './models/card-model';
-
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 defineProps<CardOptions>();
+const emits = defineEmits<ClickEvents>();
 const { getKey } = useKey();
-
 //  2、组件交互变量、常量
+/**     是否被 carditem 捕获了click事件 */
+let clickCapturedByItem: boolean = false;
 
 // *****************************************   👉  方法+事件    ****************************************
+/**
+ * Card整体点击时
+ * @param evt 
+ */
+function onCardClick(evt: MouseEvent) {
+    clickCapturedByItem == true
+        ? (clickCapturedByItem = false)
+        : emits("click", evt);
+}
 /**
  * 卡片信息项点击事件
  * @param item 
@@ -61,7 +72,8 @@ const { getKey } = useKey();
  */
 function onCardItemClick(item: CardInfoItem, evt: PointerEvent) {
     if (isFunction(item.click) == true) {
-        evt.stopPropagation(); // 阻止事件冒泡
+        // evt.stopPropagation(); // 阻止事件冒泡
+        clickCapturedByItem = true;
         item.click();
     }
 }

@@ -43,7 +43,7 @@ export type CardInfoItem = {
     /**
      * 信息项点击时的回调函数
      * - 非null时，标记此信息项可点击，右侧出现箭头图标
-     * @returns 
+     * - 若此触发，则不会触发 Card 组件的click事件
      */
     click?: () => void;
 };
