@@ -7,14 +7,16 @@
         <template v-if="mode == 'mobile' && isStringNotEmpty(title)">
             <div class="action-title ellipsis" v-text="title" />
         </template>
-        <template v-for="(action, index) in actions" :key="action.id">
-            <div class="action-item ellipsis" :class="{
-                'no-border': mode == 'mobile' && (index == actions.length - 1),
-                'selected': action.id == value,
-            }" :style="{
-                '--color': correctString(action.color, undefined, true),
-                '--hover-color': correctString(action.hoverColor, undefined, true)
-            }" v-text="action.name" @click="onActionItemClick(action)" />
+        <template v-for="action in actions" :key="action.id">
+            <div class="action-item" :class="{ 'selected': action.id == value, }"
+                :style="{ '--color': action.color, '--hover-color': action.hoverColor || action.color }"
+                @click="onActionItemClick(action)">
+                <template v-if="action.icon">
+                    <Icon v-if="isString(action.icon)" :type="as<IconType>(action.icon)" :size="16" />
+                    <component v-else :is="action.icon" />
+                </template>
+                <span class="ellipsis" v-text="action.name" />
+            </div>
         </template>
         <template v-if="mode == 'mobile'">
             <div class="action-cancel" @click="closePopup(undefined)">取消</div>
@@ -23,8 +25,11 @@
 </template>
 
 <script setup lang="ts">
-import { correctString, isFunction, isStringNotEmpty } from 'snail.core';
+import { isFunction, isString, isStringNotEmpty } from 'snail.core';
+import Icon from '../../base/icon.vue';
+import { IconType } from '../../base/models/icon-model';
 import { useApp } from '../../base/utils/app-util';
+import { as } from '../../base/utils/base-util';
 import { FollowHandle } from '../../popup/models/follow-model';
 import { ActionPickerItem, ActionPickerOptions } from '../models/action-model';
 import { PickerExtend } from '../models/picker-model';
@@ -33,7 +38,6 @@ import { PickerExtend } from '../models/picker-model';
 //  1、props、event、model、components
 const { closePopup } = defineProps<ActionPickerOptions & FollowHandle<string> & PickerExtend>();
 const { mode } = useApp();
-
 //  2、组件交互变量、常量
 
 // *****************************************   👉  方法+事件    ****************************************
@@ -59,25 +63,34 @@ function onActionItemClick(action: ActionPickerItem) {
 .snail-action-picker {
     user-select: none;
     background: #FFFFFF;
+    overflow-x: hidden;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
 
-    //  颜色配置
-    & {
-        --color: #2E3033;
-        --hover-color: #2E3033;
 
-        >div.action-item {
-            color: var(--color);
+    >div {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        // 动作项
+        &.action-item {
             cursor: pointer;
+            gap: 6px;
+            // 颜色变量，选项文字颜色、悬停颜色
+            --color: #2E3033;
+            --hover-color: #2E3033;
+            color: var(--color);
+
+            >svg {
+                fill: currentColor;
+            }
 
             &:hover {
                 color: var(--hover-color);
                 background-color: #F8F9FA;
             }
-
-
         }
     }
 }
@@ -88,68 +101,64 @@ function onActionItemClick(action: ActionPickerItem) {
     border-radius: 4px;
     min-width: 100px;
     max-width: 150px;
-    overflow: hidden;
 
-    >.action-item {
-        height: 32px;
-        line-height: 32px;
-        padding: 0 16px;
+    >div {
+        &.action-item {
+            height: 32px;
+            padding: 0 10px;
+        }
     }
 }
 
 // 移动端：放到底部
 .snail-action-picker.mobile {
     align-self: flex-end;
-    overflow-x: hidden;
     width: 100%;
 
     // 增加一个同级类样式，否则优先级不够，无法生效
     &.dialog-body {
-        border: none;
+        border-radius: 0;
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
     }
 
     >div {
-        position: relative;
         padding: 0 16px;
-        text-align: center;
+        justify-content: center;
+        border-bottom: 1px solid #E2E2E3;
 
-        &:not(.no-border) {
-            border-bottom: 1px solid #E2E2E3
+        // 操作项 标题头
+        &.action-title {
+            color: #A2A4A6;
         }
-    }
 
-    >div.action-title {
-        height: 44px;
-        line-height: 44px;
-        color: #A2A4A6;
-    }
+        // 最后两个项，不要下边框
+        &:nth-last-child(2),
+        &:last-child {
+            border: none;
+        }
 
+        //  除 取消操作项，高度44px
+        &:not(:last-child) {
+            height: 44px;
+        }
 
-    >div.action-item {
-        height: 50px;
-        line-height: 50px;
-        font-size: 16px;
-        color: black;
-    }
+        // 取消操作项
+        &.action-cancel {
+            height: 50px;
+            color: black;
+            padding-top: 6px;
 
-    >div.action-cancel {
-        height: 56px;
-        line-height: 50px;
-        padding-top: 6px;
-        font-size: 16px;
-        color: black;
-
-        &::after {
-            position: absolute;
-            left: 0;
-            top: 0;
-            content: " ";
-            width: 100%;
-            height: 6px;
-            background-color: #E2E2E3;
-            opacity: .4;
+            &::after {
+                position: absolute;
+                left: 0;
+                top: 0;
+                content: " ";
+                width: 100%;
+                height: 6px;
+                background-color: #E2E2E3;
+                opacity: .4;
+            }
         }
     }
 }

@@ -16,10 +16,10 @@ async function showAction(evt: Event, mode: AppEnv['mode']) {
     const code = await picker.showAction(evt.target as HTMLElement, {
         title: "动作选择",
         actions: [
-            { id: "code1", name: "动作1", },
-            { id: "code2", name: "动作2", },
-            { id: "code3", name: "动作3", click: () => console.log("code3被点击了") },
-            { id: "code4", name: "动作4", click: () => console.log("code4被点击了") },
+            { id: "code1", name: "动作1", icon: "arrow", color: "red" },
+            { id: "code2", name: "动作2", icon: "download" },
+            { id: "code3", name: "动作3", icon: "print", color: "green", click: () => console.log("code3被点击了") },
+            { id: "code4", name: "动作4", icon: "trash", click: () => console.log("code4被点击了") },
         ],
     });
     console.log("选择的动作编码：", code);

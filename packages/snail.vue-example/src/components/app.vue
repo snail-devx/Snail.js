@@ -204,11 +204,11 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[1].children[3], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[4], undefined);
     //  picker 测试
-    // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
-    // onTreeNodeClick(treeOptions.nodes[3].children[1], undefined);
+    onTreeNodeClick(treeOptions.nodes[4].children[0], undefined);
+    // onTreeNodeClick(treeOptions.nodes[4].children[1], undefined);
 
     //  popup 测试
-    onTreeNodeClick(treeOptions.nodes[5].children[2], undefined);
+    // onTreeNodeClick(treeOptions.nodes[5].children[2], undefined);
     // onTreeNodeClick(treeOptions.nodes[5].children[0], undefined);
 
     //  prompt 测试

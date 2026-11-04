@@ -2,7 +2,9 @@
  * 操作表 数据实体
  */
 
+import { Component } from "vue";
 import { TitleOptions, ValueOptions } from "../../base/models/base-model";
+import { IconType } from "../../base/models/icon-model";
 
 /**
  * 动作选择器 配置选项
@@ -32,20 +34,21 @@ export type ActionPickerItem = {
 
     /**
     * 颜色
+    * - 无则默认色
     */
     color?: string;
     /**
      * 鼠标移入时颜色
+     * - 无则使用 `color` 属性值
      */
     hoverColor?: string;
 
-    // /**
-    //  * 图标
-    //  * - 支持 vue组件和内置支持图标
-    //  * - vue 组件时，传入自定义图标的渲染组件，svg为根节点，否则 color 和 hoverColor 不生效
-    //  */
-    // icon?: Component | IconType;
-
+    /**
+     * 图标
+     * - 支持 vue组件和内置支持图标
+     * - vue 组件时，传入自定义图标的渲染组件，svg为根节点
+     */
+    icon?: Component | IconType;
 
     /**
      * 点击动作时的回调

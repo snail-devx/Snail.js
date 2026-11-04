@@ -14,8 +14,8 @@
                 <div class="tab-item" v-for="tab in tabs" :key="tab.id" :class="{ 'actived': selectedItemRef == tab }"
                     :title="tab.name" :id="tab.id" @click="onTabItemClick(tab)">
                     <template v-if="tab.icon">
-                        <Icon class="tab-icon" v-if="isString(tab.icon)" :type="as<IconType>(tab.icon)" />
-                        <component class="tab-icon" v-else :is="tab.content" />
+                        <Icon v-if="isString(tab.icon)" :type="as<IconType>(tab.icon)" :size="16" />
+                        <component v-else :is="tab.content" />
                     </template>
                     <span class="ellipsis" v-text="tab.name" />
                 </div>
@@ -153,7 +153,7 @@ async function onTabItemClick(tab: TabsItemOptions): Promise<boolean> {
         if (canSelect == true) {
             const oldTabId = selectedItemRef.value ? selectedItemRef.value.id : undefined;
             selectedItemRef.value = tab;
-            scrollIntoView(tab.id);
+            scrollIntoView(tab.id, { behavior: "smooth" });
             emits("active", tab.id);
             emits("change", tab.id, oldTabId);
             return true;
@@ -167,7 +167,7 @@ async function onTabItemClick(tab: TabsItemOptions): Promise<boolean> {
 async function onShowMoreTabs(evt: Event) {
     const code = await showAction(evt.target as HTMLElement, {
         title: "标签页",
-        actions: props.tabs.map(t => ({ id: t.id, name: t.name })),
+        actions: props.tabs.map(tab => ({ id: tab.id, name: tab.name, icon: tab.icon })),
         value: selectedItemRef.value ? selectedItemRef.value.id : undefined,
     });
     //  若切换了选中页签，则同步激活，并确保显示到视图窗口中
@@ -229,17 +229,14 @@ onUnmounted(() => overflowScope && overflowScope.destroy());
                 position: relative;
                 cursor: pointer;
                 padding: 0 10px;
-                gap: 4px;
                 color: #646464;
                 display: flex;
                 align-items: center;
+                gap: 4px;
 
                 // 标签项图标
-                >svg.tab-icon {
-                    flex: none;
+                >svg {
                     fill: currentColor;
-                    width: 14px;
-                    height: 14px;
                 }
             }
         }

@@ -112,7 +112,6 @@ export type TabsItemOptions = {
      * 标签项名称
      */
     name: string;
-
     /**
      * 图标
      * - 支持 vue组件和内置支持图标
