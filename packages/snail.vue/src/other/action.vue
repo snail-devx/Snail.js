@@ -73,13 +73,12 @@ function buildDefaultText() {
  * @param longPress 
  */
 async function onShowActions(longPress: boolean) {
-    //  若已显示了，则直接销毁
+    //  若已显示了，则直接销毁；禁用则不用再做处理了
     if (popupScopeRef.value && popupScopeRef.value.destroyed != true) {
         popupScopeRef.value.destroy();
         popupScopeRef.value = undefined;
     }
-    //  没禁用才生效
-    if (props.disabled != true) {
+    else if (props.disabled != true) {
         switch (props.popup) {
             case "picker": {
                 popupScopeRef.value = showScroll({
