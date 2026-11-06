@@ -110,7 +110,7 @@ export function useStyle(): IStyleManager & IScope {
     /** style标签元素 */
     const style: HTMLStyleElement = document.createElement("style");
     /** 分配的根类样式 */
-    const namespace: string = `userspace_${++styleTagIndex}`
+    const namespace: string = `userspace-${++styleTagIndex}`
 
     //#region ************************************* 接口方法：IStyleManager具体实现 *************************************
     /**
