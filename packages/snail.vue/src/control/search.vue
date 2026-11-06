@@ -51,11 +51,17 @@ let preSearchText: string = valueRef.value;
  */
 function onSubmit(keepFocus?: boolean) {
     keepFocus != true && inputDom.value.blur();
-    //  避免重复提交
-    if (preSearchText !== valueRef.value) {
-        preSearchText = valueRef.value;
-        emits("search", valueRef.value);
-    }
+    const oldValue = preSearchText;
+    // 提交搜索时，不管变没变都对外发送search事件，如桌面端点击搜索时无值，也始终触发搜索
+    preSearchText = valueRef.value;
+    emits("search", valueRef.value, oldValue);
+
+    // //  避免重复提交
+    // if (preSearchText !== valueRef.value) {
+    //     preSearchText = valueRef.value;
+    //     emits("search", valueRef.value);
+    // }
+
 }
 /**
  * 点击清除按钮时
