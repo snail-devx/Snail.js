@@ -14,7 +14,7 @@ export function buildPageCommonFooter(cancelFn: () => void, confirmFn: () => voi
         align: algin || "end",
         buttons: [
             { code: 'cancel', name: '取消', type: 'default', click: cancelFn },
-            { code: 'confirm', name: '确定', type: 'primary', click: () => confirmFn },
+            { code: 'confirm', name: '确定', type: 'primary', click: confirmFn },
         ]
     };
 }
