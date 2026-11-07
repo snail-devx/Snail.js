@@ -1,10 +1,38 @@
 import { TitleOptions } from "./base-model";
 
 /**
+ * 图标基础配置选项
+ */
+export type IconBaseOptions = {
+    /** 
+     * 图标大小
+     * - 可指定对象，如 { width: 24, height: 24 }，则图标大小为 24 * 24
+     * - 可指定数字，如 24，则图标大小为 24 * 24
+     * - 默认 14
+     */
+    size?: number | { width?: number, height?: number };
+    /** 
+     * 图标颜色 
+     */
+    color?: string;
+    /**
+     * 鼠标移入时的图标颜色
+     * - 不指定时，使用 `color`
+     */
+    hoverColor?: string;
+    /**
+     * 旋转角度
+     * - 默认0
+     * - 通过：transform: rotate(1.06); 实现
+     */
+    rotate?: number;
+}
+
+/**
  * 图标配置选项
  * - title          作为鼠标移入图标时的提示
  */
-export type IconOptions = TitleOptions & {
+export type IconOptions = TitleOptions & IconBaseOptions & {
     /**
      * 是否为自定义图标
      * - 为true时，外部通过插槽自己绘制图标
@@ -23,28 +51,12 @@ export type IconOptions = TitleOptions & {
      * - true时，鼠标移入时 cursor:pointer;
      */
     button?: boolean;
+    /**
+     * 是否禁用 交互
+     * - 为true时，无鼠标移入效果
+     */
+    disabled?: boolean;
 
-    /** 
-     * 图标大小
-     * - 可指定对象，如 { width: 24, height: 24 }，则图标大小为 24 * 24
-     * - 可指定数字，如 24，则图标大小为 24 * 24
-     * - 默认 24
-     */
-    size?: number | { width?: number, height?: number };
-    /** 
-     * 图标颜色 
-     */
-    color?: string;
-    /**
-     * 鼠标移入时的图标颜色
-     */
-    hoverColor?: string;
-    /**
-     * 旋转角度
-     * - 默认0
-     * - 通过：transform: rotate(1.06); 实现
-     */
-    rotate?: number;
     /**
      * 图标透明度
      * - 不传入，默认1
@@ -54,6 +66,11 @@ export type IconOptions = TitleOptions & {
      * 图标边样式
      */
     border?: string;
+    /**
+     * 图标内边距样式
+     * - 配合 `size` 在不影响图标内容大小的情况下扩大图标点击等区域
+     */
+    padding?: string;
     /**
      * 图标圆角样式
      */

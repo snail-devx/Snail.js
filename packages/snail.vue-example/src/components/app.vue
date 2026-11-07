@@ -82,7 +82,7 @@ const treeOptions: TreeOptions<Component> = {
     },
     nodeOptions: {
         // foldDisabled: true,
-        expandLevel: 1,
+        expandLevel: 2,
     },
     nodes: [
         {
@@ -189,6 +189,8 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 }
 
 onMounted(() => {
+    onTreeNodeClick(treeOptions.nodes[0].children[3], undefined);
+
     // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[treeOptions.nodes.length - 1].children[1], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[0], undefined);
@@ -204,7 +206,7 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[1].children[3], undefined);
     // onTreeNodeClick(treeOptions.nodes[1].children[4], undefined);
     //  picker 测试
-    onTreeNodeClick(treeOptions.nodes[4].children[0], undefined);
+    // onTreeNodeClick(treeOptions.nodes[4].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[4].children[1], undefined);
 
     //  popup 测试

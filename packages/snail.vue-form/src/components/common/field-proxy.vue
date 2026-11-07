@@ -17,19 +17,19 @@
         <div class="field-error ellipsis" v-if="isStringNotEmpty(error)" v-text="error" />
     </div>
     <!-- 字段工具栏：拖拽、复制、删除 -->
-    <div class="field-toolbar" v-if="global.mode == 'design'"
+    <div class="field-toolbar" v-if="global.mode == 'design' && isReadonly() != true"
         @click="isButtonClickInCover ? (isButtonClickInCover = false) : emitter('activateField')">
-        <Icon v-if="isReadonly() != true" type="plus" button color="#aeb6c2" hover-color="#279bf1" title="复制"
+        <Icon type="plus" button color="#aeb6c2" hover-color="#279bf1" title="复制"
             @click="isButtonClickInCover = true, emitter('copyField')" />
-        <Icon v-if="isReadonly() != true" type="trash" button color="#aeb6c2" hover-color="#279bf1" title="删除"
+        <Icon type="trash" button color="#aeb6c2" title="删除"
             @click="isButtonClickInCover = true, emitter('deleteField')" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import { components } from "snail.vue";
 import { isStringNotEmpty } from "snail.core";
+import { components } from "snail.vue";
+import { inject } from "vue";
 import { FieldRenderProxyOptions } from "../../models/field-base";
 import { INJECTKEY_GlobalContext } from "./field-common";
 
@@ -116,10 +116,12 @@ let isButtonClickInCover: boolean;
 
     >.field-toolbar {
         cursor: move;
+        padding-right: 4px;
         border: 1px dashed transparent;
         display: flex;
         justify-content: flex-end;
         align-items: center;
+        gap: 4px;
         opacity: 0;
         transition: opacity ease-in-out 200ms;
         z-index: 10;

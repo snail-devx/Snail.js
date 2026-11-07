@@ -20,7 +20,7 @@
                     <div class="row-select" v-show="selectModeRef != 'none'"
                         :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
                         @click="toggleSelect(row)">
-                        <Icon :type="'success'" :color="'white'" :size="14" />
+                        <Icon :type="'success'" :color="'white'" :size="16" />
                     </div>
                     <!-- 实际内容区域：默认插槽逻辑。区分行插槽还是列插槽 -->
                     <div class="row-body" @click="selectModeRef == 'none' && emits('click', row, undefined)">

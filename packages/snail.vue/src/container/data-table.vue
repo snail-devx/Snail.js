@@ -56,7 +56,7 @@
                                 <div class="row-select"
                                     :class="[isSelected(row) == true ? 'on' : 'off', isSelectable(row) ? '' : 'disabled']"
                                     @click="toggleSelect(row)">
-                                    <Icon :type="'success'" :color="'white'" :size="12" />
+                                    <Icon :type="'success'" :color="'white'" :hover-color="'white'" :size="12" />
                                 </div>
                             </template>
                             <template v-else>
@@ -84,7 +84,7 @@
             <tr>
                 <!-- 序号列 -->
                 <td class="index" v-if="index == true">
-                    <Icon :type="'stats'" :title="'合计'" :size="20" :color="'#4c94ff'" />
+                    <Icon :type="'stats'" :title="'合计'" :size="18" :color="'#4c94ff'" />
                 </td>
                 <!-- 自定义渲染 -->
                 <template v-if="$slots.footer">

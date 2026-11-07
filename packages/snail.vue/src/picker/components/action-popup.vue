@@ -12,7 +12,7 @@
                 :style="{ '--color': action.color, '--hover-color': action.hoverColor || action.color }"
                 @click="onActionItemClick(action)">
                 <template v-if="action.icon">
-                    <Icon v-if="isString(action.icon)" :type="as<IconType>(action.icon)" :size="16" />
+                    <Icon v-if="isString(action.icon)" :type="as<IconType>(action.icon)" :size="14" />
                     <component v-else :is="action.icon" />
                 </template>
                 <span class="ellipsis" v-text="action.name" />
@@ -167,7 +167,8 @@ function onActionItemClick(action: ActionPickerItem) {
 .snail-action-picker {
     >div.action-item {
         &.selected {
-            color: #279bf1;
+            // color: #279bf1;
+            color: #5ca3ff;
         }
     }
 }

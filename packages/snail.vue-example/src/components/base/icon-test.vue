@@ -1,36 +1,38 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <h3>状态类：</h3>
-    <Icon :type="'success'" />
-    <Icon :type="'error'" />
-    <Icon :type="'warn'" />
-    <h3>操作类：</h3>
-    <Icon :type="'close'" />
-    <Icon :type="'trash'" />
-    <Icon :type="'download'" />
-    <Icon :type="'print'" />
-    <Icon :type="'edit'" />
-    <Icon :type="'pause'" />
-    <h3>指向类：</h3>
-    <Icon :type="'arrow'" />
-    <Icon :type="'datepicker'" />
-    <Icon :type="'timepicker'" />
-    <h3>其他类：</h3>
-    <Icon :type="'plus'" />
-    <Icon :type="'subtract'" />
-    <Icon :type="'more'" />
-    <Icon :type="'stats'" />
-    <Icon :type="'grip'" />
-    <Icon :type="'circle-loading'" />
-    <h3>rotate</h3>
-    <Icon :type="'arrow'" :rotate="45" />
-    <Icon :type="'arrow'" :rotate="90" />
-    <h3>opacity</h3>
-    <Icon :type="'warn'" :opacity="0.3" />
-    <Icon :type="'warn'" :opacity="-1" />
-    <Icon :type="'warn'" :opacity="0.1" />
-    <h3>border、background、radius</h3>
-    <Icon :type="'warn'" :border="'1px solid red'" :background="'blue'" :radius="'50%'" @click="console.log" />
+    <div style="width: 100%;" class="icon-test">
+        <h3>状态类：</h3>
+        <Icon :type="'success'" />
+        <Icon :type="'error'" />
+        <Icon :type="'warn'" />
+        <h3>操作类：</h3>
+        <Icon :type="'close'" />
+        <Icon :type="'trash'" />
+        <Icon :type="'download'" />
+        <Icon :type="'print'" />
+        <Icon :type="'edit'" />
+        <Icon :type="'pause'" />
+        <h3>指向类：</h3>
+        <Icon :type="'arrow'" />
+        <Icon :type="'datepicker'" />
+        <Icon :type="'timepicker'" />
+        <h3>其他类：</h3>
+        <Icon :type="'plus'" />
+        <Icon :type="'subtract'" />
+        <Icon :type="'more'" />
+        <Icon :type="'stats'" />
+        <Icon :type="'grip'" />
+        <Icon :type="'circle-loading'" />
+        <h3>rotate</h3>
+        <Icon :type="'arrow'" :rotate="45" />
+        <Icon :type="'arrow'" :rotate="90" />
+        <h3>opacity</h3>
+        <Icon :type="'warn'" :opacity="0.3" />
+        <Icon :type="'warn'" :opacity="-1" />
+        <Icon :type="'warn'" :opacity="0.1" />
+        <h3>border、background、radius</h3>
+        <Icon :type="'warn'" :border="'1px solid red'" :background="'blue'" :radius="'50%'" @click="console.log" />
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -55,6 +57,13 @@ onDeactivated(() => console.log("onDeactivated"));
 </script>
 
 <style lang="less">
-// 引入Mixins样式
-@import "snail.view/dist/styles/mixins.less";
+.icon-test {
+    width: 100%;
+    height: 100%;
+    overflow: hidden auto;
+
+    svg {
+        margin-right: 10px;
+    }
+}
 </style>

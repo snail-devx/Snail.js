@@ -42,7 +42,7 @@
             <div class="option-items">
                 <Sort :disabled="readonly" :changer="optionItems.length" draggable=".option-item" handle=".option-move"
                     @update="onItemSort">
-                    <div class="option-item" v-for="item in optionItems" :key="item.id">
+                    <div class="option-item" v-for="(item, index) in optionItems" :key="item.id">
                         <Choose :readonly="readonly" :type="'checkbox'" :mode="'beautiful'" :multi="false"
                             :items="[{ text: '', value: true }]" v-model="item.selected"
                             @change="value => onItemSelectedChange(item, value)" />
@@ -52,8 +52,8 @@
                             v-model.trim="item.code" v-if="codeEnabledRef" @change="syncFieldSetting" />
                         <!-- 非只读模式时显示操作按钮 -->
                         <template v-if="readonly != true">
-                            <Icon type="grip" :size="20" class="option-move" />
-                            <Icon type="trash" button :size="20" @click="onDeleteItem" />
+                            <Icon type="grip" class="option-move" />
+                            <Icon type="trash" button @click="onDeleteItem(index)" />
                         </template>
                     </div>
                 </Sort>
@@ -68,15 +68,15 @@
 
 <script setup lang="ts">
 import { isArrayNotEmpty, moveFromArray } from "snail.core";
-import { Ref, ref, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import { components } from "snail.vue";
+import { Ref, ref, shallowRef, ShallowRef, useTemplateRef } from "vue";
 import { OptionControlSettings, OptionControlValueItem } from "../../models/control-model";
 import { FieldSettingOptions } from "../../models/field-setting";
 import FieldSettingProxy from "../common/field-setting-proxy.vue";
+import FieldLikeBoolean from "./atoms/field-like-boolean.vue";
+import FieldLikeText from "./atoms/field-like-text.vue";
 import FieldTitle from "./atoms/field-title.vue";
 import FieldWidth from "./atoms/field-width.vue";
-import FieldLikeText from "./atoms/field-like-text.vue";
-import FieldLikeBoolean from "./atoms/field-like-boolean.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -212,11 +212,12 @@ if (isArrayNotEmpty(field.settings.options)) {
         >.option-item {
             margin-bottom: 4px;
             width: 100%;
+            overflow: hidden;
+            height: 32px;
             display: flex;
             flex-wrap: nowrap;
-            overflow-x: hidden;
-            height: 32px;
             align-items: center;
+            gap: 10px;
 
             >.snail-choose,
             >.snail-icon {
@@ -226,7 +227,6 @@ if (isArrayNotEmpty(field.settings.options)) {
             >input {
                 flex: 1;
                 height: 28px;
-                margin-left: 10px;
             }
 
             //  只读时，组装这样的格式“ 选项文本 | 编码 ”

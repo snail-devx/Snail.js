@@ -7,8 +7,8 @@
                 <input type="search" ref="input-dom" :placeholder="placeholder" :readonly="readonly"
                     v-model.trim="valueRef" @focus="focusRef = true" @keyup="onKeyUp($event)" @blur="onInputBlur()" />
             </form>
-            <Icon v-if="readonly != true && clearDisabled != true" button :type="'plus'" :rotate="45" :size="16"
-                :color="'white'" :background="'#c5c9db'" :radius="'16px'" @click="onClear()" />
+            <Icon v-if="readonly != true && clearDisabled != true" button :type="'plus'" :size="16" :padding="'3px'"
+                :rotate="45" :color="'white'" :background="'#c5c9db'" :radius="'16px'" @click="onClear()" />
         </div>
         <!-- 操作按钮区域 -->
         <div class="operate-area" v-if="readonly != true" @click="mode == 'mobile' ? inputDom.focus() : onSubmit()">

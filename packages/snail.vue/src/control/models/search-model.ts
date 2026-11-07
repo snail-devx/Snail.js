@@ -30,6 +30,7 @@ export type SearchEvents = {
     /**
      * 事件：执行搜索
      * @param value 为搜索文本
+     * @param old 为上一次的搜索文本
      */
-    search: [value: string];
+    search: [value: string, old?: string];
 }

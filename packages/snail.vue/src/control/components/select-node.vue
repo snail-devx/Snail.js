@@ -75,6 +75,7 @@ defineOptions({ name: "SelectNode", inheritAttrs: true, });
 
     &.group {
         color: #8a9099;
+        padding-right: 12px;
     }
 
     &.item {

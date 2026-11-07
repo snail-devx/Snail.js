@@ -7,7 +7,7 @@
         :top="{ height: '40px' }" :bottom="{ height: '30px' }">
         <!-- 顶部导航区域：展示左右切换等功能 -->
         <template #top>
-            <Icon type="arrow" button :rotate="180" :size="26" :color="'#8a9099'" :hover-color="'#58a4fd'"
+            <Icon type="arrow" button :size="24" :padding="'6px'" :rotate="180" :hover-color="'#58a4fd'"
                 @click="buildPickerItems(stepRef, -1)" />
             <div class="header-content" :class="stepRef">
                 <template v-if="stepRef == 'year'">
@@ -18,7 +18,7 @@
                     <div v-text="`${dateRef.month}月`" v-if="stepRef == 'day'" @click="onSwitchStepClick('month')" />
                 </template>
             </div>
-            <Icon class="flex-0" type="arrow" button :size="26" :color="'#8a9099'" :hover-color="'#58a4fd'"
+            <Icon type="arrow" button :size="24" :padding="'6px'" :hover-color="'#58a4fd'"
                 @click="buildPickerItems(stepRef, 1)" />
         </template>
         <!-- 年月日选择-->

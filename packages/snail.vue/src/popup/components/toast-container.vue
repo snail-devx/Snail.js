@@ -7,10 +7,10 @@
         :style="{ 'z-index': context.zIndex }" @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
         <!-- 桌面端 特有：关闭按钮，和消息图标 -->
         <template v-if="mode == 'desktop'">
-            <Icon class="close-icon" v-if="props.closeDisabled != true" type="close" button :size="20"
-                :color="'#707070'" :hover-color="'red'" @click="context.closePopup();" />
+            <Icon class="close-icon" v-if="props.closeDisabled != true" type="close" button :size="22" :padding="'4px'"
+                :color="'#707070'" :hover-color="'#d91309'" @click="context.closePopup();" />
             <div class="icon" v-if="isStringNotEmpty(props.type)">
-                <Icon :type="props.type" :color="'#707070'" :size="20" />
+                <Icon :type="props.type" :color="'#707070'" :size="18" />
             </div>
         </template>
         <!-- 消息详情 -->
@@ -86,7 +86,7 @@ onMounted(() => onMouseEvent(true));
     >svg.close-icon {
         position: absolute;
         right: 10px;
-        top: 12px;
+        top: 8px;
     }
 
     >div.icon {
@@ -101,7 +101,6 @@ onMounted(() => onMouseEvent(true));
 
         >svg {
             padding: 2px;
-            cursor: none !important;
             background: white;
             border-radius: 50%;
         }

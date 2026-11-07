@@ -37,7 +37,7 @@ const tmpComponent = defineComponent({
         const pupup = usePopup();
         return {
             click() {
-                pupup.toast("对对对对对对的点点滴滴哒哒哒哒哒哒哒哒哒哒哒哒哒哒哒", { type: "error" });
+                pupup.toast("对对对对对对的点点滴滴哒哒哒哒哒哒哒哒哒哒哒哒哒哒哒", { type: "warn" });
             }
         }
     }

@@ -20,7 +20,8 @@
         <div class="trigger-slot" :class="{ 'hover-show': icon != 'always' }"
             v-if="disabled != true && (mode != 'press')">
             <slot name="trigger" :="slotHandle">
-                <Icon button :type="'more'" :size="16" @click="mode != 'whole' && onShowActions(false)" />
+                <Icon button :type="'more'" :size="18" :padding="'2px'"
+                    @click="mode != 'whole' && onShowActions(false)" />
             </slot>
         </div>
     </div>

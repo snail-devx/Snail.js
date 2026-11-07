@@ -9,10 +9,10 @@
         <span class="ellipsis" :class="{ 'empty': isStringNotEmpty(valueRef) == false }" v-text="valueRef" />
         <!-- 选择图标，PC、移动区分 -->
         <template v-if="mode != 'mobile'">
-            <Icon v-if="readonly != true" button :type="timeFormat ? 'timepicker' : 'datepicker'" :size="16" />
+            <Icon v-if="readonly != true" button :type="timeFormat ? 'timepicker' : 'datepicker'" />
         </template>
         <template v-else>
-            <Icon v-if="readonly != true" button :type="'arrow'" :size="18" />
+            <Icon v-if="readonly != true" button :type="'arrow'" />
         </template>
     </div>
 </template>

@@ -11,7 +11,7 @@
             <!-- 选项样式：radio、checkbox -->
             <input v-if="mode == 'native'" :type="type" :checked="node.selected" />
             <div v-else-if="mode == 'beautiful'" class="status" :class="[node.selected ? 'selected' : '']">
-                <Icon v-if="node.selected" type="success" :size="12" :color="readonly ? '#8a9099' : 'white'" />
+                <Icon v-if="node.selected" type="success" :size="12" :color="readonly ? undefined : 'white'" />
             </div>
             <!-- 选项文本,选项描述信息 -->
             <span class="item-text" v-if="node.item.text" v-text="node.item.text" />

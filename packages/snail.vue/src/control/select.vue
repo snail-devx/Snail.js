@@ -15,7 +15,7 @@
             </div>
             <div v-else class="placeholder" v-text="readonly ? '' : (placeholder || '请选择')" />
             <!-- 下拉选择图标，非只读时才显示 -->
-            <Icon v-if="readonly != true" type="arrow" button :size="24" :rotate="90" />
+            <Icon v-if="readonly != true" type="arrow" button :rotate="90" />
         </template>
         <!-- 无可选项时，直接给出提示 -->
         <div v-else class="placeholder">暂无可选项</div>
@@ -231,13 +231,13 @@ onAppCreated((app, env, type) => {
     //  未选选项时的提示效果
     >div.placeholder {
         flex: 1;
-        padding: 0 10px 0 6px;
+        padding: 0 8px 0 6px;
     }
 
     //  下拉选择标记图标
     >svg.snail-icon {
         flex-shrink: 0;
-        margin-right: 4px;
+        margin-right: 8px;
     }
 
     //  无数据提醒

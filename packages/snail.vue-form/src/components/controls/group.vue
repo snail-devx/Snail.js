@@ -11,15 +11,15 @@
                 <span class="item-title ellipsis" v-else v-text="`${field.title}(${rowIndex + 1})`" />
                 <!-- 操作按钮：非设计时、 非只读时才显示：添加、删除、上移、下移-->
                 <template v-if="global.mode != 'design' && isReadonly() != true">
-                    <Icon type="arrow" button :="{ size: 24, title: '下移', rotate: 90 }"
+                    <Icon type="arrow" button :="{ title: '下移', rotate: 90 }"
                         v-if="rowIndex != group.children.length - 1 && field.settings.disableSort != true"
                         @click="moveItem(rowIndex, rowIndex + 1)" />
-                    <Icon type="arrow" button :="{ size: 24, title: '上移', rotate: 270 }"
+                    <Icon type="arrow" button :="{ title: '上移', rotate: 270 }"
                         v-if="rowIndex != 0 && field.settings.disableSort != true"
                         @click="moveItem(rowIndex, rowIndex - 1)" />
-                    <Icon type="plus" button :="{ size: 22, title: field.settings.addActionName || '添加', }"
+                    <Icon type="plus" button :="{ size: 12, title: field.settings.addActionName || '添加', }"
                         v-if="needAddRef" @click="addNewItem(rowIndex + 1)" />
-                    <Icon type="subtract" button :="{ size: 22, title: '删除', }"
+                    <Icon type="subtract" button :="{ size: 12, title: '删除', }"
                         v-if="field.settings.disableDelete != true" @click="onDeleteItem(rowIndex, gv);" />
                 </template>
             </div>
@@ -29,7 +29,7 @@
         <!-- 分组控件的工具栏：显示添加按钮、总计等；若无任何内容，则加一条白线，用于占位盖住表单字段行的最后一条边框线 -->
         <div class="group-toolbar" v-if="isReadonly() != true && needAddRef">
             <Button :type="'link'" :size="'small'" @click="addNewItem()">
-                <Icon type="plus" button :size="22" :color="'#4c9aff'" />
+                <Icon type="plus" button :size="24" :padding="'6px'" :color="'#4c9aff'" />
                 <span v-text="field.settings.addActionName || '添加'" />
             </Button>
         </div>
@@ -38,14 +38,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, ShallowRef, shallowRef, } from "vue";
 import { components, usePopup } from "snail.vue";
-import FieldProxy from "../common/field-proxy.vue";
-import FormFields from "../common/form-fields.vue";
+import { computed, inject } from "vue";
 import { GroupControlSettings, GroupControlValue, IGroupControl } from "../../models/control-model";
 import { FieldEvents, FieldRenderOptions } from "../../models/field-base";
 import { } from "../../models/field-container";
-import { INJECTKEY_GlobalContext, useField } from "../common/field-common";
+import { INJECTKEY_GlobalContext } from "../common/field-common";
+import FieldProxy from "../common/field-proxy.vue";
+import FormFields from "../common/form-fields.vue";
 import { useGroup } from "../common/group-common";
 
 // *****************************************   👉  组件定义    *****************************************
@@ -110,6 +110,7 @@ async function onDeleteItem(rowIndex: number, gv: Record<string, any>) {
             align-items: center;
             flex-wrap: nowrap;
             padding-right: 10px;
+            gap: 6px;
 
             >.item-title {
                 max-width: 50%;

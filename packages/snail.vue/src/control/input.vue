@@ -16,17 +16,17 @@
             <input ref="input-el" :type="type || 'text'" :value="inputModel" :readonly="readonly == true"
                 :placeholder="placeholder" :title="inputModel" @change="onValueChange" @click="emits('click')" />
             <span class="validate" v-if="!!validateRef" :title="validateRef">
-                <Icon type="error" button :size="16" :color="'red'" />
+                <Icon type="error" button :size="12" :color="'red'" :hover-color="'red'" />
             </span>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, shallowRef, useTemplateRef } from "vue";
-import { InputEvents, InputOptions } from "./models/input-model";
-import Icon from "../base/icon.vue";
 import { css } from "snail.view";
+import { computed, nextTick, shallowRef, useTemplateRef } from "vue";
+import Icon from "../base/icon.vue";
+import { InputEvents, InputOptions } from "./models/input-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data

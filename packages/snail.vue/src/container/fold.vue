@@ -11,8 +11,8 @@
                 <div class="title ellipsis" v-text="title" />
                 <div class="subtitle ellipsis" v-if="!!subtitle" v-text="subtitle" />
                 <div class="status" v-if="disabled != true">
-                    <Icon type="arrow" button :title="statusRef == 'expand' ? '收起' : '展开'"
-                        :rotate="statusRef == 'expand' ? -90 : 90" @click="onStatusClick" />
+                    <Icon type="arrow" button :title="statusRef == 'expand' ? '收起' : '展开'" :size="24" :padding="'6px'"
+                        :rotate="statusRef == 'expand' ? -90 : 90" @click="onStatusClick" style="padding:6px;" />
                 </div>
             </slot>
         </div>

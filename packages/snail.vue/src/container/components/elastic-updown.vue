@@ -10,7 +10,7 @@
         <Icon v-if="refreshRef != 'running'" custom :size="16" :rotate="refreshRef == 'release' ? 180 : 0">
             <path :d="downIconPath" />
         </Icon>
-        <Icon v-else class="circle-infinite" :type="'circle-loading'" :size="16" />
+        <Icon v-else class="circle-infinite" :type="'circle-loading'" :size="18" />
         <span>
             <template v-if="refreshRef == 'initial'">下拉刷新数据</template>
             <template v-if="refreshRef == 'release'">释放立即刷新</template>
@@ -22,7 +22,7 @@
         <Icon v-if="moreRef != 'running'" custom :size="16" :rotate="moreRef == 'release' ? 0 : 180">
             <path :d="downIconPath" />
         </Icon>
-        <Icon v-else class="circle-infinite" :type="'circle-loading'" :size="16" />
+        <Icon v-else class="circle-infinite" :type="'circle-loading'" :size="18" />
         <span>
             <template v-if="moreRef == 'initial'">上拉加载更多数据</template>
             <template v-if="moreRef == 'release'">释放立即加载</template>

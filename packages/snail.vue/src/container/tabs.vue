@@ -14,7 +14,7 @@
                 <div class="tab-item" v-for="tab in tabs" :key="tab.id" :class="{ 'actived': selectedItemRef == tab }"
                     :title="tab.name" :id="tab.id" @click="onTabItemClick(tab)">
                     <template v-if="tab.icon">
-                        <Icon v-if="isString(tab.icon)" :type="as<IconType>(tab.icon)" :size="16" />
+                        <Icon v-if="isString(tab.icon)" :type="as<IconType>(tab.icon)" :size="14" />
                         <component v-else :is="tab.content" />
                     </template>
                     <span class="ellipsis" v-text="tab.name" />

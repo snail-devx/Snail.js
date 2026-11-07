@@ -3,7 +3,7 @@
     2、采用svg方式实现，不使用字体图片，按需引入
 -->
 <template>
-    <svg class="snail-icon" :class="type" v-bind:class="{ button: button }"
+    <svg class="snail-icon" :class="[type]" v-bind:class="{ button, custom, disabled }"
         :viewBox="correctString(viewBox, '0 0 1024 1024', false)" :="sizeRef" :style="styleRef"
         @click="evt => emits('click', evt)">
         <title v-text="title || ''" />
@@ -12,7 +12,7 @@
             <slot />
         </template>
         <!-- 内置图标绘制 -->
-        <path v-else v-for="d in getBuiltinIcon(type)" :d="d" />
+        <path v-else v-for="d in baseRef.path" :d="d" />
     </svg>
 </template>
 
@@ -21,48 +21,44 @@ import { correctNumber, correctString, isObject } from "snail.core";
 import { computed } from "vue";
 import { ClickEvents } from "./models/base-event";
 import { IconOptions } from "./models/icon-model";
-import { getBuiltinIcon } from "./utils/icon-util";
+import { getBuiltinIconOptions } from "./utils/icon-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<IconOptions>();
 const emits = defineEmits<ClickEvents>();
 //  2、组件交互变量、常量
+/**     图标基础配置 */
+const baseRef = computed<ReturnType<typeof getBuiltinIconOptions>>(() => props.custom
+    ? Object.create(null)
+    : getBuiltinIconOptions(props.type)
+);
 /**     图标尺寸，包含高度、宽度值 */
 const sizeRef = computed(() => {
-    if (isObject(props.size) == true) {
-        return {
-            width: correctNumber((props.size as any).width, 24),
-            height: correctNumber((props.size as any).height, 24)
-        }
-    }
-    else {
-        const number = correctNumber(props.size, 24);
-        return {
-            width: number,
-            height: number
-        };
-    }
+    const size = props.size || baseRef.value.size;
+    const { width, height } = isObject(size) ? size as any : { width: size, height: size };
+    return {
+        width: correctNumber(width, 14),
+        height: correctNumber(height, 14)
+    };
 });
 /**     图标样式变量：旋转，鼠标移入颜色 */
 const styleRef = computed(() => {
     const style = Object.create(null);
-    //  fill样式
-    let fill = correctString(props.color, undefined, true);
-    fill && (style["--fill"] = fill);
-    fill = correctString(props.hoverColor, fill, true);
-    fill && (style["--hover"] = fill);
-    // let fill = isMouseEnterRef.value ? correctString(props.hoverColor, props.color, true) : undefined;
-    // fill == undefined && (fill = correctString(props.color, undefined, true));
-    // fill && (style.fill = fill);
+    //  图标颜色
+    let color = correctString(props.color || baseRef.value.color, undefined, true);
+    style["--color"] = color;
+    color = correctString(props.hoverColor || baseRef.value.hoverColor, color, true);
+    style["--hover-color"] = color;
     //  旋转样式
-    const rotate = correctNumber(props.rotate, 0);
+    const rotate = correctNumber(props.rotate == undefined ? baseRef.value.rotate : props.rotate, 0);
     rotate != 0 && (style.transform = `rotate(${rotate}deg)`);
     //  透明度
     const opacity = correctNumber(props.opacity, undefined);
     opacity >= 0 && (style.opacity = opacity);
     //  边框、背景色
     style.border = correctString(props.border, undefined, true);
+    style.padding = correctString(props.padding, undefined, true);
     style.borderRadius = correctString(props.radius, undefined, true);
     style.background = correctString(props.background, undefined, true);
 
@@ -78,10 +74,9 @@ const styleRef = computed(() => {
     opacity: 1;
     flex-shrink: 0;
 
-    //  颜色控制
-    --fill: #8a8099;
-    --hover: #8a8099;
-    fill: var(--fill);
+    --color: #8a9099;
+    --hover-color: #8a9099;
+    fill: var(--color);
 
     &.button {
         cursor: pointer;
@@ -91,7 +86,7 @@ const styleRef = computed(() => {
 //  仅在拥有精确指针设备（如鼠标）时应用 hover 效果；避免 移动端 点击后，也会保留 :hover 效果
 @media (hover: hover) and (pointer: fine) {
     .snail-icon:hover {
-        fill: var(--hover);
+        fill: var(--hover-color);
     }
 }
 </style>

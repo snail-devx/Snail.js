@@ -17,18 +17,18 @@
       <!-- 步长控制按钮:不同样式,做不同按钮效果,采用不同模块实现 -->
       <template v-if="controls == 'default'">
         <div class="controls default subtract" @click="onStepClick(false)">
-          <Icon type="subtract" button :size="20" />
+          <Icon type="subtract" button :size="12" />
         </div>
         <div class="controls default plus" @click="onStepClick(true)">
-          <Icon type="plus" button :size="20" />
+          <Icon type="plus" button :size="12" />
         </div>
       </template>
       <template v-else-if="controls == 'right'">
         <div class="controls right plus" @click="onStepClick(true)">
-          <Icon type="arrow" button :size="20" :rotate="270" />
+          <Icon type="arrow" button :size="10" :rotate="270" />
         </div>
         <div class="controls right subtract" @click="onStepClick(false)">
-          <Icon type="arrow" button :size="20" :rotate="90" />
+          <Icon type="arrow" button :size="10" :rotate="90" />
         </div>
       </template>
     </div>

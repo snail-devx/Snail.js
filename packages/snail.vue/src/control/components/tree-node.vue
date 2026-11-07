@@ -13,7 +13,7 @@
         <template v-else>
             <div class="indent" />
             <div class="node-fold" v-if="options.foldDisabled != true">
-                <Icon v-if="showChildrenRef" :class="statusRef" custom button @click="toggleFold">
+                <Icon v-if="showChildrenRef" :class="statusRef" custom button :size="24" @click="toggleFold">
                     <path d="M 298.667 426.667 l 213.333 256 l 213.333 -256 Z" />
                 </Icon>
             </div>
