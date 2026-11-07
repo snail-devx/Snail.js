@@ -4,7 +4,8 @@
     3、子组件使用 useApp 方法，获取到应用环境配置
 -->
 <template>
-    <slot :="$attrs" />
+    <slot v-if="$slots[mode]" :name="mode" :="$attrs" />
+    <slot v-else :="$attrs" />
 </template>
 
 <script setup lang="ts">
