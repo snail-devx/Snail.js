@@ -51,11 +51,6 @@ export type IconOptions = TitleOptions & IconBaseOptions & {
      * - true时，鼠标移入时 cursor:pointer;
      */
     button?: boolean;
-    /**
-     * 是否禁用 交互
-     * - 为true时，无鼠标移入效果
-     */
-    disabled?: boolean;
 
     /**
      * 图标透明度

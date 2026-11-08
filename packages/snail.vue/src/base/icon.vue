@@ -3,9 +3,8 @@
     2、采用svg方式实现，不使用字体图片，按需引入
 -->
 <template>
-    <svg class="snail-icon" :class="[type]" v-bind:class="{ button, custom, disabled }"
-        :viewBox="correctString(viewBox, '0 0 1024 1024', false)" :="sizeRef" :style="styleRef"
-        @click="evt => emits('click', evt)">
+    <svg class="snail-icon" :class="[type, namespace]" v-bind:class="{ button, custom, }"
+        :viewBox="correctString(viewBox, '0 0 1024 1024', false)" :="sizeRef" @click="evt => emits('click', evt)">
         <title v-text="title || ''" />
         <!-- 自定义图标绘制 -->
         <template v-if="custom == true">
@@ -18,15 +17,19 @@
 
 <script setup lang="ts">
 import { correctNumber, correctString, isObject } from "snail.core";
-import { computed } from "vue";
+import { useStyle } from "snail.view";
+import { computed, onMounted } from "vue";
 import { ClickEvents } from "./models/base-event";
 import { IconOptions } from "./models/icon-model";
+import { useReactive } from "./reactive";
 import { getBuiltinIconOptions } from "./utils/icon-util";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
 const props = defineProps<IconOptions>();
 const emits = defineEmits<ClickEvents>();
+const { namespace, build } = useStyle();
+const { watcher } = useReactive();
 //  2、组件交互变量、常量
 /**     图标基础配置 */
 const baseRef = computed<ReturnType<typeof getBuiltinIconOptions>>(() => props.custom
@@ -42,14 +45,18 @@ const sizeRef = computed(() => {
         height: correctNumber(height, 14)
     };
 });
-/**     图标样式变量：旋转，鼠标移入颜色 */
-const styleRef = computed(() => {
+
+// *****************************************   👉  方法事件    *****************************************
+/**
+ * 构建用户自定义样式
+ */
+function buildUserStyle() {
     const style = Object.create(null);
     //  图标颜色
     let color = correctString(props.color || baseRef.value.color, undefined, true);
-    style["--color"] = color;
+    color && (style["--color"] = color);
     color = correctString(props.hoverColor || baseRef.value.hoverColor, color, true);
-    style["--hover-color"] = color;
+    color && (style["--hover-color"] = color);
     //  旋转样式
     const rotate = correctNumber(props.rotate == undefined ? baseRef.value.rotate : props.rotate, 0);
     rotate != 0 && (style.transform = `rotate(${rotate}deg)`);
@@ -62,10 +69,18 @@ const styleRef = computed(() => {
     style.borderRadius = correctString(props.radius, undefined, true);
     style.background = correctString(props.background, undefined, true);
 
-    return style;
-});
+    build([{
+        rule: "svg",
+        mode: "nesting",
+        style: style,
+    }]);
+}
 
-// *****************************************   👉  方法事件    *****************************************
+// *****************************************   👉  组件渲染    *****************************************
+//  1、数据初始化、变化监听
+watcher(() => ({ ...props }), buildUserStyle);
+//  2、生命周期响应
+onMounted(buildUserStyle)
 
 </script>
 <style lang="less">

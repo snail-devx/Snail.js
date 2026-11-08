@@ -32,20 +32,36 @@
         <Icon :type="'warn'" :opacity="0.1" />
         <h3>border、background、radius</h3>
         <Icon :type="'warn'" :border="'1px solid red'" :background="'blue'" :radius="'50%'" @click="console.log" />
+        <!-- 响应式测试 -->
+        <hr />
+        <button @click="onTestReactive" style="margin-right: 20px;">切换type值</button>
+        <Icon :="iconOptions" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { onActivated, onDeactivated } from "vue";
-import { components } from "../../libraries/snail_vue";
+import { onActivated, onDeactivated, ref, Ref } from "vue";
+import { components, IconOptions } from "../../libraries/snail_vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
 const { Icon } = components;
+const iconOptions: Ref<IconOptions> = ref({ type: "arrow" });
 //  2、可选配置选项
 defineOptions({ name: "IconTest", inheritAttrs: true, });
 
+
 // *****************************************   👉  方法+事件    ****************************************
+function onTestReactive() {
+    if (iconOptions.value.type == "arrow") {
+        iconOptions.value.type = "trash";
+        iconOptions.value.size = 20;
+        iconOptions.value.padding = "2px";
+    }
+    else {
+        iconOptions.value = { type: "arrow" };
+    }
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
