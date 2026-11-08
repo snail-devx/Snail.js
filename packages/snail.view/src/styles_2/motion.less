@@ -27,23 +27,23 @@
 
     //  放大进入
     .scale-in {
-        scale: 1;
+        transform: scale(1);
         animation: snail-scale 0.2s ease;
 
         @keyframes snail-scale {
             0% {
-                scale: 0;
+                transform: scale(0);
             }
 
             100% {
-                scale: 1;
+                transform: scale(1);
             }
         }
     }
 
     //  缩小退出
     .scale-out {
-        scale: 0;
+        transform: scale(0);
         animation: snail-scale 0.2s ease reverse;
     }
 
