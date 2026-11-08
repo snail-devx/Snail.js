@@ -119,26 +119,30 @@ export function useStyle(): IStyleManager & IScope {
      * @param classes 类样式数组，name为类样式名称，options为样式配置（key为css样式，value为样式值；如width
      */
     function build(classes: StyleClassItem[]) {
-        style.parentNode || (getLinkDefaultContainer().appendChild(style));
-        if (isArrayNotEmpty(classes) == true) {
-            style.innerText = classes.map((item, index) => {
-                //  构建当前class的类样式，注意key的大写问题
-                const styles: string[] = [];
-                {
-                    const style = css.buildStyle(item.style);
-                    for (const key in style) {
-                        hasOwnProperty(style, key) && styles.push(`\t${key.replace(/([A-Z])/g, "-$1").toLowerCase()}:${style[key]};`);
-                    }
+        const texts: string[] = [];
+        isArrayNotEmpty(classes) && classes.forEach((item, index) => {
+            //  构建当前class的类样式，注意key的大写问题
+            const styles: string[] = [];
+            {
+                //  构建出来的样式，进行大写字母转化
+                const style = css.buildStyle(item.style);
+                for (const key in style) {
+                    hasOwnProperty(style, key) && styles.push(`\t${key.replace(/([A-Z])/g, "-$1").toLowerCase()}:${style[key]};`);
                 }
-                //  生成类样式
-                //      基于 mode 生成连接符，拼接 namespace 和 rule
+                //  变量定义样式构建
+                item.style && Object.keys(item.style).forEach(key => key.startsWith("--")
+                    && item.style[key] != undefined && styles.push(`\t${key}:${item.style[key]};`)
+                );
+            }
+            //  合并拼接样式：基于 mode 生成连接符，拼接 namespace 和 rule
+            if (styles.length > 0) {
                 let linker: string = undefined;
                 switch (item.mode) {
                     case "child": linker = ">"; break;
                     case "nesting": linker = ""; break;
                     default: linker = " "; break;
                 }
-                //      拼接规则：嵌套模式时，如果为元素tag选择器，需要调整连接顺序。如 span.namespace
+                // 拼接规则：嵌套模式时，如果为元素tag选择器，需要调整连接顺序。如 span.namespace
                 const rules: string[] = (isArray(item.rule) ? item.rule as string[] : [item.rule as string])
                     .map((rule, ruleIndex) => {
                         mustString(rule, `classes[${index}].rule[${ruleIndex}]`);
@@ -147,12 +151,17 @@ export function useStyle(): IStyleManager & IScope {
                             : `.${namespace}${linker}${rule}`;
                     });
                 mustArray(rules, `classes[${index}].rule`);
-                //      组装规则样式
-                return `${rules.join(', ')} { ${styles.join("\t")} }`;
-            }).join("\n");
+                // 组装规则样式
+                texts.push(`${rules.join(', ')} { ${styles.join("\t")} }`);
+            }
+        });
+        //  样式渲染，如果为空则移除style标签
+        if (texts.length > 0) {
+            style.parentNode || (getLinkDefaultContainer().appendChild(style));
+            style.innerText = texts.join("\n");
         }
         else {
-            style.innerText = "";
+            style.parentNode && style.parentNode.removeChild(style);
         }
     }
     //#endregion

@@ -73,8 +73,10 @@ export type StyleClassItem = {
     rule: string | string[];
     /**
      * 样式配置（key为css样式，value为样式值；如width
+     * - key支持常规style样式
+     * - key支持变量样式：如：--xxx
      */
-    style: AllStyle;
+    style: AllStyle & Record<`--${string}`, string | number>;
 }
 
 /**
