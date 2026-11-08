@@ -4,7 +4,7 @@
  *  2、style 内联样式管理
  *  3、【后续支持】直接构建style标签
  */
-import { hasOwnProperty, isArray, isArrayNotEmpty, IScope, isObject, isStringNotEmpty, mountScope, mustArray, mustString } from "snail.core";
+import { hasOwnProperty, isArray, isArrayNotEmpty, IScope, isObject, isStringNotEmpty, mountScope, mustArray, mustString, throwIfNullish } from "snail.core";
 import { AllStyle, CSS, CSSDescriptor, ICSSManager, IStyleManager, StyleClassItem } from "../models/css-model";
 import { getLinkDefaultContainer } from "../utils/link-util";
 
@@ -142,6 +142,7 @@ export function useStyle(): IStyleManager & IScope {
                     default: linker = " "; break;
                 }
                 // 拼接规则：嵌套模式时，如果为元素tag选择器，需要调整连接顺序。如 span.namespace
+                throwIfNullish(item.rule, `classes[${index}].rule is null or undefined`);
                 const rules: string[] = (isArray(item.rule) ? item.rule as string[] : [item.rule as string])
                     .map((rule, ruleIndex) => {
                         mustString(rule, `classes[${index}].rule[${ruleIndex}]`);
