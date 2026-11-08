@@ -124,7 +124,6 @@ export function useStyle(): IStyleManager & IScope {
             //  构建当前class的类样式，注意key的大写问题
             const styles: string[] = [];
             {
-                //  构建出来的样式，进行大写字母转化
                 const style = css.buildStyle(item.style);
                 for (const key in style) {
                     hasOwnProperty(style, key) && styles.push(`\t${key.replace(/([A-Z])/g, "-$1").toLowerCase()}:${style[key]};`);
