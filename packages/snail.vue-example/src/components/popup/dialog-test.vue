@@ -3,6 +3,7 @@
     <button @click="onOpenClick">打开弹窗</button>
     <button @click="onOpenInShell">使用弹窗壳</button>
     <button @click="onConfirm">确认弹窗</button>
+    <button @click="onMobileConfirm">移动端：确认弹窗</button>
     <hr />
     vModelTest值双向绑定到弹窗中：{{ vModelTest }}
 </template>
@@ -15,6 +16,7 @@ import DialogContent from "./components/child-content.vue";
 // 👉 组件定义
 //  1、props、data
 const popup = usePopup();
+const popupMobile = usePopup({ mode: "mobile" });
 const vModelTest = shallowRef<boolean>(true);
 const { PopupShell } = components;
 
@@ -76,6 +78,13 @@ function onOpenInShell() {
  */
 async function onConfirm() {
     const data = await popup.confirm("顶顶顶顶顶顶顶顶", "确定要删除【xxxxd的】吗?");
+    console.log(data);
+}
+/**
+ * 移动端确认弹窗
+ */
+async function onMobileConfirm() {
+    const data = await popupMobile.confirm("顶顶顶顶顶顶顶顶", "确定要删除【xxxxd的】吗?");
     console.log(data);
 }
 

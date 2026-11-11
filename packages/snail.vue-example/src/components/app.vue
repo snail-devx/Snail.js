@@ -189,7 +189,7 @@ function onTreeNodeClick(node: TreeNodeModel<Component>, parents: TreeNodeModel<
 }
 
 onMounted(() => {
-    onTreeNodeClick(treeOptions.nodes[0].children[3], undefined);
+    // onTreeNodeClick(treeOptions.nodes[0].children[3], undefined);
 
     // onTreeNodeClick(treeOptions.nodes[3].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[treeOptions.nodes.length - 1].children[1], undefined);
@@ -210,6 +210,7 @@ onMounted(() => {
     // onTreeNodeClick(treeOptions.nodes[4].children[1], undefined);
 
     //  popup 测试
+    onTreeNodeClick(treeOptions.nodes[5].children[0], undefined);
     // onTreeNodeClick(treeOptions.nodes[5].children[2], undefined);
     // onTreeNodeClick(treeOptions.nodes[5].children[0], undefined);
 
