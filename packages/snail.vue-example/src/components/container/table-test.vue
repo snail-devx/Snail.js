@@ -1,7 +1,7 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <Table style="height: 200px;margin-top: 10px;" :border="true" :columns="columns" @bottom="console.log('到底了')"
-        :empty-message="'ddxxxx'">
+    <Table class="scale-in" style="height: 200px;margin-top: 10px;" :border="true" :columns="columns"
+        @bottom="console.log('到底了')" :empty-message="'ddxxxx'">
         <template #main>
             <tr v-for="index in 20">
                 <td v-for="col in columns">

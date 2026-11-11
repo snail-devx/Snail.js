@@ -191,8 +191,17 @@ function buildTableColStyle(): StyleClassItem[] {
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
 //  2、生命周期响应
-onMounted(() => { //  事件监听处理
-    onSize(colAssistDom.value, buildTableStyle);
+onMounted(() => {
+    //  使用scale动画时，getBoundingClientRect会随着scale动画变化，做一下兼容；稳定后，再进行事件监听
+    const tmpFunc = function () {
+        const absValue = Math.abs(colAssistDom.value.getBoundingClientRect().width - colAssistDom.value.clientWidth);
+        // console.log("-----------", absValue);
+        setTimeout(buildTableStyle, 0);
+        absValue > 1
+            ? requestAnimationFrame(tmpFunc)
+            : onSize(colAssistDom.value, buildTableStyle);
+    }
+    requestAnimationFrame(tmpFunc);
 });
 </script>
 
