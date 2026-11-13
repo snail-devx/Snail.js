@@ -28,11 +28,11 @@
 import { IAsyncScope, isArrayNotEmpty, IScope, isStringNotEmpty, useTimer } from "snail.core";
 import { computed, shallowRef, ShallowRef } from "vue";
 import { useReactive } from "../../base/reactive";
+import Search from "../../base/search.vue";
 import { usePopup } from "../../popup/manager";
 import { FollowHandle } from "../../popup/models/follow-model";
 import Empty from "../../prompt/empty.vue";
 import { SelectItem, SelectPopupEvents, SelectPopupExtend, SelectPopupOptions } from "../models/select-model";
-import Search from "../search.vue";
 import SelectNode from "./select-node.vue";
 
 // *****************************************   👉  组件定义    *****************************************

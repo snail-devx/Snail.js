@@ -18,6 +18,8 @@ import DynamicTest from "./base/dynamic-test.vue";
 import FieldTest from "./base/field-test.vue";
 import IconTest from "./base/icon-test.vue";
 import MotionTest from "./base/motion-test.vue";
+import SearchTest from "./base/search-test.vue";
+import SwitchTest from "./base/switch-test.vue";
 //  👉 容器组件
 import DatatableTest from "./container/datatable-test.vue";
 import ElasticTest from "./container/elastic-test.vue";
@@ -33,9 +35,7 @@ import TabsTest from "./container/tabs-test.vue";
 //  👉 控件组件
 import ChooseTest from "./control/choose-test.vue";
 import InputTest from "./control/input-test.vue";
-import SearchTest from "./control/search-test.vue";
 import SelectTest from "./control/select-test.vue";
-import SwitchTest from "./control/switch-test.vue";
 import TextareaTest from "./control/textarea-test.vue";
 import TreeTest from "./control/tree-test.vue";
 //  👉 表单组件
@@ -95,6 +95,8 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Field 字段容器", data: FieldTest, clickable: true, searchable: true },
                 { text: "Icon 图标组件", data: IconTest, clickable: true, searchable: true, },
                 { text: "Motion 动画组件", data: MotionTest, clickable: true, searchable: true, },
+                { text: "Search 搜索组件", data: SearchTest, clickable: true, searchable: true, },
+                { text: "Switch 开关组件", data: SwitchTest, clickable: true, searchable: true, },
             ],
         },
         {
@@ -119,9 +121,7 @@ const treeOptions: TreeOptions<Component> = {
             children: [
                 { text: "Choose 选择组件", data: ChooseTest, clickable: true, searchable: true, },
                 { text: "Input 输入框组件", data: InputTest, clickable: true, searchable: true, },
-                { text: "Search 搜索组件", data: SearchTest, clickable: true, searchable: true, },
                 { text: "Select 选项菜单组件", data: SelectTest, clickable: true, searchable: true, },
-                { text: "Switch 开关组件", data: SwitchTest, clickable: true, searchable: true, },
                 { text: "Textarea 多行文本框", data: TextareaTest, clickable: true, searchable: true },
                 { text: "Tree 树组件", data: TreeTest, clickable: true, searchable: true, },
             ]

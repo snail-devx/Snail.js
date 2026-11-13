@@ -21,7 +21,7 @@
 import { TreeEvents, TreeNodeModel, TreeNodeSlotOptions, TreeOptions } from "./models/tree-model";
 //  三方组件
 import { shallowRef, ShallowRef } from "vue";
-import Search from "../control/search.vue";
+import Search from "../base/search.vue";
 import { useTreeContext } from "./components/tree-base";
 import TreeNode from "./components/tree-node.vue";
 import { ITreeBaseContext } from "./models/tree-base";
