@@ -4,7 +4,7 @@
         <button @click="open();">打开弹窗</button>
         <button @click="onClose">关闭</button>
         <button @click="trigger();">触发事件</button>
-        <div>inPopup：{{ inPopup }} closePopup：{{ typeof closePopup }}</div>
+        <div>inPopup：{{ inPopup }} closePopup：{{ typeof closePopup }} inShell:{{ inShell }}</div>
         <div>自定义传入内容：{{ $attrs }}</div>
         <div>v-Model：绑定值为 {{ bvModel }}</div>
     </div>
@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { useTimer } from "snail.core";
 import { shallowRef } from "vue";
-import { components, FollowHandle, usePopup } from "../../../libraries/snail_vue";
+import { buildCommonFooter, components, FollowHandle, PopupShellHandle, usePopup } from "../../../libraries/snail_vue";
 import DialogContentTest from "./child-content.vue";
 const { } = components;
 
@@ -20,7 +20,7 @@ const { } = components;
 //  1、props、data
 const bvModel = defineModel<boolean>();
 const { onInterval } = useTimer();
-const { inPopup, closePopup, } = defineProps<FollowHandle<string>>()
+const { inPopup, closePopup, inShell, setFooter } = defineProps<FollowHandle<string> & PopupShellHandle>()
 const emits = defineEmits<{
     customEvent: [data: number]
 }>();
@@ -55,6 +55,7 @@ function trigger() {
 // 👉 组件渲染
 //  1、数据初始化、变化监听；仅dialog对话框才有此方法
 onInterval(() => bvModel.value = !bvModel.value, 1000);
+inShell && setFooter && setFooter(buildCommonFooter(closePopup, closePopup, "end"))
 //  2、生命周期响应
 </script>
 

@@ -20,14 +20,7 @@
                 <Empty v-else :message="`未实现[${mode}]端渲染`" />
             </Scroll>
             <!-- 底部区域：配置了，且没禁用时显示-->
-            <Flex class="footer-area" :class="{ divider: footer && footer.divider == true }"
-                v-if="footer && footer.disabled != true" :cross="'center'"
-                :main="footer && footer.align ? footer.align : 'center'" :gap="'20px'">
-                <template v-for="item in footer.buttons" :key="item.code">
-                    <Button v-if="item.disabled != true" :type="item.type || 'primary'" :size="item.size || 'max'"
-                        :title="item.name" v-text="item.name" @click="onFooterButtonClick(item)" />
-                </template>
-            </Flex>
+            <Footer class="footer-area" v-if="footer && footer.disabled != true" :="footer" />
         </template>
         <Empty v-else :message="`不支持[${mode}]端渲染`" />
         <!-- loading提示效果，显示头部时，在弹窗中时增加 头部逃逸 效果 -->
@@ -35,14 +28,12 @@
     </div>
 </template>
 <script setup lang="ts">
-import { isFunction } from 'snail.core';
-import Button from '../base/button.vue';
+import Footer from '../base/components/footer.vue';
+import Header from '../base/components/header.vue';
 import { useApp } from '../base/utils/app-util';
 import Empty from '../prompt/empty.vue';
 import Loading from '../prompt/loading.vue';
-import Header from './components/header.vue';
-import Flex from './flex.vue';
-import { PageEvents, PageFooterButton, PageOptions, PageSlotHandle } from './models/page-model';
+import { PageEvents, PageOptions, PageSlotHandle } from './models/page-model';
 import Scroll from './scroll.vue';
 
 // *****************************************   👉  组件定义    *****************************************
@@ -61,14 +52,6 @@ const pageArea = [
 const { header, main = {}, footer } = pageArea || {};
 
 // *****************************************   👉  方法+事件    ****************************************
-/**
- * 底部的按钮点击时
- * @param button 
- */
-function onFooterButtonClick(button: PageFooterButton) {
-    emits("button", button.code);
-    isFunction(button.click) && button.click();
-}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
@@ -90,16 +73,9 @@ function onFooterButtonClick(button: PageFooterButton) {
         flex: 1;
     }
 
-    >div.footer-area {
-        position: relative;
-        overflow: hidden;
-        flex-shrink: 0;
-        background-color: white;
-
-        &.divider {
-            border-top: 1px solid #dddfed;
-        }
-    }
+    // >div.footer-area {
+    //     position: relative;
+    // }
 
     // 桌面端
     &.desktop {
@@ -108,10 +84,10 @@ function onFooterButtonClick(button: PageFooterButton) {
         // &.dialog-body {}
 
         //  桌面端 底部区域特定样式
-        >.footer-area {
-            height: 72px;
-            padding: 0 40px;
-        }
+        // >.footer-area {
+        //     height: 72px;
+        //     padding: 0 40px;
+        // }
     }
 
     // 移动端渲染

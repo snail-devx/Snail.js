@@ -7,8 +7,8 @@ import { HeightStyle, WidthStyle } from "snail.view";
 import { ShallowRef } from "vue";
 import Dynamic from "../../base/dynamic.vue";
 import { ComponentBindOptions, ComponentOptions } from "../../base/models/component-model";
+import { FooterOptions, HeaderOptions } from "../../base/models/header-footer-model";
 import { MotionEffectOptions } from "../../base/models/motion-model";
-import { FooterOptions, HeaderOptions } from "../../container/models/page-model";
 
 /**
  * 弹窗配置选项
@@ -193,4 +193,22 @@ export type PopupShellHook<T> = {
      * @param fn 取数据时执行的钩子函数，支持异步；若需要阻止弹窗关闭则`fn`方法直接报错即可
      */
     onBuildData(fn: () => T | Promise<T>): void;
+}
+
+/**
+ * 弹窗外壳 组件的操作句柄
+ * - 下方给业务组件使用
+ */
+export type PopupShellHandle = {
+    /**
+     * 是否在【弹窗外壳】中
+     * - 取值为 弹窗类型，有值时表示在弹窗外壳中
+     */
+    inShell: PopupType;
+
+    /**
+     * 设置弹窗尾部内容
+     * @param footer 尾部配置，为空表示无尾部
+     */
+    setFooter(footer?: FooterOptions): void;
 }

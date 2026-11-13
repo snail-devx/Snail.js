@@ -13,6 +13,7 @@ import { components, TreeNodeModel, TreeOptions, useReactive } from "../librarie
 //#region *******************************   👉  组件定义    *****************************************
 //  👉 基础组件：
 import BaseTest from "./base/base-test.vue";
+import ButtonTest from "./base/button-test.vue";
 import DynamicTest from "./base/dynamic-test.vue";
 import FieldTest from "./base/field-test.vue";
 import IconTest from "./base/icon-test.vue";
@@ -30,7 +31,6 @@ import ScrollTest from "./container/scroll-test.vue";
 import TableTest from "./container/table-test.vue";
 import TabsTest from "./container/tabs-test.vue";
 //  👉 控件组件
-import ButtonTest from "./control/button-test.vue";
 import ChooseTest from "./control/choose-test.vue";
 import InputTest from "./control/input-test.vue";
 import SearchTest from "./control/search-test.vue";
@@ -90,6 +90,7 @@ const treeOptions: TreeOptions<Component> = {
             fixed: true,
             children: [
                 { text: "基础测试组件", data: BaseTest, clickable: true, searchable: true, },
+                { text: "Button 按钮组件", data: ButtonTest, clickable: true, searchable: true, },
                 { text: "Dynamic 动态组件", data: DynamicTest, clickable: true, searchable: true, },
                 { text: "Field 字段容器", data: FieldTest, clickable: true, searchable: true },
                 { text: "Icon 图标组件", data: IconTest, clickable: true, searchable: true, },
@@ -116,7 +117,6 @@ const treeOptions: TreeOptions<Component> = {
         {
             text: "控件组件",
             children: [
-                { text: "Button 按钮组件", data: ButtonTest, clickable: true, searchable: true, },
                 { text: "Choose 选择组件", data: ChooseTest, clickable: true, searchable: true, },
                 { text: "Input 输入框组件", data: InputTest, clickable: true, searchable: true, },
                 { text: "Search 搜索组件", data: SearchTest, clickable: true, searchable: true, },

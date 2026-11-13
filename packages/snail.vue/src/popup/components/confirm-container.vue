@@ -24,8 +24,8 @@
 </template>
 
 <script setup lang="ts">
+import Header from "../../base/components/header.vue";
 import { useApp } from "../../base/utils/app-util";
-import Header from "../../container/components/header.vue";
 import { ConfirmOptions } from "../models/confirm-model";
 import { PopupHandle } from "../models/popup-model.js";
 

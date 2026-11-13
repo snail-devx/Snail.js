@@ -31,6 +31,7 @@ export * from "./base/reactive";
 export * from "./base/utils/app-util";
 export * from "./base/utils/base-util";
 export * from "./base/utils/component-util";
+export { buildCommonFooter } from "./base/utils/footer-util";
 export * from "./base/utils/icon-util";
 export * from "./base/utils/motion-util";
 
@@ -48,8 +49,6 @@ export * from "./container/models/tabs-model";
 import ElasticBar from "./container/components/elastic-bar.vue";
 import ElasticPadding from "./container/components/elastic-padding.vue";
 import ElasticUpdown from "./container/components/elastic-updown.vue";
-import Footer from "./container/components/footer.vue";
-import Header from "./container/components/header.vue";
 import DataTable from "./container/data-table.vue";
 import ElasticTable from "./container/elastic-table.vue";
 import Elastic from "./container/elastic.vue";
@@ -60,8 +59,6 @@ import Page from "./container/page.vue";
 import Scroll from "./container/scroll.vue";
 import Table from "./container/table.vue";
 import Tabs from "./container/tabs.vue";
-//  方法导出
-export { buildPageCommonFooter } from "./container/utils/page-util";
 
 // *****************************************   👉  control 相关导出    ****************************************
 //  类型导出
@@ -144,7 +141,7 @@ export const components = {
     Flex, Fold, Layout, Page, Scroll, Tabs,
     Elastic, ElasticTable, Table, DataTable,
     //      components下的辅助组件
-    ElasticBar, ElasticPadding, ElasticUpdown, Footer, Header,
+    ElasticBar, ElasticPadding, ElasticUpdown,
     //  control 下的组件
     Choose, Input, Number, Search, Select, Switch, Textarea, Tree,
     //  other   下的组件

@@ -22,11 +22,11 @@
         <Page class="no-xxx" style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef" :desktop="{
             header: { useTo: 'dialog', title: '测试', divider: true },
             footer: {
-                align: 'center',
+                align: 'end',
                 divider: true,
                 buttons: [
-                    { code: 'xx', name: '测试', size: 'max' },
-                    { code: 'xx1', name: '测试2', type: 'primary', size: 'max' }
+                    { id: 'xx', name: '测试', size: 'max' },
+                    { id: 'xx1', name: '测试2', type: 'primary', size: 'max' }
                 ]
             }
         }">
@@ -55,8 +55,8 @@
             footer: {
                 disabled: false,
                 buttons: [
-                    { code: 'xx', name: '测试', size: 'max' },
-                    { code: 'xx1', name: '测试2', type: 'primary', size: 'max' }
+                    { id: 'xx', name: '测试', size: 'max' },
+                    { id: 'xx1', name: '测试2', type: 'primary', size: 'max' }
                 ]
             }
         }" :loading="loadingRef">
@@ -92,7 +92,4 @@ const loadingRef: ShallowRef<boolean> = shallowRef(true);
 //  2、生命周期响应
 </script>
 
-<style lang="less">
-// 引入基础Mixins样式
-@import "snail.view/dist/styles/mixins.less";
-</style>
+<style lang="less"></style>

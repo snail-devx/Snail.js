@@ -65,9 +65,7 @@ function onOpenInShell() {
                         console.log("接收自定义事件：", data);
                     }
                 }
-            },
-            footer: {}
-
+            }
         },
         model: vModelTest,
     });
