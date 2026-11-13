@@ -18,18 +18,17 @@ const emits = defineEmits<ClickEvents>();
 </script>
 
 <style lang="less">
-// 引入Mixins样式
-@import "snail.view/dist/styles/mixins.less";
-
 .snail-button {
     cursor: pointer;
     border-radius: 2px;
     white-space: nowrap;
     user-select: none;
     overflow: hidden;
-    // flex 布局：display: flex，align-items、justify-content 都为center
-    .flex-center();
+    // flex布局，预留4px间距，方便icon+text布局
     display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
 }
 
 // *****************************************   👉  特殊样式适配    *****************************************
