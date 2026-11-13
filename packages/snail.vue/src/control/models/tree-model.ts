@@ -3,7 +3,7 @@
  * - 基于 snail.core中的TreeNode做扩展
  */
 
-import { SearchOptions } from "../../control/models/search-model";
+import { SearchOptions } from "../../base/models/search-model";
 import { ITreeBaseContext, TreeNode, TreeNodeExtend } from "../models/tree-base";
 
 /**
