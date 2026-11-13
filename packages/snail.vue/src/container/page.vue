@@ -36,8 +36,8 @@
 </template>
 <script setup lang="ts">
 import { isFunction } from 'snail.core';
+import Button from '../base/button.vue';
 import { useApp } from '../base/utils/app-util';
-import Button from '../control/button.vue';
 import Empty from '../prompt/empty.vue';
 import Loading from '../prompt/loading.vue';
 import Header from './components/header.vue';

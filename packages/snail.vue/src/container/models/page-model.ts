@@ -2,7 +2,7 @@ import { AppEnv } from "../../base/models/app-model";
 import { CloseEvents } from "../../base/models/base-event";
 import { AlignOptions, ConfirmAreaOptions, DisabledOptions, TitleOptions } from "../../base/models/base-model";
 import { EventsType } from "../../base/models/component-model";
-import { ButtonOptions } from "../../control/models/button-model";
+import { ButtonOptions } from "../../base/models/button-model";
 import { ScrollEvents, ScrollOptions } from "./scroll-model";
 
 /**

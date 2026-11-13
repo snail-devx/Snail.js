@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import Button from "../../control/button.vue";
+import Button from "../../base/button.vue";
 import { FooterEvents, FooterOptions } from "../models/page-model";
 
 // *****************************************   👉  组件定义    *****************************************

@@ -11,6 +11,7 @@
 export * from "./base/models/app-model";
 export * from "./base/models/base-event";
 export * from "./base/models/base-model";
+export * from "./base/models/button-model";
 export * from "./base/models/component-model";
 export * from "./base/models/field-model";
 export * from "./base/models/icon-model";
@@ -18,6 +19,7 @@ export * from "./base/models/motion-model";
 export * from "./base/models/reactive-model";
 export * from "./base/models/sort-model";
 //  组件导出
+import Button from "./base/button.vue";
 import Dynamic from "./base/dynamic.vue";
 import Env from "./base/env.vue";
 import Field from "./base/field.vue";
@@ -63,7 +65,6 @@ export { buildPageCommonFooter } from "./container/utils/page-util";
 
 // *****************************************   👉  control 相关导出    ****************************************
 //  类型导出
-export * from "./control/models/button-model";
 export * from "./control/models/choose-model";
 export * from "./control/models/input-model";
 export * from "./control/models/number-model";
@@ -74,7 +75,6 @@ export * from "./control/models/textarea-model";
 export * from "./control/models/tree-base";
 export * from "./control/models/tree-model";
 //  组件导出：赋值给 components
-import Button from "./control/button.vue";
 import Choose from "./control/choose.vue";
 import Input from "./control/input.vue";
 import Number from "./control/number.vue";
@@ -139,14 +139,14 @@ import Spinner from "./prompt/spinner.vue";
 // *****************************************   👉  组件合并导出    ****************************************
 export const components = {
     //  base下的组件
-    Dynamic, Env, Field, Icon, Motion, Sort,
+    Button, Dynamic, Env, Field, Icon, Motion, Sort,
     //  container 下的组件
     Flex, Fold, Layout, Page, Scroll, Tabs,
     Elastic, ElasticTable, Table, DataTable,
     //      components下的辅助组件
     ElasticBar, ElasticPadding, ElasticUpdown, Footer, Header,
     //  control 下的组件
-    Button, Choose, Input, Number, Search, Select, Switch, Textarea, Tree,
+    Choose, Input, Number, Search, Select, Switch, Textarea, Tree,
     //  other   下的组件
     Action, Card, FlashNumber, NavBar,
     //  picker    下的组件
