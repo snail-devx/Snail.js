@@ -13,7 +13,6 @@ import ToastPopup from "./components/toast-popup.vue";
  * @returns 提示管理器
  */
 export function usePrompt(options?: Pick<ScopeOptions, "global"> & AppEnv): IPromptManager & IScope {
-    const global = options ? options.global : false;
     /** 弹窗管理器：显式指定 应用环境信息 */
     const popup = usePopup(options);
 
@@ -55,7 +54,10 @@ export function usePrompt(options?: Pick<ScopeOptions, "global"> & AppEnv): IPro
     //  初始化管理器并返回
     const manager = Object.freeze(mountScope<IPromptManager>(
         { confirm, toast },
-        { global, type: "IPickerManager" }
+        {
+            global: options ? options.global : false,
+            type: "IPromptManager"
+        }
     ));
     manager.onDestroy(popup.destroy);
     return manager;

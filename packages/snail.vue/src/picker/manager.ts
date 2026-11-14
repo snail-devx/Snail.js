@@ -22,7 +22,6 @@ import { correctFormat } from "./utils/datetime-util";
  * @returns 选择器实例+作用域对象
  */
 export function usePicker(options?: Pick<ScopeOptions, "global"> & AppEnv): IPickerManager & IScope {
-    const global = options ? options.global : false;
     /** 弹窗管理器：显式指定 应用环境信息 */
     const popup = usePopup(options);
 
@@ -161,7 +160,10 @@ export function usePicker(options?: Pick<ScopeOptions, "global"> & AppEnv): IPic
     //  初始化管理器并返回
     const manager = Object.freeze(mountScope<IPickerManager>(
         { showDateTime, showScroll, showAction },
-        { global, type: "IPickerManager" }
+        {
+            global: options ? options.global : false,
+            type: "IPickerManager"
+        }
     ));
     manager.onDestroy(popup.destroy);
     return manager;
