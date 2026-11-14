@@ -27,8 +27,8 @@ import { hasAny, IAsyncScope, isArrayNotEmpty, IScope, removeFromArray, useTimer
 import { computed, nextTick, ShallowRef, shallowRef, useTemplateRef } from "vue";
 import Icon from "../base/icon.vue";
 import { EventsType } from "../base/models/component-model";
+import { usePopup } from "../base/popup";
 import { } from "../base/reactive";
-import { usePopup } from "../popup/manager";
 import { useSelectContext } from "./components/select-context";
 import { ISelectContext, SelectEvents, SelectItem, SelectOptions, SelectPopupEvents, SelectPopupOptions, SelectSlotOptions } from "./models/select-model";
 

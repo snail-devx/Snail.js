@@ -32,8 +32,8 @@ import { IAsyncScope, isArrayNotEmpty, isStringNotEmpty } from 'snail.core';
 import { useObserver } from 'snail.view';
 import { onMounted, shallowRef, ShallowRef, useTemplateRef } from 'vue';
 import Icon from '../base/icon.vue';
+import { usePopup } from '../base/popup';
 import { usePicker } from '../picker/manager';
-import { usePopup } from '../popup/manager';
 import ActionItems from './components/action-items.vue';
 import { ActionEvents, ActionItemsOptions, ActionOptions, ActionSlotHandle } from './models/action-model';
 

@@ -40,8 +40,8 @@
 <script setup lang="ts">
 import { correctString, DateValue, formatDateValue, formatTimeValue, getDateValue, getFromArray, getTimeValue, isValidTime, parseDateValue, parseTimeValue } from "snail.core";
 import { Ref, ref, shallowRef, ShallowRef } from "vue";
-import { usePopup } from "../../popup/manager";
-import { PopupHandle } from "../../popup/models/popup-model";
+import { PopupHandle } from "../../base/models/popup-model";
+import { usePrompt } from "../../prompt/manager";
 import { DateTimePickerBaseOptions } from "../models/datetime-model";
 import { PickerExtend } from "../models/picker-model";
 import { ScrollPickItem } from "../models/scroll-piker-model";
@@ -52,7 +52,7 @@ import { buildDayScrollItems, buildHourScrollItems, buildMinuteScrollItems, buil
 //  1、props、event、model、components
 const props = defineProps<DateTimePickerBaseOptions & PopupHandle<string> & PickerExtend>();
 const { dateFormat, timeFormat } = correctFormat(props.format);
-const { toast } = usePopup();
+const { toast } = usePrompt();
 //  2、配置的最大最小值
 /**     日期最小值 */
 const minDate: DateValue = Object.freeze(parseDateValue(props.minDate, "min"));

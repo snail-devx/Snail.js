@@ -36,9 +36,9 @@
 import { correctNumber, correctString, isArrayNotEmpty, isStringNotEmpty } from "snail.core";
 import { ElasticDetail, IElasticManager, useElastic, useObserver } from "snail.view";
 import { onMounted, shallowRef, ShallowRef, useTemplateRef } from "vue";
+import { PopupHandle } from "../base/models/popup-model";
 import { useReactive } from "../base/reactive";
-import { usePopup } from "../popup/manager";
-import { PopupHandle } from "../popup/models/popup-model";
+import { usePrompt } from "../prompt/manager";
 import { PickerExtend } from "./models/picker-model";
 import { ScrollPickerEvents, ScrollPickerOptions, ScrollPickerPopupOptions } from "./models/scroll-piker-model";
 
@@ -48,7 +48,7 @@ const props = defineProps<ScrollPickerOptions & ScrollPickerPopupOptions & Parti
 const emits = defineEmits<ScrollPickerEvents>();
 const { onSize } = useObserver();
 const { watcher } = useReactive();
-const toast = props.inPopup ? usePopup().toast : undefined;
+const toast = props.inPopup ? usePrompt().toast : undefined;
 /** 选择项根容器 */
 const pickItemsDom = useTemplateRef("pick-items");
 /** 弹性滚动实例引用 */

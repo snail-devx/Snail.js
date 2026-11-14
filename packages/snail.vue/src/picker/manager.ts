@@ -1,10 +1,10 @@
 import { correctNumber, IAsyncScope, IScope, mountScope, ScopeOptions, throwIfFalse } from "snail.core";
 import { Component } from "vue";
 import { AppEnv } from "../base/models/app-model";
+import { FollowExtendOptions } from "../base/models/popup-model";
+import { usePopup } from "../base/popup";
 import { useApp } from "../base/utils/app-util";
 import { MOTION } from "../base/utils/motion-util";
-import { usePopup } from "../popup/manager";
-import { FollowExtendOptions } from "../popup/models/follow-model";
 import ActionPopup from "./components/action-popup.vue";
 import DateDesktopPopup from "./components/date-desktop-popup.vue";
 import DatetimeMobilePopup from "./components/datetime-mobile-popup.vue";

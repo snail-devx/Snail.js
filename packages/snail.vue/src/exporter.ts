@@ -16,6 +16,7 @@ export * from "./base/models/component-model";
 export * from "./base/models/field-model";
 export * from "./base/models/icon-model";
 export * from "./base/models/motion-model";
+export * from "./base/models/popup-model";
 export * from "./base/models/reactive-model";
 export * from "./base/models/search-model";
 export * from "./base/models/sort-model";
@@ -27,10 +28,13 @@ import Env from "./base/env.vue";
 import Field from "./base/field.vue";
 import Icon from "./base/icon.vue";
 import Motion from "./base/motion.vue";
+import PopupShell from "./base/popup-shell.vue";
 import Search from "./base/search.vue";
 import Sort from "./base/sort.vue";
 import Switch from "./base/switch.vue";
+
 //  方法导出
+export * from "./base/popup";
 export * from "./base/reactive";
 export * from "./base/utils/app-util";
 export * from "./base/utils/base-util";
@@ -105,26 +109,13 @@ import ScrollPicker from "./picker/scroll-picker.vue";
 //  方法导出
 export * from "./picker/manager";
 
-// *****************************************   👉  popup 相关导出    ****************************************
-//  类型导出
-export * from "./popup/models/confirm-model";
-export * from "./popup/models/dialog-model";
-export * from "./popup/models/follow-model";
-export * from "./popup/models/manager-model";
-export * from "./popup/models/popup-model";
-export * from "./popup/models/toast-model";
-//  组件导出：赋值给 components
-import PopupShell from "./popup/popup-shell.vue";
-//  方法导出
-export * from "./popup/manager";
-export { configPopup } from "./popup/utils/popup-util";
-
 // *****************************************   👉  prompt 相关导出    ****************************************
 //  类型导出
 export * from "./prompt/models/drag-verify-model";
 export * from "./prompt/models/empty-model";
 export * from "./prompt/models/loading-model";
 export * from "./prompt/models/progress-model";
+export * from "./prompt/models/prompt-model";
 //  组件导出：赋值给 components
 import DragVerify from "./prompt/drag-verify.vue";
 import Empty from "./prompt/empty.vue";
@@ -132,11 +123,13 @@ import Loading from "./prompt/loading.vue";
 import Progress from "./prompt/progress.vue";
 import Spinner from "./prompt/spinner.vue";
 //  方法导出
+export * from "./prompt/manager";
 
 // *****************************************   👉  组件合并导出    ****************************************
 export const components = {
     //  base下的组件
-    Button, Dynamic, Env, Field, Icon, Motion, Sort, Search, Switch,
+    Button, Dynamic, Env, Field, Icon, Motion, PopupShell,
+    Sort, Search, Switch,
     //  container 下的组件
     Flex, Fold, Layout, Page, Scroll, Tabs,
     Elastic, ElasticTable, Table, DataTable,
@@ -148,8 +141,6 @@ export const components = {
     Action, Card, FlashNumber, NavBar,
     //  picker    下的组件
     DateTimePicker, ScrollPicker,
-    //  popup    下的组件
-    PopupShell,
     //  prompt 下的组件
     DragVerify, Empty, Loading, Progress, Spinner
 };

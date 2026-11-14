@@ -1,4 +1,4 @@
-<!-- 弹窗容器组件 -->
+<!-- 通用弹窗 根组件 -->
 <template>
     <Dynamic :class="['snail-popup', context.popupStatus.value, context.motion.value]"
         :style="{ 'z-index': context.zIndex }" :name="name" :component="component" :url="url" :props="props.props"

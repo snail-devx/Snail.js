@@ -1,14 +1,13 @@
-<!-- 提示组件：
+<!-- 提示组件 弹窗组件
     1、模拟Toast提示，兼容PC、移动端 
     2、不直接对外提供，外部使用toast方法使用
 -->
 <template>
-    <div class="snail-toast" :class="[mode, context.popupStatus.value, context.motion.value]"
-        :style="{ 'z-index': context.zIndex }" @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
+    <div class="snail-toast" :class="mode" @mouseenter="onMouseEvent(false)" @mouseleave="onMouseEvent(true)">
         <!-- 桌面端 特有：关闭按钮，和消息图标 -->
         <template v-if="mode == 'desktop'">
             <Icon class="close-icon" v-if="props.closeDisabled != true" type="close" button :size="22" :padding="'4px'"
-                :color="'#707070'" :hover-color="'#d91309'" @click="context.closePopup();" />
+                :color="'#707070'" :hover-color="'#d91309'" @click="closePopup();" />
             <div class="icon" v-if="isStringNotEmpty(props.type)">
                 <Icon :type="props.type" :color="'#707070'" :size="18" />
             </div>
@@ -21,13 +20,13 @@
 import { IScope, isStringNotEmpty, useTimer } from "snail.core";
 import { onMounted } from "vue";
 import Icon from "../../base/icon.vue";
+import { PopupHandle } from "../../base/models/popup-model";
 import { useApp } from "../../base/utils/app-util";
-import { PopupContainerOptions } from "../models/popup-model";
-import { ToastOptions } from "../models/toast-model";
+import { ToastOptions } from "../models/prompt-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-const { props, context } = defineProps<PopupContainerOptions<any, any, any> & ToastOptions>();
+const props = defineProps<PopupHandle<void> & ToastOptions>();
 const { onTimeout } = useTimer();
 const { mode } = useApp();
 /** 显示时长，默认2000ms */
@@ -45,7 +44,7 @@ defineOptions({ name: "ToastContainer", inheritAttrs: true });
  */
 function onMouseEvent(isLeave: boolean) {
     destroyTimer && destroyTimer.destroy();
-    destroyTimer = isLeave ? onTimeout(context.closePopup, duration) : undefined;
+    destroyTimer = isLeave ? onTimeout(props.closePopup, duration) : undefined;
 }
 
 // *****************************************   👉  组件渲染    *****************************************
@@ -58,7 +57,6 @@ onMounted(() => onMouseEvent(true));
 @import "snail.view/dist/styles/mixins.less";
 
 .snail-toast {
-    position: fixed;
     overflow: hidden;
     // flex 布局，垂直水平居中
     display: flex;
@@ -122,6 +120,7 @@ onMounted(() => onMouseEvent(true));
     border-radius: 6px;
     //  底部水平居中对齐
     left: 50%;
+    top: unset !important;
     bottom: -40px;
     transform: translate(-50%, -60px);
 
@@ -150,10 +149,12 @@ onMounted(() => onMouseEvent(true));
         }
 
         &.toast-in {
+            opacity: 1;
             animation: snail-toast-mobile 0.2s ease-in-out;
         }
 
         &.toast-out {
+            opacity: 0;
             animation: snail-toast-mobile 0.2s ease-in-out reverse;
         }
     }

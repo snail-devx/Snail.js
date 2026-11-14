@@ -27,10 +27,10 @@
 <script setup lang="ts">
 import { IAsyncScope, isArrayNotEmpty, IScope, isStringNotEmpty, useTimer } from "snail.core";
 import { computed, shallowRef, ShallowRef } from "vue";
+import { FollowHandle } from "../../base/models/popup-model";
+import { usePopup } from "../../base/popup";
 import { useReactive } from "../../base/reactive";
 import Search from "../../base/search.vue";
-import { usePopup } from "../../popup/manager";
-import { FollowHandle } from "../../popup/models/follow-model";
 import Empty from "../../prompt/empty.vue";
 import { SelectItem, SelectPopupEvents, SelectPopupExtend, SelectPopupOptions } from "../models/select-model";
 import SelectNode from "./select-node.vue";

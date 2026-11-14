@@ -1,4 +1,4 @@
-<!-- 模态弹窗容器组件 -->
+<!-- 模态弹窗 根组件 -->
 <template>
     <div :class="['snail-dialog', context.popupStatus.value, rootClass]" :style="{ 'z-index': context.zIndex }"
         @mousedown.self="onDialogRootMouseDown" @click.self="onDialogRootClick">
@@ -11,8 +11,7 @@
 import { useObserver } from 'snail.view';
 import { onMounted, shallowRef } from 'vue';
 import Dynamic from '../../base/dynamic.vue';
-import { DialogExtendOptions } from '../models/dialog-model';
-import { PopupContainerOptions, PopupHandle } from '../models/popup-model';
+import { DialogExtendOptions, PopupContainerOptions, PopupHandle } from '../models/popup-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

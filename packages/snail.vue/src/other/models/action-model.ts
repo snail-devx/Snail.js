@@ -1,6 +1,6 @@
 import { DisabledOptions, ValueOptions } from "../../base/models/base-model";
 import { IconOptions } from "../../base/models/icon-model";
-import { FollowExtendOptions } from "../../popup/models/follow-model";
+import { FollowExtendOptions } from "../../base/models/popup-model";
 
 /**
  * 可操作项组件 的配置选项

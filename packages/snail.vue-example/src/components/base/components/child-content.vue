@@ -12,9 +12,8 @@
 <script setup lang="ts">
 import { useTimer } from "snail.core";
 import { shallowRef } from "vue";
-import { buildCommonFooter, components, FollowHandle, PopupShellHandle, usePopup } from "../../../libraries/snail_vue";
+import { buildCommonFooter, FollowHandle, PopupShellHandle, usePopup } from "../../../libraries/snail_vue";
 import DialogContentTest from "./child-content.vue";
-const { } = components;
 
 // 👉 组件定义
 //  1、props、data
@@ -25,8 +24,6 @@ const emits = defineEmits<{
     customEvent: [data: number]
 }>();
 const popup = usePopup();
-//  2、可选配置选项
-defineOptions({ name: "DialogContentTest", inheritAttrs: true, });
 
 // 👉 方法+事件
 function open() {

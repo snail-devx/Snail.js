@@ -44,10 +44,10 @@
 import { formatTimeValue, getTimeValue, padStart, parseTimeValue, TimeValue } from 'snail.core';
 import { computed, nextTick, onMounted, ref, Ref, ShallowRef, shallowRef, useTemplateRef } from 'vue';
 import Button from "../../base/button.vue";
+import { FollowHandle } from '../../base/models/popup-model';
 import Motion from "../../base/motion.vue";
 import { MOTION } from '../../base/utils/motion-util';
 import Layout from "../../container/layout.vue";
-import { FollowHandle } from '../../popup/models/follow-model.js';
 import { DateTimePickerEvents, DateTimePickerToolbarOptions, TimeDesktopPopupOptions, TimePickerHourItem, TimePickerMinuteItem, TimePickerSecondItem } from '../models/datetime-model';
 import { PickerExtend } from '../models/picker-model';
 import { buildHourItems, buildMinuteItems, buildSecondItems } from '../utils/datetime-util';

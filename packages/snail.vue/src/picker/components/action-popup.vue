@@ -28,9 +28,9 @@
 import { isFunction, isString, isStringNotEmpty } from 'snail.core';
 import Icon from '../../base/icon.vue';
 import { IconType } from '../../base/models/icon-model';
+import { FollowHandle } from '../../base/models/popup-model';
 import { useApp } from '../../base/utils/app-util';
 import { as } from '../../base/utils/base-util';
-import { FollowHandle } from '../../popup/models/follow-model';
 import { ActionPickerItem, ActionPickerOptions } from '../models/action-model';
 import { PickerExtend } from '../models/picker-model';
 

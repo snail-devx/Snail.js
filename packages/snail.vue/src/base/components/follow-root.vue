@@ -1,4 +1,4 @@
-<!-- 组件介绍写到这里 -->
+<!-- 跟随弹窗 根组件 -->
 <template>
     <Dynamic :class="['snail-follow', 'initial', context.popupStatus.value, context.motion.value]"
         :style="{ 'z-index': context.zIndex }" :name="name" :component="component" :url="url" :props="props.props"
@@ -10,9 +10,8 @@ import { useTimer } from 'snail.core';
 import { css, ElementSize, HeightStyle, OverflowStyle, PositionStyle, useObserver, WidthStyle } from 'snail.view';
 import { getCurrentInstance, nextTick, onMounted, readonly, shallowRef, ShallowRef } from 'vue';
 import Dynamic from '../../base/dynamic.vue';
-import { FollowElectResult, FollowExtendOptions, FollowHandle, FollowStrategy } from '../models/follow-model';
-import { PopupContainerOptions } from '../models/popup-model';
-import { calcFollowX, calcFollowY } from '../utils/follow-util';
+import { FollowElectResult, FollowExtendOptions, FollowHandle, FollowStrategy, PopupContainerOptions } from '../models/popup-model';
+import { calcFollowX, calcFollowY } from '../utils/popup-util';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components

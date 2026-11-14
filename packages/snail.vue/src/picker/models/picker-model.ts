@@ -3,9 +3,7 @@
  */
 
 import { IAsyncScope } from "snail.core";
-import { DialogOptions } from "../../popup/models/dialog-model";
-import { FollowExtendOptions } from "../../popup/models/follow-model";
-import { IPopupManager } from "../../popup/models/manager-model";
+import { DialogOptions, FollowExtendOptions, IPopupManager } from "../../base/models/popup-model";
 import { ActionPickerOptions } from "./action-model";
 import { DateTimePickerBaseOptions } from "./datetime-model";
 import { ScrollPickerOptions, ScrollPickerPopupOptions } from "./scroll-piker-model";

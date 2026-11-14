@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { correctString, isStringNotEmpty } from "snail.core";
 import Icon from "../../base/icon.vue";
-import { FollowHandle } from "../../popup/models/follow-model";
+import { FollowHandle } from "../../base/models/popup-model";
 import { ActionEvents, ActionItemsOptions } from "../models/action-model";
 
 // *****************************************   👉  组件定义    *****************************************

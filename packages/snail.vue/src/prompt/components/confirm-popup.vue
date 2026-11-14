@@ -1,4 +1,4 @@
-<!-- 确认 弹窗容器
+<!-- 确认提示 弹窗组件
     1、支持定制确认消息、按钮信息
     2、这里的header、main、footer 保持不变，弹窗算一个独立页面
 -->
@@ -25,9 +25,9 @@
 
 <script setup lang="ts">
 import Header from "../../base/components/header.vue";
+import { PopupHandle } from "../../base/models/popup-model";
 import { useApp } from "../../base/utils/app-util";
-import { ConfirmOptions } from "../models/confirm-model";
-import { PopupHandle } from "../models/popup-model.js";
+import { ConfirmOptions } from "../models/prompt-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data

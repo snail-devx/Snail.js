@@ -18,6 +18,7 @@ import DynamicTest from "./base/dynamic-test.vue";
 import FieldTest from "./base/field-test.vue";
 import IconTest from "./base/icon-test.vue";
 import MotionTest from "./base/motion-test.vue";
+import PopupTest from "./base/popup-test.vue";
 import SearchTest from "./base/search-test.vue";
 import SwitchTest from "./base/switch-test.vue";
 //  👉 容器组件
@@ -45,15 +46,12 @@ import RendererTest from "./form/renderer-test.vue";
 import ActionpickerTest from "./picker/actionpicker-test.vue";
 import DateTimeTest from "./picker/datetime-test.vue";
 import ScrollpikcerTest from "./picker/scrollpikcer-test.vue";
-//  👉 弹窗组件
-import DialogTest from "./popup/dialog-test.vue";
-import FollowTest from "./popup/follow-test.vue";
-import PopupTest from "./popup/popup-test.vue";
 //  👉 提示组件
 import DragVerifyTest from "./prompt/drag-verify-test.vue";
 import EmptyTest from "./prompt/empty-test.vue";
 import LoadingTest from "./prompt/loading-test.vue";
 import ProgressTest from "./prompt/progress-test.vue";
+import PromptTest from "./prompt/prompt-test.vue";
 //  👉 其他组件
 import ActionTest from "./other/action-test.vue";
 import CardTest from "./other/card-test.vue";
@@ -97,6 +95,7 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "Motion 动画组件", data: MotionTest, clickable: true, searchable: true, },
                 { text: "Search 搜索组件", data: SearchTest, clickable: true, searchable: true, },
                 { text: "Switch 开关组件", data: SwitchTest, clickable: true, searchable: true, },
+                { text: "Popup 弹窗管理", data: PopupTest, clickable: true, searchable: true, },
             ],
         },
         {
@@ -142,16 +141,9 @@ const treeOptions: TreeOptions<Component> = {
             ]
         },
         {
-            text: "弹窗管理",
-            children: [
-                { text: "Dialog 模态弹窗", data: DialogTest, clickable: true, searchable: true, },
-                { text: "Follow 跟随弹窗", data: FollowTest, clickable: true, searchable: true, },
-                { text: "Popup 弹出", data: PopupTest, clickable: true, searchable: true, },
-            ]
-        },
-        {
             text: "提示组件",
             children: [
+                { text: "usePrompt 测试", data: PromptTest, clickable: true, searchable: true, },
                 { text: "DragVerify 滑块验证", data: DragVerifyTest, clickable: true, searchable: true, },
                 { text: "Empty 空状态", data: EmptyTest, clickable: true, searchable: true, },
                 { text: "Loading 加载状态", data: LoadingTest, clickable: true, searchable: true, },
