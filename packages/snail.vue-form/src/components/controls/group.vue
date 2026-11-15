@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { components, usePopup } from "snail.vue";
+import { components, usePrompt } from "snail.vue";
 import { computed, inject } from "vue";
 import { GroupControlSettings, GroupControlValue, IGroupControl } from "../../models/control-model";
 import { FieldEvents, FieldRenderOptions } from "../../models/field-base";
@@ -56,7 +56,7 @@ const global = inject(INJECTKEY_GlobalContext);
 const group: IGroupControl = useGroup(global, props, emits);
 //      解构对象，便捷引入使用
 const { Icon, Button, Empty } = components;
-const { confirm } = usePopup();
+const { confirm } = usePrompt();
 const { fields, getItemKey, buildItemMonitor, addNewItem, moveItem, deleteItem } = group;
 const { handle, getError, updateError, isReadonly, isReqired } = group.fieldManager;
 //  2、组件交互变量、常量

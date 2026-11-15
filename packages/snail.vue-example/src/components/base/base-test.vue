@@ -8,9 +8,9 @@
 </template>
 <script setup lang="ts">
 import { shallowRef } from "vue";
-import { usePopup } from "../../libraries/snail_vue";
+import { usePrompt } from "../../libraries/snail_vue";
 
-const { toast } = usePopup();
+const { toast } = usePrompt();
 const showTest = shallowRef(false);
 defineOptions({ name: "BaseTest", inheritAttrs: true, });
 

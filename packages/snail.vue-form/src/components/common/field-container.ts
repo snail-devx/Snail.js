@@ -3,7 +3,7 @@
  */
 
 import { isArrayNotEmpty, IScope, mountScope, moveFromArray, newId, RunResult, throwIfFalse, throwIfNullish } from "snail.core";
-import { EmitterType, EventsType, usePopup } from "snail.vue";
+import { EmitterType, EventsType, usePrompt } from "snail.vue";
 import { markRaw, Ref, ref, ShallowRef, shallowRef, toRaw } from "vue";
 import { FieldActionOptions, FieldChangeEvent, FieldEvents, FieldOptions, FieldStatusOptions, IFieldHandle } from "../../models/field-base";
 import { FieldContainerEvents, FieldContainerLocation, FieldContainerOptions, IFieldContainer, IFieldContainerHandle } from "../../models/field-container";
@@ -44,7 +44,7 @@ export function useContainer(global: IFieldGlobalContext, options: FieldContaine
         { type: "IFieldContainer" }
     ));
     /** 弹窗管理器；用于进行消息提醒处理 */
-    const popup = usePopup();
+    const prompt = usePrompt();
 
     /** 终端的唯一标记字典；key为字段Id，value为分配的唯一key */
     const fieldKeyMap: Map<string, ShallowRef<string>> = new Map<string, ShallowRef<string>>();
@@ -442,14 +442,14 @@ export function useContainer(global: IFieldGlobalContext, options: FieldContaine
                 const index = fieldsRef.value.findIndex(item => item.type == type);
                 if (index != -1) {
                     const message = `[${control.name}]控件只能添加一个实例`;
-                    showError && popup.toast(message, { duration: 300, closeDisabled: true });
+                    showError && prompt.toast(message, { duration: 300, closeDisabled: true });
                     return { success: false, reason: message };
                 }
             }
             //  是否子容器禁止添加
             if (control.extend.childDisabled == true && location && location.parentFieldId != undefined) {
                 const message = `不支持添加[${control.name}]控件到子容器`;
-                showError && popup.toast(message, { duration: 300, closeDisabled: true });
+                showError && prompt.toast(message, { duration: 300, closeDisabled: true });
                 return { success: false, reason: message };
             }
         }
@@ -476,7 +476,7 @@ export function useContainer(global: IFieldGlobalContext, options: FieldContaine
     {
         tryTriggerRenderEvent();
         container.onDestroy(() => {
-            popup.destroy();
+            prompt.destroy();
             handle.destroy();
         });
     }
