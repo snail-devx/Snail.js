@@ -170,8 +170,14 @@ function correctPopupMotion(type: PopupType, status: PopupStatus, motion?: Popup
  * @returns 新的z-index值，确保新弹窗在最前面
  */
 function correctZIndex(zIndex: number): number {
-    const globalZIndex = DEFAULT.zIndex > 0 ? DEFAULT.zIndex : 2000;
-    zIndex > globalZIndex || (zIndex = globalZIndex);
+    // const globalZIndex = DEFAULT.zIndex > 0 ? DEFAULT.zIndex : 2000;
+    // zIndex > globalZIndex || (zIndex = globalZIndex);
+    {
+        zIndex = correctNumber(zIndex, undefined);
+        DEFAULT.zIndex > 0 && (zIndex >= DEFAULT.zIndex || (zIndex = DEFAULT.zIndex));
+        zIndex > 0 || (zIndex = 2000);
+    }
+    // 确保新的弹窗在最前面
     QUEUE_ZINDEX.length && (zIndex = Math.max(QUEUE_ZINDEX[QUEUE_ZINDEX.length - 1], zIndex));
     QUEUE_ZINDEX.push(zIndex);
     return zIndex;
