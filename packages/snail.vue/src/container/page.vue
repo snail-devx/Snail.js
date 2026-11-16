@@ -12,7 +12,9 @@
     <div class="snail-page" :class="mode">
         <template v-if="pageArea != undefined" :key="mode">
             <!-- 头部渲染：配置了，且没禁用时显示 -->
-            <Header class="header-area" v-if="header && header.disabled != true" :="header" @close="emits('close')" />
+            <Header class="header-area" v-if="header && header.disabled != true" :="header" @close="emits('close')">
+                <slot name="header" :="slotHandle" />
+            </Header>
             <!-- 主内容区域渲染。渲染顺序：端自有插槽 > 默认插槽 > 不支持提示 -->
             <Scroll class="main-area" :="main.scroll || { bar: 'y', barSize: mode == 'mobile' ? 'mini' : 'small' }">
                 <slot v-if="$slots[mode]" :name="mode" :="slotHandle" />
@@ -78,17 +80,17 @@ const { header, main = {}, footer } = pageArea || {};
     // }
 
     // 桌面端
-    &.desktop {
+    // &.desktop {
 
-        // 弹窗打开时
-        // &.dialog-body {}
+    //     // 弹窗打开时
+    //     // &.dialog-body {}
 
-        //  桌面端 底部区域特定样式
-        // >.footer-area {
-        //     height: 72px;
-        //     padding: 0 40px;
-        // }
-    }
+    //     //  桌面端 底部区域特定样式
+    //     // >.footer-area {
+    //     //     height: 72px;
+    //     //     padding: 0 40px;
+    //     // }
+    // }
 
     // 移动端渲染
     &.mobile {
