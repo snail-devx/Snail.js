@@ -73,10 +73,38 @@ function buildSortable() {
             onAdd: (evt: SortEvent) => emits("add", evt),
             onRemove: (evt: SortEvent) => emits("remove", evt),
             onEnd: (evt: SortEvent) => emits("end", evt),
-            onUpdate: (evt: SortEvent) => emits("update", evt.oldIndex, evt.newIndex),
+            onUpdate: onUpdate,
         });
     }
 }
+/**
+ * 拖拽更新位置时触发
+ * @param evt 
+ */
+function onUpdate(evt: SortEvent) {
+    /**
+     * 执行到这里时，这里还原真实dom到原始位置，保证vnode和真实dom一致
+     *      1、若不还原，会导致一些奇怪现象：如三个元素 1、2、3，将2拖拽到3，然后再push元素4，此时4在1的后面
+     *      2、出现此问题的原因：deepseek分析的解决方案，qwen没分析出来（它推荐重新渲染）
+     *          1、SortableJS 直接操作了真实 DOM，Vue 的虚拟 DOM 不知道这次移动。
+     *          2、拖拽后真实 DOM 顺序已经变成 1,3,2，Vue 内部旧 vnode 顺序/节点锚点仍可能按 1,2,3 
+     *          3、在 diff；后续 push 新数据时，Vue 找插入锚点就会错，出现“新数据跑到第 1/2 个位置”的现象。
+     * 处理要点：
+     *      1、先只处理同容器下的移动，跨容器移动、新增、删除，不处理，交给外部自己处理，或者后期看情况再说
+     * 注意事项：
+     *      1、还有一种处理方式：每次重构排序时，为当前 Slot 插槽重置key值，但这样会导致每次都重新渲染，性能较低
+     */
+    const { from, to, item, oldIndex, newIndex } = evt;
+    if (from && item && from === to && oldIndex !== newIndex) {
+        //  oldIndex > newIndex 时，参照节点要往后取一个
+        const refIndex = oldIndex + (oldIndex > newIndex ? 1 : 0);
+        const reference = from.children[refIndex] || null;
+        from.insertBefore(item, reference);
+    }
+
+    emits("update", evt.oldIndex, evt.newIndex)
+}
+
 // *****************************************   👉  组件渲染    *****************************************
 onMounted(async () => {
     const instance = getCurrentInstance();
