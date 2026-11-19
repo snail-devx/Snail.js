@@ -58,63 +58,53 @@ function buildClass() {
  * 构建修复子项空间
  */
 function repairSpace() {
-    repairItemsRef.value = 0;
+    let repairCount: number = 0;
     const needRepair = props.repairItem == true
         && (props.main == "between" || props.main == "around" || props.main == "evenly")
         && props.itemCount > 0
         && rootDom.value.children.length > 0;
+    // 进行项目修复
     if (needRepair == true) {
-        //  计算容器尺寸、子项尺寸、子项间距
-        let containerSize: number, itemSize: number, itemGap: number;
-        const containerStyle = getComputedStyle(rootDom.value);
-        const itemStyle = getComputedStyle(rootDom.value.children[0]);
-        switch (props.direction) {
-            //  按列布局时
-            case "column":
-            case "column-reverse": {
-                containerSize = parseFloat(containerStyle.height);
-                itemGap = parseFloat(containerStyle.rowGap);
-                itemSize = parseFloat(itemStyle.height);
-                break;
+        /** 一行的项目数量 */
+        let itemCountPer: number = 0;
+        {
+            //  计算容器尺寸、子项尺寸、子项间距：始终向下取整，避免出现小数点导致的计算误差
+            let containerSize: number, itemSize: number, itemGap: number;
+            const containerStyle = getComputedStyle(rootDom.value);
+            const itemStyle = getComputedStyle(rootDom.value.children[0]);
+            switch (props.direction) {
+                //  按列布局时
+                case "column":
+                case "column-reverse": {
+                    containerSize = Math.floor(parseFloat(containerStyle.height));
+                    itemGap = Math.floor(parseFloat(containerStyle.rowGap));
+                    itemSize = Math.floor(parseFloat(itemStyle.height));
+                    break;
+                }
+                //  按行布局时
+                default: {
+                    containerSize = Math.floor(parseFloat(containerStyle.width));
+                    itemGap = Math.floor(parseFloat(containerStyle.columnGap));
+                    itemSize = Math.floor(parseFloat(itemStyle.width));
+                    break;
+                }
             }
-            //  按行布局时
-            default: {
-                containerSize = parseFloat(containerStyle.width);
-                itemGap = parseFloat(containerStyle.columnGap);
-                itemSize = parseFloat(itemStyle.width);
-                break;
+            //  计算每行能显示多少个子项：整数不等式 + 双向收敛，确保真正能显示下，替代 Math.floor(比值)
+            itemCountPer = Math.floor((containerSize + itemGap) / (itemSize + itemGap));
+            while (itemCountPer > 1 && ((itemSize + itemGap) * itemCountPer - itemGap > containerSize)) {
+                itemCountPer--;
+            }
+            while ((itemCountPer + 1) * itemSize + itemCountPer * itemGap <= containerSize) {
+                itemCountPer++;
             }
         }
-        /** 计算每行能显示多少个子项
-         *   1、初期规则：根据不同space效果做测试，发现左右两侧的间距时有可能调整为0的，所有始终按照如下公式计算即可
-         *           x*size+(x-1)*gap=totalSize  -> x*size+x*gap=totalSize+gap;
-         *          itemCountPer = Math.floor((containerSize + itemGap) / (itemSize + itemGap));
-         *   2、备份代码：
-         *      // switch (parseFloat(itemStyle.flexGrow) > 0 ? "between" : props.main) {
-         *      //     //  x*size+(x-1)*gap=totalSize  -> x*size+x*gap=totalSize+gap;
-         *      //     case "between": {
-         *      //         itemCountPer = Math.floor((containerSize + itemGap) / (itemSize + itemGap));
-         *      //         break;
-         *      //     }
-         *      //     //  x*size+x*2*gap=totalSize  
-         *      //     case "around": {
-         *      //         itemCountPer = Math.floor(containerSize / (itemSize + 2 * itemGap));
-         *      //         break;
-         *      //     }
-         *      //     //  x*size+(x+1)*gap=totalSize
-         *      //     case "evenly": {
-         *      //         itemCountPer = Math.floor((containerSize - itemGap) / (itemSize + itemGap));
-         *      //         break;
-         *      //     }
-         *      // }
-         */
-        let itemCountPer: number = Math.floor((containerSize + itemGap) / (itemSize + itemGap));
         //  计算最后一行需要补充的子项：每行仅显示1个的话，没有修复的意义，忽略
         if (itemCountPer > 1) {
             const mode = props.itemCount % itemCountPer;
-            mode > 0 && (repairItemsRef.value = itemCountPer - mode);
+            mode > 0 && (repairCount = itemCountPer - mode);
         }
     }
+    repairItemsRef.value = repairCount;
 }
 
 // *****************************************   👉  组件渲染    *****************************************
