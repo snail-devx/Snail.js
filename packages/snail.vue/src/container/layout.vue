@@ -125,35 +125,36 @@ function buildHeightStyle(style: HeightStyle) {
     flex-wrap: nowrap;
     overflow: hidden;
 
+    &.vertical {
+        flex-direction: column;
+    }
+}
+
+// 各区域特定样式：顶部、底部、左侧、右侧、主内容区域。不增加 .vertical / .horizontal 规则约束，避免外部适配时，样式覆盖优先级太高
+.snail-layout {
+
     //  非滚动视图区域，强制溢出隐藏
     >div:not(.snail-scroll) {
         overflow: hidden;
     }
 
-    //  主内容区域弹性
+    // 左侧、右侧
+    >div.left-area,
+    >div.right-area {
+        flex-shrink: 0;
+        width: fit-content;
+    }
+
+    // 主内容区域
     >div.main-area {
         flex: 1;
     }
 
-    //  水平布局：左中右
-    &.horizontal {
-
-        >div.left-area,
-        >div.right-area {
-            flex-shrink: 0;
-            width: fit-content;
-        }
-    }
-
-    //  垂直布局：上中下
-    &.vertical {
-        flex-direction: column;
-
-        >div.top-area,
-        >div.bottom-area {
-            flex-shrink: 0;
-            height: fit-content;
-        }
+    // 顶部、底部
+    >div.top-area,
+    >div.bottom-area {
+        flex-shrink: 0;
+        height: fit-content;
     }
 }
 </style>
