@@ -2,7 +2,7 @@
     1、通用逻辑封装到 ./utils/scroll-util.ts 中
 -->
 <template>
-    <div :="$attrs" :class="classRef" ref="scroll-root">
+    <div :="$attrs" class="snail-scroll" :class="classRef" ref="scroll-root">
         <slot></slot>
     </div>
 </template>
