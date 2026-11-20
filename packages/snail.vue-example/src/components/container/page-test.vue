@@ -43,7 +43,9 @@
     <br />
     <Env :mode="'mobile'">
         移动端模式，默认：
-        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef">
+        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef" :mobile="{
+            header: { useTo: 'dialog', title: '测试移动端头部' }
+        }">
             <template #mobile>
                 mobile区域:
             </template>
