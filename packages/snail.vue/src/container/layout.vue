@@ -4,7 +4,7 @@
     3、若对应区域未启用滚动配置，则是不使用Scroll组件，通过template做一下v-if；
 -->
 <template>
-    <div class="snail-layout" :class="direction || 'horizontal'">
+    <div :="$attrs" class="snail-layout" :class="direction || 'horizontal'">
         <template v-for="item in ['top', 'left', 'main', 'right', 'bottom']" :key="item">
             <template v-if="areaMap[item] && $slots[item]">
                 <Scroll v-if="areaMap[item].scrollable" :class="areaMap[item].class" :style="areaMap[item].style"
@@ -31,6 +31,7 @@ import Scroll from "./scroll.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
+defineOptions({ inheritAttrs: false });
 const props = defineProps<LayoutOptions>();
 defineSlots<SlotsType<Pick<LayoutOptions, "main" | "top" | "bottom" | "left" | "right">>>();
 //  2、组件交互变量、常量
