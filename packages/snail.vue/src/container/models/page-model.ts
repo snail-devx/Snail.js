@@ -10,10 +10,11 @@ import { ScrollEvents, ScrollOptions } from "./scroll-model";
  */
 export type PageOptions = {
     /**
-     * 显示loading效果
-     * - 用于做一些耗时、异步操作时，显示loading提示
+     * 页面类型：基于不同页面类型，进行导航、底部等区分适配
+     * - page       【默认】普通页面
+     * - dialog     弹窗页面
      */
-    loading?: boolean;
+    type: "page" | "dialog";
 
     /**
      * desktop 桌面客户端模式下的页面配置
@@ -28,6 +29,12 @@ export type PageOptions = {
      * - footer 底部区域，有配置不禁用才显示
      */
     readonly mobile?: PageAreaOptions;
+
+    /**
+     * 显示loading效果
+     * - 用于做一些耗时、异步操作时，显示loading提示
+     */
+    loading?: boolean;
 }
 
 /**
@@ -53,25 +60,17 @@ export type PageAreaOptions = {
  * - align      标题在头部的对齐方式
  * - disabled   是否禁用头部区域
  */
-export type PageHeaderOptions = TitleOptions & AlignOptions & DisabledOptions & {
-    /**
-     * 使用到哪里
-     * - page   ：页面头部：默认类型；标题、关闭按钮等对齐一行；
-     * - dialog ：弹窗头部；标题、关闭按钮等对齐两行，错开排列
-     * - 仅在 {@link AppEnv} 为 桌面端 环境时生效
-     */
-    useTo: "page" | "dialog";
+export type PageHeaderOptions = Required<TitleOptions> & AlignOptions & DisabledOptions & {
     /**
      * 是否启用分割线
-     * - 启用后，则组件顶部设置边框 border-bottom: 1px solid #dddfed;;
-     * - 仅在 {@link AppEnv} 为 桌面端 环境时生效
+     * - 启用后，则组件底部设置边框
      */
     divider?: boolean;
 
     /**
      * 禁用【返回】按钮
      * - 默认值false
-     * - 仅在 {@link AppEnv} 为 移动端 环境时生效
+     * - 仅在 {@link AppEnv} 为 移动端 环境时才有【返回按钮】
      */
     backDisabled?: boolean;
     /** 禁用【关闭】按钮

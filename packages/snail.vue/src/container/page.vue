@@ -10,12 +10,20 @@
     5、bottom区域支持完全自定义
 -->
 <template>
-    <Layout :class="['snail-page', mode]" :direction="'vertical'" :top="topLayoutRef" :main="mainLayoutRef"
+    <Layout :class="['snail-page', mode, type]" :direction="'vertical'" :top="topLayoutRef" :main="mainLayoutRef"
         :bottom="bottomLayoutRef" :loading="loading">
         <!-- 头部区域渲染，支持PC、移动端，支持header插槽进行自定义渲染 -->
         <template #top v-if="topLayoutRef != undefined">
-            <!-- 移动端：返回、关闭图标；标题；右侧插槽；图标使用全新的，不用icon中的 arrow 和 plus ；效果上有点差异 -->
-            <template v-if="mode == 'mobile'">
+            <!-- 桌面端 or dialog模式：标题、插槽、关闭按钮 -->
+            <template v-if="mode != 'mobile' || type == 'dialog'">
+                <div class="header-title ellipsis" :class="pageAreaRef.header.align || 'center'"
+                    v-if="isStringNotEmpty(pageAreaRef.header.title)" v-text="pageAreaRef.header.title" />
+                <slot name="header" :="slotHandle" />
+                <Icon class="close-icon" v-if="pageAreaRef.header.closeDisabled != true" button :type="'close'"
+                    :size="24" :padding="'4px'" :title="'关闭'" @click="emits('close')" />
+            </template>
+            <!-- 移动端 and page 模式：返回、关闭图标；标题；右侧插槽；图标使用全新的，不用 arrow 和 plus ；效果上有点差异 -->
+            <template v-else>
                 <div class="left-buttons">
                     <svg class="back-icon" v-if="pageAreaRef.header.backDisabled != true" viewBox="0 0 24 24" width="34"
                         height="34" @click="emits('back')">
@@ -29,17 +37,9 @@
                 </div>
                 <div class="header-title ellipsis" :class="pageAreaRef.header.align || 'center'"
                     v-if="isStringNotEmpty(pageAreaRef.header.title)" v-text="pageAreaRef.header.title" />
-                <div class="righ-slot" v-if="$slots['header']">
+                <div class="righ-slot">
                     <slot name="header" :="slotHandle" />
                 </div>
-            </template>
-            <!-- PC端：标题、插槽、关闭按钮 -->
-            <template v-else>
-                <div class="header-title ellipsis" :class="pageAreaRef.header.align || 'center'"
-                    v-if="isStringNotEmpty(pageAreaRef.header.title)" v-text="pageAreaRef.header.title" />
-                <slot name="header" :="slotHandle" />
-                <Icon class="close-icon" v-if="pageAreaRef.header.closeDisabled != true" button :type="'close'"
-                    :size="24" :padding="'4px'" :title="'关闭'" @click="emits('close')" />
             </template>
         </template>
         <!-- 主内容区域渲染：不支持的mode，给出提示；插槽支持 [mode] > default -->
@@ -63,7 +63,7 @@
     </Layout>
 </template>
 <script setup lang="ts">
-import { isStringNotEmpty } from 'snail.core';
+import { isFunction, isStringNotEmpty } from 'snail.core';
 import { computed } from 'vue';
 import Button from '../base/button.vue';
 import Icon from '../base/icon.vue';
@@ -94,7 +94,7 @@ const pageAreaRef = computed<PageAreaOptions>(() => mode == "mobile"
 /**     顶部区域布局配置 */
 const topLayoutRef = computed<LayoutOptions["top"]>(() => {
     if (pageAreaRef.value && pageAreaRef.value.header && pageAreaRef.value.header.disabled != true) {
-        const classes: string[] = [pageAreaRef.value.header.useTo || "page"];
+        const classes: string[] = [];
         pageAreaRef.value.header.divider && classes.push('start-divider');
         return { class: classes };
     }
@@ -113,7 +113,7 @@ const bottomLayoutRef = computed<LayoutOptions['bottom']>(() => {
     const footer = pageAreaRef.value ? pageAreaRef.value.footer : undefined;
     if (footer && footer.disabled != true) {
         const classes: string[] = [];
-        classes.push(footer.align || (mode == 'mobile' ? 'start' : 'end'));
+        classes.push(footer.align || ((props.type == 'dialog' || mode == 'desktop') ? 'end' : 'center'));
         footer.divider && classes.push('start-divider');
         return { class: classes };
     }
@@ -128,7 +128,7 @@ const bottomLayoutRef = computed<LayoutOptions['bottom']>(() => {
  */
 function onFooterButtonClick(button: FooterButton, evt: MouseEvent | TouchEvent | PointerEvent) {
     emits("button", button.id, evt);
-    button.click && button.click();
+    isFunction(button.click) && button.click();
 }
 
 // *****************************************   👉  组件渲染    *****************************************
@@ -143,13 +143,19 @@ function onFooterButtonClick(button: FooterButton, evt: MouseEvent | TouchEvent 
 // 基础架构：通用样式
 .snail-page {
 
-    // 顶部导航条区域
-    >div.top-area {
+    //  顶部和底部的公共样式：flex布局，垂直居中
+    >div.top-area,
+    >div.bottom-area {
         position: relative;
         background-color: white;
         display: flex;
         align-items: center;
+    }
 
+    // 顶部导航条区域
+    >div.top-area {
+
+        // 启动分割线
         &.start-divider {
             border-bottom: 1px solid #dddfed;
         }
@@ -157,7 +163,6 @@ function onFooterButtonClick(button: FooterButton, evt: MouseEvent | TouchEvent 
         //  标题区域
         >.header-title {
             color: #2e3033;
-            line-height: 48px;
             flex: 1;
             padding: 0 30px;
 
@@ -185,12 +190,9 @@ function onFooterButtonClick(button: FooterButton, evt: MouseEvent | TouchEvent 
 
     // 底部操作按钮区域
     >div.bottom-area {
-        position: relative;
-        background-color: white;
-        display: flex;
-        align-items: center;
         gap: 20px;
 
+        // 启动分割线
         &.start-divider {
             border-top: 1px solid #dddfed;
         }
@@ -212,14 +214,14 @@ function onFooterButtonClick(button: FooterButton, evt: MouseEvent | TouchEvent 
     }
 }
 
-//  PC适配：适配弹窗等地方
-.snail-page.desktop {
+//  page模式适配：PC+移动端，做特定适配
+.snail-page.page {
 
-    // 顶部导航条区域
-    >div.top-area {
+    // 桌面端
+    &.desktop {
 
-        //  Page模式时：高度、字体差异；关闭按钮右边距
-        &.page {
+        // 顶部导航条：高度、字体差异；关闭按钮右边距
+        >div.top-area {
             height: 48px;
 
             >.header-title {
@@ -232,20 +234,93 @@ function onFooterButtonClick(button: FooterButton, evt: MouseEvent | TouchEvent 
             }
         }
 
-        //  Dialog模式时：高度差异、字体；关闭按钮做绝对定位
-        &.dialog {
-            height: 64px;
-            padding-top: 16px;
+        // 底部操作按钮区域
+        >div.bottom-area {
+            height: 72px;
+            padding: 0 40px;
+        }
+    }
 
-            >.header-title {
-                font-size: 20px;
+    // 移动端：全屏，多用于独立完整html页面
+    &.mobile {
+        width: 100%;
+        height: 100%;
+        background: #F7F8F9;
+
+        // 顶部导航条：模拟出原生移动端的导航条
+        >div.top-area {
+            padding-top: calc(env(safe-area-inset-top, 0));
+            user-select: none;
+            color: #000000;
+            gap: 8px;
+
+            // 左右两边，强制固定100px；剩余的给中间区域
+            >div.left-buttons,
+            >div.righ-slot {
+                flex: none;
+                width: 100px;
+                overflow: hidden;
+                padding: 0 6px;
             }
 
-            >.close-icon {
-                position: absolute;
-                top: 8px;
-                right: 8px;
+            // 左侧的返回、关闭按钮
+            >div.left-buttons {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                >svg {
+                    cursor: pointer;
+                    fill: none;
+                    stroke: currentColor;
+                    stroke-width: 2;
+                    stroke-linecap: round;
+                    stroke-linejoin: round;
+                }
             }
+
+            // 主内容区域：显示标题，文本居中加粗
+            .header-title {
+                height: 44px;
+                line-height: 44px;
+                font-size: 18px;
+                font-weight: 500;
+            }
+        }
+
+        // 底部操作按钮区域
+        >div.bottom-area {
+            height: 56px;
+            padding: 0 12px;
+            z-index: 1;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+
+            // 按钮 均分宽度
+            >div.snail-button {
+                flex: 1;
+                min-width: fit-content;
+                font-size: 16px;
+            }
+        }
+    }
+}
+
+//  dialog模式下的top、bottom区域通用
+.snail-page.dialog {
+
+    // 顶部导航条：高度差异、字体；关闭按钮做绝对定位
+    >div.top-area {
+        height: 64px;
+        padding-top: 16px;
+
+        >.header-title {
+            font-size: 20px;
+        }
+
+        >.close-icon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
         }
     }
 
@@ -253,70 +328,6 @@ function onFooterButtonClick(button: FooterButton, evt: MouseEvent | TouchEvent 
     >div.bottom-area {
         height: 72px;
         padding: 0 40px;
-    }
-}
-
-//  移动端适配
-.snail-page.mobile {
-    //  默认全屏，多用于独立完整html页面，后期看情况再调整
-    width: 100%;
-    height: 100%;
-    background: #F7F8F9;
-
-    // 顶部导航条区域：全屏浏览器下的兼容适配，留出状态栏的空间出来
-    >div.top-area {
-        padding-top: calc(env(safe-area-inset-top, 0));
-        user-select: none;
-        color: #000000;
-        gap: 8px;
-
-        // 左右两边，强制固定100px；剩余的给中间区域
-        >div.left-buttons,
-        >div.righ-slot {
-            flex: none;
-            width: 100px;
-            overflow: hidden;
-            padding: 0 6px;
-        }
-
-        // 左侧的返回、关闭按钮
-        >div.left-buttons {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-
-            >svg {
-                cursor: pointer;
-                fill: none;
-                stroke: currentColor;
-                stroke-width: 2;
-                stroke-linecap: round;
-                stroke-linejoin: round;
-            }
-        }
-
-        // 主内容区域：显示标题，文本居中加粗
-        .header-title {
-            flex: 1;
-            text-align: center;
-            font-size: 18px;
-            font-weight: 500;
-        }
-    }
-
-    // 底部操作按钮区域
-    >div.bottom-area {
-        height: 56px;
-        padding: 0 12px;
-        z-index: 1;
-        box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-
-        // 按钮 均分宽度
-        >div.snail-button {
-            flex: 1;
-            min-width: fit-content;
-            font-size: 16px;
-        }
     }
 }
 </style>
