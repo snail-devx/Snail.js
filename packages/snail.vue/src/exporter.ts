@@ -63,6 +63,7 @@ import Elastic from "./container/elastic.vue";
 import Flex from "./container/flex.vue";
 import Fold from "./container/fold.vue";
 import Layout from "./container/layout.vue";
+import PageShell from "./container/page-shell.vue";
 import Page from "./container/page.vue";
 import Scroll from "./container/scroll.vue";
 import Table from "./container/table.vue";
@@ -131,7 +132,7 @@ export const components = {
     Button, Dynamic, Env, Field, Icon, Motion, PopupShell,
     Sort, Search, Switch,
     //  container 下的组件
-    Flex, Fold, Layout, Page, Scroll, Tabs,
+    Flex, Fold, Layout, Page, PageShell, Scroll, Tabs,
     Elastic, ElasticTable, Table, DataTable,
     //      components下的辅助组件
     ElasticBar, ElasticPadding, ElasticUpdown,

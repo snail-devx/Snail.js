@@ -1,8 +1,9 @@
+import { CSSClassOptions } from "snail.view";
 import { AppEnv } from "../../base/models/app-model";
 import { CloseEvents } from "../../base/models/base-event";
 import { AlignOptions, DisabledOptions, TitleOptions } from "../../base/models/base-model";
 import { ButtonOptions } from "../../base/models/button-model";
-import { EventsType } from "../../base/models/component-model";
+import { ComponentBindOptions, ComponentOptions, EventsType } from "../../base/models/component-model";
 import { ScrollEvents, ScrollOptions } from "./scroll-model";
 
 /**
@@ -148,3 +149,31 @@ export type PageEvents = CloseEvents & {
  * 页面组件 插槽句柄
  */
 export type PageSlotHandle = Required<Pick<AppEnv, "mode">>;
+
+/**
+ * 页面壳 组件配置选项
+ * - class 为shell的根类样式，方便业务组件针对外层shell做自定义样式处理
+ */
+export type PageShellOptions<Props = void, Model = void> = ComponentOptions & ComponentBindOptions<Props, Model> & CSSClassOptions;
+/**
+ * 页面壳 组件操作句柄
+ * - 下方给业务组件使用
+ */
+export type PageShellHandle = {
+    /**
+     * 是否在【PageShell】中
+     * - 为true时，表示当前页面组件在【PageShell】中渲染
+     */
+    readonly inPageShell: boolean;
+
+    /**
+     * 设置页面布局
+     * @param page 
+     */
+    setPage(page: PageOptions);
+    /**
+     * 监听Page页面事件
+     * @param emits 
+     */
+    onPage(emits: EventsType<PageEvents>);
+}

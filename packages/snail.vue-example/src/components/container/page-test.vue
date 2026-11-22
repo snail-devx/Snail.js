@@ -1,6 +1,8 @@
 <!-- 组件介绍写到这里 -->
 <template>
-    <button @click="loadingRef = !loadingRef">切换loading</button><br />
+    <button @click="loadingRef = !loadingRef">切换loading</button>
+    <button @click="onPageShellTest">PageShell测试：{{ vModelTest }}</button>
+    <br />
     <br />
     <!-- 桌面环境 测试 -->
     <Env :mode="'desktop'">
@@ -106,15 +108,38 @@
 
 <script setup lang="ts">
 import { shallowRef, ShallowRef } from "vue";
-import { components } from "../../libraries/snail_vue";
+import { components, MOTION, PageShellOptions, usePopup } from "../../libraries/snail_vue";
+import PageShellContent from "./components/page-shell-content.vue";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
-const { Page, Env } = components;
+const { Page, PageShell, Env } = components;
+const popup = usePopup();
+const vModelTest: ShallowRef<string> = shallowRef(String(Date.now()));
 //  2、组件交互变量、常量
 const loadingRef: ShallowRef<boolean> = shallowRef(true);
 
 // *****************************************   👉  方法+事件    ****************************************
+function onPageShellTest() {
+    const dialog = popup.dialog<any, PageShellOptions<Record<string, any>>, string>({
+        component: PageShell,
+        motion: MOTION.scale,
+        props: {
+            // size: { width: "50%", height: "40%" },
+            // header: { useTo: "dialog", title: "测试弹窗壳" },
+            class: "page-shell-test",
+            component: PageShellContent,
+            props: {
+                //  接收自定义事件
+                onCustomEvent(data: number) {
+                    console.log("接收自定义事件：", data);
+                }
+            }
+        },
+        model: vModelTest,
+    });
+    dialog.then(data => console.log("返回数据：", data));
+}
 
 // *****************************************   👉  组件渲染    *****************************************
 //  1、数据初始化、变化监听
