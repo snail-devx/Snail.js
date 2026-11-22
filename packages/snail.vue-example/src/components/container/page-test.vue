@@ -127,7 +127,7 @@ function onPageShellTest() {
         props: {
             // size: { width: "50%", height: "40%" },
             // header: { useTo: "dialog", title: "测试弹窗壳" },
-            class: "page-shell-test",
+            rootClass: "page-shell-test",
             component: PageShellContent,
             props: {
                 //  接收自定义事件

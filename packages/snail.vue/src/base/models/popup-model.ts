@@ -6,11 +6,9 @@
  */
 
 import { IAsyncScope } from "snail.core";
-import { HeightStyle, WidthStyle } from "snail.view";
 import { ShallowRef } from "vue";
 import { AppEnv } from "./app-model";
 import { ComponentBindOptions, ComponentOptions } from "./component-model";
-import { FooterOptions, HeaderOptions } from "./header-footer-model";
 import { MotionEffectOptions } from "./motion-model";
 
 //#region ************************************* 公共数据结构 *************************************
@@ -291,53 +289,6 @@ export type FollowHandle<T> = PopupHandle<T> & {
      * - 满足 子弹窗 点击等操作时，不自动销毁父级弹窗
      */
     readonly pinned: ShallowRef<boolean>;
-};
-
-/**
- * 弹窗外壳 组件配置选项
- * - 各个地方不支持 disabled 配置，这个是弹窗，一锤子买卖，若不需要，直接不构建即可
- */
-export type PopupShellOptions<Props = void, Model = void> = {
-    /**
-     * 弹窗尺寸
-     * - 可指定固定值，最大、最小值，也可以指定百分比
-     * - 必须指定，否则会出现闪动情况；若不确定最后宽度，可给一个最小宽度、高度值
-     * - 原因：content 是异步加载，若不指定则一开始只会渲染header和footer，很小一部分，等 content 加载渲染完成后，弹窗尺寸会变大
-     */
-    size: WidthStyle & HeightStyle;
-    /**
-     * Header组件配置
-     * - 不传入，则不需要 Header组件
-     */
-    header?: HeaderOptions;
-    /**
-     * 内容组件配置
-     * - 直接通过 {@link Dynamic} 组件加载作为，不会在外层包裹一层div
-     */
-    main: ComponentOptions & ComponentBindOptions<Props, Model>;
-    /**
-     * Footer组件配置
-     * - 不传入，则不需要 Footer 组件
-     */
-    footer?: FooterOptions;
-};
-
-/**
- * 弹窗外壳 组件的操作句柄
- * - 下方给业务组件使用
- */
-export type PopupShellHandle = {
-    /**
-     * 是否在【弹窗外壳】中
-     * - 取值为 弹窗类型，有值时表示在弹窗外壳中
-     */
-    inShell: PopupType;
-
-    /**
-     * 设置弹窗尾部内容
-     * @param footer 尾部配置，为空表示无尾部
-     */
-    setFooter(footer?: FooterOptions): void;
 };
 //#endregion
 

@@ -1,4 +1,4 @@
-import { FooterOptions } from "../models/header-footer-model";
+import { PageFooterOptions } from "../models/page-model";
 
 /**
  * 构建`Footer`组件的通用Footer配置
@@ -8,7 +8,7 @@ import { FooterOptions } from "../models/header-footer-model";
  * @param algin 按钮对齐方式
  * @returns 
  */
-export function buildCommonFooter(cancelFn: () => void, confirmFn: () => void, algin?: FooterOptions["align"],): FooterOptions {
+export function buildCommonFooter(cancelFn: () => void, confirmFn: () => void, algin?: PageFooterOptions["align"],): PageFooterOptions {
     return {
         align: algin || "end",
         buttons: [

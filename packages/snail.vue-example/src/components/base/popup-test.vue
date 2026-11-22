@@ -3,7 +3,6 @@
     <div class="popup-test">
         <button @click="openPopup">popup</button>
         <button @click="openDialog">打开弹窗</button>
-        <button @click="onOpenInShell">使用弹窗壳</button>
         <hr />
         vModelTest值双向绑定到弹窗中：{{ vModelTest }}
 
@@ -26,7 +25,7 @@
 
 <script setup lang="ts">
 import { shallowRef } from 'vue';
-import { components, FollowOptions, MOTION, PopupShellOptions, usePopup } from '../../libraries/snail_vue';
+import { FollowOptions, MOTION, usePopup } from '../../libraries/snail_vue';
 import ChildContent from './components/child-content.vue';
 
 
@@ -34,7 +33,6 @@ import ChildContent from './components/child-content.vue';
 //  1、props、event、model、components
 const popup = usePopup();
 const vModelTest = shallowRef<boolean>(true);
-const { PopupShell } = components;
 //  2、组件交互变量、常量
 const followOpitions: FollowOptions = Object.freeze<FollowOptions>({
     component: ChildContent,
@@ -74,32 +72,6 @@ function openDialog() {
     dialog.then(data => console.log("返回数据：", data));
     // 测试弹窗自动关闭
     // setTimeout(() => dialog.close(), 4000);
-}
-/**
- * 在弹窗壳中打开弹窗
- */
-function onOpenInShell() {
-    const dialog = popup.dialog<any, PopupShellOptions<Record<string, any>>, boolean>({
-        component: PopupShell,
-        closeOnEscape: true,
-        closeOnMask: true,
-        motion: MOTION.scale,
-        props: {
-            size: { width: "50%", height: "40%" },
-            header: { useTo: "dialog", title: "测试弹窗壳" },
-            main: {
-                component: ChildContent,
-                props: {
-                    //  接收自定义事件
-                    onCustomEvent(data: number) {
-                        console.log("接收自定义事件：", data);
-                    }
-                }
-            }
-        },
-        model: vModelTest,
-    });
-    dialog.then(data => console.log("返回数据：", data));
 }
 /**
  * 启动跟随

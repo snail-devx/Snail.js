@@ -67,12 +67,11 @@ import { isFunction, isStringNotEmpty } from 'snail.core';
 import { computed } from 'vue';
 import Button from '../base/button.vue';
 import Icon from '../base/icon.vue';
-import { FooterButton } from '../base/models/header-footer-model';
 import { useApp } from '../base/utils/app-util';
 import { LayoutOptions } from '../container/models/layout-model';
 import Empty from '../prompt/empty.vue';
 import Layout from './layout.vue';
-import { PageAreaOptions, PageEvents, PageOptions, PageSlotHandle } from './models/page-model';
+import { PageAreaOptions, PageEvents, PageFooterButton, PageOptions, PageSlotHandle } from './models/page-model';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
@@ -126,7 +125,7 @@ const bottomLayoutRef = computed<LayoutOptions['bottom']>(() => {
  * @param button 
  * @param evt 
  */
-function onFooterButtonClick(button: FooterButton, evt: MouseEvent | TouchEvent | PointerEvent) {
+function onFooterButtonClick(button: PageFooterButton, evt: MouseEvent | TouchEvent | PointerEvent) {
     emits("button", button.id, evt);
     isFunction(button.click) && button.click();
 }

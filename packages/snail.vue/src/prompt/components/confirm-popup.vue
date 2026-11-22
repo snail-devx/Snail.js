@@ -81,7 +81,7 @@ const { closePopup } = defineProps<ConfirmOptions & PopupHandle<boolean>>();
     }
 
     >div.main-area {
-        margin: 20px;
+        padding: 20px !important;
         text-align: center;
         color: black;
     }

@@ -28,18 +28,15 @@ import Env from "./base/env.vue";
 import Field from "./base/field.vue";
 import Icon from "./base/icon.vue";
 import Motion from "./base/motion.vue";
-import PopupShell from "./base/popup-shell.vue";
 import Search from "./base/search.vue";
 import Sort from "./base/sort.vue";
 import Switch from "./base/switch.vue";
-
 //  方法导出
 export * from "./base/popup";
 export * from "./base/reactive";
 export * from "./base/utils/app-util";
 export * from "./base/utils/base-util";
 export * from "./base/utils/component-util";
-export { buildCommonFooter } from "./base/utils/footer-util";
 export * from "./base/utils/icon-util";
 export * from "./base/utils/motion-util";
 
@@ -68,6 +65,8 @@ import Page from "./container/page.vue";
 import Scroll from "./container/scroll.vue";
 import Table from "./container/table.vue";
 import Tabs from "./container/tabs.vue";
+// 方法导出：
+export { buildCommonFooter } from "./container/utils/page-util";
 
 // *****************************************   👉  control 相关导出    ****************************************
 //  类型导出
@@ -92,12 +91,10 @@ export * from "./control/components/tree-base";
 //  类型导出
 export * from "./other/models/action-model";
 export * from "./other/models/card-model";
-export * from "./other/models/nav-bar-model";
 //  组件导出：赋值给 components
 import Action from "./other/action.vue";
 import Card from "./other/card.vue";
 import FlashNumber from "./other/flash-number.vue";
-import NavBar from "./other/nav-bar.vue";
 
 // *****************************************   👉  picker 相关导出    ****************************************
 //  类型导出
@@ -129,7 +126,7 @@ export * from "./prompt/manager";
 // *****************************************   👉  组件合并导出    ****************************************
 export const components = {
     //  base下的组件
-    Button, Dynamic, Env, Field, Icon, Motion, PopupShell,
+    Button, Dynamic, Env, Field, Icon, Motion,
     Sort, Search, Switch,
     //  container 下的组件
     Flex, Fold, Layout, Page, PageShell, Scroll, Tabs,
@@ -139,7 +136,7 @@ export const components = {
     //  control 下的组件
     Choose, Input, Number, Select, Textarea, Tree,
     //  other   下的组件
-    Action, Card, FlashNumber, NavBar,
+    Action, Card, FlashNumber,
     //  picker    下的组件
     DateTimePicker, ScrollPicker,
     //  prompt 下的组件

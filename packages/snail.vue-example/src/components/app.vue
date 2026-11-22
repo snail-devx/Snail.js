@@ -27,7 +27,6 @@ import ElasticTest from "./container/elastic-test.vue";
 import ElasticTableTest from "./container/elastictable-test.vue";
 import FlexTest from "./container/flex-test.vue";
 import FoldTest from "./container/fold-test.vue";
-import HeaderFooterTest from "./container/header-footer-test.vue";
 import LayoutTest from "./container/layout-test.vue";
 import PageTest from "./container/page-test.vue";
 import ScrollTest from "./container/scroll-test.vue";
@@ -106,7 +105,6 @@ const treeOptions: TreeOptions<Component> = {
                 { text: "ElasticTable 弹性表格", data: ElasticTableTest, clickable: true, searchable: true, },
                 { text: "Flex 弹性布局", data: FlexTest, clickable: true, searchable: true, },
                 { text: "Fold 折叠组件", data: FoldTest, clickable: true, searchable: true, },
-                { text: "Header/Footer 头尾组件", data: HeaderFooterTest, clickable: true, searchable: true, },
                 { text: "Layout 布局测试", data: LayoutTest, clickable: true, searchable: true, },
                 { text: "Page 页面组件", data: PageTest, clickable: true, searchable: true, },
                 { text: "Scroll 滚动组件", data: ScrollTest, clickable: true, searchable: true, },

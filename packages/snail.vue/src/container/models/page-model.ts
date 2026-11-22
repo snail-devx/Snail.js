@@ -154,7 +154,14 @@ export type PageSlotHandle = Required<Pick<AppEnv, "mode">>;
  * 页面壳 组件配置选项
  * - class 为shell的根类样式，方便业务组件针对外层shell做自定义样式处理
  */
-export type PageShellOptions<Props = void, Model = void> = ComponentOptions & ComponentBindOptions<Props, Model> & CSSClassOptions;
+export type PageShellOptions<Props = void, Model = void> = ComponentOptions & ComponentBindOptions<Props, Model> & {
+    /**
+     * shell的根类样式
+     * - 方便业务组件针对外层shell做自定义样式处理
+     * - 直接全局用class，在生成.d.ts文件时会报错，估计是把 class 当成关键字了
+     */
+    rootClass?: CSSClassOptions["class"];
+};
 /**
  * 页面壳 组件操作句柄
  * - 下方给业务组件使用
