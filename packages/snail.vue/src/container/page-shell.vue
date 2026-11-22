@@ -5,8 +5,7 @@
         1、如可以弹窗时，外部弹窗到此组件，然后中转到具体业务组件，这样业务组件内部就不用管导航、底部区域的渲染，方便业务组件复用到不同地方
   -->
 <template>
-    <Page type="page" :class="class" :="pageRef" v-bind="pageEventsRef" v-bind:class="attrs.class"
-        v-bind:style="attrs.style">
+    <Page :class="class" v-bind:class="attrs.class" v-bind:style="attrs.style" :="pageRef" v-bind="pageEventsRef">
         <Dynamic :="inheritOtherRef" :in-page-shell="true" :set-page="page => pageRef = page"
             :on-page="evt => pageEventsRef = evt" />
     </Page>
@@ -29,7 +28,7 @@ const attrs = useAttrs();
 //  2、组件交互变量、常量
 /**     透传过来的其他属性， */
 const inheritOtherRef = computed(() => {
-    const { class: _, ...newAttrs } = attrs;
+    const { class: _, style: __, ...newAttrs } = attrs;
     return newAttrs;
 });
 /**     页面配置：业务组件中设置*/

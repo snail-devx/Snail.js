@@ -1,6 +1,7 @@
 <!-- 组件介绍写到这里 -->
 <template>
     <div>inPopup：{{ inPopup }} closePopup：{{ typeof closePopup }}</div>
+    <div>$attrs:{{ $attrs }}</div>
     <div> inPageShell:{{ inPageShell }}</div>
     <div>v-Model：绑定值为 {{ valueModel }}</div>
 </template>
@@ -12,6 +13,7 @@ import { PageShellHandle, PopupHandle } from '../../../libraries/snail_vue';
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、event、model、components
+defineOptions({ inheritAttrs: false });
 const props = defineProps<PopupHandle<any> & PageShellHandle>();
 const valueModel = defineModel<string>();
 const { onInterval } = useTimer();
