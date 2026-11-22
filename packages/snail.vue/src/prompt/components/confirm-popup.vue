@@ -3,105 +3,57 @@
     2、这里的header、main、footer 保持不变，弹窗算一个独立页面
 -->
 <template>
-    <div class="snail-confirm" :class="mode">
-        <!-- 头部区域 -->
-        <div class="header" v-if="mode == 'mobile'">
-            <span class="ellipsis" v-text="title || '提示'" />
-        </div>
-        <Header v-else :use-to="'dialog'" :title="title || '提示'" @close="closePopup(false)" />
-        <!-- 内容区域 -->
-        <div class="body" v-html="message || '请确认？'" />
-        <!-- 底部区域：重写footer，移动端Footer组件不满足 -->
-        <div class="footer" v-if="cancelDisabled != true || confirmDisabled != true">
-            <div class="button cancel" v-if="cancelDisabled != true" @click="closePopup(false)">
-                <span class="ellipsis" v-text="cancelName || '取消'" />
-            </div>
-            <div class="button confirm" v-if="confirmDisabled != true" @click="closePopup(true)">
-                <span class="ellipsis" v-text="confirmName || '确定'" />
-            </div>
-        </div>
-    </div>
+    <Page class="snail-confirm" type="dialog" :desktop="{
+        header: { title: title || '提示', align: 'center' },
+        footer: {
+            align: 'end',
+            buttons: [
+                { id: 'cancel', name: '取消', click: () => closePopup(false) },
+                { id: 'confirm', type: 'primary', name: '确定', click: () => closePopup(true) },
+            ]
+        }
+    }" :mobile="{
+        header: { title: title || '提示', align: 'center', closeDisabled: true },
+        footer: {
+            align: 'center',
+            buttons: [
+                { id: 'cancel', name: '取消', click: () => closePopup(false) },
+                { id: 'confirm', name: '确定', click: () => closePopup(true) },
+            ]
+        }
+    }" @close="closePopup(false)">
+        {{ message || '请确认？' }}
+    </Page>
 </template>
 
 <script setup lang="ts">
-import Header from "../../base/components/header.vue";
 import { PopupHandle } from "../../base/models/popup-model";
-import { useApp } from "../../base/utils/app-util";
+import Page from "../../container/page.vue";
 import { ConfirmOptions } from "../models/prompt-model";
 
 // *****************************************   👉  组件定义    *****************************************
 //  1、props、data
-defineProps<ConfirmOptions & PopupHandle<boolean>>();
-const { mode } = useApp();
+const { closePopup } = defineProps<ConfirmOptions & PopupHandle<boolean>>();
 </script>
 
 <style lang="less">
 .snail-confirm {
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-
-    >div.header {
-        flex: none;
-    }
-
-    >div.body {
-        flex: 1;
-        overflow: auto;
+    >div.main-area {
+        height: fit-content;
         word-wrap: break-word;
-    }
-
-    >div.footer {
-        flex: none;
-        display: flex;
-        align-items: center;
-
-        >div.button {
-            cursor: pointer;
-            user-select: none;
-            padding: 0 10px;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
     }
 }
 
 // PC端适配
 .snail-confirm.desktop {
-    border-radius: 4px;
     min-width: 348px;
+    width: max-content;
     max-width: 548px;
     max-height: 350px;
 
-    >div.body {
-        margin: 20px 40px;
+    >div.main-area {
+        padding: 20px 40px !important;
         color: #2e2f33;
-    }
-
-    >div.footer {
-        height: 72px;
-        padding: 0 40px;
-        gap: 20px;
-        justify-content: flex-end;
-
-        >div.button {
-            flex-shrink: 0;
-            width: 120px;
-            height: 40px;
-            border-radius: 2px;
-
-            &.cancel {
-                border: 1px solid #dddfed;
-                color: #2e2f33;
-            }
-
-            &.confirm {
-                background-color: #5ca3ff;
-                color: white;
-            }
-        }
     }
 }
 
@@ -110,46 +62,43 @@ const { mode } = useApp();
     width: 270px;
     max-height: 80%;
 
-    &.dialog-body {
-        border-radius: 10px
-    }
-
     --color: #0082F6;
     --border-color: rgba(221, 223, 237, 0.8);
 
-    >div.header {
-        height: 48px;
-        border-bottom: 2px solid var(--color);
-        padding: 0 20px;
-        display: flex;
-        align-items: center;
+    &.dialog-body {
+        border-radius: 10px;
+    }
 
-        >span {
-            width: 100%;
-            text-align: center;
+    >div.top-area {
+        height: 48px;
+        padding: 0 20px;
+        border-bottom: 2px solid var(--color);
+
+        >div.header-title {
             color: var(--color);
             font-size: 18px;
         }
     }
 
-    >div.body {
+    >div.main-area {
         margin: 20px;
         text-align: center;
         color: black;
     }
 
-    >div.footer {
+    >div.bottom-area {
         height: 44px;
+        padding: 0;
+        gap: 0;
         border-top: 1px solid var(--border-color);
 
-        >div.button {
+        >div.snail-button {
             flex: 1;
             height: 100%;
-
-            >span {
-                color: var(--color);
-                font-size: 16px;
-            }
+            border: 0;
+            border-radius: 0;
+            color: var(--color);
+            font-size: 16px;
 
             &:nth-child(2) {
                 border-left: 1px solid var(--border-color);

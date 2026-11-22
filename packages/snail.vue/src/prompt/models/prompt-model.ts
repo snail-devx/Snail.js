@@ -1,5 +1,5 @@
 import { IAsyncScope, IScope } from "snail.core";
-import { ConfirmAreaOptions, MessageOptions, TitleOptions } from "../../base/models/base-model";
+import { MessageOptions, TitleOptions } from "../../base/models/base-model";
 import { IconType } from "../../base/models/icon-model";
 
 /**
@@ -28,8 +28,7 @@ export interface IPromptManager {
  * - title          弹窗标题，默认“提示”
  * - message        确认提示信息；默认“请确认？”；支持html格式内容
  */
-export type ConfirmOptions = TitleOptions & MessageOptions & ConfirmAreaOptions & {
-}
+export type ConfirmOptions = TitleOptions & MessageOptions;
 
 /**
  * Toast提示 配置选项
