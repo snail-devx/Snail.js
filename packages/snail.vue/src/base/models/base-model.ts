@@ -101,31 +101,3 @@ export type ClickOptions = {
      */
     clickable?: boolean;
 }
-
-/**
- * 确认区域 配置选项
- * - 约束 确认区域 的 确定、取消 按钮
- */
-export type ConfirmAreaOptions = {
-    /**
-     * 【取消】按钮名称
-     * - 默认【取消】
-     */
-    cancelName?: string;
-    /**
-     * 禁用【取消】按钮
-     * - 为true时，不显示【取消】按钮
-     */
-    cancelDisabled?: boolean;
-
-    /**
-     * 【确定】按钮名称
-     * - 默认【确定】
-     */
-    confirmName?: string;
-    /**
-     * 禁用【确定】按钮
-     * - 为true时，不显示【确定】按钮
-     */
-    confirmDisabled?: boolean;
-}
