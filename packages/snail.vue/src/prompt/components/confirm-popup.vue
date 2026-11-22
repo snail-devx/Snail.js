@@ -71,7 +71,7 @@ const { closePopup } = defineProps<ConfirmOptions & PopupHandle<boolean>>();
 
     >div.top-area {
         height: 48px;
-        padding: 0 20px;
+        padding: 0 20px !important;
         border-bottom: 2px solid var(--color);
 
         >div.header-title {
@@ -88,7 +88,7 @@ const { closePopup } = defineProps<ConfirmOptions & PopupHandle<boolean>>();
 
     >div.bottom-area {
         height: 44px;
-        padding: 0;
+        padding: 0 !important;
         gap: 0;
         border-top: 1px solid var(--border-color);
 
