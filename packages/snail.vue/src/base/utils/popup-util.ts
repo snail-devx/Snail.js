@@ -71,6 +71,8 @@ export function openPopup<T, Options extends PopupOptions<any, any>>(env: AppEnv
     };
     // 构建弹窗app实例，并做绑定
     {
+        //  弹窗打开后，超时将动画值清空
+        setTimeout(() => motionRef.value = undefined, duration);
         //  对options进行复制，并剔除掉[PopupOptions]一些属性，这些属性无需往下传递，或者需要加工后共享到context中
         const props = { ...options, context };
         ["motion", "motionDuration", "zIndex"].forEach(key => delete props[key]);
