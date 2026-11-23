@@ -137,8 +137,8 @@ importers:
         specifier: '>=2.0.30'
         version: 2.0.30(typescript@5.9.3)
       snail.vue:
-        specifier: '>=2.0.64'
-        version: 2.0.64(typescript@5.9.3)
+        specifier: '>=2.0.65'
+        version: 2.0.65(typescript@5.9.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -222,8 +222,8 @@ importers:
         specifier: '>=2.0.30'
         version: 2.0.30(typescript@5.9.3)
       snail.vue:
-        specifier: '>=2.0.64'
-        version: 2.0.64(typescript@5.9.3)
+        specifier: '>=2.0.65'
+        version: 2.0.65(typescript@5.9.3)
       sortablejs:
         specifier: '>=1.15.6'
         version: 1.15.6
@@ -2381,8 +2381,8 @@ packages:
   snail.view@2.0.30:
     resolution: {integrity: sha512-Q29qWIDuXtdz2x5wbHgnIUF/Ahtiq8D//+aQ9UGeenoOxcEA8Bjli+aJ7osm1ue4dlI9m3BjGd6iOqcfzcc5WA==}
 
-  snail.vue@2.0.64:
-    resolution: {integrity: sha512-XTb/9/ZfKrjbpD7zUeqxuco1b4FrOZYSVczMMuVZ8wjM7hy844nstDkDXffzgGKxAjRBIOIlQuU2TM8DNS+ruQ==}
+  snail.vue@2.0.65:
+    resolution: {integrity: sha512-IIUe6mLV4COIFBdBuQmZCgLMEklxwcKIP9of4b+QBdU7zwi35WVwMQVKLQhUsmv6L4hJ7pBT3awggmizp7UKqQ==}
 
   sortablejs@1.15.6:
     resolution: {integrity: sha512-aNfiuwMEpfBM/CN6LY0ibyhxPfPbyFeBTYJKCvzkJ2GkUpazIt3H+QIPAMHwqQ7tMKaHz1Qj+rJJCqljnf4p3A==}
@@ -4874,7 +4874,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  snail.vue@2.0.64(typescript@5.9.3):
+  snail.vue@2.0.65(typescript@5.9.3):
     dependencies:
       snail.core: 2.0.35(typescript@5.9.3)
       snail.view: 2.0.30(typescript@5.9.3)

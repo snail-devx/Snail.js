@@ -18,14 +18,17 @@
 
 # 3. **使用说明**
 
+**更新日志**：[www.yuque.com/snail-devx/js/ckukzf1aa7cxbgla#qQuZn#qQuZn#qQuZn#qQuZn](https://www.yuque.com/snail-devx/js/ckukzf1aa7cxbgla#qQuZn)
+
 ## 3.1. **base 基础组件**
 
 **封装基础 vue 组件，如 Button、Select、Header、Icon、Search、Switch 等等**
 
 **详细说明：**[https://www.yuque.com/snail-devx/js/mhieowa8ddbdhgu8](https://www.yuque.com/snail-devx/js/mhieowa8ddbdhgu8)
 
+
 | **组件**                                                                 | **简介**                                                                             |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | [Button](https://www.yuque.com/snail-devx/js/mhieowa8ddbdhgu8#s1zYq)     | **按钮组件；集成 type、size 属性，封装大小和类型，简化使用**                         |
 | [Choose](https://www.yuque.com/snail-devx/js/mhieowa8ddbdhgu8#gCenb)     | **选择组件；集成 radio、checkbook 常用功能，支持选项组；支持美化和原生两种渲染模式** |
 | [DatePicker](https://www.yuque.com/snail-devx/js/mhieowa8ddbdhgu8#je00A) | **日期选择器组件；仅支持盖板模式，后续支持 input 输入框模式**                        |
@@ -43,8 +46,9 @@
 
 **详细说明：**[https://www.yuque.com/snail-devx/js/kaynh9t44gbl6fxc](https://www.yuque.com/snail-devx/js/kaynh9t44gbl6fxc)
 
+
 | **组件**                                                              | **简介**                                                                                                                  |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | [Dynamic](https://www.yuque.com/snail-devx/js/kaynh9t44gbl6fxc#NNGJt) | **动态组件；vue 的 Component 组件扩展，支持 url、name、object 方式加载异步组件，并支持 event、props、model、slot 等绑定** |
 | [Fold](https://www.yuque.com/snail-devx/js/kaynh9t44gbl6fxc#sJOfO)    | **折叠面板组件；通过 slot 加载实际内容，封装折叠 title 实现面板展开、收起功能**                                           |
 | [Layout](https://www.yuque.com/snail-devx/js/kaynh9t44gbl6fxc#lGmps)  | **布局组件；实现上中下、左中右布局，通过 slot 指定每块内容**                                                              |
@@ -64,8 +68,9 @@
 
 **详细说明：**[https://www.yuque.com/snail-devx/js/byho94c6ms40kdb2](https://www.yuque.com/snail-devx/js/byho94c6ms40kdb2)
 
+
 | **弹窗方法**                                                           | **简介**                                                                               |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
 | [usePopup](https://www.yuque.com/snail-devx/js/byho94c6ms40kdb2#MF7uV) | **弹窗管理器接口实现接口，后续 popup、dialog 等弹窗的具体实现**                        |
 | [popup](https://www.yuque.com/snail-devx/js/byho94c6ms40kdb2#gppwu)    | **通用弹窗方法；管理弹窗生成周期，自动分配弹层，实现属性、事件绑定**                   |
 | [dialog](https://www.yuque.com/snail-devx/js/byho94c6ms40kdb2#YZ42j)   | **模态弹窗；利用 popup 实现弹窗遮罩，支持关闭前拦截**                                  |
@@ -79,8 +84,9 @@
 
 **详细说明：**[https://www.yuque.com/snail-devx/js/kp0nznuu61qs8zgw](https://www.yuque.com/snail-devx/js/kp0nznuu61qs8zgw)
 
+
 | **组件**                                                                 | **简介**                                               |
-| ------------------------------------------------------------------------ | ------------------------------------------------------ |
+| -------------------------------------------------------------------------- | -------------------------------------------------------- |
 | [DragVerify](https://www.yuque.com/snail-devx/js/kp0nznuu61qs8zgw#YN3YF) | **拖拽验证组件；拖动滑块验证，给出验证提示和结果信息** |
 | [Empty](https://www.yuque.com/snail-devx/js/kp0nznuu61qs8zgw#qZsqi)      | **空组件；用于提示无数据、无搜索结果等空状态**         |
 | [Loading](https://www.yuque.com/snail-devx/js/kp0nznuu61qs8zgw#IuBmQ)    | **加载组件；用于在数据加载过程中进行加载提示**         |
