@@ -10,12 +10,12 @@
     5、bottom区域支持完全自定义
 -->
 <template>
-    <Layout :class="['snail-page', mode, type]" :direction="'vertical'" :top="topLayoutRef" :main="mainLayoutRef"
-        :bottom="bottomLayoutRef" :loading="loading">
+    <Layout :class="['snail-page', mode, pageAreaRef.type || 'page']" :direction="'vertical'" :top="topLayoutRef"
+        :main="mainLayoutRef" :bottom="bottomLayoutRef" :loading="loading">
         <!-- 头部区域渲染，支持PC、移动端，支持header插槽进行自定义渲染 -->
         <template #top v-if="topLayoutRef != undefined">
             <!-- 桌面端 or dialog模式：标题、插槽、关闭按钮 -->
-            <template v-if="mode != 'mobile' || type == 'dialog'">
+            <template v-if="mode != 'mobile' || pageAreaRef.type == 'dialog'">
                 <div class="header-title ellipsis" :class="pageAreaRef.header.align || 'center'"
                     v-if="isStringNotEmpty(pageAreaRef.header.title)" v-text="pageAreaRef.header.title" />
                 <slot name="header" :="slotHandle" />
@@ -81,18 +81,14 @@ const { mode } = useApp();
 //  2、组件交互变量、常量
 /**     插槽句柄 */
 const slotHandle: PageSlotHandle = Object.freeze<PageSlotHandle>({ mode });
-/**     页面配置：基于mode动态计算出来，暂时仅支持desktop和mobile模式 */
-const pageAreaRef = computed<PageAreaOptions>(() => mode == "mobile"
-    ? (props.mobile || Object.create(null))
-    : (mode == "desktop"
-        ? (props.desktop || Object.create(null))
-        : undefined
-    )
+/**     页面配置：基于mode动态计算出来，保证非空，暂时仅支持desktop和mobile模式 */
+const pageAreaRef = computed<PageAreaOptions>(() =>
+    (mode == "mobile" ? props.mobile : props.desktop) || Object.create(null)
 );
 //  3、顶部、主内容、底部区域布局配置：根据mode动态计算出来
 /**     顶部区域布局配置 */
 const topLayoutRef = computed<LayoutOptions["top"]>(() => {
-    if (pageAreaRef.value && pageAreaRef.value.header && pageAreaRef.value.header.disabled != true) {
+    if (pageAreaRef.value.header && pageAreaRef.value.header.disabled != true) {
         const classes: string[] = [];
         pageAreaRef.value.header.divider && classes.push('start-divider');
         return { class: classes };
@@ -100,20 +96,16 @@ const topLayoutRef = computed<LayoutOptions["top"]>(() => {
     return undefined;
 });
 /**     主内容区域：做一些默认配置处理*/
-const mainLayoutRef = computed<LayoutOptions['main']>(() => pageAreaRef.value != undefined
-    ? {
-        scroll: { bar: "y", barSize: mode == 'mobile' ? 'mini' : 'small' },
-        ...pageAreaRef.value.main
-    }
-    : undefined
-);
-/**     底部区域布局配置：默认选项梳理，移动端默认起始位置对齐 */
+const mainLayoutRef = computed<LayoutOptions['main']>(() => ({
+    scroll: { bar: "y", barSize: mode == 'mobile' ? 'mini' : 'small' },
+    ...pageAreaRef.value.main
+}));
+/**     底部区域布局配置：默认选项梳理*/
 const bottomLayoutRef = computed<LayoutOptions['bottom']>(() => {
-    const footer = pageAreaRef.value ? pageAreaRef.value.footer : undefined;
-    if (footer && footer.disabled != true) {
+    if (pageAreaRef.value.footer && pageAreaRef.value.footer.disabled != true) {
         const classes: string[] = [];
-        classes.push(footer.align || ((props.type == 'dialog' || mode == 'desktop') ? 'end' : 'center'));
-        footer.divider && classes.push('start-divider');
+        classes.push(pageAreaRef.value.footer.align || ((mode != "mobile" || pageAreaRef.value.type == "dialog") ? 'end' : 'center'));
+        pageAreaRef.value.footer.divider && classes.push('start-divider');
         return { class: classes };
     }
     return undefined;
@@ -292,7 +284,7 @@ function onFooterButtonClick(button: PageFooterButton, evt: MouseEvent | TouchEv
             height: 56px;
             padding: 0 12px;
             z-index: 1;
-            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
 
             // 按钮 均分宽度
             >div.snail-button {

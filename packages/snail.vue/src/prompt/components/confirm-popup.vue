@@ -4,6 +4,7 @@
 -->
 <template>
     <Page class="snail-confirm" type="dialog" :desktop="{
+        type: 'dialog',
         header: { title: title || '提示', align: 'center' },
         footer: {
             align: 'end',
@@ -13,6 +14,7 @@
             ]
         }
     }" :mobile="{
+        type: 'dialog',
         header: { title: title || '提示', align: 'center', closeDisabled: true },
         footer: {
             align: 'center',

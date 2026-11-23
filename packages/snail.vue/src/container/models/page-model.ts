@@ -11,13 +11,6 @@ import { ScrollEvents, ScrollOptions } from "./scroll-model";
  */
 export type PageOptions = {
     /**
-     * 页面类型：基于不同页面类型，进行导航、底部等区分适配
-     * - page       【默认】普通页面
-     * - dialog     弹窗页面
-     */
-    type: "page" | "dialog";
-
-    /**
      * desktop 桌面客户端模式下的页面配置
      * - header 头部区域，有配置不禁用才显示
      * - main   内容区域，自动撑开，可配置是否要滚动条
@@ -42,6 +35,13 @@ export type PageOptions = {
  * 页面组件渲染区域 配置选项
  */
 export type PageAreaOptions = {
+    /**
+     * 页面类型：基于不同页面类型，进行导航、底部等区分适配
+     * - page       【默认】普通页面
+     * - dialog     弹窗页面
+     */
+    readonly type: "page" | "dialog";
+
     /**
      * 头部区域，有配置不禁用才显示
      */

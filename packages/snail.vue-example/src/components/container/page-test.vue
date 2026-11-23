@@ -8,7 +8,8 @@
     <Env :mode="'desktop'">
         桌面模式，默认：
         <button @click="loadingRef = !loadingRef">切换loading</button><br />
-        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :type="'page'" :desktop="{
+        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :desktop="{
+            type: 'page',
             main: {
                 scroll: { bar: 'y' }
             }
@@ -21,36 +22,36 @@
         </Page>
         <br />
         桌面：Page模式
-        <Page class="no-xxx" style="width: 100%;height: 200px;border: 1px solid gray;" :type="'page'"
-            :loading="loadingRef" :desktop="{
-                header: { title: '测试', divider: true },
-                footer: {
-                    align: 'end',
-                    divider: true,
-                    buttons: [
-                        { id: 'xx', name: '测试', size: 'max' },
-                        { id: 'xx1', name: '测试2', type: 'primary', size: 'max' }
-                    ]
-                }
-            }">
+        <Page class="no-xxx" style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef" :desktop="{
+            type: 'page',
+            header: { title: '测试', divider: true },
+            footer: {
+                align: 'end',
+                divider: true,
+                buttons: [
+                    { id: 'xx', name: '测试', size: 'max' },
+                    { id: 'xx1', name: '测试2', type: 'primary', size: 'max' }
+                ]
+            }
+        }">
             <template #desktop>
                 destktop区域:
             </template>
         </Page>
         <br />
         桌面：Dialog模式
-        <Page class="no-xxx" style="width: 100%;height: 200px;border: 1px solid gray;" :type="'dialog'"
-            :loading="loadingRef" :desktop="{
-                header: { title: '测试', divider: true },
-                footer: {
-                    align: 'end',
-                    divider: true,
-                    buttons: [
-                        { id: 'xx', name: '测试', size: 'max' },
-                        { id: 'xx1', name: '测试2', type: 'primary', size: 'max' }
-                    ]
-                }
-            }">
+        <Page class="no-xxx" style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef" :desktop="{
+            type: 'dialog',
+            header: { title: '测试', divider: true },
+            footer: {
+                align: 'end',
+                divider: true,
+                buttons: [
+                    { id: 'xx', name: '测试', size: 'max' },
+                    { id: 'xx1', name: '测试2', type: 'primary', size: 'max' }
+                ]
+            }
+        }">
             <template #desktop>
                 destktop区域:
             </template>
@@ -64,7 +65,8 @@
     <br />
     <Env :mode="'mobile'">
         移动端：Dialog模式
-        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :type="'dialog'" :loading="loadingRef" :mobile="{
+        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :loading="loadingRef" :mobile="{
+            type: 'dialog',
             header: { title: '测试移动端头部' },
             footer: {
                 divider: true,
@@ -80,7 +82,8 @@
         </Page>
         <br />
         移动端：Page模式
-        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :type="'page'" :mobile="{
+        <Page style="width: 100%;height: 200px;border: 1px solid gray;" :mobile="{
+            type: 'page',
             header: { title: '测试移动端头部' },
             main: { scroll: { bar: 'y', barSize: 'mini' } },
             footer: {
